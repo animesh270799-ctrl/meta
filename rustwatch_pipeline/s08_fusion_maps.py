@@ -14,6 +14,8 @@ import shap
 from collections import Counter
 from statsmodels.stats.contingency_tables import mcnemar
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.base import clone
 from sklearn.model_selection import GroupKFold
 from sklearn.metrics import r2_score, mean_squared_error
 import matplotlib
@@ -76,6 +78,21 @@ def robust_features(picks, config):
 
 
 # ------------------------------------------------------------------ 8.4 SHAP
+def probability_function(clf, Xs, y):
+    """Class probabilities for Kernel SHAP. SVC has no predict_proba unless calibrated."""
+    try:
+        clf.predict_proba(Xs[:1])
+        return clf.predict_proba
+    except AttributeError:
+        pass
+    n_min = int(pd.Series(y).value_counts().min())
+    if n_min >= 2:
+        cal = CalibratedClassifierCV(clone(clf), cv=min(3, n_min)).fit(Xs, y)
+        return cal.predict_proba
+    classes = np.unique(y)                              # last resort: explain the predicted label
+    return lambda X: (clf.predict(X)[:, None] == classes[None]).astype(float)
+
+
 def shap_importance(model, X, y):
     pre = model[:-1]
     clf = model.named_steps["clf"]
@@ -83,10 +100,8 @@ def shap_importance(model, X, y):
     if clf.__class__.__name__ == "RandomForestClassifier":
         sv = np.array(shap.TreeExplainer(clf).shap_values(Xs))
     else:
-        if hasattr(clf, "probability") and not clf.probability:   # SVM needs class probabilities
-            clf.set_params(probability=True).fit(Xs, y)
         bg = shap.kmeans(Xs, min(10, len(Xs)))
-        sv = np.array(shap.KernelExplainer(clf.predict_proba, bg).shap_values(Xs, nsamples=100, silent=True))
+        sv = np.array(shap.KernelExplainer(probability_function(clf, Xs, y), bg).shap_values(Xs, nsamples=100, silent=True))
     n, p = X.shape
     if sv.ndim == 2:
         imp = np.abs(sv).mean(0)
@@ -143,7 +158,7 @@ def di_regression(df, cols, sensors, n_folds=None):
         rf.fit(train[feats].fillna(train[feats].median()), train.DI)
         preds[te] = rf.predict(df.iloc[te][feats].fillna(train[feats].median()))
     rmse = mean_squared_error(df.DI, preds) ** 0.5
-    return dict(R2=r2_score(df.DI, preds), RMSE=rmse, RE_pct=100 * rmse / df.DI.mean()), preds
+    return dict(R2=float(r2_score(df.DI, preds)), RMSE=float(rmse), RE_pct=float(100 * rmse / df.DI.mean())), preds
 
 
 # ------------------------------------------------------------------ driver
