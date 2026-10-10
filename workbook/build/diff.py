@@ -1,7 +1,7 @@
 import openpyxl, sys
 a=openpyxl.load_workbook(sys.argv[1],read_only=True); b=openpyxl.load_workbook(sys.argv[2],read_only=True)
-assert a.sheetnames==b.sheetnames, 'sheet list changed'
-for n in a.sheetnames:
+print('new sheets:', [s for s in b.sheetnames if s not in a.sheetnames], 'removed:', [s for s in a.sheetnames if s not in b.sheetnames])
+for n in [s for s in a.sheetnames if s in b.sheetnames]:
     ra=list(a[n].iter_rows(values_only=True)); rb=list(b[n].iter_rows(values_only=True))
     if n=='Bibliography':
         sa=set(r[1:] for r in ra if r and r[0]!=None and isinstance(r[0],int)); sb=set(r[1:] for r in rb if r and isinstance(r[0],int))
