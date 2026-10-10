@@ -95,6 +95,8 @@ class WB:
                 f = Font(name='Arial', size=10, bold=f.bold, italic=f.italic, color=f.color)
             if red:
                 f = Font(name=f.name, size=f.size, bold=f.bold, italic=f.italic, color=RED)
+            elif f.color is not None and f.color.rgb == RED:
+                f = Font(name=f.name, size=f.size, bold=f.bold, italic=f.italic)
             cell.font = f
         self.log.append((sheet, r))
         return r

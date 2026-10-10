@@ -8,16 +8,17 @@ ST = dict(
     doi='10.1016/j.fcr.2010.01.003',
     fert='Rice HKR-126: 160 N + 26 P + 50 K + 25 ZnSO4 kg/ha; wheat PBW-343 (100 kg seed/ha, 20 cm rows): 150 N + 26 P + 50 K kg/ha; glyphosate before no-till seeding; plots kept weed-free',
     tmap=('RCB, 3 reps (17 x 8.5 m), CCSHAU College of Agriculture farm, Kaul, rice 2005 / 2006, wheat 2005-06 / 2006-07. T1 puddled transplanted rice (2 dry harrowings + 2 plankings + 2 wet rotavator passes) '
-          '+ conventional drill-sown wheat (2 harrowings + 3 cultivator ploughings + planking) -> CT ; T2 REDUCED-TILLED (2 harrowings + 2 plankings, no puddling) transplanted rice + no-till wheat -> MT '
-          '(rule 127: the paper calls it reduced tillage - FLAG, rule 138 would give pZT) ; T3 no-till transplanted rice + no-till wheat -> ZT (row a) ; T4 puddled drum-seeded wet DSR + no-till wheat -> pZT ; '
+          '+ conventional drill-sown wheat (2 harrowings + 3 cultivator ploughings + planking) -> CT ; T2 REDUCED-TILLED (2 harrowings + 2 plankings, no puddling) transplanted rice + no-till wheat -> ZT (row c; '
+          'AUTHOR DECISION 2026-10-10 for this study, was MT in updated 143; rules 127 / 138 would give MT / pZT - FLAG) ; T3 no-till transplanted rice + no-till wheat -> ZT (row a) ; T4 puddled drum-seeded wet DSR + no-till wheat -> pZT ; '
           'T5 no-till drill-seeded dry DSR + no-till wheat -> ZT (row b). Residue not described (crops cut 15 cm above ground) -> no residue codes (rule 104).'),
     details=('TREATMENTS IN PAPER: T1 CT puddled TPR - CT wheat; T2 reduced-tilled unpuddled TPR - ZT wheat; T3 no-till TPR - ZT wheat; T4 CT puddled drum-seeded rice - ZT wheat; T5 no-till drill-seeded rice - ZT wheat '
-             '(RCB, 3 reps). || MAPPING: T1 -> CT [rice: puddled TPR; wheat: conventional; residue: not stated] | T2 -> MT [rice: reduced-tilled unpuddled TPR; wheat: no-till; rule 127 - FLAG] | '
+             '(RCB, 3 reps). || MAPPING: T1 -> CT [rice: puddled TPR; wheat: conventional; residue: not stated] | T2 -> ZT (row c) [rice: reduced-tilled unpuddled TPR; wheat: no-till; author decision 2026-10-10 - FLAG] | '
              'T3 -> ZT (row a) [rice: no-till TPR; wheat: no-till] | T4 -> pZT [rice: puddled wet drum-seeded DSR; wheat: no-till] | T5 -> ZT (row b) [rice: no-till dry DSR; wheat: no-till]'),
 )
 SITE = dict(country='India (Haryana)', site='CCS HAU College of Agriculture research farm, Kaul (Kaithal)', lat=29.850, lon=76.683, climate='ST', duration='0-3 Y', soil='LOAMY',
             **{'RAIN FALL': 750, 'ph (initial)': 7.8, 'soc (initial)': 4.1, 'Bdi': 1.58})
-TAGS = {'a': ('CT = T1, MT = T2, ZT = T3, pZT = T4', {'CT': 0, 'MT': 1, 'ZT': 2, 'pZT': 3}), 'b': ('CT = T1, ZT = T5 (CT repeated)', {'CT': 0, 'ZT': 4})}
+TAGS = {'a': ('CT = T1, ZT = T3, pZT = T4', {'CT': 0, 'ZT': 2, 'pZT': 3}), 'b': ('CT = T1, ZT = T5 (CT repeated)', {'CT': 0, 'ZT': 4}),
+        'c': ('CT = T1, ZT = T2 (reduced-tilled unpuddled TPR + ZT wheat; author decision 2026-10-10, was MT in updated 143; CT repeated)', {'CT': 0, 'ZT': 1})}
 M_Y = 'Central 100 m2 harvested; rice grain at 14 %, wheat at 12 % moisture; straw oven-dry; yield components from 1 m2 quadrats at 3 places.'
 
 
@@ -47,7 +48,7 @@ def rows(B):
            1: ('3263 / 3384 / 3264 / 3916 / 2878', '290 / 287 / 254 / 274 / 248', '3553 / 3671 / 3518 / 4190 / 3126')}
     for k, (ry, wy, lab) in enumerate(YR):
         yd = f'rice {ry}, wheat {wy}'
-        for tag in ('a', 'b'):
+        for tag in ('a', 'b', 'c'):
             r, w, s = T2[k]
             add('YIELD', {**cv(tag, 'RICE YIELD_', r), **cv(tag, 'WYIELD_', w), **cv(tag, 'SYS YIELD_', s)},
                 f'Table 2 grain yields, {lab} (rice 14 %, wheat 12 % moisture; system = rice + wheat grain).', tag, 'Mg/ha (= t/ha)', 'Table 2', f'Rice {ry}; wheat {wy}; system', yd)
@@ -63,7 +64,7 @@ def rows(B):
                 f'Table 5 IRRIGATION water-use efficiency (grain / irrigation water applied), {lab}. Irrigation applied T1-T5 (mm): rice {ir[0]}; wheat {ir[1]}; system {ir[2]}. '
                 f'Rainfall rice {"544" if k == 0 else "277"} mm, wheat {"53" if k == 0 else "64"} mm.', tag, 'kg/ha/mm (irrigation water basis)', 'Table 5', f'Rice {ry}; wheat {wy}; system', yd,
                 meth='Irrigation measured with water meter (PVC pipes); IWUE = grain yield / irrigation water applied (Bhushan et al. 2007).')
-            if tag == 'a':
+            if tag in ('a', 'c'):
                 t4 = T4[k]
                 add('DAYS TO MATURITY', {**cv(tag, 'DTM_R', t4['GDR']), **cv(tag, 'DTM_W', t4['GDW'])},
                     f'Table 4 GROWTH duration (seed to seed; rice incl. nursery for T1-T3 - FLAG), rice {ry} / wheat {wy}. T5 not printed in Table 4 (row b not available). '
@@ -73,13 +74,13 @@ def rows(B):
                     f'{"133 / 132 / 131 / 106" if k == 0 else "136 / 133 / 132 / 110"}, wheat {"74 / 77 / 80 / 80" if k == 0 else "73 / 74 / 75 / 75"} - no sheet.', tag,
                     'kg grain/ha/day', 'Table 4', f'Rice {ry}; wheat {wy}', yd)
     # wheat effective tillers (Table 3: both columns headed 2005-2006 with identical values)
-    for tag in ('a', 'b'):
+    for tag in ('a', 'b', 'c'):
         add('PANICLE-SPIKE DENSITY', cv(tag, 'PSD_W', [411, 432, 456, 469, 472]),
             'Table 3 wheat effective tillers per m2. Both printed columns are headed "2005-2006" and carry identical values (header misprint / duplicate - FLAG); entered once as year 1.', tag,
             'no. effective tillers/m2 (wheat)', 'Table 3', 'Wheat 2005-06 (column duplicated - FLAG)', 'wheat 2005-06')
     # net returns (Table 7, 2-yr average, US$/ha)
     NR = dict(R=[330, 341, 348, 324, 340], W=[356, 371, 373, 380, 380], S=[686, 712, 721, 704, 720])
-    for tag in ('a', 'b'):
+    for tag in ('a', 'b', 'c'):
         add('NET RETURN', {**cv(tag, 'NR_R', NR['R']), **cv(tag, 'NR_W', NR['W']), **cv(tag, 'NR_SYS', NR['S'])},
             'Table 7 average net returns (2-yr average). Gross return at MSP (rice US$ 172.2 / Mg, wheat US$ 214.2 / Mg) minus total cost (inputs, labour, machine hire).', tag,
             'US$/ha', 'Table 7', 'Rice, wheat and system (2-yr average)', '2005-2007 (2-yr average)', y=2,
@@ -91,7 +92,7 @@ TM = [
     ('T1 CT puddled TPR - CT wheat', 'Rice: 2 dry harrowings + 2 plankings + 2 wet rotavator passes, transplanted; wheat: 2 harrowings + 3 cultivator ploughings + 1 planking, drill seeded',
      'Puddled TPR', 'Conventional', 'Not stated', None, 'CT', 'Conventional in both phases.', 'High', 'INCLUDED'),
     ('T2 reduced-tilled unpuddled TPR - ZT wheat', 'Rice: 2 harrowings + 2 plankings (dry), no puddling, transplanted; wheat no-till drill', 'Reduced-till unpuddled TPR', 'No tillage', 'Not stated', None,
-     'MT - FLAG', 'Paper calls it reduced tillage (rule 127); rule 138 alternative = pZT.', 'Medium', 'INCLUDED'),
+     'ZT (row c) - FLAG', 'AUTHOR DECISION 2026-10-10 for this study (was MT under rule 127 in updated 143).', 'Medium', 'INCLUDED'),
     ('T3 no-till TPR - ZT wheat', 'Rice transplanted into no-till soil (glyphosate); wheat no-till drill', 'No-till TPR', 'No tillage', 'Not stated', None, 'ZT (row a)', 'No tillage in both phases.', 'High', 'INCLUDED'),
     ('T4 puddled drum-seeded rice - ZT wheat', 'Rice: dry harrowings + 2 wet rotavator passes, sprouted seed by drum seeder; wheat no-till drill', 'Puddled wet DSR', 'No tillage', 'Not stated', None, 'pZT',
      'Puddled rice + ZT wheat (rules 124 / 135).', 'High', 'INCLUDED'),
@@ -103,9 +104,9 @@ STUDY_INFO = dict(estab=2005, yeardata='Rice 2005, 2006; wheat 2005-06, 2006-07'
                   treatments='5 tillage x rice establishment treatments (T1-T5), RCB, 3 reps',
                   supp='None',
                   params=('Year-wise rice, wheat and system grain yield; rice panicles / m2, grains / panicle, TGW; rice and wheat HI; irrigation WUE (rice / wheat / system); growth duration and grain production efficiency '
-                          '(T1-T4 only); wheat effective tillers (year 1); net returns (2-yr average) - rows a (CT / MT / ZT / pZT) and b (CT / ZT)'),
+                          '(T1-T4 only); wheat effective tillers (year 1); net returns (2-yr average) - rows a (CT / ZT T3 / pZT), b (CT / ZT T5), c (CT / ZT T2)'),
                   notes=('NEW serial 329 (ext\\654.pdf). Kaul (Kaithal) on-station trial - not one of the Modipuram / Karnal trials already entered (checked studies 15, 158, 175, 195, 199). '
-                         'T2 coded MT under rule 127 (paper: "reduced tilled (unpuddled) transplanted rice") - FLAG (rule 138 alternative pZT). '
+                         'RECODED updated 144 (author 2026-10-10): T2 ("reduced tilled (unpuddled) transplanted rice" + ZT wheat) coded ZT row c for this study (was MT). '
                          'NOT ON A SHEET: irrigation water applied and per-day water use (Table 5, given in WUE notes), machine / human labour and biocide use (Table 6: machine labour rice T1-T5 14.2 / 12.0 / 7.2 / 14.8 / 7.6 h/ha, '
                          'wheat 11.5 / 6.5 / 6.5 / 6.5 / 6.5; human labour rice 64 / 65 / 58 / 67 / 56, wheat 15 / 14 / 14 / 14 / 14 day/ha; biocide rice 14.5 x 4 / 22.5, wheat 2.5 kg/ha), biomass production efficiency, field duration. '
                          'Soil 0-15 cm: BD 1.58, pH 7.8, EC 0.24, OC 0.41 %, KMnO4-N 141, Olsen P 25, NH4OAc-K 301 kg/ha. Long-term rainfall 750 mm.'))

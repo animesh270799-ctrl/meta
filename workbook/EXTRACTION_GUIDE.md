@@ -2,7 +2,7 @@
 
 This is a working summary of the workbook's own README, RULES (141 rules), Codes and FORMULAS sheets. If this guide and the workbook disagree, the workbook wins.
 
-State: latest version **META_ANALYSIS_MASTER updated 143.xlsx** (ext 651-655 + new sheets AGGREGATE STABILITY, AGGREGATE RATIO, AGG-OC CONTRIBUTION). **Next serial = 330.** Bibliography has 465 references. New batches: write one module per study (see sNNN.py / cNN.py) and run `batch.py`. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch or post-step, e.g. build143.py adds new sheets after batch.py).
+State: latest version **META_ANALYSIS_MASTER updated 144.xlsx** (ext 666-670 + author recodes of 326 / 328 / 329, rule 142). **Next serial = 331.** Bibliography has 468 references. Updated 144 was rebuilt from updated 142 with the recoded modules (batch.py s326-s329, build143.py, batch.py s330 c290 c1, build144.py). New batches: write one module per study (see sNNN.py / cNN.py) and run `batch.py`. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch or post-step, e.g. build143.py adds new sheets after batch.py).
 
 ## Workbook map (199 sheets)
 - **Rulebook:** README (history log, one line per batch), RULES (numbered rules with status), Codes, FORMULAS.
