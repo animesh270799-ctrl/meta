@@ -2,7 +2,7 @@
 
 This is a working summary of the workbook's own README, RULES (141 rules), Codes and FORMULAS sheets. If this guide and the workbook disagree, the workbook wins.
 
-State at hand-over: README ends at **updated 139** (ext 631-640). **Next serial = 319.** Bibliography has 452 references.
+State: latest version **META_ANALYSIS_MASTER updated 140.xlsx** (ext 641-645). **Next serial = 323.** Bibliography has 456 references. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch).
 
 ## Workbook map (192 sheets)
 - **Rulebook:** README (history log, one line per batch), RULES (numbered rules with status), Codes, FORMULAS.
