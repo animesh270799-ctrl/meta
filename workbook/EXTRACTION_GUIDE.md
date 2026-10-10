@@ -2,9 +2,9 @@
 
 This is a working summary of the workbook's own README, RULES (141 rules), Codes and FORMULAS sheets. If this guide and the workbook disagree, the workbook wins.
 
-State: latest version **META_ANALYSIS_MASTER updated 142.xlsx** (ext 646-650). **Next serial = 326.** Bibliography has 461 references. New batches: write one module per study (see sNNN.py / cNN.py) and run `batch.py`. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch).
+State: latest version **META_ANALYSIS_MASTER updated 143.xlsx** (ext 651-655 + new sheets AGGREGATE STABILITY, AGGREGATE RATIO, AGG-OC CONTRIBUTION). **Next serial = 330.** Bibliography has 465 references. New batches: write one module per study (see sNNN.py / cNN.py) and run `batch.py`. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch or post-step, e.g. build143.py adds new sheets after batch.py).
 
-## Workbook map (192 sheets)
+## Workbook map (199 sheets)
 - **Rulebook:** README (history log, one line per batch), RULES (numbered rules with status), Codes, FORMULAS.
 - **Study-level sheets:** Study_Info (44 cols, one row per study x site; fill it FIRST), Treatment_Mapping (one row per paper treatment, giving its code, rationale, confidence and status), LAT_LONG, Bibliography (APA; col B = serial), EXCLUDED_rows (sheet, serial, authors, year, reason, full row).
 - **Auto-generated index sheets, rebuilt at every build:** PARAMETERS_BY_STUDY and STUDIES_BY_PARAMETER.
