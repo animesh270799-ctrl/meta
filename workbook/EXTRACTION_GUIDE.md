@@ -2,7 +2,7 @@
 
 This is a working summary of the workbook's own README, RULES (141 rules), Codes and FORMULAS sheets. If this guide and the workbook disagree, the workbook wins.
 
-State: latest version **META_ANALYSIS_MASTER updated 141.xlsx** (ext 641-645 + author requests; new sheets stock-TN, stock-POXC, MACHINE FIELD CAPACITY). **Next serial = 323.** Bibliography has 456 references. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch).
+State: latest version **META_ANALYSIS_MASTER updated 142.xlsx** (ext 646-650). **Next serial = 326.** Bibliography has 461 references. New batches: write one module per study (see sNNN.py / cNN.py) and run `batch.py`. Build scripts for each batch are in `workbook/build/` (wblib.py = row-append helper; sNNN.py = one study; buildNNN.py = batch).
 
 ## Workbook map (192 sheets)
 - **Rulebook:** README (history log, one line per batch), RULES (numbered rules with status), Codes, FORMULAS.
