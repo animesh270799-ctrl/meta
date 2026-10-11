@@ -44,6 +44,8 @@ class WB:
         """Last data row that is not red (style source)."""
         ws = self.wb[sheet]
         r = self.last_row(sheet)
+        if r == 1 and ws.cell(2, 2).has_style:
+            return 2  # empty new sheet with a pre-styled row 2
         rr = r
         while rr > 1:
             f = ws.cell(rr, 1).font

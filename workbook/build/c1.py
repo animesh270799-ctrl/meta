@@ -77,6 +77,41 @@ def rows(B):
     for sc, lab, x in (('>0.25 mm', 'macro-aggregates (>0.25 mm)', (17.7, 20.9, 21.4)), ('<0.25 mm', 'micro-aggregates (<0.25 mm)', (16.7, 18.4, 20.1))):
         add('AGG-ALKP', cv('ALP_', x), f'Table 6 alkaline phosphatase in {lab}. ' + ENZ, 'ug p-nitrophenol/g aggregate/h', 'Table 6',
             'p-nitrophenyl phosphate assay on field-moist aggregates (Tabatabai).', extra={'Aggregate size class': sc})
+    # ---- updated 145 (author 2026-10-11): within-aggregate values converted to BULK SOIL = mass-weighted mean of the macro- (>0.25 mm) and
+    # micro-aggregate (0.25-0.053 mm) values, weights = Table 3 water-stable macro / micro-aggregate proportions (CT 37.1 / 30.7, pZT 43.8 / 29.9, pCA 50.7 / 29.0 %)
+    PM = (37.1, 43.8, 50.7); Pm = (30.7, 29.9, 29.0)
+    BULK = ('BULK-SOIL ESTIMATE (author request 2026-10-11) DERIVED = (macro x Pmacro + micro x Pmicro) / (Pmacro + Pmicro), Pmacro / Pmicro = Table 3 water-stable macro- / micro-aggregate % '
+            '(assumes the unaggregated <0.053 mm fraction has the weighted-mean concentration - FLAG). ')
+
+    def bulk(pre, mac, mic):
+        return {f'{pre}{c}': f'=ROUND(({a}*{pm}+{b}*{pn})/({pm}+{pn}),3)' for c, a, b, pm, pn in zip(('CT', 'pZT', 'pCA'), mac, mic, PM, Pm)}
+
+    def agg(mac, mic):
+        return f'Macro-aggregate values CT / pZT / pCA {mac[0]} / {mac[1]} / {mac[2]}; micro-aggregate {mic[0]} / {mic[1]} / {mic[2]}.'
+
+    UPB = 'ADDED updated 145. '
+    F = {'VLC(Cfrac1)': ('VLC_', (0.43, 0.44, 0.53), (0.35, 0.36, 0.44), 'g/kg (very labile C, 12 N H2SO4; bulk DERIVED)', 'Table 5 Fract. 1 (very labile C)'),
+         'LC(Cfrac2)': ('LC_', (0.59, 0.70, 0.72), (0.44, 0.49, 0.55), 'g/kg (labile C, 18-12 N; bulk DERIVED)', 'Table 5 Fract. 2 (labile C)'),
+         'LLC(Cfrac3)': ('LLC_', (0.92, 0.98, 1.21), (0.73, 0.79, 0.96), 'g/kg (less labile C, 24-18 N; bulk DERIVED)', 'Table 5 Fract. 3 (less labile C)'),
+         'NLC(Cfrac4)': ('NLC_', (2.32, 2.55, 3.01), (2.18, 2.38, 2.78), 'g/kg (non-labile C, TOC - 24 N; bulk DERIVED)', 'Table 5 Fract. 4 (recalcitrant C)'),
+         'TOC': ('TOC_', (4.26, 4.67, 5.47), (3.70, 4.02, 4.93), 'g/kg (TOC, wet digestion 150 C; bulk DERIVED)', 'Table 5 aggregate TOC')}
+    for sheet, (pre, mac, mic, unit, txt) in F.items():
+        add(sheet, bulk(pre, mac, mic), UPB + BULK + txt + '. ' + agg(mac, mic), unit, 'Table 5 + Table 3 (DERIVED)', mc)
+    for sheet, pre, lab, mac, mic in (('ACTIVE C POOL', 'ACT_', 'ACTIVE C pool = Fract. 1 + Fract. 2 (very labile + labile, Chan et al.; Fig. 2)', (1.02, 1.14, 1.25), (0.79, 0.85, 0.99)),
+                                      ('PASSIVE C POOL', 'PAS_', 'NON-LABILE (passive) C pool = Fract. 3 + Fract. 4 (less labile + recalcitrant; Fig. 2)', (3.24, 3.53, 4.22), (2.91, 3.17, 3.74))):
+        add(sheet, bulk(pre, mac, mic), UPB + BULK + lab + '; aggregate values = sums of Table 5 fractions (they reproduce the Fig. 2 bars). ' + agg(mac, mic),
+            'g/kg (bulk DERIVED)', 'Table 5 / Fig. 2 + Table 3 (DERIVED)', mc)
+    ENZ2 = {'DHA': ('DHA_', (33.0, 46.3, 50.8), (25.7, 26.3, 30.2), 'ug TPF/g soil/h (bulk DERIVED)', 'Table 6 dehydrogenase'),
+            'CELL': ('CELL_', (30.6, 33.0, 47.8), (20.7, 24.5, 32.8), 'ug glucose/g soil/h (bulk DERIVED)', 'Table 6 cellulase'),
+            'B-GLU': ('BGL_', (16.7, 21.1, 24.2), (12.8, 15.5, 19.6), 'ug p-nitrophenol/g soil/h (bulk DERIVED)', 'Table 6 beta-glucosidase'),
+            'ALKP': ('ALP_', (17.7, 20.9, 21.4), (16.7, 18.4, 20.1), 'ug p-nitrophenol/g soil/h (bulk DERIVED; aggregate values also on AGG-ALKP)', 'Table 6 alkaline phosphatase')}
+    me = 'Enzyme assays on field-moist macro- / micro-aggregates: DHA (TTC reduction), Alk-P and beta-glucosidase (p-nitrophenol release), cellulase (CMC, DNS reducing sugars, 30 C 24 h).'
+    for sheet, (pre, mac, mic, unit, txt) in ENZ2.items():
+        add(sheet, bulk(pre, mac, mic), UPB + BULK + txt + '. ' + agg(mac, mic), unit, 'Table 6 + Table 3 (DERIVED)', me)
+    mg = 'Glomalin-related soil protein: EEG 20 mM citrate pH 7.0, 30 min autoclave; TG 50 mM citrate pH 8.0, 5 x 60 min cycles; Bradford protein.'
+    for lab, mac, mic in (('EASILY EXTRACTABLE glomalin (EEG)', (7.11, 7.99, 9.94), (10.12, 12.13, 14.53)), ('TOTAL glomalin (TG)', (6.44, 7.47, 8.79), (5.82, 7.00, 8.53))):
+        add('GLOMALIN', bulk('GLO_', mac, mic), UPB + BULK + f'Figure 5 {lab}, DIGITISED aggregate values (vector figure at 300 dpi, calibrated axes; text percentages reproduced within 1 %). ' + agg(mac, mic),
+            f'g/kg ({lab}; bulk DERIVED)', 'Figure 5 (digitised) + Table 3 (DERIVED)', mg)
     add('YIELD', {'WYIELD_CT': 5.73, 'WYIELD_pZT': 5.35, 'WYIELD_pCA': 6.26, 'W STRAW_CT': 6.82, 'W STRAW_pZT': 6.71, 'W STRAW_pCA': 7.05},
         'Figure 6 wheat grain (10 % moisture) and straw yield, DIGITISED (vector figure rendered at 300 dpi, calibrated axes). Season not stated (presumably 2016-17, before the April 2017 sampling - FLAG). '
         'Text: CT ~9 % and ZTWR0 ~17 % lower than ZTWR100 (digitised 8 / 15 %). Rice main plots grain 5.15 / 5.64 / 5.95 / 6.37, straw 6.69 / 6.80 / 6.91 / 7.04 t/ha.',
@@ -99,9 +134,8 @@ STUDY_INFO = dict(estab=2011, yeardata='Soil April 2017 (after 6th wheat); wheat
                   residue='Wheat: rice residue removed / 100 % retained (Happy Seeder); rice: 0 / 25 % wheat stubble', irrigation='Not detailed', treatments='4 rice main plots x 3 wheat sub plots (split plot, 3 reps)',
                   supp='Supplementary Tables 1-2 (PCA loadings) - not downloaded (permission needed); no treatment means',
                   params=('Wheat main effects CT / pZT / pCA (pooled over rice main plots): BD, IR, Ks, FC and PWP (w/w derived), AWC (v/v and w/w), MACRO, MICRO, WSA, MWD, GMD, aggregate ratio, '
-                          'macro / micro aggregate TOC, aggregate alkaline phosphatase, wheat grain and straw yield (Fig. 6 digitised), SQI (Fig. 8 digitised)'),
+                          'macro / micro aggregate TOC, aggregate alkaline phosphatase, wheat grain and straw yield (Fig. 6 digitised), SQI (Fig. 8 digitised); [updated 145, author request] BULK-SOIL estimates '
+                          '(aggregate-mass weighted) of Chan fractions 1-4, TOC, active and non-labile C pools (new sheets ACTIVE C POOL / PASSIVE C POOL), DHA, cellulase, beta-glucosidase, Alk-P, EEG and TG glomalin (Fig. 5 digitised)'),
                   notes=('COMPANION 5 of study 1 (ext\\670.pdf; April 2017 sampling - companions 1-4 hold 2015-16 / 2016 data). '
-                         'NOT ON A SHEET: Chan C fractions within aggregates (in macro c / micro c notes), aggregate DHA / cellulase / beta-glucosidase (AGG-ALKP notes), glomalin EEG / TG in aggregates '
-                         '(Fig. 5, read by eye - approximate: EEG >0.25 / <0.25 mm: CT 7.0 / 10.1, pZT 8.0 / 12.1, pCA 9.9 / 14.4; TG 6.4 / 5.8, 7.4 / 6.9, 8.7 / 8.5 g/kg), active / non-labile C in aggregates (Fig. 2; = F1 + F2 / F3 + F4 of Table 5), '
-                         'aggregate-class change (Fig. 1), PCA (Figs 7, 9-10, Table 7). Rice main-plot effects in row notes.'))
+                         'UPDATE updated 145 (author 2026-10-11): within-aggregate Chan fractions, TOC, enzymes and glomalin (Fig. 5 digitised) converted to bulk-soil estimates (mass-weighted by Table 3 macro / micro proportions) and entered; active / non-labile C (Fig. 2 = F1 + F2 / F3 + F4) on the new ACTIVE / PASSIVE C POOL sheets. NOT ON A SHEET: aggregate-class change (Fig. 1), PCA (Figs 7, 9-10, Table 7). Rice main-plot effects in row notes.'))
 SITES = [('PAU research farm, Ludhiana', "30 56' N", "75 52' E", 30.933, 75.867, 'Paper', 'TEMP', 'Trial of study 1')]
