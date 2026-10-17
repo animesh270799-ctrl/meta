@@ -1,0 +1,212 @@
+=== TEST DATA SET ===
+192 rows = 48 plots x 4 dates, 21 features
+rows per class: {0: 50, 1: 24, 2: 27, 3: 40, 4: 33, 5: 18}
+plot_id date  DI  severity_class  MS_NDRE  MS_CIre  MS_NDVI  MS_OSAVI  TIR_CTD  RGB_contrast
+    P01   D1 0.0               0    0.383    1.253    0.794     0.691   -2.585         0.284
+    P01   D2 0.0               0    0.388    1.264    0.792     0.691   -2.282         0.309
+    P01   D3 0.0               0    0.397    1.310    0.855     0.747   -2.211         0.451
+    P01   D4 0.0               0    0.400    1.321    0.857     0.752   -2.044         0.550
+    P02   D1 0.0               0    0.408    1.393    0.792     0.694   -1.268         0.358
+    P02   D2 0.0               0    0.419    1.440    0.799     0.701   -2.114         0.428
+    P02   D3 0.0               0    0.416    1.429    0.853     0.742   -1.681         0.229
+    P02   D4 0.0               0    0.410    1.392    0.876     0.775   -1.589         0.271
+
+class means of key features:
+                MS_NDRE  MS_NDVI   HS_REP  RGB_contrast  TIR_CTD  MS_B475
+severity_class                                                           
+0                 0.417    0.821  727.071         0.423   -1.878    0.035
+1                 0.371    0.792  725.357         0.337   -1.720    0.034
+2                 0.300    0.780  723.263         0.383   -0.854    0.035
+3                 0.239    0.758  721.210         0.676   -0.087    0.036
+4                 0.191    0.705  719.124         1.248    0.841    0.035
+5                 0.178    0.629  718.187         2.214    1.342    0.036
+
+=== OUTER FOLD 1 ===
+TEST plots (locked away): ['P06', 'P09', 'P11', 'P13', 'P17', 'P20', 'P26', 'P35', 'P36', 'P40', 'P41', 'P42']
+TRAIN plots: ['P01', 'P02', 'P03', 'P04', 'P05', 'P07', 'P08', 'P10', 'P12', 'P14', 'P15', 'P16', 'P18', 'P19', 'P21', 'P22', 'P23', 'P24', 'P25', 'P27', 'P28', 'P29', 'P30', 'P31', 'P32', 'P33', 'P34', 'P37', 'P38', 'P39', 'P43', 'P44', 'P45', 'P46', 'P47', 'P48']
+train rows 144, test rows 48; test classes {0: 14, 1: 6, 2: 7, 3: 8, 4: 8, 5: 5}
+
+=== PHASE 1 (training plots only) ===
+
+-- MS: DSF = ['MS_CIre', 'MS_NDRE', 'MS_PSRI', 'MS_NDVI', 'MS_OSAVI']
+          n_dates_sig  JM_max  relief  rf_perm  boruta_hits  votes  stability    DSF
+MS_NDRE             4   2.000   0.293    0.074        1.000      3        1.0   True
+MS_CIre             4   2.000   0.298    0.078        1.000      3        1.0   True
+MS_NDVI             4   1.701   0.072    0.000        1.000      1        0.0  False
+MS_OSAVI            4   1.702   0.070    0.013        1.000      1        0.0  False
+MS_PSRI             3   1.789   0.098    0.021        1.000      3        0.0  False
+MS_B475             0   0.073   0.014   -0.007        0.017      0        0.0  False
+
+-- HS: DSF = ['HS_REP', 'HS_CR670', 'HS_NDWI', 'HS_R550', 'HS_PRI']
+          n_dates_sig  JM_max  relief  rf_perm  boruta_hits  votes  stability    DSF
+HS_REP              4   2.000   0.261    0.238        1.000      3       0.96   True
+HS_CR670            4   2.000   0.228    0.177        1.000      3       0.04  False
+HS_PRI              1   0.397   0.017    0.000        0.983      1       0.00  False
+HS_NDWI             2   0.973   0.042    0.011        1.000      1       0.00  False
+HS_R550             2   1.015   0.045   -0.024        1.000      2       0.00  False
+HS_R1650            1   0.078   0.010    0.013        0.017      1       0.00  False
+
+-- RGB: DSF = ['RGB_contrast', 'RGB_homog', 'RGB_ExG', 'RGB_entropy', 'RGB_VARI']
+              n_dates_sig  JM_max  relief  rf_perm  boruta_hits  votes  stability    DSF
+RGB_contrast            3   1.778   0.094    0.152        1.000      3       1.00   True
+RGB_homog               3   1.664   0.082    0.062        1.000      3       0.68   True
+RGB_ExG                 2   1.663   0.077    0.062        1.000      3       0.32  False
+RGB_VARI                2   0.418   0.012   -0.031        0.017      0       0.00  False
+RGB_entropy             2   1.679   0.074    0.009        1.000      1       0.00  False
+
+-- TIR: DSF = ['TIR_CTD', 'TIR_CT', 'TIR_NRCT', 'TIR_Tstd']
+          n_dates_sig  JM_max  relief  rf_perm  boruta_hits  votes  stability    DSF
+TIR_CTD             4   2.000   0.222    0.144          1.0      3       1.00   True
+TIR_CT              4   1.526   0.172    0.171          1.0      2       0.18  False
+TIR_Tstd            4   1.436   0.066   -0.008          1.0      1       0.00  False
+TIR_NRCT            4   1.997   0.191   -0.023          1.0      2       0.82   True
+
+=== PHASE 2 (per sensor, training plots only; inner CV = 4 folds grouped by plot) ===
+
+-- MS: VIF before = {'MS_CIre': 125.3, 'MS_NDRE': 137.0, 'MS_PSRI': 3.9, 'MS_NDVI': 299.1, 'MS_OSAVI': 294.3}
+   VIF removed ['MS_NDVI', 'MS_NDRE'] -> kept ['MS_CIre', 'MS_PSRI', 'MS_OSAVI']
+   SFFS (RF) best subset for each size k, inner-CV macro-F1:
+ k  macro_F1                 features
+ 1     0.447                  MS_CIre
+ 2     0.583          MS_CIre;MS_PSRI
+ 3     0.606 MS_CIre;MS_PSRI;MS_OSAVI
+   one-SE rule -> OFC = ['MS_CIre', 'MS_PSRI']
+   RF  OFC=['MS_CIre', 'MS_PSRI']  params={'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 3}  TEST OA=0.67 macro-F1=0.60
+   SVM OFC=['MS_CIre', 'MS_PSRI']  params={'clf__C': np.float64(0.5), 'clf__gamma': np.float64(0.125)}  TEST OA=0.69 macro-F1=0.61
+   KNN OFC=['MS_CIre', 'MS_OSAVI']  params={'clf__n_neighbors': 15, 'clf__weights': 'uniform'}  TEST OA=0.71 macro-F1=0.61
+
+-- HS: VIF before = {'HS_REP': 7.7, 'HS_CR670': 7.7, 'HS_NDWI': 1.5, 'HS_R550': 1.4, 'HS_PRI': 1.2}
+   VIF removed [] -> kept ['HS_REP', 'HS_CR670', 'HS_NDWI', 'HS_R550', 'HS_PRI']
+   SFFS (RF) best subset for each size k, inner-CV macro-F1:
+ k  macro_F1                               features
+ 1     0.550                                 HS_REP
+ 2     0.642                        HS_REP;HS_CR670
+ 3     0.634                HS_REP;HS_CR670;HS_R550
+ 4     0.617        HS_REP;HS_CR670;HS_NDWI;HS_R550
+ 5     0.569 HS_REP;HS_CR670;HS_NDWI;HS_R550;HS_PRI
+   one-SE rule -> OFC = ['HS_REP', 'HS_CR670']
+   RF  OFC=['HS_REP', 'HS_CR670']  params={'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 1}  TEST OA=0.65 macro-F1=0.60
+   SVM OFC=['HS_REP', 'HS_CR670', 'HS_NDWI', 'HS_R550']  params={'clf__C': np.float64(512.0), 'clf__gamma': np.float64(0.0078125)}  TEST OA=0.67 macro-F1=0.60
+   KNN OFC=['HS_REP']  params={'clf__n_neighbors': 5, 'clf__weights': 'uniform'}  TEST OA=0.60 macro-F1=0.53
+
+-- RGB: VIF before = {'RGB_contrast': 33.6, 'RGB_homog': 25.4, 'RGB_ExG': 4.3, 'RGB_entropy': 2.6, 'RGB_VARI': 1.2}
+   VIF removed ['RGB_homog'] -> kept ['RGB_contrast', 'RGB_ExG', 'RGB_entropy', 'RGB_VARI']
+   SFFS (RF) best subset for each size k, inner-CV macro-F1:
+ k  macro_F1                                  features
+ 1     0.456                              RGB_contrast
+ 2     0.458                      RGB_contrast;RGB_ExG
+ 3     0.443          RGB_contrast;RGB_ExG;RGB_entropy
+ 4     0.392 RGB_contrast;RGB_ExG;RGB_entropy;RGB_VARI
+   one-SE rule -> OFC = ['RGB_contrast']
+   RF  OFC=['RGB_contrast']  params={'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 1}  TEST OA=0.42 macro-F1=0.48
+   SVM OFC=['RGB_contrast']  params={'clf__C': np.float64(512.0), 'clf__gamma': np.float64(2.0)}  TEST OA=0.52 macro-F1=0.53
+   KNN OFC=['RGB_contrast', 'RGB_ExG']  params={'clf__n_neighbors': 3, 'clf__weights': 'uniform'}  TEST OA=0.50 macro-F1=0.48
+
+-- TIR: VIF before = {'TIR_CTD': 27.7, 'TIR_CT': 3.9, 'TIR_NRCT': 18.3, 'TIR_Tstd': 1.8}
+   VIF removed ['TIR_NRCT'] -> kept ['TIR_CTD', 'TIR_CT', 'TIR_Tstd']
+   SFFS (RF) best subset for each size k, inner-CV macro-F1:
+ k  macro_F1                features
+ 1     0.428                  TIR_CT
+ 2     0.549         TIR_CT;TIR_Tstd
+ 3     0.558 TIR_CTD;TIR_CT;TIR_Tstd
+   one-SE rule -> OFC = ['TIR_CT', 'TIR_Tstd']
+   RF  OFC=['TIR_CT', 'TIR_Tstd']  params={'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 3}  TEST OA=0.33 macro-F1=0.35
+   SVM OFC=['TIR_CTD', 'TIR_CT']  params={'clf__C': np.float64(0.125), 'clf__gamma': np.float64(2.0)}  TEST OA=0.65 macro-F1=0.66
+   KNN OFC=['TIR_CTD', 'TIR_CT']  params={'clf__n_neighbors': 9, 'clf__weights': 'uniform'}  TEST OA=0.67 macro-F1=0.64
+
+=== PHASE 3 (fusion of all four sensors' DSFs) ===
+pooled DSFs (19): ['MS_CIre', 'MS_NDRE', 'MS_PSRI', 'MS_NDVI', 'MS_OSAVI', 'HS_REP', 'HS_CR670', 'HS_NDWI', 'HS_R550', 'HS_PRI', 'RGB_contrast', 'RGB_homog', 'RGB_ExG', 'RGB_entropy', 'RGB_VARI', 'TIR_CTD', 'TIR_CT', 'TIR_NRCT', 'TIR_Tstd']
+VIF removed ['MS_NDVI', 'TIR_NRCT', 'MS_NDRE', 'HS_CR670', 'RGB_homog', 'MS_CIre'] -> kept ['MS_PSRI', 'MS_OSAVI', 'HS_REP', 'HS_NDWI', 'HS_R550', 'HS_PRI', 'RGB_contrast', 'RGB_ExG', 'RGB_entropy', 'RGB_VARI', 'TIR_CTD', 'TIR_CT', 'TIR_Tstd']
+SFFS (RF) on the fused pool:
+ k  macro_F1                                                features
+ 1     0.550                                                  HS_REP
+ 2     0.673                                           HS_REP;TIR_CT
+ 3     0.700                                  HS_REP;RGB_VARI;TIR_CT
+ 4     0.712                          HS_REP;RGB_VARI;TIR_CTD;TIR_CT
+ 5     0.734             HS_REP;RGB_contrast;RGB_VARI;TIR_CTD;TIR_CT
+ 6     0.732 HS_REP;RGB_contrast;RGB_entropy;RGB_VARI;TIR_CTD;TIR_CT
+one-SE rule -> fused OFC = ['HS_REP', 'RGB_VARI', 'TIR_CTD', 'TIR_CT']
+RF  OFC=['HS_REP', 'RGB_VARI', 'TIR_CTD', 'TIR_CT']  TEST OA=0.75 macro-F1=0.70
+confusion matrix, fused RF on the test rows (rows = true class 0-5, cols = predicted):
+    0  1  2  3  4  5
+0  13  1  0  0  0  0
+1   1  3  2  0  0  0
+2   0  0  7  0  0  0
+3   0  0  1  6  1  0
+4   0  0  0  2  5  1
+5   0  0  0  0  3  2
+plot date   DI  true  pred
+ P06   D1  0.0     0     0
+ P06   D2  0.0     0     0
+ P06   D3  0.0     0     0
+ P06   D4  0.0     0     0
+ P09   D1  0.0     0     0
+ P09   D2  0.0     0     0
+ P09   D3  0.0     0     0
+ P09   D4  0.0     0     0
+ P11   D1  0.0     0     0
+ P11   D2  0.0     0     0
+ P11   D3  0.0     0     0
+ P11   D4  0.0     0     0
+ P13   D1  0.0     0     1
+ P13   D2  0.6     1     1
+ P13   D3  2.4     1     2
+ P13   D4  4.5     1     2
+ P17   D1  5.5     2     2
+ P17   D2 14.8     3     3
+ P17   D3 28.8     4     3
+ P17   D4 45.1     4     5
+ P20   D1  7.5     2     2
+ P20   D2 19.6     3     4
+ P20   D3 37.6     4     4
+ P20   D4 58.7     5     5
+ P26   D1 10.9     3     3
+ P26   D2 27.5     4     3
+ P26   D3 52.3     5     4
+ P26   D4 81.2     5     5
+ P35   D1  1.8     1     0
+ P35   D2  6.1     2     2
+ P35   D3 12.7     3     2
+ P35   D4 20.3     3     3
+ P36   D1  0.0     0     0
+ P36   D2  1.4     1     1
+ P36   D3  3.9     1     1
+ P36   D4  6.8     2     2
+ P40   D1  7.2     2     2
+ P40   D2 18.8     3     3
+ P40   D3 36.1     4     4
+ P40   D4 56.4     5     4
+ P41   D1  6.2     2     2
+ P41   D2 16.4     3     3
+ P41   D3 31.7     4     4
+ P41   D4 49.6     4     4
+ P42   D1  7.9     2     2
+ P42   D2 20.3     3     3
+ P42   D3 39.1     4     4
+ P42   D4 60.9     5     4
+SVM OFC=['MS_OSAVI', 'HS_REP', 'RGB_contrast', 'TIR_CT']  TEST OA=0.65 macro-F1=0.65
+KNN OFC=['MS_PSRI', 'HS_REP', 'RGB_contrast', 'RGB_entropy', 'TIR_CTD', 'TIR_CT']  TEST OA=0.67 macro-F1=0.65
+
+=== FULL NESTED CV: 4 outer folds, every plot tested once ===
+config clf  OA_mean  macro_F1_mean  kappa_mean
+  ALL4  RF    0.740          0.723       0.681
+  ALL4 SVM    0.719          0.705       0.656
+  ALL4 KNN    0.714          0.687       0.646
+MS+TIR  RF    0.698          0.676       0.631
+MS+TIR SVM    0.698          0.672       0.630
+MS+TIR KNN    0.682          0.648       0.609
+    MS SVM    0.682          0.644       0.611
+   TIR KNN    0.656          0.644       0.575
+    HS KNN    0.672          0.628       0.597
+   TIR  RF    0.625          0.624       0.544
+   TIR SVM    0.615          0.619       0.535
+    HS  RF    0.641          0.606       0.560
+    HS SVM    0.641          0.601       0.561
+    MS  RF    0.625          0.589       0.541
+    MS KNN    0.630          0.581       0.542
+   RGB KNN    0.536          0.520       0.424
+   RGB SVM    0.495          0.510       0.385
+   RGB  RF    0.443          0.462       0.318
+
+McNemar: best single = MS/SVM, fused = ALL4/RF
+fused right & single wrong = 36, single right & fused wrong = 25, chi2 = 1.64, p = 0.200
