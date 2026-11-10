@@ -1,5 +1,6 @@
 """Assemble the Objective 1 tier document (o1_docx.js) from o1_body.js, the thesis helpers and the u10 index tables."""
-import re, json, os
+import re, json, os, sys
+FULL = len(sys.argv) > 1 and sys.argv[1] == "full"
 S = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 OD = S + 'obj1/'
 T = open(S + 'thesis/t_docx.js').read()
@@ -8,11 +9,12 @@ DUM = json.load(open(OD + 'o1_dummy.json'))
 
 head = T[:T.index('// ======================= TITLE')]
 head = re.sub(r"const B = '.*?';", "const B = '%s';" % OD, head)
-head = re.sub(r"const OUT = '.*?';", "const OUT = '%s';" % (S + 'outputs/Objective1_tier_methodology.docx'), head)
+head = re.sub(r"const OUT = '.*?';", "const OUT = '%s';" % (S + ('outputs/White_rust_final_methodology.docx' if FULL else 'outputs/Objective1_tier_methodology.docx')), head)
 head = re.sub(r"const FORDER = \[.*?\];", "const FORDER = __FORDER__;", head)
 head = re.sub(r"const TORDER = \[.*?\];", "const TORDER = __TORDER__;", head)
 head += r"""
 const DUM = require(B + 'o1_dummy.json');
+const DUM2 = require(B + 'o23_dummy.json');
 const FIG = (k, file, cap, w) => ({ t: 'f', k, file, cap, w });
 const TAB = (k, rows, widths, cap, size) => ({ t: 't', k, rows, widths, cap, size });
 const VIS = v => v.t === 'f' ? fig2(v.k, v.file, v.cap, v.w) : tab2(v.k, v.rows, v.widths, v.cap, v.size);
@@ -107,6 +109,27 @@ for k, v in fills.items():
     assert body.count(k) == 1, k; body = body.replace(k, v)
 assert not re.search(r'__[A-Z_]+__', body)
 
+if FULL:
+    def rep1(a, b):
+        global body
+        assert body.count(a) == 1, a[:70]; body = body.replace(a, b)
+    rep1("text: 'Objective 1: Characterise white rust of mustard through multimodal UAV sensing'", "text: 'AI-based multimodal UAV sensing of white rust in mustard'")
+    rep1("text: 'Tier-wise, sensor-wise methodology (hyperspectral, multispectral, RGB, thermal)'", "text: 'Final methodology: Objective 1 (sensor-wise tiers), Objective 2 (six-grade classification and PDI regression by fusion), Objective 3 (pre-symptomatic prediction)'")
+    rep1("**How this document is organised.** ", "**How this document is organised.** Chapter 1 gives the overall workflow; Chapters 2–8 describe Objective 1, Chapters 9 and 10 Objectives 2 and 3, Chapter 11 summarises all tiers, and Chapters 12 and 13 contain interview questions. ")
+    rep1("K.push(H1('1. Objective 1 at a glance'));", "K.push(H1('1. Overall workflow and Objective 1 at a glance'));\nK.push(P(`The thesis has three objectives built on common inputs (Tier 0): Objective 1 characterises white rust with each sensor in tiers, Objective 2 classifies the six grades and estimates PDI with single sensors and fused sensors, and Objective 3 predicts infection before symptoms (${F('master')}). Every objective uses the same plot-level data, grades and leave-one-replication-out rule.`));\nK.push(...fig2('master', 'o_master.png', 'Overall workflow of the thesis: common inputs, Objective 1 (sensor tiers), Objective 2 (classification and regression by fusion) and Objective 3 (pre-symptomatic prediction).', 470));")
+    i = body.index('// ======================= 9 GENERAL Q&A')
+    rest = body[i:].replace("K.push(H1('9. General interview questions on Objective 1'));", "K.push(H1('12. General interview questions (Objectives 1–3)'));")
+    assert '12. General' in rest
+    isro = open(S + 'final/f_isro.js').read()
+    isro = isro.replace("K.push(H1('7. ", "K.push(H1('13. ").replace("K.push(H2('7.", "K.push(H2('13.")
+    for a, b in (("Step 1.3", "HS Tier 2"), ("Step 1.5", "HS Tier 5"), ("Step 2.3", "O2 Tier 3"), ("the 4-class and DI tasks", "the six-grade and PDI tasks"),
+                 ("Classes cut from a continuous DI overlap", "Grades cut from a continuous severity overlap"), ("correlation scalogram against DI", "correlation scalogram against PDI"),
+                 ("DI regression in parallel", "PDI regression in parallel and ±1-grade accuracy"), ("Before symptoms DI = 0 everywhere", "Before symptoms every plot is grade 0 (PDI = 0)"),
+                 ("Leaves are scored on a 0–6 area scale at five points per plot by the same trained scorer, and DI is computed with the standard formula (Liu et al., 2024); class limits are explicit, and errors near limits are reported.",
+                  "Leaves are graded with the 0–9 key (Conn et al., 1990) at five points per plot by the same trained scorer; the plot grade comes from the mean % leaf area and PDI from the leaf grades; grade limits are explicit, and errors near limits are reported as ±1-grade accuracy.")):
+        assert a in isro, a; isro = isro.replace(a, b)
+    body = body[:i] + open(OD + 'o23_body.js').read() + '\n' + rest + '\n' + open(OD + 'o23_qa.js').read() + '\n' + isro
+
 # equations numbered by chapter
 chap = '0'; cnt = {}; lab = {}
 for line in body.split('\n'):
@@ -137,6 +160,9 @@ pool += [
  "Kundu, R., Dutta, D., Nanda, M.K., Chakrabarty, A. (2021). Near real time monitoring of potato late blight disease severity using field based hyperspectral observation. Smart Agricultural Technology 1, 100019.",
  "Serrano, L., Peñuelas, J., Ustin, S.L. (2002). Remote sensing of nitrogen and lignin in Mediterranean vegetation from AVIRIS data: decomposing biochemical from structural signals. Remote Sensing of Environment 81(2–3), 355–364.",
  "Nagler, P.L., Daughtry, C.S.T., Goward, S.N. (2000). Plant litter and soil reflectance. Remote Sensing of Environment 71(2), 207–215.",
+ "Frank, E., Hall, M. (2001). A simple approach to ordinal classification. In: De Raedt, L., Flach, P. (eds) Machine Learning: ECML 2001. Lecture Notes in Computer Science 2167, Springer, Berlin, 145–156.",
+ "Cohen, J. (1968). Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. Psychological Bulletin 70(4), 213–220.",
+ "Hastie, T., Tibshirani, R., Friedman, J. (2009). The Elements of Statistical Learning: Data Mining, Inference, and Prediction, 2nd edn. Springer, New York.",
  "Hotelling, H. (1936). Relations between two sets of variates. Biometrika 28(3–4), 321–377.",
 ]
 pat = re.compile(r"([A-Z][A-Za-zÀ-ÿŠš\-]+)(?: et al\.| and [A-Z][A-Za-zÀ-ÿ\-]+)?,? \(?(\d{4})[a-z]?")
@@ -164,7 +190,7 @@ for fname in re.findall(r"\b(?:fig2|FIG)\('[A-Za-z0-9]+', '([^']+)'", body):
     assert os.path.exists(OD + 'fig/' + fname), fname
 head = head.replace('__FORDER__', repr(FO)).replace('__TORDER__', repr(TO))
 tail = T[T.index('\nconst numcfg'):]
-tail = tail.replace("title: 'AI-based multimodal UAV sensing of white rust in mustard: complete methodology'", "title: 'Objective 1: tier-wise methodology for white rust characterisation'")
+tail = tail.replace("title: 'AI-based multimodal UAV sensing of white rust in mustard: complete methodology'", "title: 'AI-based multimodal UAV sensing of white rust in mustard: final methodology'" if FULL else "title: 'Objective 1: tier-wise methodology for white rust characterisation'")
 tail = re.sub(r"'eqs', \d+, 'refs', \d+", "'eqs', %d, 'refs', %d" % (len(lab), len(used)), tail)
 open(OD + 'o1_docx.js', 'w').write(head + '\n' + body + '\n' + tail)
 print('figs', len(FO), 'tabs', len(TO), 'eqs', len(lab), 'refs', len(used))

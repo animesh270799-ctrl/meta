@@ -295,5 +295,6 @@ Sw = sum(np.cov(Xall[cls == k].T) * ((cls == k).sum() - 1) for k in range(6)); S
 eig = np.sort(np.real(np.linalg.eigvals(np.linalg.solve(Sw, St - Sw))))[::-1]; can = np.sqrt(eig / (1 + eig))
 OUT['combined'] = {'can1': round(float(can[0]), 2), 'acc': round(float(cross_val_score(LDA(), Xall, cls, cv=4).mean()), 2)}
 OUT['counts'] = counts
+np.savez(D + 'o1_sim.npz', cls=cls, DI=DI, area=area, **{'%s|%s' % (k_, fe): v for k_, d_ in sens.items() for fe, v in d_.items()})
 json.dump(OUT, open(D + 'o1_dummy.json', 'w'), indent=1, default=lambda o: o.item())
 print(json.dumps({k: (v if k != 'sensors' else {s_: {'cda': v[s_]['cda']} for s_ in v}) for k, v in OUT.items()}, default=lambda o: o.item())[:2500])
