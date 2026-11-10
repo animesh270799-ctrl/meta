@@ -67,5 +67,6 @@ Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 
 - Earlier, larger documents (thesis edition, ML guide, SIF/FLEX, chlorophyll fluorescence) were made in the earlier session scratchpad and are superseded by the final methodology.
 
 ## 8. Pending / to confirm
+- User uploaded `White_rust_final_methodology_a.pdf` (41 pages, the earlier version with Kruskal–Wallis/Spearman, Cliff's δ, JM, one-SE rule, no paper lists, no class-overlap section) and said they are working on it; asked which base to continue from, no preference given yet. Latest sources in `thesis_build/` include all later changes.
 - Produce the final PDF + Word only when the user says so.
 - Confirm endmember algorithm, NDVI/SAM combination (AND), ASD file date, and whether Objective 2 wording changes.
