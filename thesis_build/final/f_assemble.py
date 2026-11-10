@@ -56,8 +56,8 @@ cda = [['Quantity', 'Dummy value (HS features PSSRa, REP, WRI, DWSI-1)'],
        ['Canonical correlation of function 1 (0–1)', str(c['can'][0])],
        ["Wilks' lambda (0 = separated, 1 = not separated)", str(c['wilks'])],
        ['Weights of the features on function 1', '; '.join('%s %s' % (r[0].split(' (')[0], r[1]) for r in c['coef'])],
-       ['Cross-validated accuracy of LDA', str(c['acc'])]]
-CDA = rows(cda) + ", [3200, 6106], 'Dummy output of the canonical discriminant analysis and JM distances.', 16"
+       ['Held-out accuracy of the discriminant functions', str(c['acc'])]]
+CDA = rows(cda) + ", [3200, 6106], 'Dummy output of the canonical discriminant analysis (CDA).', 16"
 vif = [['Iteration', 'VIF of each feature', 'Action']] + [[str(i + 1), r[0], r[1]] for i, r in enumerate(DUM['vif'])]
 VIF = rows(vif) + ", [1100, 6000, 2206], 'Dummy VIF iterations on a hyperspectral DSF pool (computed on simulated data).', 16"
 cm = DUM['cm']

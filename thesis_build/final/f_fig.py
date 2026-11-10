@@ -49,7 +49,7 @@ for x, k, t in zip([0.25, 2.95, 5.65, 8.35], ['RGB', 'MS', 'HS', 'TIR'], ['RGB',
     head(ax, x, 12.95, 2.4, 0.5, t, COL[k]); arrow(ax, x + 1.2, 12.95, x + 1.2, 12.68)
 box(ax, 0.25, 10.75, 10.5, 1.9, 'COMMON STEPS  A1–A4', ['A1 Experiment: 72 plots (4 inoculation timings × 3 varieties × 2 doses × 3 replications)', 'A2 Ground truth: DI (%) → classes Healthy (0), Low (0–25], Moderate (25–50], High (> 50); tasks C (4 classes) and R (DI)', 'A3 Pre-processing: orthomosaics, reflectance / temperature calibration, canopy mask, plot-mean features', 'A4 Pooled plot-date table; leave-one-replication-out validation (all dates of a plot kept together)'], '#EEF3E8', '#2C5F2D', 10.5, 8.6)
 arrow(ax, 5.5, 10.75, 5.5, 10.45)
-box(ax, 0.25, 7.55, 10.5, 2.85, 'OBJECTIVE 1  Characterise white rust (each sensor)', ['1.1 Feature extraction: HS 481 bands + FD + 39 indices + red edge; MS bands + 12 indices + texture;', '      RGB texture, colour, cover; TIR CT, CTD, CTR, NRCT, MTD, texture', '1.2 Univariate response: one-way ANOVA + Tukey HSD across 4 classes; Pearson r with DI; physiology', '1.3 HS band level: correlation scalogram (R, FD, SD vs DI) + ReliefF (4 classes); one band per correlated region', '1.4 White Rust Index (ReliefF + exhaustive search, Mahlein 2013)', '1.5 Class discrimination: two-step stepwise discriminant analysis (Bhattacharya 2013)', '1.6 Disease-specific features (DSF): Boruta for C and R → 8 DSF pools; cross-sensor correlation'], '#E3F2FD', '#1565C0', 10.5, 8.5)
+box(ax, 0.25, 7.55, 10.5, 2.85, 'OBJECTIVE 1  Characterise white rust (each sensor)', ['1.1 Feature extraction: HS 481 bands + FD + 39 indices + red edge; MS bands + 12 indices + texture;', '      RGB texture, colour, cover; TIR CT, CTD, CTR, NRCT, MTD, texture', '1.2 Univariate response: one-way ANOVA + Tukey HSD across 4 classes; Pearson r with DI; physiology', '1.3 HS band level: correlation scalogram (R, FD, SD vs DI) + ReliefF (4 classes); one band per correlated region', '1.4 White Rust Index (ReliefF + exhaustive search, Mahlein 2013)', '1.5 Class discrimination: two-step stepwise canonical discriminant analysis, CDA (Bhattacharya 2013)', '1.6 Disease-specific features (DSF): Boruta for C and R → 8 DSF pools; cross-sensor correlation'], '#E3F2FD', '#1565C0', 10.5, 8.5)
 arrow(ax, 5.5, 7.55, 5.5, 7.25)
 box(ax, 0.25, 4.4, 10.5, 2.8, 'OBJECTIVE 2  Classify and estimate severity by multimodal fusion', ['2.1 Optimum features: VIF < 10 → ML-SFFS (criterion macro-F1 for C, RMSE for R)', '2.2 Six models: SVM/SVR, RF/RFR, k-NN, PLSR (R only), DNN-F1, DNN-F2', '2.3 Single sensors S1–S4 vs combinations S5 RGB+TIR, S6 MS+TIR, S7 HS+TIR, S8 all four', '      Fusion: ML-SFFS feature-level fusion and DNN-F1 / DNN-F2', '2.4 Evaluation: OA, kappa, macro-F1, confusion matrix | R², RMSE, NRMSE', '2.5 Maps of class and DI      2.6 Independent validation (Bharatpur, farmers\' fields)'], '#FCE4EC', '#AD1457', 10.5, 8.5)
 arrow(ax, 5.5, 4.4, 5.5, 4.1)
@@ -209,8 +209,8 @@ fig, ax0 = plt.subplots(figsize=(7.2, 4.6))
 for k in range(4):
     ax0.scatter(Zs[cls == k, 0], Zs[cls == k, 1], s=8, color=CC[k], alpha=0.5, label=CL[k])
     ax0.plot(Zs[cls == k, 0].mean(), Zs[cls == k, 1].mean(), 'X', color='black', ms=9)
-ax0.set_xlabel('Discriminant function 1 (%.0f%% of separation)' % (100 * ev[0])); ax0.set_ylabel('Discriminant function 2 (%.0f%%)' % (100 * ev[1]))
-ax0.legend(fontsize=8, markerscale=2); ax0.set_title('Dummy LDA score plot (X = class centroid)', fontsize=10)
+ax0.set_xlabel('Canonical function 1 (%.0f%% of separation)' % (100 * ev[0])); ax0.set_ylabel('Canonical function 2 (%.0f%%)' % (100 * ev[1]))
+ax0.legend(fontsize=8, markerscale=2); ax0.set_title('Dummy CDA score plot (X = class centre)', fontsize=10)
 def jm(a, b):
     m1, m2 = a.mean(0), b.mean(0); S1, S2 = np.cov(a.T), np.cov(b.T); S = (S1 + S2) / 2
     B = 0.125 * (m1 - m2) @ np.linalg.solve(S, m1 - m2) + 0.5 * np.log(np.linalg.det(S) / np.sqrt(np.linalg.det(S1) * np.linalg.det(S2)))
