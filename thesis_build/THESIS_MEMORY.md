@@ -22,7 +22,8 @@ Last updated: 10 Nov 2026. Status: methodology agreed step by step; **final PDF 
 - Objective 1: characterise white rust through multimodal UAV sensing.
 - Objective 2 (ORW wording kept; user did not give new wording): detect and discriminate disease severity through AI-based multimodal data fusion.
 - Objective 3: predict white rust at the pre-symptomatic stage.
-- **Classification: 4 classes — Healthy (DI = 0), Low (0 < DI ≤ 25), Moderate (25 < DI ≤ 50), High (DI > 50).** Healthy is a class, so detection is part of the 4-class task.
+- **UPDATED (Objective 1 doc): classification = 6 ordered grades 0, 1, 3, 5, 7, 9** (user: "the classes are healthy(0), 1, 3, 5, 7, 9"). Rule chosen by user: plot mean % leaf area with pustules → grade by the Conn et al. (1990) 0–9 key: 0 = none, 1 = 1–5%, 3 = 6–10%, 5 = 11–25%, 7 = 26–50%, 9 = > 50%. **PDI = Σ(grade × n)/(N × 9) × 100** for regression. Dummy counts 130/90/60/70/50/32 (432 plot-dates).
+- (Old, superseded: 4 classes Healthy/Low/Moderate/High by DI. The final methodology sources in `final/` still use the old 4 classes and must be updated to the 6 grades before the final PDF is made.)
 - **Regression: DI (%)** in parallel. Pre-symptomatic task: healthy vs later-infected.
 - DI = Σ(x·f)/(n·Σf) × 100, 0–6 leaf scale (Liu et al. 2024).
 - All dates pooled (no date effect modelled).
@@ -53,6 +54,13 @@ Objective 2:
 - 2.5 Maps (class, DI, error). 2.6 Independent validation (Bharatpur, farmers' fields).
 
 Objective 3: 3.1 labels (control = healthy; inoculated = infected only if symptoms appear later; non-symptomatic inoculated e.g. PM 38 excluded; Tian 2021); 3.2 t-test + % difference from healthy, Boruta; 3.3 VIF → ML-SFFS → SVM, RF, k-NN for S1–S8 (no DNN), sensitivity/specificity/AUC; 3.4 risk maps.
+
+## 4b. Objective 1 tier document (built Nov 2026)
+- Separate document: sensor-wise **tiers**, each common method described once (Chapter 3: M1 ANOVA + Tukey + Pearson r; M2 VIF < 10; M3 stepwise CDA; M4 Boruta), each tier with position, problem solved, concept, why needed, why this method in my case, papers, alternatives table with references, how, my data, dummy figure/table, output, interview Q&A, references.
+- Tiers: Tier 0 common inputs; HS Tiers 1–6 (features; scalogram + ReliefF; WRI; M1; M2+M3 two-step CDA; M4); MS/RGB/TIR Tiers 1–4 (features; M1; M2+M3 one-step CDA; M4); cross-sensor tier (DSF correlation + optional combined CDA). Flow chart per sensor.
+- **CDA is run per sensor**, plus one optional combined CDA on the CDA-selected features of all sensors (preview only; fusion proper is Objective 2).
+- **SWIR disease indices added (9; HS indices now 48 = 39 base + 9 SWIR):** DWSI-2 = R1660/R550, DWSI-3 = R1660/R680, DWSI-5 = (R800 + R550)/(R1660 + R680) (Apan et al. 2004, sugarcane orange rust; DWSI vs potato late blight, Kundu et al. 2021); NDWI = (R860 − R1240)/(R860 + R1240) (Gao 1996; best for Septoria tritici blotch, Yu et al. 2018); MSI = R1600/R820 (Hunt and Rock 1989); NDII = (R819 − R1649)/(R819 + R1649) (Hardisky et al. 1983); RBI_M = R1148/R1301 and NDBI = (R1148 − R1301)/(R1148 + R1301) (Mandal et al. 2023, rice blast severity, R² 0.85/0.86 — band order to be checked in the paper); RBI_R = (R1068 − R1560)/(R1068 + R1560) (Ramalingam et al. 2026, early access, rice blast early detection F1 0.95). All bands outside the removed water regions. NDNI, NDLI, CAI not used (no disease validation; noisy at UAV SNR). HS Tier 1 feature count: 1443 + 3 + 48 = 1494.
+- Sources: `thesis_build/obj1/` (`o1_body.js` content, `o1_fig.py` dummy figures + `o1_dummy.json`, `o1_flow.py` flow charts, `o1_assemble.py` assembler). Rebuild: `cd thesis_build/obj1 && python3 o1_fig.py && python3 o1_flow.py && python3 o1_assemble.py && NODE_PATH=/opt/node22/lib/node_modules node o1_docx.js && python3 ../satmet/to_pdf.py ../outputs/Objective1_tier_methodology.docx ../outputs/Objective1_tier_methodology.pdf`.
 
 ## 5. Class-overlap handling (Section 1.2 of final document)
 Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 70% severity vs 87% detection; Lv 2023 81.8% vs 93.1%; Mandal 2023 adjacent blast levels inseparable). Measures: careful scoring (5 points, same scorer, explicit limits; Bock 2010); DI-based screening (scalogram); ReliefF for overlapping classes; disease-specific WRI (Mahlein 2013; Meng 2020); multivariate LDA (Bhattacharya 2013; Zhang 2012a); sensor/feature fusion (Lv 2023; Feng 2022; Mahlein 2019); soft-margin SVM, RF, k-NN with class weights; DI regression alongside; per-class F1 and adjacent-class error reporting.
