@@ -82,6 +82,8 @@ Objective 3: 3.1 labels (control = healthy; inoculated = infected only if sympto
 - Sources: thesis_build/interview/ (i_fig.py, i_build.py, i_extra.py). Rebuild: python3 i_fig.py && python3 i_build.py && NODE_PATH=/opt/node22/lib/node_modules node i_build.js && to_pdf.
 - Verify before interview: Dutta et al. 2008 author order; Chattopadhyay et al. 2011 details and white-rust weather thresholds; planned mission specs (TRISHNA).
 
+- **v2 (Nov 2026, user request): no results quoted**; outputs/ISRO_interview_guide_white_rust_v2.docx/.pdf (34 pages, 104 Q&As, 14 figures): adds disease physiology, biotic-stress detection section, detailed mustard masking (vegetative + flowering; SAR, timing offset, NDYI, DTW, Olofsson area), 7-step satellite pipeline (SRF transfer, mask, weather risk, anomaly, attribution, severity, validation), expanded stress discrimination (incl. sulphur deficiency, herbicide). Sources i2_fig.py, i2_content.py, i2_content2.py, i2_build.py.
+
 ## 5. Class-overlap handling (Section 1.2 of final document)
 Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 70% severity vs 87% detection; Lv 2023 81.8% vs 93.1%; Mandal 2023 adjacent blast levels inseparable). Measures: careful scoring (5 points, same scorer, explicit limits; Bock 2010); DI-based screening (scalogram); ReliefF for overlapping classes; disease-specific WRI (Mahlein 2013; Meng 2020); multivariate LDA (Bhattacharya 2013; Zhang 2012a); sensor/feature fusion (Lv 2023; Feng 2022; Mahlein 2019); soft-margin SVM, RF, k-NN with class weights; DI regression alongside; per-class F1 and adjacent-class error reporting.
 

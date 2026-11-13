@@ -41,16 +41,17 @@ ax.text(5.5, 4.2, 'Each level calibrates and validates the next (spectral resamp
 ax.text(3.6, 2.25, 'band selection\n→ sensor SRF', ha='center', fontsize=7.5, color='#555'); ax.text(7.2, 2.25, 'UAV maps = training\n& validation pixels', ha='center', fontsize=7.5, color='#555')
 plt.tight_layout(); plt.savefig(FG + 'i_scaling.png', dpi=200); plt.close()
 
-# ---------- 3. leaf spectra with satellite bands ----------
-Z = np.load(B + '../leaf/data/prep.npz'); import pandas as pd
-M = pd.read_csv(B + '../leaf/data/meta_leaf2.csv'); R = Z['R1nm'].astype(float); y = M.grade.values; w = np.arange(350, 2501)
-keep = (w >= 400) & (w <= 2400) & ~((w >= 1350) & (w <= 1450)) & ~((w >= 1800) & (w <= 1950))
+# ---------- 3. schematic spectra with satellite bands (no measured data) ----------
+from scipy.interpolate import PchipInterpolator
+w = np.arange(400, 2401)
+ph = [(400,.040),(450,.045),(500,.060),(550,.120),(600,.070),(650,.045),(680,.040),(700,.090),(720,.250),(750,.420),(800,.460),(900,.470),(970,.440),(1050,.460),(1200,.400),(1300,.420),(1450,.200),(1650,.300),(1800,.270),(1940,.080),(2100,.180),(2200,.200),(2300,.150),(2400,.110)]
+pd_ = [(400,.060),(450,.070),(500,.090),(550,.150),(600,.110),(650,.090),(680,.085),(700,.130),(720,.240),(750,.350),(800,.380),(900,.390),(970,.370),(1050,.390),(1200,.360),(1300,.380),(1450,.240),(1650,.330),(1800,.300),(1940,.120),(2100,.220),(2200,.240),(2300,.190),(2400,.140)]
+keep = ~((w >= 1350) & (w <= 1450)) & ~((w >= 1800) & (w <= 1950))
 fig, ax = plt.subplots(figsize=(12, 6.2))
-for g, c, lab in ((0, '#2E7D32', 'healthy leaf (grade 0)'), (9, '#7B1FA2', 'severe white rust (grade 9)')):
-    m = R[y == g].mean(0); m[~keep] = np.nan; ax.plot(w, m, color=c, lw=2, label=lab)
-for lo, hi, c, t in ((690, 860, '#FFCDD2', 'robust red edge\n690–860 nm'), (1495, 1515, '#BBDEFB', ''), (1595, 1615, '#BBDEFB', 'robust SWIR'), (1965, 1995, '#BBDEFB', '')):
-    ax.axvspan(lo, hi, color=c, alpha=0.8, zorder=0)
-    if t: ax.text((lo + hi) / 2, 0.66, t, ha='center', fontsize=8, color='#333')
+for pts, c, lab in ((ph, '#2E7D32', 'healthy canopy (schematic)'), (pd_, '#7B1FA2', 'infected canopy (schematic)')):
+    m = PchipInterpolator(*zip(*pts))(w); m[~keep] = np.nan; ax.plot(w, m, color=c, lw=2, label=lab)
+for lo, hi, c, tx in ((680, 760, '#FFCDD2', 'red edge'), (500, 680, '#FFF9C4', 'pigments'), (1450, 1800, '#BBDEFB', 'SWIR-1 water'), (1950, 2400, '#E1F5FE', 'SWIR-2 water / dry matter')):
+    ax.axvspan(lo, hi, color=c, alpha=0.8, zorder=0); ax.text((lo + hi) / 2, 0.66, tx, ha='center', fontsize=8, color='#333')
 sens = [('Sentinel-2 MSI', [(490, 65), (560, 35), (665, 30), (705, 15), (740, 15), (783, 20), (842, 115), (865, 20), (1610, 90), (2190, 180)], '#1565C0'),
         ('LISS-IV (RS-2/2A)', [(555, 70), (650, 60), (815, 90)], '#C62828'),
         ('LISS-III / AWiFS', [(555, 70), (650, 60), (815, 90), (1625, 150)], '#EF6C00'),
@@ -60,7 +61,7 @@ for k, (nm, bands, c) in enumerate(sens):
     for cen, wid in bands: ax.plot([cen - wid / 2, cen + wid / 2], [yy, yy], color=c, lw=6, solid_capstyle='butt')
     ax.text(2410, yy, nm, va='center', fontsize=8, color=c)
 ax.set_xlim(380, 2900); ax.set_ylim(-0.23, 0.72); ax.set_xlabel('Wavelength (nm)'); ax.set_ylabel('Reflectance')
-ax.set_title('Real leaf spectra (ASD, this study) with robust white-rust regions and satellite band positions\n(hyperspectral sensors cover 400–2500 nm continuously; bars drawn schematically)', fontsize=10)
+ax.set_title('Schematic canopy spectra (healthy vs infected) with disease-sensitive regions from the literature and satellite band positions', fontsize=10)
 ax.legend(loc='upper right', fontsize=8.5, frameon=False); ax.axhline(0, color='grey', lw=0.5)
 plt.tight_layout(); plt.savefig(FG + 'i_bands.png', dpi=200); plt.close()
 
@@ -109,7 +110,7 @@ box(ax, 0.3, 2.85, 3.3, 0.9, 'Yes → drought / water stress\n(check rainfall, i
 box(ax, 4.1, 2.85, 3.3, 0.9, 'Yes → nutrient, salinity,\nwaterlogging or herbicide\n(check soil maps, history)', '#FFEBEE', '#C62828', 8.3)
 box(ax, 7.9, 2.85, 3.3, 0.9, 'Yes → biotic suspect:\npatchy foci, spreading\nbetween dates', '#FFF8E1', '#C98A00', 8.3)
 for x in (1.95, 5.75, 9.55): arr(ax, x, 4.28, x, 3.77)
-box(ax, 5.2, 1.25, 6.0, 1.15, 'Q4 Disease signature?\nWRI ↓, red-edge FD 790–830 ↑, SWIR 1600 nm ↑ (water loss), white pustule texture (RGB),\nno yellow flower confusion (flower fraction), timing: Dec–Feb, lower leaves first', '#E8F5E9', '#2E7D32', 8.3)
+box(ax, 5.2, 1.25, 6.0, 1.15, 'Q4 Disease signature?\nred-edge shift + visible ↑ (chlorophyll loss), SWIR ↑ (leaf water loss), disease index,\nwhite pustule texture (RGB), flowers excluded, timing Dec–Feb, lower leaves first', '#E8F5E9', '#2E7D32', 8.3)
 arr(ax, 9.55, 2.83, 8.6, 2.42)
 box(ax, 0.3, 0.25, 4.5, 1.0, 'Alternaria blight: dark concentric spots, later season;\naphids: honeydew, colonies on tips, Jan–Feb;\ndowny mildew: often with staghead, angular lesions', '#F3E5F5', '#6A1B9A', 8)
 box(ax, 5.2, 0.12, 6.0, 0.8, 'Confirm with ground truth (Conn key) → white rust map', '#2E7D32', '#2E7D32', 9, True, 'white')
@@ -125,10 +126,10 @@ for a, b, t, c in ph: ax.add_patch(FancyBboxPatch((a, 4.1), b - a - 0.6, 0.9, bo
 rows = [('Thermal (stomatal closure)', 22, 100, '#C62828'), ('Hyperspectral red edge / WRI', 30, 100, '#00695C'), ('SWIR water indices', 50, 100, '#1565C0'), ('Multispectral red edge', 40, 100, '#2E7D32'), ('RGB texture (pustules)', 45, 100, '#6D4C41'), ('Satellite (10–30 m)', 62, 100, '#455A64')]
 for i, (t, a, b, c) in enumerate(rows):
     yy = 3.45 - i * 0.58; ax.plot([a, b], [yy, yy], color=c, lw=7, solid_capstyle='butt', alpha=0.85); ax.text(a - 1, yy, t, ha='right', va='center', fontsize=8.3)
-ax.text(50, 0.0, 'Expected detection window by sensor (hypothesis tested in Objectives 1–3; leaf data: SWIR responds mainly at higher severity)', ha='center', fontsize=8.5, style='italic')
+ax.text(50, 0.0, 'Expected detection window by sensor (hypothesis to be tested in Objectives 1–3)', ha='center', fontsize=8.5, style='italic')
 plt.tight_layout(); plt.savefig(FG + 'i_timeline.png', dpi=200); plt.close()
 
 # copies of existing figures
-for src, dst in ((B + '../obj1/fig/o_master.png', 'i_master.png'), (B + '../leaf/fig/l_scal_relief.png', 'i_leaf_scal.png'), (B + '../leaf/fig/l_eval.png', 'i_leaf_eval.png'), (B + '../leaf/fig/l_wri.png', 'i_leaf_wri.png'), (B + '../obj1/fig/o1_tiers.png', 'i_tiers.png')):
+for src, dst in ((B + '../obj1/fig/o_master.png', 'i_master.png'), (B + '../obj1/fig/o1_tiers.png', 'i_tiers.png')):
     shutil.copy(src, FG + dst)
 print('ok')
