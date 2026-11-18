@@ -140,7 +140,7 @@ s = slide('What is updated since the ORW (2025)');
 table(s, [['Component', 'ORW (2025)', 'Updated methodology (2026-27)'], ['Experiments', 'Field (IARI) + controlled condition; 72 plots of 3 m × 3 m', 'Drone field: 48 plots of 5 m × 3.5 m (4 dates × 3 varieties × 3 rep. + 12 healthy); glasshouse: 48 pots; validation at Bharatpur'],
   ['Sensors', 'RGB, MS, TIR, Headwall Co-Aligned HP, ASD', '+ Headwall Nano (VNIR); glasshouse RGB, MS, TIR, hyperspectral imaging, ASD; IRGA and canopy analyzer'],
   ['Ground truth', '0–6 scale; DI; five DI classes', 'Leaf grade 0–9 key → six grades (0, 1, 3, 5, 7, 9) and plot PDI (Conn et al., 1990; Wheeler, 1969); staghead %'],
-  ['Pre-processing', 'NDVI threshold mask; plot mean', 'NDVI > 0.6 AND SAM < 0.3 rad crop mask on HS, transferred to all sensors; flower pixels removed; endmember-based plot spectrum'],
+  ['Pre-processing', 'NDVI threshold mask; plot mean', 'NDVI > 0.6 AND SAM < 0.3 rad crop mask on HS, transferred to all sensors; flower pixels removed; SMACC endmember-based plot spectrum'],
   ['Feature selection', 'Many alternative methods (t-test, JM, SPA, RFE, ReliefF, Boruta)', 'Fixed tier chain: correlation scalogram + ReliefF (one band per correlated region) → White Rust Index → ANOVA/Tukey → VIF + stepwise CDA → Boruta'],
   ['Models', 'SVM, BPNN, ELM, LS-SVM, PLS-DA, RF, QDA, RustQNet', 'SVM/SVR, RF/RFR, k-NN, PLS-DA/PLSR, DNN-F1 (input fusion), DNN-F2 (intermediate fusion); encoder-decoder for pixel maps'],
   ['Validation', 'Cross-validation', 'Nested leave-one-replication-out (all selection inside training replications) + Bharatpur + farmers\' fields'],
@@ -162,6 +162,43 @@ s.addImage({ path: figpath('leaf/fig/l_spectra.png'), x: 0.45, y: 1.2, w: 6.2, h
 s.addImage({ path: figpath('leaf/fig/l_wri_full.png'), x: 6.8, y: 1.2, w: 6.08, h: 6.08 * 0.5077, altText: 'WRI' });
 bul(s, ['Visible and SWIR reflectance rise, NIR falls and the red-edge peak drops and shifts with grade', 'Whole-range White Rust Index search confirms the VNIR index (red edge, NIR, 970 nm water shoulder)'], { x: 0.45, y: 4.5, w: 12.4, h: 1.0, fontSize: 13 });
 refl(s, 'Mahlein et al., 2013; Shukla et al., 2024; Robnik-Šikonja and Kononenko, 2003.');
+
+// ---------- UAV image processing done (from lab notebook) ----------
+s = slide('UAV processing done (2025-26): hyperspectral cubes');
+const hp = [['Raw cube', 'Headwall Co-Aligned HP (VNIR + SWIR): 613 bands; imported in ENVI, saved in ENVI format'], ['Spectral subset', 'VNIR up to 919.7 nm + SWIR from 921.4 nm; water and noisy bands removed: 900–915, 1335–1460, 1785–1965, 2400–2500 nm (and 1964.4 nm) → 483 bands'],
+  ['Smoothing', 'Savitzky–Golay filter in ENVI: filter width 5, polynomial order 2; exported'], ['Projection', 'ArcMap: WGS 1984 / UTM zone 43N (Project, data management)'],
+  ['Plot boundaries', 'Plot polygons digitised; field "plot no." added; polygons dissolved/merged; final boundary saved as shapefile'], ['Plot clipping', 'Extract by mask (Spatial Analyst) / subset by ROI in ENVI → one clipped cube per plot']];
+hp.forEach((p, i) => { const col = i % 3, row = Math.floor(i / 3), x = 0.45 + col * 4.15, y = 1.25 + row * 2.05;
+  box(s, x, y, 0.42, 1.75, String(i + 1), { fill: X.field, line: X.field, color: 'FFFFFF', bold: true, fs: 15 });
+  box(s, x + 0.47, y, 3.45, 1.75, [{ text: p[0], options: { bold: true, color: X.field, fontSize: 13, breakLine: true } }, { text: p[1] }], { fill: X.lfield, line: X.field, fs: 11.5, align: 'left', valign: 'top', margin: 6 });
+  if (col < 2) arrow(s, x + 3.92, y + 0.87, x + 4.15, y + 0.87, X.field); });
+arrow(s, 12.6, 3.0, 12.6, 3.15, X.field, { noHead: true }); poly(s, [[12.75, 3.0], [12.75, 3.17], [0.66, 3.17], [0.66, 3.3]], X.field);
+hbox(s, 0.45, 5.45, 8.0, 1.15, 'Status', 'Clipping completed for three flight dates (11 Feb, 24 Feb and 13 Mar 2026); 13 Mar cube processing in progress. RGB, multispectral (MicaSense RedEdge-MX), thermal and Headwall Nano data follow the same projection and plot boundaries.', X.navy, X.lcom, { nobullet: true, fs: 11.5 });
+hbox(s, 8.6, 5.45, 4.28, 1.15, 'Open checks', ['MS data units: DN, radiance or scaled reflectance (metadata)', 'Thermal: emissivity correction applied?'], X.o3, X.lo3, { fs: 11 });
+refl(s, 'Savitzky and Golay, 1964; Thenkabail et al., 2004.', { y: 6.72, h: 0.3 });
+
+s = slide('UAV processing done (2025-26): crop mask (SAM × NDVI)');
+box(s, 0.45, 1.25, 2.7, 1.5, [{ text: 'Training ROIs', options: { bold: true, fontSize: 13, breakLine: true } }, { text: 'Soil, shadow, grass, mustard (+ flower); 3 × 2 training sites per plot; 48 plot ROIs' }], { fill: X.lfield, line: X.field, fs: 11 });
+box(s, 3.55, 1.25, 2.9, 0.68, [{ text: 'SAM classification', options: { bold: true, breakLine: true } }, { text: 'angle 0.1, 0.2, 0.3 rad tested' }], { fill: X.field, line: X.field, color: 'FFFFFF', fs: 11 });
+box(s, 3.55, 2.07, 2.9, 0.68, [{ text: 'NDVI (band math)', options: { bold: true, breakLine: true } }, { text: '(R898 − R684)/(R898 + R684)' }], { fill: X.field, line: X.field, color: 'FFFFFF', fs: 11 });
+arrow(s, 3.15, 2.0, 3.55, 1.6, X.field); arrow(s, 3.15, 2.0, 3.55, 2.4, X.field);
+box(s, 6.85, 1.25, 2.6, 1.5, [{ text: 'Binary masks multiplied', options: { bold: true, breakLine: true } }, { text: 'NDVI > 0.6 × SAM mustard class (0.3 rad) = crop pixels' }], { fill: X.lcom, line: X.navy, fs: 11 });
+arrow(s, 6.45, 1.6, 6.85, 1.9, X.field); arrow(s, 6.45, 2.4, 6.85, 2.1, X.field);
+box(s, 9.85, 1.25, 3.03, 1.5, [{ text: 'Morphological erosion', options: { bold: true, breakLine: true } }, { text: 'removes mixed edge pixels; saved as GeoTIFF' }], { fill: X.lcom, line: X.navy, fs: 11 });
+arrow(s, 9.45, 2.0, 9.85, 2.0, X.navy);
+const vs = [['Reclassify', 'mustard = 2, others = 1'], ['Raster → polygon', '"simplify polygons" unchecked'], ['Select by attribute', 'grid code of mustard class'], ['Clip and export', 'crop polygons / masked cube per plot']];
+vs.forEach((v, i) => { const x = 0.45 + i * 3.15; box(s, x, 3.3, 2.9, 0.95, [{ text: v[0], options: { bold: true, breakLine: true } }, { text: v[1] }], { fill: X.lo1, line: X.o1, fs: 11.5 }); if (i < 3) arrow(s, x + 2.9, 3.77, x + 3.15, 3.77, X.o1); });
+poly(s, [[11.36, 2.75], [11.36, 3.02], [1.9, 3.02], [1.9, 3.3]], X.navy);
+bul(s, ['Same crop polygons are applied to RGB, multispectral and thermal images after co-registration', 'True-colour display: R 640–670, G 540–570, B 460–480 nm (bands near 644, 544, 466 nm)', 'Crop stage differed among plots on one date (16 vegetative, 22 flowering, 10 pod-formation plots) → flower pixels must be handled before leaf-based analysis'], { x: 0.45, y: 4.5, w: 12.43, h: 1.6, fontSize: 13 });
+banner(s, 'Matches the agreed methodology: crop mask = NDVI > 0.6 AND SAM < 0.3 rad, with 1-pixel edge erosion.', X.gold, X.out, 6.12, 0.45);
+refl(s, 'Kruse et al., 1993; Rouse et al., 1974.', { y: 6.72, h: 0.3 });
+
+s = slide('UAV processing done (2025-26): endmember extraction (SMACC)');
+const em = [['Subset cube', '483-band subset (.hdr) of one date opened in ENVI'], ['Plot ROI', 'Plot boundary shapefile → ROI per plot (48 ROIs); subset data from ROI'], ['SMACC', 'Sequential maximum angle convex cone endmember extraction run plot by plot'], ['Outputs', 'Spectral library (endmembers), abundance maps, endmember ROIs; signatures exported']];
+em.forEach((e, i) => { const x = 0.45 + i * 3.15; box(s, x, 1.3, 2.9, 1.55, [{ text: e[0], options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: e[1] }], { fill: X.field, line: X.field, color: 'FFFFFF', fs: 11.5 }); if (i < 3) arrow(s, x + 2.9, 2.07, x + 3.15, 2.07, X.field); });
+hbox(s, 0.45, 3.15, 6.1, 2.85, 'Next steps (agreed methodology)', ['Label endmembers: crop (green, chlorotic, pustule) vs non-crop (soil, shadow, grass) by NDVI and spectral angle', 'Remove non-crop endmembers; average crop endmembers → plot spectrum', 'Chlorotic and pustule endmembers are kept (disease signal)', 'Repeat for every date; then features and tiers (Objective 1)'], X.o1, X.lo1, { fs: 12.5 });
+hbox(s, 6.75, 3.15, 6.13, 2.85, 'Open question: keep or remove flowers?', ['Proposal: remove flower pixels/endmembers from the leaf spectrum, because yellow petals dominate 500–650 nm and flowering differs with sowing date and variety (Sulik and Long, 2016)', 'Keep the flower fraction as a covariate', 'Keep inflorescence pixels for staghead severity after flowering', 'For advisory committee decision'], X.glass, X.lglass, { fs: 12 });
+refl(s, 'Gruninger et al., 2004; Sulik and Long, 2016; Winter, 1999.', { y: 6.15, h: 0.3 });
 
 // =========================== FRAMEWORK ===========================
 section('Overall research framework', 'Two experimental platforms, one methodology');
@@ -281,8 +318,8 @@ arrow(s, 9.7, 3.0, 9.95, 3.0, X.glass);
 s = slide('A1.4 Pre-processing of drone data');
 const pp = [['Radiometric calibration', 'Reflectance panels / empirical line; DLS for MS; ASD panel check', 'Smith and Milton, 1999'], ['Orthomosaic and geometry', 'Structure-from-motion mosaics; HS cubes georectified with IMU/GNSS', 'Guo et al., 2021'],
   ['Co-registration', 'Same ground control points; nearest-neighbour resampling to a common grid', 'Guo et al., 2021'], ['Thermal correction', 'Emissivity 0.98, air temperature and RH; CTD = CT − Tair', 'Jones, 2014'],
-  ['Crop mask', 'NDVI > 0.6 AND spectral angle < 0.3 rad on HS; transferred to all sensors; 1-pixel edge erosion', 'Kruse et al., 1993'], ['Flower removal', 'Yellow-flower pixels removed from the leaf spectrum; flower fraction kept as covariate', 'Sulik and Long, 2016'],
-  ['HS plot spectrum', 'Endmember extraction per plot (N-FINDR / VCA); non-crop endmembers removed; crop endmembers averaged', 'Winter, 1999; Nascimento and Bioucas-Dias, 2005'], ['Spectral smoothing', 'Noisy bands removed; Savitzky–Golay filter; derivatives', 'Savitzky and Golay, 1964']];
+  ['Crop mask', 'NDVI (R898, R684) > 0.6 × SAM mustard class (0.3 rad) on HS; erosion; transferred to all sensors', 'Kruse et al., 1993'], ['Flower removal', 'Yellow-flower pixels removed from the leaf spectrum; flower fraction kept as covariate', 'Sulik and Long, 2016'],
+  ['HS plot spectrum', 'Endmember extraction per plot (SMACC in ENVI); non-crop endmembers removed; crop endmembers averaged', 'Gruninger et al., 2004'], ['Spectral smoothing', '613 → 483 bands (water/noisy bands removed); Savitzky–Golay (width 5, order 2); derivatives', 'Savitzky and Golay, 1964']];
 pp.forEach((p, i) => { const col = i % 2, row = Math.floor(i / 2), x = 0.45 + col * 6.3, y = 1.2 + row * 1.2;
   box(s, x, y, 0.45, 1.0, String(i + 1), { fill: X.field, line: X.field, color: 'FFFFFF', bold: true, fs: 16 });
   box(s, x + 0.5, y, 5.6, 1.0, [{ text: p[0], options: { bold: true, color: X.field, breakLine: true } }, { text: p[1], options: { breakLine: true } }, { text: p[2], options: { italic: true, color: X.grey, fontSize: 10 } }], { fill: X.lfield, line: X.field, fs: 11.5, align: 'left', margin: 5 });

@@ -2,7 +2,7 @@
 import re, json, os
 B = os.path.dirname(os.path.abspath(__file__)) + '/'
 src = open(B + 'acm_ppt.js').read(); P = json.load(open(B + 'refpool.json')); pool = P['pool'] + P['orw']
-pool += ["Terentev, A., Dolzhenko, V., Fedotov, A., Eremenko, D. (2022). Current state of hyperspectral remote sensing for early plant disease detection: a review. Sensors 22(3), 757.", "Elsayed, S., Elhoweity, M., Ibrahim, H.H., Dewir, Y.H., Migdadi, H.M., Schmidhalter, U. (2017). Thermal imaging and passive reflectance sensing to estimate the water status and grain yield of wheat under different irrigation regimes. Agricultural Water Management 189, 98–110."]
+pool += ["Gruninger, J., Ratkowski, A.J., Hoke, M.L. (2004). The sequential maximum angle convex cone (SMACC) endmember model. Proceedings of SPIE 5425, Algorithms and Technologies for Multispectral, Hyperspectral, and Ultraspectral Imagery X, 1–14.", "Terentev, A., Dolzhenko, V., Fedotov, A., Eremenko, D. (2022). Current state of hyperspectral remote sensing for early plant disease detection: a review. Sensors 22(3), 757.", "Elsayed, S., Elhoweity, M., Ibrahim, H.H., Dewir, Y.H., Migdadi, H.M., Schmidhalter, U. (2017). Thermal imaging and passive reflectance sensing to estimate the water status and grain yield of wheat under different irrigation regimes. Agricultural Water Management 189, 98–110."]
 pat = re.compile(r"([A-Z][A-Za-zÀ-ÿŠš'\-]+)(?:,? [A-Z][A-Za-zÀ-ÿ\-]+)?(?: et al\.| and [A-Z][A-Za-zÀ-ÿŠš\-]+(?:-[A-Z][a-z]+)?)?,? (\d{4})[a-z]?")
 cites = set(m.groups() for m in pat.finditer(src))
 def key(r):
