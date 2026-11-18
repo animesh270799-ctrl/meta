@@ -65,6 +65,7 @@ rows = [['Sheet', 'Step', 'Method (reference)'],
         ['2_ReliefF', 'Tier 2: ReliefF weights for six leaf grades', 'Robnik-Šikonja and Kononenko (2003); Mahlein et al. (2013)'],
         ['2_Band_lists', 'Tier 2: one band per correlated region; robust / regression / classification lists', 'Tian et al. (2021)'],
         ['3_WRI', 'Tier 3: White Rust Index search (VNIR and SWIR)', 'Mahlein et al. (2013)'],
+        ['3b_WRI_full', 'Tier 3b: whole-range WRI (water bands kept, contact probe) vs VNIR and SWIR WRIs; nested check', 'Mahlein et al. (2013); Varma and Simon (2006)'],
         ['4_ANOVA', 'Tier 4: one-way ANOVA, Tukey HSD, Pearson r with PDI', 'Tukey (1949); Mahlein et al. (2019)'],
         ['5_CDA', 'Tier 5: VIF < 10 and two-step stepwise CDA', 'Bhattacharya and Chattopadhyay (2013); Klecka (1980)'],
         ['6_Boruta', 'Tier 6: Boruta DSF pools (classification and regression)', 'Kursa and Rudnicki (2010); Mustafa et al. (2023)'],
@@ -217,6 +218,55 @@ for k, g in enumerate(G6):
         ws.cell(5 + k, cc, "=AVERAGEIFS('0_Leaf_data'!$%s$5:$%s$%d,'0_Leaf_data'!$%s$5:$%s$%d,I%d)" % (leaf_col[fn], leaf_col[fn], LEAF_LAST, gc, gc, LEAF_LAST, 5 + k)).number_format = '0.0000'
 bar(ws, 'M4', 'Mean VNIR WRI by leaf grade', 'WRI', Reference(ws, min_col=9, min_row=5, max_row=10), [Reference(ws, min_col=10, min_row=4, max_row=10)], w=14, h=8)
 ws.cell(12, 9, 'r (WRI_VNIR, PDI) at plot level').font = Font(name=FONT, bold=True); ws.cell(12, 12, round(t3['r_pdi'] if t3['chosen'] == 'VNIR' else float(np.corrcoef(Fp.WRI_VNIR, P.PDI)[0, 1]), 3))
+
+
+# ===================== 3b WRI full range =====================
+WF = json.load(open(D + 'wri_full.json')); WC = WF['comparison']; WS = WF['searches']; WN = pd.DataFrame(WF['nested']); WIX = WF['indices']; wn = [c['Index'] for c in WC]
+from l10_wri_full import Rp1, idx as idx1
+ws = sheet('3b_WRI_full', 'Tier 3b — whole-range White Rust Index (400–2400 nm, water bands kept: contact-probe spectra) and comparison with the VNIR and SWIR WRIs',
+           'Contact probe = own light source, no atmospheric path, so 1350–1450 and 1800–1950 nm are kept (leaf water). Same rules as 3_WRI (Mahlein et al., 2013); splice correction applied to 1001–2500 nm (Hueni and Bialek, 2017); nested leave-one-replication-out check (Varma and Simon, 2006).')
+rng = [('VNIR', '450–950 nm'), ('SWIR', '1000–2400 nm, water bands removed'), ('SWIR-W', '1000–2400 nm, water bands kept'), ('FULL', '400–2400 nm, all bands')]
+sm = pd.DataFrame([[r, lab, WS[r + ' all']['n_bands'], WS[r + ' all']['n_pairs'], WS[r + ' all']['n_cand'], WIX[wn[i]][0], round(WS[r + ' all']['top'][0]['ba_cv'], 3)] for i, (r, lab) in enumerate(rng)],
+                  columns=['Search', 'Wavelengths', 'Bands', 'ND pairs', 'Candidates', 'Best index (all leaves)', 'BA (8-fold CV)'])
+a, b = table(ws, 4, 1, sm, widths=[10, 30, 8, 10, 12, 28, 12])
+cmp_ = pd.DataFrame([[c['Index'], c['Formula'], c['BA_CV'], c['BA_CV_SD'], c['AUC'], c['AUC_0v1'], c['F'], c['eta2'], c['rho_grade'], c['r_PDI']] for c in WC],
+                    columns=['Index', 'Formula', 'BA (8-fold CV)', 'CV SD', 'AUC', 'AUC grade 0 vs 1', 'ANOVA F', 'η²', 'ρ with grade', 'r with PDI (plots)']).round(3)
+c1, c2 = table(ws, 11, 1, cmp_); note(ws, c2 + 1, 1, 'NDVI: Rouse et al. (1974); NDWI: Gao (1996). AUC 0 vs 1 = grade 0 vs grade 1 (early detection). SWIR index re-derived on the corrected spectra (3_WRI: ND(1564, 2122)).')
+bar(ws, 'L4', 'Balanced accuracy and AUC of the indices', 'Score', Reference(ws, min_col=1, min_row=c1, max_row=c2), [Reference(ws, min_col=3, min_row=c1 - 1, max_row=c2), Reference(ws, min_col=5, min_row=c1 - 1, max_row=c2)], w=20, h=9)
+nt = pd.DataFrame([[r] + ['%s (%.3f)' % (q.formula, q.ba_test) for q in WN[WN.Range == r].itertuples()] for r, _ in rng], columns=['Search', 'Test R1: formula (BA)', 'Test R2: formula (BA)', 'Test R3: formula (BA)'])
+n1, n2 = table(ws, c2 + 4, 1, nt)
+for i in range(len(rng)): ws.cell(n1 + i, 5, '=AVERAGE(%s)' % ','.join('%s%d' % (CL(20 + f), n1 + i) for f in range(3))).number_format = '0.000'
+ws.cell(n1 - 1, 5, 'Mean held-out BA').font = HF; ws.cell(n1 - 1, 5).fill = HFILL
+for i, (r, _) in enumerate(rng):
+    for f, q in enumerate(WN[WN.Range == r].itertuples()): ws.cell(n1 + i, 20 + f, round(q.ba_test, 4))
+ws.cell(n1 - 1, 20, 'BA R1').font = HF; ws.cell(n1 - 1, 21, 'BA R2').font = HF; ws.cell(n1 - 1, 22, 'BA R3').font = HF
+for cc in (20, 21, 22): ws.cell(n1 - 1, cc).fill = HFILL
+note(ws, n2 + 1, 1, 'Nested check: formula and threshold chosen on two replications (+ controls), balanced accuracy on the held-out replication (values in T:V, mean by formula in E).')
+# grade means of the indices
+gm = pd.DataFrame([[g] + [WF['grade_means'][k][j] for k in wn[:5]] for j, g in enumerate(G6)], columns=['Grade'] + [k.split(' (')[0] for k in wn[:5]]).round(4)
+g1, g2 = table(ws, n2 + 4, 1, gm); note(ws, g2 + 1, 1, 'Mean index value per leaf grade (Tukey letters in the Word report and PPT).')
+# ReliefF weights over the whole range
+rf = pd.DataFrame({'Wavelength (nm)': WF['bands_full'], 'ReliefF weight': np.round(WF['wb_full'], 5)})
+w1, w2 = table(ws, 4, 25, rf, widths=[14, 14])
+scatter(ws, 'L24', 'ReliefF weights over 400–2400 nm (healthy vs diseased; water bands kept)', 'Wavelength (nm)', 'ReliefF weight', Reference(ws, min_col=25, min_row=w1, max_row=w2), [Reference(ws, min_col=26, min_row=w1, max_row=w2)], ['ReliefF'], w=22, h=9)
+# live formulas: plot-mean reflectance at the index bands and the four WRIs
+bl = sorted({w for k in wn[:5] for w in (WIX[k][1]['l1'], WIX[k][1]['l2'], WIX[k][1]['l3']) if w is not None})
+r0 = g2 + 4; ws.cell(r0 - 1, 1, 'Plot-mean reflectance (corrected) at the index bands, with live index formulas and CORREL with PDI').font = Font(name=FONT, bold=True)
+hdr = ['Plot-date', 'PDI'] + ['R%d' % w for w in bl] + [k.split(' (')[0] for k in wn[:5]]
+for j, h in enumerate(hdr):
+    c = ws.cell(r0, 1 + j, h); c.font = HF; c.fill = HFILL
+col = {w: CL(3 + j) for j, w in enumerate(bl)}
+for i in range(len(P)):
+    rr_ = r0 + 1 + i; ws.cell(rr_, 1, P.pd[i]); ws.cell(rr_, 2, round(float(P.PDI[i]), 3))
+    for w in bl: ws.cell(rr_, 3 + bl.index(w), round(float(Rp1[i, idx1(w)]), 5)).font = Font(name=FONT, size=10, color='0000FF')
+    for j, k in enumerate(wn[:5]):
+        d = WIX[k][1]; f = '=(%s%d-%s%d)/(%s%d+%s%d)' % (col[d['l1']], rr_, col[d['l2']], rr_, col[d['l1']], rr_, col[d['l2']], rr_)
+        if d['l3'] is not None: f += '%+g*%s%d' % (d['w'], col[d['l3']], rr_)
+        ws.cell(rr_, 3 + len(bl) + j, f).number_format = '0.0000'
+last = r0 + len(P)
+ws.cell(last + 1, 1, 'r with PDI').font = Font(name=FONT, bold=True)
+for j in range(5):
+    cc = CL(3 + len(bl) + j); ws.cell(last + 1, 3 + len(bl) + j, '=CORREL(%s%d:%s%d,$B$%d:$B$%d)' % (cc, r0 + 1, cc, last, r0 + 1, last)).number_format = '0.000'
 
 # ===================== 4 ANOVA =====================
 ws = sheet('4_ANOVA', 'Tier 4 — univariate response: one-way ANOVA across six grades (leaves), Tukey HSD and Pearson r with PDI (plots)', 'F, p, η² = SS_between/SS_total; r_PDI_plot from plot-mean features (n = 192); rho_score_leaf = Spearman ρ with leaf grade. Sorted by F. p-values describe leaves within plots (not independent) and are used only to rank features (Mahlein et al., 2019).')

@@ -15,8 +15,8 @@ a.plot(bands, wb, color='#00695C', lw=1.2)
 for lo, hi in ((1350, 1450), (1800, 1950)): a.axvspan(lo, hi, color='#90CAF9', alpha=0.35, lw=0)
 a.text(1400, wb.max() * 0.95, 'water band\n(kept)', ha='center', fontsize=8, color='#1565C0'); a.text(1875, wb.max() * 0.95, 'water band\n(kept)', ha='center', fontsize=8, color='#1565C0')
 d = W['indices'][names[3]][1]
-for w_, lab, c in ((d['l1'], 'λ1', '#AD1457'), (d['l2'], 'λ2', '#AD1457'), (d['l3'], 'λ3', '#C98A00')):
-    if w_ is not None: a.axvline(w_, color=c, ls='--', lw=1); a.text(w_ + 8, wb.min() + 0.05 * (wb.max() - wb.min()), '%s = %d' % (lab, w_), color=c, fontsize=8)
+for w_, lab, c, ha, hy in ((d['l1'], 'λ1', '#AD1457', 'left', 0.05), (d['l2'], 'λ2', '#AD1457', 'left', 0.05), (d['l3'], 'λ3', '#C98A00', 'right', 0.18)):
+    if w_ is not None: a.axvline(w_, color=c, ls='--', lw=1); a.text(w_ + (8 if ha == 'left' else -8), wb.min() + hy * (wb.max() - wb.min()), '%s = %d' % (lab, w_), color=c, fontsize=8, ha=ha)
 a.set_xlim(400, 2400); a.set_xlabel('Wavelength (nm)'); a.set_ylabel('ReliefF weight')
 a.set_title('(a) ReliefF weights of single bands, 400–2400 nm (healthy vs diseased); dashed: bands of WRI-FULL = %s' % W['indices'][names[3]][0], fontsize=9.5)
 for i, n in enumerate(names[:4]):

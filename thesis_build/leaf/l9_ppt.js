@@ -55,7 +55,7 @@ s.addText('ASD leaf spectra, four dates (Feb–Mar 2026) | Objective 1 tiers and
 // ===================== 2 OUTLINE =====================
 s = slide('Outline');
 const parts = [['1', 'Study and data', 'Objectives, design, ground truth (Tier 0)'], ['2', 'Methodology flow with results', 'Objective 1 and Objective 2 flow charts'], ['3', 'Pre-processing and features', 'Splice, smoothing, derivatives, 1047 bands, 48 indices'],
-  ['4', 'Objective 1 tiers', 'Band selection, WRI, ANOVA, CDA, Boruta, SWIR regions'], ['5', 'Objective 2 models', 'Nested selection, classification, regression'], ['6', 'Results and discussion', 'Major results, findings, implications, conclusions']];
+  ['4', 'Objective 1 tiers', 'Band selection, WRI (VNIR, SWIR, full range), ANOVA, CDA, Boruta, SWIR regions'], ['5', 'Objective 2 models', 'Nested selection, classification, regression'], ['6', 'Results and discussion', 'Major results, findings, implications, conclusions']];
 parts.forEach((p, i) => {
   const x = 0.5 + (i % 3) * 4.15, y = 1.45 + Math.floor(i / 3) * 2.55;
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w: 3.9, h: 2.25, fill: { color: X.light }, line: { color: X.light }, rectRadius: 0.1, objectName: 'part ' + p[0] });
@@ -83,7 +83,7 @@ const f1 = [
   ['Pre-processing', 'Splice correction; 400–2400 nm; water bands removed; SG smoothing; FD, SD', 'Hueni and Bialek, 2017; Savitzky and Golay, 1964', k.n_bands + ' bands × R, FD, SD = 1047 features'],
   ['Tier 1  Features', 'Red edge (REP, Dr, SDr); 39 base + 9 SWIR indices', 'Horler et al., 1983; Apan et al., 2004', '1047 band + 51 features per spectrum'],
   ['Tier 2  Scalogram + ReliefF', 'r with PDI; ReliefF on 6 grades; one band per correlated region', 'Shukla et al., 2024; Robnik-Šikonja and Kononenko, 2003', k.n_rob + ' robust, ' + k.n_reg + ' regression, ' + k.n_cls + ' classification bands'],
-  ['Tier 3  White Rust Index', 'ND + w·R search (VNIR, SWIR); 8-fold plot-grouped CV', 'Mahlein et al., 2013', k.wri + '; BA ' + k.wri_ba + '; r ' + k.wri_r],
+  ['Tier 3  White Rust Index', 'ND + w·R search: VNIR, SWIR and full 400–2400 nm; nested check', 'Mahlein et al., 2013', k.wri + '; BA ' + k.wri_ba + '; full range: same bands (' + k.wf_ba + ')'],
   ['Tier 4  ANOVA + Tukey', 'Six grades (leaves); Pearson r with PDI (plots)', 'Tukey, 1949; Mahlein et al., 2019', k.n_sig + ' of ' + k.n_feat + ' features p < 0.001; top ' + k.top_f[0] + ' (F ' + k.top_f[1] + ')'],
   ['Tier 5  VIF + stepwise CDA', 'Step 1 bands; step 2 indices + WRI', 'Bhattacharya and Chattopadhyay, 2013', 'One severity axis (' + k.cda1[2] + '%); r₁ ' + k.cda1[1] + '; LORO acc. ' + k.cda1[4]],
   ['Tier 6  Boruta', 'All-relevant selection: grades and PDI', 'Kursa and Rudnicki, 2010', k.bor[0] + ' (classification) and ' + k.bor[2] + ' (regression) DSFs']];
@@ -125,7 +125,7 @@ output(s, 'Validated models: compact feature sets (' + k.ofc_sizes[0] + '–' + 
 s = slide('Workflow of the analysis (report Figure 1 and Table 1)');
 img(s, 'l_flow', 0.5, 1.3, 5.6, 4.85, 'Workflow with references in the output boxes');
 table(s, [['Step', 'Method (reference)', 'Output'], ['Tier 0', 'Grades (Conn et al., 1990); PDI (Wheeler, 1969); LORO folds', 'Labelled tables'], ['Pre-processing', 'Splice (Hueni and Bialek, 2017); SG (Savitzky and Golay, 1964)', 'Clean spectra'],
-  ['Tier 1', 'Red edge (Horler et al., 1983); indices (Apan et al., 2004)', '1047 + 51 features'], ['Tier 2', 'Scalogram (Shukla et al., 2024); ReliefF (Robnik-Šikonja and Kononenko, 2003)', 'Band lists'], ['Tier 3', 'WRI search (Mahlein et al., 2013)', 'WRI'],
+  ['Tier 1', 'Red edge (Horler et al., 1983); indices (Apan et al., 2004)', '1047 + 51 features'], ['Tier 2', 'Scalogram (Shukla et al., 2024); ReliefF (Robnik-Šikonja and Kononenko, 2003)', 'Band lists'], ['Tier 3', 'WRI search: VNIR, SWIR, full range (Mahlein et al., 2013)', 'WRI'],
   ['Tier 4', 'ANOVA + Tukey (Tukey, 1949)', 'Responding features'], ['Tier 5', 'VIF + stepwise CDA (Bhattacharya and Chattopadhyay, 2013)', 'Separability'], ['Tier 6', 'Boruta (Kursa and Rudnicki, 2010)', 'DSF pools'], ['Objective 2', 'Nested LORO; ML-SFFS (Pudil et al., 1994)', 'Validated models']],
   6.4, 1.3, 6.4, [1.25, 3.75, 1.4], 11, 0.44);
 
@@ -144,7 +144,7 @@ bul(s, ['11 February: mostly grades 0–1 (onset)', 'From 24 February all grades
 output(s, 'All six grades represented; severity increases over time; unequal class sizes handled in modelling.');
 
 s = slide('Pre-processing of the ASD spectra');
-bul(s, ['Splice correction at 1000 nm (mean step ' + k.splice + ')', '400–2400 nm kept; 350–399 nm noisy', '1350–1450 and 1800–1950 nm removed', 'Savitzky–Golay smoothing, 11 nm, 2nd order', 'First and second derivatives', '5 nm bands → 349 × (R, FD, SD)', 'Plot spectrum = mean of leaves per plot-date'], { x: 0.5, y: 1.3, w: 5.1, h: 4.2 });
+bul(s, ['Splice correction at 1000 nm (mean step ' + k.splice + ')', '400–2400 nm kept; 350–399 nm noisy', '1350–1450 and 1800–1950 nm removed for band selection; kept for the full-range WRI (contact probe)', 'Savitzky–Golay smoothing, 11 nm, 2nd order', 'First and second derivatives', '5 nm bands → 349 × (R, FD, SD)', 'Plot spectrum = mean of leaves per plot-date'], { x: 0.5, y: 1.3, w: 5.1, h: 4.2 });
 refs(s, 'Hueni and Bialek, 2017; Thenkabail et al., 2004; Savitzky and Golay, 1964; Tsai and Philpot, 1998.');
 img(s, 'l_spectra', 5.8, 1.35, 7.0, 4.5, 'Mean leaf reflectance (a) and first derivative (b) of the six grades');
 output(s, 'Clean spectra: visible and SWIR reflectance rise, NIR falls and the red-edge peak drops and shifts with increasing grade.');
@@ -185,6 +185,34 @@ table(s, D.t_wri, 0.5, 1.35, 6.6, [2.9, 1.25, 1.25, 1.2], 11, 0.38);
 s.addChart(pres.charts.BAR, [{ name: 'Mean WRI', labels: ['G0', 'G1', 'G3', 'G5', 'G7', 'G9'], values: D.wri_means }],
   ax({ x: 7.4, y: 1.3, w: 5.4, h: 4.85, barDir: 'col', chartColors: GC, showValue: true, dataLabelPosition: 'outEnd', dataLabelFormatCode: '0.000', showLegend: false, showTitle: true, title: 'Mean VNIR WRI by leaf grade' }));
 output(s, 'The WRI decreases steadily from grade 0 to 9, combining NIR structure (750 nm), water (948 nm) and red-edge chlorophyll (696 nm).');
+
+// ---------- Tier 3b: full-range WRI (contact probe) ----------
+s = slide('Tier 3b: full-range WRI with contact-probe spectra');
+bul(s, ['Contact probe has its own light source and a few-mm path: no atmospheric water-vapour effect, so water bands are kept', 'Absorption near 1450 and 1940 nm is then leaf liquid water, a disease-relevant signal', 'Same rules as Tier 3: ND + w·R, 6 nm, ND bands ≥ 50 nm apart, ReliefF top 25%', 'Four searches on the same splice-corrected spectra', 'Nested LORO: index formula chosen without the test replication'], { x: 0.5, y: 1.3, w: 5.1, h: 4.2, fontSize: 13 });
+refs(s, 'Mahlein et al., 2013; Gao, 1996; Hunt and Rock, 1989; Hueni and Bialek, 2017; Varma and Simon, 2006.');
+table(s, D.t_wf_search, 5.8, 1.35, 7.0, [0.75, 1.5, 0.55, 0.75, 0.9, 1.75, 0.8], 10, 0.62);
+output(s, 'Whole range: ' + k.wf_nb + ' bands, ' + k.wf_npairs + ' pairs, ' + k.wf_ncand + ' candidates; best WRI-FULL = ' + k.wf + ' (BA ' + k.wf_ba + '), the same red-edge / NIR / 970 nm region as the VNIR WRI.');
+
+s = slide('Tier 3b results: ReliefF (400–2400 nm) and WRIs by grade');
+img(s, 'l_wri_full', 0.5, 1.3, 12.3, 4.75, '');
+output(s, 'ReliefF peaks in the red edge (≈700 nm); smaller peaks fall inside the kept water bands (≈1450, 1880 nm). All four WRIs fall steadily with grade.');
+
+s = slide('Tier 3b results: comparison of the White Rust Indices');
+table(s, D.t_wf_cmp, 0.5, 1.3, 12.3, [1.75, 2.75, 0.95, 0.95, 1.15, 0.85, 0.85, 1.3, 1.75], 11, 0.36);
+bul(s, ['WRI-FULL ≈ WRI-VNIR (BA ' + k.wf_ba + ' vs ' + k.wv_ba2 + ', within CV SD 0.02): the whole range adds no extra discrimination',
+  'Keeping water bands improves the SWIR index (BA ' + k.ws_ba2 + ' → ' + k.wsw_ba + '; r with PDI −0.66 → −0.71), but SWIR stays below VNIR',
+  'All WRIs beat NDVI and NDWI; simplest two-band ' + k.wnd + ' gives the highest F and best grade 0 vs 1 AUC'], { x: 0.5, y: 4.35, w: 12.3, h: 1.45, fontSize: 13 });
+s.addText('BA (CV) = 8-fold plot-grouped CV of the threshold (formula selected on all leaves); AUC 0 vs 1 = grade 0 vs grade 1 (early detection). SWIR index re-derived on corrected spectra: ND(1564, 2116) (Tier 3: ND(1564, 2122)). References: Rouse et al., 1974; Gao, 1996; Mahlein et al., 2013.',
+  { isTextBox: true, x: 0.5, y: 5.8, w: 12.3, h: 0.45, fontSize: 9.5, italic: true, color: X.grey, margin: 0 });
+output(s, 'Best overall: WRI-FULL ≈ WRI-VNIR ≈ ND(790, 862) > SWIR-W > SWIR > NDVI > NDWI.');
+
+s = slide('Tier 3b results: nested leave-one-replication-out check');
+table(s, D.t_wf_nested, 0.5, 1.3, 12.3, [1.0, 3.45, 3.45, 3.45, 0.95], 11, 0.42);
+s.addChart(pres.charts.BAR, [{ name: 'BA, 8-fold CV (formula from all leaves)', labels: ['VNIR', 'SWIR', 'SWIR-W', 'FULL'], values: [D.wf_bar['WRI-VNIR'][0], D.wf_bar['WRI-SWIR'][0], D.wf_bar['WRI-SWIR-W'][0], D.wf_bar['WRI-FULL'][0]] },
+  { name: 'BA, nested LORO (formula from training reps)', labels: ['VNIR', 'SWIR', 'SWIR-W', 'FULL'], values: ['VNIR', 'SWIR', 'SWIR-W', 'FULL'].map(r => +k.nest[r]) }],
+  ax({ x: 0.5, y: 3.6, w: 6.4, h: 2.6, barDir: 'col', chartColors: [X.teal, X.mustard], showValue: true, dataLabelPosition: 'outEnd', dataLabelFormatCode: '0.00', showLegend: true, legendPos: 'b', valAxisMinVal: 0.5, valAxisMaxVal: 0.85 }));
+bul(s, ['VNIR and FULL searches choose the same region in every fold: 748–808 vs 862–994 nm (± R696–700)', 'SWIR formulas change between folds: less stable and lower held-out BA', 'Held-out BA ≈ ' + k.nest.VNIR + ' (VNIR), ' + k.nest.FULL + ' (FULL), ' + k.nest.SWIR + ' (SWIR), ' + k.nest['SWIR-W'] + ' (SWIR-W)'], { x: 7.1, y: 3.7, w: 5.7, h: 2.5, fontSize: 13 });
+output(s, 'Recommended: VNIR WRI (UAV-compatible); the whole-range search confirms it. SWIR index with water bands is complementary severity information.');
 
 s = slide('Tier 4: univariate response (ANOVA, Tukey HSD, r with PDI)');
 bul(s, ['One-way ANOVA across six grades (leaves): F, η²', 'Tukey HSD pairwise grade groups', 'Pearson r with PDI (plot-mean features)', 'Spearman ρ with leaf grade', 'p-values used only to rank (leaves within plots)'], { x: 0.5, y: 1.3, w: 5.1, h: 4.0 });
@@ -279,7 +307,7 @@ output(s, 'Models are consistent across dates with sufficient severity range and
 section('Results, findings and discussion', 'What the leaf analysis shows and what it means');
 s = slide('Outputs of each step');
 table(s, [['Step', 'Output', 'Key result'], ['Tier 0', 'Labelled data, folds', k.n_leaves + ' leaves; ' + k.n_pd + ' plot-dates'], ['Pre-processing', 'Clean spectra', '349 bands × R, FD, SD'], ['Tier 1', 'Feature tables', '1047 band + 51 features'],
-  ['Tier 2', 'Band lists', k.n_rob + ' robust bands (630–860 nm); max r ' + k.maxr_fd[0] + ' (FD' + k.maxr_fd[1] + ')'], ['Tier 3', 'White Rust Index', k.wri + '; BA ' + k.wri_ba + '; r ' + k.wri_r], ['Tier 4', 'Responding features', k.n_sig + '/' + k.n_feat + ' significant; SWIR |r| up to ' + k.swir_maxr],
+  ['Tier 2', 'Band lists', k.n_rob + ' robust bands (630–860 nm); max r ' + k.maxr_fd[0] + ' (FD' + k.maxr_fd[1] + ')'], ['Tier 3', 'White Rust Index', k.wri + '; BA ' + k.wri_ba + '; r ' + k.wri_r + '; full-range WRI ' + k.wf + ' (BA ' + k.wf_ba + ')'], ['Tier 4', 'Responding features', k.n_sig + '/' + k.n_feat + ' significant; SWIR |r| up to ' + k.swir_maxr],
   ['Tier 5', 'Separability', 'One severity axis; r₁ ' + k.cda1[1] + '; ±1 grade ' + k.cda1[5]], ['Tier 6', 'DSF pools', k.bor[0] + ' classification, ' + k.bor[2] + ' regression features'], ['SWIR analysis', 'Robust SWIR regions', '1495–1515, 1595–1615, 1965–1995 nm'],
   ['Objective 2 (grades)', 'Classifier', k.bc + ': macro-F1 ' + k.c_mf1 + '; ±1 grade ' + k.c_adj + '; healthy vs diseased ' + k.c_det], ['Objective 2 (PDI)', 'Regressor', k.br + ': R² ' + k.r_r2 + '; RMSE ' + k.r_rmse + '; RPD ' + k.r_rpd]],
   0.5, 1.3, 12.3, [2.3, 2.6, 7.4], 12, 0.4);
@@ -300,11 +328,11 @@ s = slide('Key findings and literature support');
 table(s, [['Finding', 'Evidence in this study', 'Literature'], ['Red-edge derivatives are the most robust features', 'Tiers 2, 4, 5, 6 all select FD/SD at 680–860 nm', 'Horler et al., 1983; Filella and Peñuelas, 1994; Shukla et al., 2024'],
   ['A disease-specific index works better than general indices', 'WRI top univariate and regression feature', 'Mahlein et al., 2013; Ashourloo et al., 2014; Meng et al., 2020'], ['SWIR adds water-loss information', 'DWSI-5, MSI, NDII, NDWI respond; DWSI-5 in DSF pool', 'Apan et al., 2004; Yu et al., 2018; Kundu et al., 2021'],
   ['Neighbouring grades overlap', 'One canonical axis; errors mostly adjacent', 'Mandal et al., 2023; Meng et al., 2020; Lv et al., 2023'], ['PDI regression is more reliable than exact grades', 'Plot averaging reduces within-plot noise', 'Liu et al., 2024; Feng et al., 2022'],
-  ['Compact nested models generalise', 'Selected features match all-feature baselines', 'Varma and Simon, 2006; Tian et al., 2021; Mustafa et al., 2023']], 0.5, 1.3, 12.3, [3.6, 4.0, 4.7], 12, 0.62);
+  ['Compact nested models generalise', 'Selected features match all-feature baselines', 'Varma and Simon, 2006; Tian et al., 2021; Mustafa et al., 2023'], ['The VNIR carries the white-rust index signal', 'Whole-range (400–2400 nm) search selects 748, 994, 700 nm; SWIR indices weaker', 'Mahlein et al., 2013; Apan et al., 2004']], 0.5, 1.3, 12.3, [3.6, 4.0, 4.7], 12, 0.6);
 
 s = slide('Discussion: physiological interpretation');
 const dz = [['Red edge', 'Pustules and chlorosis reduce chlorophyll and disturb mesophyll structure, lowering and shifting the red-edge slope; first derivatives at 790–830 nm capture this best (Horler et al., 1983; Carter and Knapp, 2001).', X.teal],
-  ['White Rust Index', 'Combines NIR plateau (750 nm), the 970 nm water-band shoulder (948 nm) and red-edge chlorophyll (696 nm): structure, water and pigment in one index (Mahlein et al., 2013).', X.mustard],
+  ['White Rust Index', 'Combines NIR plateau (750 nm), the 970 nm water-band shoulder (948 nm) and red-edge chlorophyll (696 nm): structure, water and pigment in one index (Mahlein et al., 2013). A whole-range search with water bands kept chose the same bands (748, 994, 700 nm).', X.mustard],
   ['SWIR', 'Infected leaves lose water, raising reflectance near 1500, 1600 and 1970 nm; the SWIR signal grows with severity, so it is a severity rather than an early marker (Apan et al., 2004).', X.green]];
 dz.forEach((d, i) => {
   const x = 0.5 + i * 4.15;
@@ -324,11 +352,11 @@ s = slide('Implications for UAV and satellite analysis, and limitations');
 s.addText('Implications', { isTextBox: true, x: 0.5, y: 1.3, w: 6.0, h: 0.45, fontSize: 18, bold: true, color: X.teal, margin: 0 });
 bul(s, ['Prioritise the red edge (690–860 nm) in UAV band selection; MS red-edge band expected to be most useful', 'Test the leaf WRI on UAV canopy spectra (recalibration likely)', 'Use SWIR water indices and 1595–1615 nm as complementary features', 'Apply the same nested chain (Tier 2 → Boruta → VIF → ML-SFFS) to UAV data'], { x: 0.5, y: 1.8, w: 6.0, h: 4.3, fontSize: 14 });
 s.addText('Limitations', { isTextBox: true, x: 6.8, y: 1.3, w: 6.0, h: 0.45, fontSize: 18, bold: true, color: X.berry, margin: 0 });
-bul(s, ['Leaf data are an upper bound for canopy performance (Mahlein, 2016)', 'WRI formula searched on all leaves; threshold and accuracy cross-validated', 'Leaf-level p-values optimistic (leaves within plots)', 'One season, one site; independent validation pending', 'Physiological measurements (pigments, RWC) to be added'], { x: 6.8, y: 1.8, w: 6.0, h: 4.3, fontSize: 14 });
+bul(s, ['Leaf data are an upper bound for canopy performance (Mahlein, 2016)', 'WRI formula searched on all leaves; nested LORO check gives held-out BA ≈ ' + k.nest.VNIR, 'Leaf-level p-values optimistic (leaves within plots)', 'One season, one site; independent validation pending', 'Physiological measurements (pigments, RWC) to be added'], { x: 6.8, y: 1.8, w: 6.0, h: 4.3, fontSize: 14 });
 output(s, 'Leaf results fix the wavelengths and index to test at canopy and satellite scale.');
 
 s = slide('Conclusions');
-const cc = [['1', 'Red-edge first and second derivatives (680–860 nm) are the most robust white-rust features'], ['2', 'A VNIR White Rust Index (' + k.wri + ') separates healthy and diseased leaves and tracks PDI'], ['3', 'SWIR water regions (1495–1515, 1595–1615, 1965–1995 nm) add severity information'],
+const cc = [['1', 'Red-edge first and second derivatives (680–860 nm) are the most robust white-rust features'], ['2', 'A VNIR White Rust Index (' + k.wri + ') separates healthy and diseased leaves and tracks PDI; a whole-range search confirms it'], ['3', 'SWIR water regions (1495–1515, 1595–1615, 1965–1995 nm) add severity information'],
   ['4', 'Severity acts as one spectral axis; neighbouring grades overlap, so PDI and ±1-grade accuracy are essential'], ['5', 'Compact nested models predict plot PDI well and give honest accuracy estimates']];
 cc.forEach((c, i) => {
   const y = 1.35 + i * 0.95;

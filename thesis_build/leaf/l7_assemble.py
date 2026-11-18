@@ -1,13 +1,15 @@
 """Assemble the leaf-analysis Word document (docx JS) from the thesis helpers, the generated body and the reference pool."""
 import re, json, os
 B = os.path.dirname(os.path.abspath(__file__)) + '/'; S = B + '../'; D = B + 'data/'
+import sys; SLIDES = '--slides' in sys.argv
+OUTF = 'Leaf_ASD_slide_by_slide_guide.docx' if SLIDES else 'Leaf_ASD_analysis_report.docx'
 T = open(S + 'thesis/t_docx.js').read()
 head = T[:T.index('// ======================= TITLE')]
 head = re.sub(r"const B = '.*?';", "const B = '%s';" % B, head)
-head = re.sub(r"const OUT = '.*?';", "const OUT = '%s';" % (S + 'outputs/Leaf_ASD_analysis_report.docx'), head)
+head = re.sub(r"const OUT = '.*?';", "const OUT = '%s';" % (S + 'outputs/' + OUTF), head)
 head = re.sub(r"const FORDER = \[.*?\];", "const FORDER = __FORDER__;", head)
 head = re.sub(r"const TORDER = \[.*?\];", "const TORDER = __TORDER__;", head)
-body = open(D + 'docx_body.js').read()
+body = open(D + ('docx_body_slides.js' if SLIDES else 'docx_body.js')).read()
 assert 'children: [new Paragraph({ children: runs(String(c)' in head
 head = head.replace('children: [new Paragraph({ children: runs(String(c)', 'children: [new Paragraph({ keepNext: true, children: runs(String(c)')
 
@@ -20,7 +22,10 @@ pool += ["Hueni, A., Bialek, A. (2017). Cause, effect, and correction of field s
          "Ashourloo, D., Mobasheri, M.R., Huete, A. (2014). Developing two spectral disease indices for detection of wheat leaf rust (Puccinia triticina). Remote Sensing 6(6), 4723–4740.",
          "Mahlein, A.-K., Steiner, U., Hillnhütter, C., Dehne, H.-W., Oerke, E.-C. (2012). Hyperspectral imaging for small-scale analysis of symptoms caused by different sugar beet diseases. Plant Methods 8, 3.",
          "Chang, C.-W., Laird, D.A., Mausbach, M.J., Hurburgh, C.R. (2001). Near-infrared reflectance spectroscopy–principal components regression analyses of soil properties. Soil Science Society of America Journal 65(2), 480–490.",
-         "Saharan, G.S., Verma, P.R., Meena, P.D., Kumar, A. (2014). White Rust of Crucifers: Biology, Ecology and Management. Springer India, New Delhi."]
+         "Saharan, G.S., Verma, P.R., Meena, P.D., Kumar, A. (2014). White Rust of Crucifers: Biology, Ecology and Management. Springer India, New Delhi.",
+         "Rouse, J.W., Haas, R.H., Schell, J.A., Deering, D.W. (1974). Monitoring vegetation systems in the Great Plains with ERTS. Third ERTS Symposium, NASA SP-351, 309–317.",
+         "Cohen, J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37–46.",
+         "Sokolova, M., Lapalme, G. (2009). A systematic analysis of performance measures for classification tasks. Information Processing and Management 45(4), 427–437."]
 pat = re.compile(r"([A-Z][A-Za-zÀ-ÿŠš\-]+)(?: et al\.| and [A-Z][A-Za-zÀ-ÿ\-]+)?,? \(?(\d{4})[a-z]?")
 cites = set((m.group(1), m.group(2)) for m in pat.finditer(body))
 def rk(r):
@@ -36,7 +41,7 @@ missing = sorted(x for x in cites if x not in have and x[0] not in skip and 1900
 print('missing refs:', missing)
 q = lambda s: "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
 body += "\nK.push(H1('References'));\nconst refPara = r => new Paragraph({ spacing: { after: 70, line: 255 }, indent: { left: 400, hanging: 400 }, children: [new TextRun({ text: r, font: FONT, size: 18 })] });\n[\n" + '\n'.join('  ' + q(r) + ',' for r in used) + "\n].forEach(r => K.push(refPara(r)));\n"
-json.dump(used, open(D + 'refs_used.json', 'w'), indent=0, ensure_ascii=False)
+json.dump(used, open(D + ('refs_slides.json' if SLIDES else 'refs_used.json'), 'w'), indent=0, ensure_ascii=False)
 FO = [m.group(2) for m in re.finditer(r"\b(fig2|FIG)\('([A-Za-z0-9]+)'", body)]
 TO = [m.group(2) for m in re.finditer(r"\b(tab2|TAB)\('([A-Za-z0-9]+)'", body)]
 assert len(FO) == len(set(FO)) and len(TO) == len(set(TO))
@@ -44,7 +49,7 @@ mf = set(re.findall(r"\bF\('([A-Za-z0-9]+)'\)", body)) - set(FO); mt = set(re.fi
 assert not mf and not mt, (mf, mt)
 head = head.replace('__FORDER__', repr(FO)).replace('__TORDER__', repr(TO))
 tail = T[T.index('\nconst numcfg'):]
-tail = tail.replace("title: 'AI-based multimodal UAV sensing of white rust in mustard: complete methodology'", "title: 'Leaf-level ASD analysis of white rust in mustard'")
+tail = tail.replace("title: 'AI-based multimodal UAV sensing of white rust in mustard: complete methodology'", "title: '%s'" % ('Leaf-level ASD analysis: slide-by-slide guide' if SLIDES else 'Leaf-level ASD analysis of white rust in mustard'))
 tail = re.sub(r"'eqs', \d+, 'refs', \d+", "'eqs', 0, 'refs', %d" % len(used), tail)
-open(B + 'l7_build.js', 'w').write(head + '\n' + body + '\n' + tail)
+open(B + ('l11_build.js' if SLIDES else 'l7_build.js'), 'w').write(head + '\n' + body + '\n' + tail)
 print('figs', len(FO), 'tabs', len(TO), 'refs', len(used))
