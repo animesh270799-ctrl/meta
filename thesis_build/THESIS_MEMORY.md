@@ -102,3 +102,7 @@ Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 
 - User uploaded `White_rust_final_methodology_a.pdf` (41 pages, the earlier version with Kruskal–Wallis/Spearman, Cliff's δ, JM, one-SE rule, no paper lists, no class-overlap section) and said they are working on it; asked which base to continue from, no preference given yet. Latest sources in `thesis_build/` include all later changes.
 - Final PDF + Word produced on user request (Nov 2026); rebuild after any change.
 - Confirm endmember algorithm, NDVI/SAM combination (AND), ASD file date, and whether Objective 2 wording changes.
+
+### 4f. Full leaf results deck (Nov 2026)
+- `thesis_build/leaf/l9_data.py` (exports data/deck.json) + `l9_ppt.js` → `outputs/Leaf_ASD_analysis_presentation_full.pptx` (45 slides): flow charts of Obj 1 and Obj 2 with method, reference and result in each box; one slide per step with refs (et al., year), figure/table and an "Output:" banner; all report tables and figures; step-output summary; major results, findings vs literature, discussion, implications/limitations, conclusions; 59 references.
+- Rebuild: `cd thesis_build/leaf && python3 l9_data.py && NODE_PATH=$PWD/node_modules node l9_ppt.js`.
