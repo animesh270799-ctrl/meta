@@ -77,12 +77,15 @@ def wform(d):
 
 if __name__ == '__main__':
     t0 = time.time(); allrows = np.arange(len(M))
-    jobs = [(r, allrows, r + ' all') for r in RANGES] + [(r, np.where(fold != f)[0], '%s fold%d' % (r, f)) for r in RANGES for f in range(3)]
-    res = Parallel(n_jobs=3, verbose=0)(delayed(search)(RANGES[r], rows, lab) for r, rows, lab in jobs)
-    S = {lab: v for (r, rows, lab), v in zip(jobs, res)}
+    if '--compare' in sys.argv:          # reuse saved searches, recompute the comparison only
+        prev = json.load(open(D + 'wri_full.json')); S = prev['searches']; S['FULL all']['Wb'] = prev['wb_full']
+    else:
+        jobs = [(r, allrows, r + ' all') for r in RANGES] + [(r, np.where(fold != f)[0], '%s fold%d' % (r, f)) for r in RANGES for f in range(3)]
+        res = Parallel(n_jobs=3, verbose=0)(delayed(search)(RANGES[r], rows, lab) for r, rows, lab in jobs)
+        S = {lab: v for (r, rows, lab), v in zip(jobs, res)}
     print('searches done %.0fs' % (time.time() - t0), flush=True)
-    old = json.load(open(D + 'res1.json'))['wri']
-    IDX = {'WRI-VNIR (450–950 nm)': old['vnir'], 'WRI-SWIR (1000–2400 nm, water bands removed)': old['swir'],
+    # all indices re-derived on the same (corrected) spectra with the same rules
+    IDX = {'WRI-VNIR (450–950 nm)': S['VNIR all']['top'][0], 'WRI-SWIR (1000–2400 nm, water bands removed)': S['SWIR all']['top'][0],
            'WRI-SWIR-W (1000–2400 nm, water bands kept)': S['SWIR-W all']['top'][0], 'WRI-FULL (400–2400 nm)': S['FULL all']['top'][0],
            'ND-FULL (best two-band, 400–2400 nm)': S['FULL all']['best_nd']}
     NDVI = lambda Rm: (Rm[:, idx(800)] - Rm[:, idx(670)]) / (Rm[:, idx(800)] + Rm[:, idx(670)])
