@@ -58,6 +58,24 @@ out['t_reg'] = [['Model', 'R²', 'RMSE (PDI %)', 'NRMSE', 'RPD']] + [[k, f2(q['r
 out['reg_bar'] = {k: round(max(q['r2'], 0), 3) for k, q in rr.items()}
 out['t_date'] = [['Date', 'OA', 'Macro-F1', 'R² (PDI)', 'RMSE (PDI)']] + [[d, f2(q['oa']), f2(q['macro_f1']), (f2(q['r2']) if q['r2'] is not None else '—'), '%.1f' % q['rmse']] for d, q in R2['by_date'].items()]
 out['t_var'] = [['Variety', 'Macro-F1', 'R² (PDI)']] + [[k, f2(q['macro_f1']), f2(q['r2'])] for k, q in R2['by_variety'].items()]
+# ---- full-range WRI comparison (l10_wri_full.py) ----
+if os.path.exists(D + 'wri_full.json'):
+    WF = json.load(open(D + 'wri_full.json')); C = WF['comparison']; S = WF['searches']; N = pd.DataFrame(WF['nested'])
+    nm = [c['Index'] for c in C]; IX = WF['indices']
+    out['k'].update(wf=IX[nm[3]][0], wf_ba=f3(C[3]['BA_CV']), wf_auc=f3(C[3]['AUC']), wf_r=f2(C[3]['r_PDI']), wsw=IX[nm[2]][0], wsw_ba=f3(C[2]['BA_CV']),
+                    wnd=IX[nm[4]][0], wnd_ba=f3(C[4]['BA_CV']), wv_ba2=f3(C[0]['BA_CV']), wv_auc=f3(C[0]['AUC']), ws_ba2=f3(C[1]['BA_CV']),
+                    wf_ncand='{:,}'.format(S['FULL all']['n_cand']), wf_npairs='{:,}'.format(S['FULL all']['n_pairs']), wf_nb=S['FULL all']['n_bands'],
+                    nest={r: f3(N[N.Range == r].ba_test.mean()) for r in ('VNIR', 'SWIR', 'SWIR-W', 'FULL')})
+    rng = {'VNIR': '450–950 nm', 'SWIR': '1000–2400 nm, water bands removed', 'SWIR-W': '1000–2400 nm, water bands kept', 'FULL': '400–2400 nm, all bands'}
+    out['t_wf_search'] = [['Search', 'Wavelengths', 'Bands', 'ND pairs', 'Candidates', 'Best index (all leaves)', 'BA (8-fold CV)']] + \
+        [[r, rng[r], str(S[r + ' all']['n_bands']), '{:,}'.format(S[r + ' all']['n_pairs']), '{:,}'.format(S[r + ' all']['n_cand']),
+          IX[nm[{'VNIR': 0, 'SWIR': 1, 'SWIR-W': 2, 'FULL': 3}[r]]][0] if r != 'SWIR' else IX[nm[1]][0], f3(S[r + ' all']['top'][0]['ba_cv'])] for r in rng]
+    out['t_wf_cmp'] = [['Index', 'Formula', 'BA (CV)', 'AUC', 'AUC 0 vs 1', 'F', 'η²', 'ρ grade', 'r PDI']] + \
+        [[c['Index'].split(' (')[0], c['Formula'], f3(c['BA_CV']), f3(c['AUC']), f3(c['AUC_0v1']), '%.0f' % c['F'], f2(c['eta2']), f2(c['rho_grade']), f2(c['r_PDI'])] for c in C]
+    out['t_wf_nested'] = [['Search', 'Test R1: formula (BA)', 'Test R2: formula (BA)', 'Test R3: formula (BA)', 'Mean BA']] + \
+        [[r] + ['%s (%s)' % (q.formula, f3(q.ba_test)) for q in N[N.Range == r].itertuples()] + [f3(N[N.Range == r].ba_test.mean())] for r in rng]
+    out['wf_bar'] = {c['Index'].split(' (')[0]: [round(c['BA_CV'], 3), round(c['AUC'], 3), round(c['AUC_0v1'], 3)] for c in C}
+    out['wf_means'] = {k_.split(' (')[0]: v_ for k_, v_ in WF['grade_means'].items()}
 # ---- figure aspect ratios ----
 out['img'] = {f[:-4]: round(Image.open(FG + f).size[1] / Image.open(FG + f).size[0], 4) for f in os.listdir(FG) if f.endswith('.png')}
 out['refs'] = json.load(open(D + 'refs_used.json'))
