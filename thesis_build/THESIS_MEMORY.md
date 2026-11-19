@@ -125,3 +125,8 @@ Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 
 - **Endmember algorithm = SMACC (ENVI)** per plot (Gruninger et al. 2004) — answers the pending question; outputs spectral library, abundance maps, endmember ROIs. In progress (24 Feb image done 8 Jul 2026).
 - Open: flowers keep/remove (proposal: remove from leaf spectrum, keep fraction as covariate, keep for staghead); MS data units (DN/radiance/reflectance); thermal emissivity correction. Stage mix on one date: 16 vegetative, 22 flowering, 10 pod plots.
 - Decks: advisory deck now 53 slides (3 "UAV processing done" slides added; A1.4 slide uses SMACC, 483 bands, SG 5/2); new `outputs/UAV_processing_steps_done_flowcharts.pptx` (15 slides, `acm/done_ppt.js`).
+
+### 4j. Field layout 2026-27 revised (19 Nov 2026)
+- User: buffer 10 m, plot 5 m × 3 m, total field 48 m × 24 m, show variety and date of sowing. → 12 columns × 3 m + 10 m buffer = 46 m, so bunds = 0.2 m (healthy block 9.4 m, inoculated block 28.6 m). Script `acm/field_layout_ppt.js` → `outputs/Field_layout_2026-27_10m_buffer.pptx` (layout + treatment/plot-number table); geometry saved in layout.json 'buffer10' and used by the advisory deck.
+- Assumed (confirm): V1 PM 26, V2 Pusa Vijay, V3 PM 37 (glasshouse names); sowing D1 20 Nov, D2 30 Nov, D3 10 Dec, D4 20 Dec 2026.
+- Container restart wiped thesis_build/outputs and leaf/node_modules; reinstall pptxgenjs in leaf/ and rebuild outputs from scripts when needed.

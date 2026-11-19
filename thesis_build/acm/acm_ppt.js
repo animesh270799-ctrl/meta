@@ -137,7 +137,7 @@ objs.forEach((o, i) => { const y = 1.3 + i * 1.75;
   txt(s, [{ text: o[1], options: { bold: true, fontSize: 17, color: X.navy, breakLine: true } }, { text: o[2], options: { fontSize: 13, color: X.text } }], { x: 1.9, y: y + 0.08, w: 10.9, h: 1.4, valign: 'middle' }); });
 
 s = slide('What is updated since the ORW (2025)');
-table(s, [['Component', 'ORW (2025)', 'Updated methodology (2026-27)'], ['Experiments', 'Field (IARI) + controlled condition; 72 plots of 3 m × 3 m', 'Drone field: 48 plots of 5 m × 3.5 m (4 dates × 3 varieties × 3 rep. + 12 healthy); glasshouse: 48 pots; validation at Bharatpur'],
+table(s, [['Component', 'ORW (2025)', 'Updated methodology (2026-27)'], ['Experiments', 'Field (IARI) + controlled condition; 72 plots of 3 m × 3 m', 'Drone field: 48 plots of 5 m × 3 m (4 dates × 3 varieties × 3 rep. + 12 healthy); glasshouse: 48 pots; validation at Bharatpur'],
   ['Sensors', 'RGB, MS, TIR, Headwall Co-Aligned HP, ASD', '+ Headwall Nano (VNIR); glasshouse RGB, MS, TIR, hyperspectral imaging, ASD; IRGA and canopy analyzer'],
   ['Ground truth', '0–6 scale; DI; five DI classes', 'Leaf grade 0–9 key → six grades (0, 1, 3, 5, 7, 9) and plot PDI (Conn et al., 1990; Wheeler, 1969); staghead %'],
   ['Pre-processing', 'NDVI threshold mask; plot mean', 'NDVI > 0.6 AND SAM < 0.3 rad crop mask on HS, transferred to all sensors; flower pixels removed; SMACC endmember-based plot spectrum'],
@@ -154,7 +154,7 @@ hbox(s, 0.45, 1.2, 4.0, 4.8, 'Completed', ['IARI field experiment (rabi 2025-26)
   'Leaf-level ASD analysis: 2339 leaf spectra, 4 dates, 48 plots, full tier methodology applied', 'Detailed methodology document (Objectives 1–3)'], X.field, X.lfield, { fs: 13.5 });
 hbox(s, 4.6, 1.2, 4.0, 4.8, 'Key leaf-level findings', ['Red-edge first derivatives (790–830 nm) most robust (r with PDI up to 0.78)', 'White Rust Index ND(750, 948) − 0.5 R696: balanced accuracy 0.77; a whole-range search (400–2400 nm) chose the same region',
   'SWIR water indices respond (|r| up to 0.63)', 'Six-grade macro-F1 0.32, ±1-grade 0.73, healthy vs diseased 0.78; plot PDI R² 0.74 (nested validation)'], X.o1, X.lo1, { fs: 12.5 });
-hbox(s, 8.75, 1.2, 4.13, 4.8, 'Lessons used in the update', ['Neighbouring grades overlap → report ±1-grade accuracy and PDI regression', 'Nested selection needed for honest accuracy', 'Healthy plots need isolation → 30 m buffer / isolation compartment', 'Denser early sampling needed for pre-symptomatic analysis → glasshouse study'], X.glass, X.lglass, { fs: 12.5 });
+hbox(s, 8.75, 1.2, 4.13, 4.8, 'Lessons used in the update', ['Neighbouring grades overlap → report ±1-grade accuracy and PDI regression', 'Nested selection needed for honest accuracy', 'Healthy plots need isolation → 10 m buffer / isolation compartment', 'Denser early sampling needed for pre-symptomatic analysis → glasshouse study'], X.glass, X.lglass, { fs: 12.5 });
 banner(s, 'The leaf-level analysis validated the tier chain on real data; the same chain is now applied to drone and glasshouse imagery.', X.gold, X.out, 6.15, 0.45);
 
 s = slide('Leaf-level proof of concept (ASD, 2025-26)');
@@ -220,17 +220,17 @@ box(s, 0.45, 5.9, 12.43, 0.62, 'Validation: nested leave-one-replication-out  �
 // =========================== EXPERIMENTS ===========================
 section('Experimental set-up 2026-27', 'Drone-based field experiment, glasshouse pot study and validation sites');
 s = slide('Drone-based field experiment (IARI, rabi 2026-27)');
-hbox(s, 0.45, 1.2, 3.55, 5.35, 'Design', ['Crop: Indian mustard; factorial RBD', 'Factor 1, D1–D4: four sowing dates at 10-day intervals, one inoculation date → crop age 20, 30, 40, 50 DAS at inoculation', 'Factor 2, V1–V3: three varieties of different susceptibility',
-  '36 inoculated plots (12 treatments × R1–R3) + 12 healthy plots (one per treatment) = 48 plots', 'Plot 5 m × 3.5 m; 0.5 m bunds; 2 m channels', 'Healthy block separated by a 30 m buffer (no crucifers) to avoid cross-infection; field 77 m × 24 m', 'Inoculum 1.5 × 10⁵ zoosporangia mL⁻¹ (Mishra et al., 2009)'], X.field, X.lfield, { fs: 11.5 });
+hbox(s, 0.45, 1.2, 3.55, 5.35, 'Design', ['Crop: Indian mustard; factorial RBD', 'Factor 1, date of sowing: D1 20 Nov, D2 30 Nov, D3 10 Dec, D4 20 Dec 2026; one inoculation date → crop age 20–50 DAS', 'Factor 2, variety: V1 PM 26, V2 Pusa Vijay, V3 PM 37',
+  '36 inoculated plots (12 treatments × R1–R3) + 12 healthy plots (one per treatment) = 48 plots', 'Plot 5 m × 3 m; 0.2 m bunds; 2 m channels', 'Healthy block separated by a 10 m buffer (no crucifers) to avoid cross-infection; field 48 m × 24 m', 'Inoculum 1.5 × 10⁵ zoosporangia mL⁻¹ (Mishra et al., 2009)'], X.field, X.lfield, { fs: 11.5 });
 // field layout with buffer, scaled from layout.json
-{ const L = LAY.buffer; const ox = 4.15, oy = 1.25, sc = 8.7 / 11.2, x0 = 1.85, y0 = 1.1;
+{ const L = LAY.buffer10; const ox = 4.15, oy = 1.25, sc = 8.7 / 11.2, x0 = 1.85, y0 = 1.1;
   const T = (o) => ({ x: ox + (o.x - x0) * sc, y: oy + (o.y - y0) * sc, w: Math.max(o.w * sc, 0.01), h: Math.max(o.h * sc, 0.01) });
   L.forEach(o => { if (o.x < x0 - 0.05 || o.t.startsWith('Field layout') || o.t.startsWith('Plot 5') || o.y > 6.5) return; const r = T(o);
     if (o.geom === 'line') { s.addShape(pres.shapes.LINE, { x: r.x, y: r.y, w: o.w ? r.w : 0.001, h: o.h ? r.h : 0.001, line: { color: '555555', width: 1 } }); return; }
     if (o.geom === 'upArrow') { s.addShape(pres.shapes.UP_ARROW, { x: r.x, y: r.y, w: r.w, h: r.h, fill: { color: o.fill }, line: { color: o.fill } }); return; }
     if (o.fill || o.line) s.addShape(o.geom === 'roundRect' ? pres.shapes.ROUNDED_RECTANGLE : pres.shapes.RECTANGLE, { x: r.x, y: r.y, w: r.w, h: r.h, fill: o.fill ? { color: o.fill } : { type: 'none' }, line: o.line ? { color: o.line, width: 0.75, dashType: o.t ? 'solid' : 'dash' } : { type: 'none' }, rectRadius: 0.04 });
     if (o.t) s.addText(o.t.replace(/\n/g, '\n'), { isTextBox: true, x: r.x, y: r.y, w: r.w, h: r.h, fontSize: Math.max(6, (o.sz || 11) * sc * 0.82), bold: !!o.b, color: o.col || '1F1F1F', align: 'center', valign: 'middle', margin: 0 }); });
-  img(s, 'compass.png', 12.0, 1.15, 0.8, 0.8); }
+  s.addImage({ path: path.join(IMG, 'compass.png'), x: 12.0, y: 1.15, w: 0.8, h: 0.8, rotate: 180 }); }
 txt(s, 'Layout of the 2026-27 field (plot code: D = sowing date, V = variety; number = plot ID)', { x: 4.15, y: 6.25, w: 8.7, h: 0.3, fontSize: 10.5, italic: true, color: X.grey, align: 'center' });
 
 s = slide('Glasshouse pot experiment (Division of Plant Pathology, 2026-27)');
