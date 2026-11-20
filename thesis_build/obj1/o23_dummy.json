@@ -1,0 +1,102 @@
+{
+ "vif": [
+  [
+   "NDVI780 130.6; NDVI850 118.9; SR850 8.6; WRI 6.1; others < 5.3",
+   "Remove NDVI780"
+  ],
+  [
+   "NDVI850 11.9; SR850 8.0; WRI 6.1; PSSRa 5.3; others < 5.1",
+   "Remove NDVI850"
+  ],
+  [
+   "WRI 5.9; PSSRa 5.1; REP (nm) 4.9; DWSI-5 3.4; others < 2.8",
+   "All VIF < 10: stop (9 features kept)"
+  ]
+ ],
+ "sffs": {
+  "SVM": [
+   "WRI (HS), REP (nm) (HS), PSSRa (HS), CON_NIR (MS), Hue (RGB), PSRI_MS (MS)",
+   0.79,
+   6
+  ],
+  "k-NN": [
+   "WRI (HS), REP (nm) (HS), DWSI-5 (HS), PSSRa (HS), Entropy_G (RGB)",
+   0.77,
+   5
+  ],
+  "RF": [
+   "WRI (HS), REP (nm) (HS), Hue (RGB), VF (RGB), DWSI-5 (HS), MTD (\u00b0C) (TIR), NDRE (MS)",
+   0.79,
+   7
+  ]
+ },
+ "fusion": {
+  "S1 RGB": [
+   0.48,
+   0.79
+  ],
+  "S2 MS": [
+   0.56,
+   0.85
+  ],
+  "S3 HS": [
+   0.72,
+   0.9
+  ],
+  "S4 TIR": [
+   0.41,
+   0.74
+  ],
+  "S5 RGB+TIR": [
+   0.53,
+   0.83
+  ],
+  "S6 MS+TIR": [
+   0.51,
+   0.87
+  ],
+  "S7 HS+TIR": [
+   0.7,
+   0.91
+  ],
+  "S8 all four": [
+   0.73,
+   0.92
+  ]
+ },
+ "cm": {
+  "set": "S8 all four",
+  "setR": "S8 all four",
+  "P": [
+   "0.80",
+   "0.52",
+   "0.51",
+   "0.71",
+   "0.87",
+   "0.97"
+  ],
+  "R": [
+   "0.82",
+   "0.49",
+   "0.55",
+   "0.73",
+   "0.80",
+   "0.97"
+  ],
+  "F1": [
+   "0.81",
+   "0.50",
+   "0.53",
+   "0.72",
+   "0.83",
+   "0.97"
+  ],
+  "oa": "0.71",
+  "kap": "0.63",
+  "mf1": "0.73",
+  "adj": "0.99",
+  "r2": "0.92",
+  "rmse": "6.5",
+  "nrmse": "0.41"
+ }
+}
