@@ -136,3 +136,10 @@ Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 
 - HS header (24 Feb 2026, subset_200526.hdr): 2355 × 2142 px × 483 bands, float32, BIL (~9.75 GB/date); VNIR 399.4–919.7 nm (288 bands, 1.76 nm; gap 898.6–916.2), SWIR 921.4–2397.6 nm (195 bands, 6 nm; gaps 1329.4–1461.4, 1779.5–1971.5); pixel 2.25 × 2.22 cm (≈ 2.2 cm), Geographic WGS-84. User: ORW GSD values (VNIR 9.7 cm, SWIR 36 cm) are wrong — do not use them.
 - Issues told to user: SG smoothing was run on the band-reduced cube (name *_rd_smt) → windows cross the gaps/sensor join → smooth per segment or drop 2 bands each side of gaps; drop isolated 916.2–919.7 nm bands; reproject to UTM 43N; extract subplot means per date by script.
 - Severity scale of the subplot canopy score not yet stated (ask: 0–9 grade, 0–6, or %?).
+
+### 4l. Subplot spectrum decision (20 Nov 2026, user)
+- **Flowers are NOT removed. No unmixing.** One average spectrum per subplot = mean reflectance of all vegetation pixels (green canopy + stressed canopy + yellow flower) after removing soil and shadow; it represents the subplot canopy severity score (score includes inflorescence/staghead).
+- Hourglass (user's Python notebook: MNF → PPI → n-D → endmember identification → SAM) **replaces per-plot SMACC**: build one field-wide endmember library from samples of all 7 dates; SAM classifies every pixel; unmixing, MF/MTMF, SFF, binary-encoding outputs are not used.
+- Vegetation mask rule: SAM mustard/flower classes × (NDVI > 0.6 OR flower class) with edge erosion (NDVI > 0.6 alone drops flower pixels). Flower % and canopy cover % per subplot (SAM class counts) saved as covariates/checks only.
+- Feature table: 1344 rows per sensor (ID, label, spectral features from subplot spectrum, covariates) → Objective 1 tiers.
+- Deck: `outputs/Subplot_spectra_hourglass_SAM_workflow.pptx` (10 slides, `acm/subplot_ppt.js`); advisory and processing decks updated accordingly.

@@ -46,7 +46,7 @@ s = slide('Overview: complete processing chain');
 [['Done', X.done], ['In progress', X.prog], ['Next', X.next]].forEach((l, i) => { s.addShape(pres.shapes.RECTANGLE, { x: 8.9 + i * 1.35, y: 1.12, w: 0.25, h: 0.2, fill: { color: l[1] }, line: { color: l[1] } }); txt(s, l[0], { x: 9.2 + i * 1.35, y: 1.05, w: 1.1, h: 0.32, fontSize: 11, margin: 0 }); });
 const ov = [['1', 'UAV flights', '5 sensors, 2025-26', 'd'], ['2', 'Band selection', '613 → 483 bands (ENVI)', 'd'], ['3', 'SG smoothing', 'width 5, order 2', 'd'], ['4', 'Projection', 'WGS 84 / UTM 43N', 'd'],
   ['5', 'Plot boundaries', 'shapefile, plot no., dissolve', 'd'], ['6', 'Plot clipping', '3 dates complete', 'd'], ['7', 'Training ROIs', 'soil, shadow, grass, mustard', 'd'], ['8', 'SAM + NDVI', 'angle 0.1–0.3; R898, R684', 'd'],
-  ['9', 'Crop mask', 'NDVI 0.6 × SAM 0.3; erode', 'd'], ['10', 'Crop polygons', 'reclass → vector → clip', 'd'], ['11', 'Endmembers', 'SMACC per plot', 'p'], ['12', 'Plot spectra → features', 'remove non-crop; flowers?', 'n']];
+  ['9', 'Crop mask', 'NDVI 0.6 × SAM 0.3; erode', 'd'], ['10', 'Crop polygons', 'reclass → vector → clip', 'd'], ['11', 'Hourglass', 'MNF, PPI, n-D, SAM (24 Feb run)', 'p'], ['12', 'Subplot spectra', 'mean of leaf + flower pixels', 'n']];
 ov.forEach((o, i) => { const row = Math.floor(i / 4), c = i % 4, col = row % 2 === 0 ? c : 3 - c; const x = 0.55 + col * 3.15, y = 1.55 + row * 1.75;
   const st = o[3] === 'd' ? [X.done, X.ldone] : o[3] === 'p' ? [X.prog, X.lprog] : [X.next, X.lnext];
   box(s, x, y, 2.75, 1.25, [{ text: o[0] + '. ' + o[1], options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: o[2], options: { fontSize: 11 } }], { fill: st[1], line: st[0], lw: 1.75 });
@@ -149,6 +149,15 @@ box(s, 6.88, 3.4, 6.0, 1.5, [{ text: 'Why SMACC', options: { bold: true, fontSiz
 note(s, 'Issue noted: ROI drawn by hand around a plot was not proper → use the plot boundary shapefile to create plot ROIs.', 5.75, 0.55, X.red, X.lred);
 
 
+
+// ============ 11 HOURGLASS ============
+s = slide('Step 11: hourglass workflow (Python notebook)'); tag(s, 'IN PROGRESS', X.prog); sw(s, 'Run on 24 Feb 2026 cube (subset_200526, 48-plot ROIs); outputs 14 Oct – 20 Nov 2026');
+const hgs = [['1. Browse', 'colour composites; field and plot mean spectra'], ['2. MNF (+ PCA, ICA)', 'noise-ordered components; eigenvalues show real information vs noise'], ['3. PPI', '10 000 random projections in MNF space → purest pixels'], ['4. n-D visualization', 'clusters at the corners of the pixel cloud → 8 endmembers (mean of each cluster)'], ['5. Identify endmembers', 'canopy, stressed canopy, flower, soil, shadow (check with field photos and ASD spectra)'], ['6. SAM mapping', 'class of every pixel = closest endmember (smallest spectral angle)']];
+hgs.forEach((h, i) => { const col = i % 3, row = Math.floor(i / 3), x = 0.45 + col * 4.15, y = 1.5 + row * 1.75; box(s, x, y, 3.9, 1.45, step(h[0], h[1]), { fill: X.lprog, line: X.prog }); if (col < 2) arrow(s, x + 3.9, y + 0.72, x + 4.15, y + 0.72, X.prog); });
+poly(s, [[10.67, 2.95], [10.67, 3.1], [2.4, 3.1], [2.4, 3.25]], X.prog);
+box(s, 0.45, 5.1, 7.6, 0.85, step('Used further', 'endmember library + SAM class map → soil and shadow pixels removed → subplot mean spectrum (leaf + flower)'), { fill: X.ldone, line: X.done });
+box(s, 8.3, 5.1, 4.58, 0.85, step('Not used', 'unmixing abundances, MF / MTMF, SFF, binary encoding'), { fill: X.lnext, line: X.next });
+note(s, 'Replaces per-plot SMACC: one endmember library for the whole field gives the same classes in every plot and on every date (Boardman et al., 1995; Kruse et al., 1993).', 6.2, 0.55, X.done, X.ldone);
 // ============ 12b DATASET + CUBE CHECK ============
 s = slide('Dataset structure: dates, sensors, plots and subplots');
 { const lv = [['7 flight dates', 'all four sensors on each date'], ['4 sensors', 'HS, MS, RGB, thermal → 28 images'], ['48 plots per image', '12 treatments × 3 replications + 12 healthy'], ['4 subplots per plot', 'quadrants inside the crop mask']];
@@ -170,10 +179,10 @@ fixes.forEach((f, i) => box(s, 7.0, 1.5 + i * 0.93, 5.88, 0.82, [{ text: f[0] + 
 note(s, 'Band selection and the 483-band count match the notebook; the points on the right should be fixed before features are extracted.', 6.35, 0.5, X.done, X.ldone);
 // ============ 13 NEXT ============
 s = slide('Next steps and open questions'); tag(s, 'NEXT', X.next);
-const nx = [['Label endmembers', 'crop (green, chlorotic, pustule) vs non-crop (soil, shadow, grass) by NDVI and spectral angle'], ['Plot spectrum', 'remove non-crop endmembers; average crop endmembers'], ['All dates and sensors', 'repeat for 11 Feb, 24 Feb, 13 Mar; RGB, MS, TIR, Nano'], ['Features and tiers', 'Objective 1: bands, derivatives, indices, White Rust Index …'], ['Healthy vs diseased', 'compare endmember spectra of healthy (H) and diseased (D1, D2) plots']];
+const nx = [['Hourglass for all dates', 'one field-wide endmember library (MNF → PPI → n-D) from samples of all 7 dates'], ['SAM classification', 'every pixel → canopy, stressed canopy, flower, soil, shadow'], ['Subplot spectrum', 'mean of canopy + stressed + flower pixels; soil and shadow removed (1344 subplot-dates)'], ['Features and tiers', 'Objective 1: bands, derivatives, indices, White Rust Index …'], ['Label and covariates', 'subplot canopy severity score; flower % and canopy cover % from SAM class counts']];
 nx.forEach((n, i) => { const y = 1.35 + i * 0.85; box(s, 0.45, y, 6.6, 0.7, [{ text: n[0] + ': ', options: { bold: true } }, { text: n[1] }], { fill: X.lnext, line: X.next, align: 'left', fs: 12, margin: 6 }); if (i < 4) arrow(s, 3.75, y + 0.7, 3.75, y + 0.85, X.next); });
-box(s, 7.4, 1.35, 5.48, 2.35, [{ text: 'Open question: keep or remove flowers?', options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: 'Proposal: remove flower endmembers/pixels from the leaf spectrum (yellow petals dominate 500–650 nm and flowering differs with sowing date and variety); keep the flower fraction as a covariate; keep inflorescence pixels for staghead severity (Sulik and Long, 2016)', options: { fontSize: 12 } }], { fill: X.lred, line: X.red, align: 'left', margin: 8 });
-box(s, 7.4, 3.9, 5.48, 1.6, [{ text: 'Data checks', options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: 'Multispectral values: DN, radiance or reflectance? • Thermal emissivity correction? • Same 483 bands in every subset cube', options: { fontSize: 12 } }], { fill: X.lred, line: X.red, align: 'left', margin: 8 });
+box(s, 7.4, 1.35, 5.48, 2.35, [{ text: 'Decision: flowers kept, no unmixing', options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: 'The subplot spectrum is the average of all vegetation pixels (leaf + flower), matching the canopy-level severity score, which includes the inflorescence (staghead). Flower % per subplot is recorded to check that selected features are not only a flowering (sowing-date) effect.', options: { fontSize: 12 } }], { fill: X.ldone, line: X.done, align: 'left', margin: 8 });
+box(s, 7.4, 3.9, 5.48, 1.6, [{ text: 'Data checks', options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: 'NDVI > 0.6 alone drops yellow flower pixels → use NDVI > 0.6 OR flower class • smooth each band segment separately • multispectral units (DN / reflectance)? • thermal emissivity?', options: { fontSize: 12 } }], { fill: X.lred, line: X.red, align: 'left', margin: 8 });
 
 // ============ 14 TIMELINE ============
 s = slide('Timeline of work done (from the notebook)');
@@ -185,7 +194,8 @@ tl.forEach((t, i) => { const y = 1.45 + i * 0.86; s.addShape(pres.shapes.OVAL, {
 
 // ============ 15 REFS ============
 s = slide('References');
-bul(s, ['Gruninger, J., Ratkowski, A.J., Hoke, M.L. (2004). The sequential maximum angle convex cone (SMACC) endmember model. Proceedings of SPIE 5425, Algorithms and Technologies for Multispectral, Hyperspectral, and Ultraspectral Imagery X, 1–14.',
+bul(s, ['Boardman, J.W., Kruse, F.A., Green, R.O. (1995). Mapping target signatures via partial unmixing of AVIRIS data. Summaries of the Fifth Annual JPL Airborne Earth Science Workshop, JPL Publication 95-1, Vol. 1, 23–26.',
+  'Gruninger, J., Ratkowski, A.J., Hoke, M.L. (2004). The sequential maximum angle convex cone (SMACC) endmember model. Proceedings of SPIE 5425, Algorithms and Technologies for Multispectral, Hyperspectral, and Ultraspectral Imagery X, 1–14.',
   'Kruse, F.A., Lefkoff, A.B., Boardman, J.W., Heidebrecht, K.B., Shapiro, A.T., Barloon, P.J., Goetz, A.F.H. (1993). The spectral image processing system (SIPS) – interactive visualization and analysis of imaging spectrometer data. Remote Sensing of Environment 44(2–3), 145–163.',
   'Rouse, J.W., Haas, R.H., Schell, J.A., Deering, D.W. (1974). Monitoring vegetation systems in the Great Plains with ERTS. Third ERTS Symposium, NASA SP-351, 309–317.',
   'Savitzky, A., Golay, M.J.E. (1964). Smoothing and differentiation of data by simplified least squares procedures. Analytical Chemistry 36(8), 1627–1639.',

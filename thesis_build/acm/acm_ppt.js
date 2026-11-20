@@ -140,7 +140,7 @@ s = slide('What is updated since the ORW (2025)');
 table(s, [['Component', 'ORW (2025)', 'Updated methodology (2026-27)'], ['Experiments', 'Field (IARI) + controlled condition; 72 plots of 3 m × 3 m', 'Drone field: 48 plots of 5 m × 3 m (4 dates × 3 varieties × 3 rep. + 12 healthy); glasshouse: 48 pots; validation at Bharatpur'],
   ['Sensors', 'RGB, MS, TIR, Headwall Co-Aligned HP, ASD', '+ Headwall Nano (VNIR); glasshouse RGB, MS, TIR, hyperspectral imaging, ASD; IRGA and canopy analyzer'],
   ['Ground truth', '0–6 scale; DI; five DI classes', 'Leaf grade 0–9 key → six grades (0, 1, 3, 5, 7, 9) and plot PDI (Conn et al., 1990; Wheeler, 1969); staghead %'],
-  ['Pre-processing', 'NDVI threshold mask; plot mean', 'NDVI > 0.6 AND SAM < 0.3 rad crop mask on HS, transferred to all sensors; flower pixels removed; SMACC endmember-based plot spectrum'],
+  ['Pre-processing', 'NDVI threshold mask; plot mean', 'Vegetation mask (SAM × NDVI, flowers kept) on HS, transferred to all sensors; hourglass endmembers; subplot mean spectrum'],
   ['Feature selection', 'Many alternative methods (t-test, JM, SPA, RFE, ReliefF, Boruta)', 'Fixed tier chain: correlation scalogram + ReliefF (one band per correlated region) → White Rust Index → ANOVA/Tukey → VIF + stepwise CDA → Boruta'],
   ['Models', 'SVM, BPNN, ELM, LS-SVM, PLS-DA, RF, QDA, RustQNet', 'SVM/SVR, RF/RFR, k-NN, PLS-DA/PLSR, DNN-F1 (input fusion), DNN-F2 (intermediate fusion); encoder-decoder for pixel maps'],
   ['Validation', 'Cross-validation', 'Nested leave-one-replication-out (all selection inside training replications) + Bharatpur + farmers\' fields'],
@@ -189,16 +189,16 @@ arrow(s, 9.45, 2.0, 9.85, 2.0, X.navy);
 const vs = [['Reclassify', 'mustard = 2, others = 1'], ['Raster → polygon', '"simplify polygons" unchecked'], ['Select by attribute', 'grid code of mustard class'], ['Clip and export', 'crop polygons / masked cube per plot']];
 vs.forEach((v, i) => { const x = 0.45 + i * 3.15; box(s, x, 3.3, 2.9, 0.95, [{ text: v[0], options: { bold: true, breakLine: true } }, { text: v[1] }], { fill: X.lo1, line: X.o1, fs: 11.5 }); if (i < 3) arrow(s, x + 2.9, 3.77, x + 3.15, 3.77, X.o1); });
 poly(s, [[11.36, 2.75], [11.36, 3.02], [1.9, 3.02], [1.9, 3.3]], X.navy);
-bul(s, ['Same crop polygons are applied to RGB, multispectral and thermal images after co-registration', 'True-colour display: R 640–670, G 540–570, B 460–480 nm (bands near 644, 544, 466 nm)', 'Crop stage differed among plots on one date (16 vegetative, 22 flowering, 10 pod-formation plots) → flower pixels must be handled before leaf-based analysis'], { x: 0.45, y: 4.5, w: 12.43, h: 1.6, fontSize: 13 });
-banner(s, 'Matches the agreed methodology: crop mask = NDVI > 0.6 AND SAM < 0.3 rad, with 1-pixel edge erosion.', X.gold, X.out, 6.12, 0.45);
+bul(s, ['Same crop polygons are applied to RGB, multispectral and thermal images after co-registration', 'True-colour display: R 640–670, G 540–570, B 460–480 nm (bands near 644, 544, 466 nm)', 'Crop stage differed among plots on one date (16 vegetative, 22 flowering, 10 pod-formation plots) → flowers are kept; flower fraction recorded per subplot'], { x: 0.45, y: 4.5, w: 12.43, h: 1.6, fontSize: 13 });
+banner(s, 'Updated rule: vegetation = SAM mustard class (0.3 rad) × (NDVI > 0.6 OR flower class), edge erosion; flowers kept.', X.gold, X.out, 6.12, 0.45);
 refl(s, 'Kruse et al., 1993; Rouse et al., 1974.', { y: 6.72, h: 0.3 });
 
 s = slide('UAV processing done (2025-26): endmember extraction (SMACC)');
 const em = [['Subset cube', '483-band subset (.hdr) of one date opened in ENVI'], ['Plot ROI', 'Plot boundary shapefile → ROI per plot (48 ROIs); subset data from ROI'], ['SMACC', 'Sequential maximum angle convex cone endmember extraction run plot by plot'], ['Outputs', 'Spectral library (endmembers), abundance maps, endmember ROIs; signatures exported']];
 em.forEach((e, i) => { const x = 0.45 + i * 3.15; box(s, x, 1.3, 2.9, 1.55, [{ text: e[0], options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: e[1] }], { fill: X.field, line: X.field, color: 'FFFFFF', fs: 11.5 }); if (i < 3) arrow(s, x + 2.9, 2.07, x + 3.15, 2.07, X.field); });
-hbox(s, 0.45, 3.15, 6.1, 2.85, 'Next steps (agreed methodology)', ['Label endmembers: crop (green, chlorotic, pustule) vs non-crop (soil, shadow, grass) by NDVI and spectral angle', 'Remove non-crop endmembers; average crop endmembers → plot spectrum', 'Chlorotic and pustule endmembers are kept (disease signal)', 'Repeat for every date; then features and tiers (Objective 1)'], X.o1, X.lo1, { fs: 12.5 });
-hbox(s, 6.75, 3.15, 6.13, 2.85, 'Open question: keep or remove flowers?', ['Proposal: remove flower pixels/endmembers from the leaf spectrum, because yellow petals dominate 500–650 nm and flowering differs with sowing date and variety (Sulik and Long, 2016)', 'Keep the flower fraction as a covariate', 'Keep inflorescence pixels for staghead severity after flowering', 'For advisory committee decision'], X.glass, X.lglass, { fs: 12 });
-refl(s, 'Gruninger et al., 2004; Sulik and Long, 2016; Winter, 1999.', { y: 6.15, h: 0.3 });
+hbox(s, 0.45, 3.15, 6.1, 2.85, 'Next: hourglass replaces per-plot SMACC', ['MNF → PPI → n-D → one field-wide endmember library for all plots and 7 dates (Boardman et al., 1995)', 'SAM classification of every pixel with these endmembers: canopy, stressed canopy, flower, soil, shadow (Kruse et al., 1993)', 'Soil and shadow pixels removed; leaf and flower pixels kept (no unmixing)', 'Subplot spectrum = mean of the kept pixels (1344 subplot-dates) → features and tiers'], X.o1, X.lo1, { fs: 12.5 });
+hbox(s, 6.75, 3.15, 6.13, 2.85, 'Decision: flowers are kept', ['The canopy severity score is given to the whole canopy, including the inflorescence (staghead), so the spectrum covers the same canopy', 'Flower pixel share per subplot (from SAM class counts) is recorded to check that selected features are not only a flowering effect (Sulik and Long, 2016)', 'NDVI > 0.6 alone would drop yellow flower pixels → vegetation = NDVI > 0.6 OR flower class'], X.glass, X.lglass, { fs: 12 });
+refl(s, 'Gruninger et al., 2004; Boardman et al., 1995; Kruse et al., 1993; Sulik and Long, 2016.', { y: 6.15, h: 0.3 });
 
 // ---------- dataset structure (2025-26) ----------
 s = slide('2025-26 drone dataset: structure and sample size');
@@ -222,7 +222,7 @@ legend(s, 7.6, 1.05);
 hbox(s, 0.45, 1.4, 4.0, 1.25, 'Drone-based field experiment', 'IARI, rabi 2025-26 and 2026-27; 48 plots; UAV RGB, MS, TIR, HS (Headwall Co-Aligned HP, Nano) + ASD, LAI, IRGA', X.field, X.lfield, { nobullet: true, fs: 10.5 });
 hbox(s, 4.67, 1.4, 4.0, 1.25, 'Glasshouse pot experiment', 'Division of Plant Pathology, 2026-27; 48 pots; RGB, MS, TIR, hyperspectral imaging, ASD, IRGA', X.glass, X.lglass, { nobullet: true, fs: 10.5 });
 hbox(s, 8.88, 1.4, 4.0, 1.25, 'Ground truth (both)', 'Leaf grade 0–9 → six grades, PDI, staghead %; RWC, MSI, chlorophyll a, b, carotenoid, anthocyanin, protein, Pn, gs, E', X.navy, X.lcom, { nobullet: true, fs: 10.5 });
-box(s, 0.45, 2.95, 12.43, 0.62, 'Pre-processing: radiometric calibration → orthomosaic / image cubes → co-registration → crop mask (NDVI > 0.6 AND SAM < 0.3 rad) → flower removal → plot / pot spectra and features', { fill: X.lcom, line: X.navy, fs: 12.5, bold: true });
+box(s, 0.45, 2.95, 12.43, 0.62, 'Pre-processing: radiometric calibration → orthomosaic / image cubes → co-registration → vegetation mask (leaf + flower kept; soil, shadow removed) → subplot / pot mean spectra and features', { fill: X.lcom, line: X.navy, fs: 12.5, bold: true });
 [2.45, 6.67, 10.88].forEach(x => arrow(s, x, 2.65, x, 2.95, X.navy));
 const ob = [[0.45, 'Objective 1: Characterisation', ['Sensor-wise features', 'Tiers: scalogram + ReliefF, White Rust Index, ANOVA, VIF + CDA, Boruta', 'Physiology links; glasshouse vs field'], X.o1, X.lo1],
   [4.67, 'Objective 2: Detection and severity', ['VIF → ML-SFFS optimum features', 'Six models; 8 sensor sets; feature and deep fusion', 'Six grades, healthy vs diseased, PDI; maps'], X.o2, X.lo2],
@@ -309,7 +309,7 @@ section('Objective 1', 'To characterise white rust of mustard through multimodal
 s = slide('Objective 1: activities (drone field and glasshouse)');
 table(s, [['Activity', 'Drone-based field', 'Glasshouse', 'Output'], ['1.1 Sensor measurements', 'UAV RGB, MS, TIR, HS (Co-Aligned HP, Nano) + ASD, LAI, IRGA', 'RGB, MS, TIR, hyperspectral imaging, ASD, IRGA', 'Image and spectral data per date'],
   ['1.2 Biophysico-chemical parameters', 'RWC, MSI, pigments, anthocyanin, protein, gas exchange, LAI', 'Same, on imaged leaves', 'Physiological response table'], ['1.3 Disease assessment', 'Grades 0–9 at 5 points/plot; PDI; staghead', 'Grades of all leaves; PDI', 'Labels: six grades, PDI'],
-  ['1.4 Pre-processing', 'Calibration, orthomosaic, co-registration, crop mask, flower removal, endmember plot spectrum', 'White/dark reference, leaf/pot segmentation, pustule/chlorosis masks', 'Plot / pot / leaf spectra and images'],
+  ['1.4 Pre-processing', 'Calibration, orthomosaic, co-registration, vegetation mask (flowers kept), hourglass endmembers, subplot mean spectrum', 'White/dark reference, leaf/pot segmentation, pustule/chlorosis masks', 'Plot / pot / leaf spectra and images'],
   ['1.5 Feature extraction', 'HS, MS, RGB, TIR features per plot', 'Same features per pot / leaf', 'Feature tables'], ['1.6 Disease-specific features (tiers)', 'Tiers per sensor → DSF pools', 'Tiers per sensor → DSF pools', 'Bands, White Rust Index, DSF pools'],
   ['1.7 Physiology and scale links', 'Feature–physiology correlation', 'Feature–physiology correlation; time trajectories', 'Common glasshouse–field features']],
   { x: 0.45, y: 1.2, w: 12.43, colW: [2.6, 4.0, 3.4, 2.43], fontSize: 11.5, rowH: 0.62 });
@@ -318,7 +318,7 @@ s = slide('Objective 1: flow chart');
 legend(s, 7.6, 1.05);
 const c1 = [[0.45, X.field, X.lfield, 'Drone field data', ['UAV RGB, MS, TIR, HS', 'ASD canopy, LAI, IRGA']], [3.6, X.glass, X.lglass, 'Glasshouse data', ['RGB, MS, TIR, HSI', 'ASD leaf, IRGA']], [6.75, X.navy, X.lcom, 'Ground truth', ['Grades, PDI, staghead', 'RWC, MSI, pigments, protein']]];
 c1.forEach(c => hbox(s, c[0], 1.4, 2.95, 1.1, c[3], c[4], c[1], c[2], { fs: 10.5 }));
-box(s, 0.45, 2.8, 9.25, 0.5, 'Pre-processing (A1.4): calibration → masks (NDVI > 0.6 AND SAM < 0.3) → flower removal → plot / pot / leaf spectra', { fill: X.lcom, line: X.navy, fs: 11.5, bold: true });
+box(s, 0.45, 2.8, 9.25, 0.5, 'Pre-processing (A1.4): calibration → hourglass endmembers + SAM → vegetation mask (leaf + flower kept) → subplot / pot / leaf mean spectra', { fill: X.lcom, line: X.navy, fs: 11.5, bold: true });
 [1.9, 5.05, 8.2].forEach(x => arrow(s, x, 2.5, x, 2.8, X.navy));
 const sens = [['HS', 'R, FD, SD; REP, Dr, SDr; 48 indices (39 + 9 SWIR)'], ['MS', '5 bands; 12 indices; 40 GLCM'], ['RGB', '24 GLCM; HSV; vegetation fraction; colour'], ['TIR', 'CT, CTD, CTR, NRCT, MTD; 8 GLCM']];
 sens.forEach((t, i) => { const x = 0.45 + i * 2.35; box(s, x, 3.6, 2.2, 0.75, [{ text: t[0] + ' features', options: { bold: true, breakLine: true } }, { text: t[1], options: { fontSize: 9.5 } }], { fill: X.lo1, line: X.o1, fs: 11 }); arrow(s, x + 1.1, 3.3, x + 1.1, 3.6, X.o1); });
@@ -333,8 +333,8 @@ arrow(s, 9.7, 3.0, 9.95, 3.0, X.glass);
 s = slide('A1.4 Pre-processing of drone data');
 const pp = [['Radiometric calibration', 'Reflectance panels / empirical line; DLS for MS; ASD panel check', 'Smith and Milton, 1999'], ['Orthomosaic and geometry', 'Structure-from-motion mosaics; HS cubes georectified with IMU/GNSS', 'Guo et al., 2021'],
   ['Co-registration', 'Same ground control points; nearest-neighbour resampling to a common grid', 'Guo et al., 2021'], ['Thermal correction', 'Emissivity 0.98, air temperature and RH; CTD = CT − Tair', 'Jones, 2014'],
-  ['Crop mask', 'NDVI (R898, R684) > 0.6 × SAM mustard class (0.3 rad) on HS; erosion; transferred to all sensors', 'Kruse et al., 1993'], ['Flower removal', 'Yellow-flower pixels removed from the leaf spectrum; flower fraction kept as covariate', 'Sulik and Long, 2016'],
-  ['HS plot spectrum', 'Endmember extraction per plot (SMACC in ENVI); non-crop endmembers removed; crop endmembers averaged', 'Gruninger et al., 2004'], ['Spectral smoothing', '613 → 483 bands (water/noisy bands removed); Savitzky–Golay (width 5, order 2); derivatives', 'Savitzky and Golay, 1964']];
+  ['Vegetation mask', 'SAM mustard class (0.3 rad) × (NDVI > 0.6 OR flower class); erosion; transferred to all sensors', 'Kruse et al., 1993'], ['Flowers kept', 'Leaf and flower pixels both kept; flower pixel share per subplot (SAM class count) recorded as a covariate', 'Sulik and Long, 2016'],
+  ['HS subplot spectrum', 'Hourglass: MNF → PPI → n-D endmembers (field-wide) → SAM classes; subplot mean of leaf + flower pixels (no unmixing)', 'Boardman et al., 1995'], ['Spectral smoothing', '613 → 483 bands (water/noisy bands removed); Savitzky–Golay (width 5, order 2); derivatives', 'Savitzky and Golay, 1964']];
 pp.forEach((p, i) => { const col = i % 2, row = Math.floor(i / 2), x = 0.45 + col * 6.3, y = 1.2 + row * 1.2;
   box(s, x, y, 0.45, 1.0, String(i + 1), { fill: X.field, line: X.field, color: 'FFFFFF', bold: true, fs: 16 });
   box(s, x + 0.5, y, 5.6, 1.0, [{ text: p[0], options: { bold: true, color: X.field, breakLine: true } }, { text: p[1], options: { breakLine: true } }, { text: p[2], options: { italic: true, color: X.grey, fontSize: 10 } }], { fill: X.lfield, line: X.field, fs: 11.5, align: 'left', margin: 5 });
