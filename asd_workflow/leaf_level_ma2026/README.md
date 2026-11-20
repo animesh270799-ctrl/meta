@@ -10,3 +10,11 @@ Scripts that produced `ASD_Leaf_WhiteRust_StepByStep.xlsx`, `ASD_Leaf_WhiteRust_
 4. `build_excel.py`, `build_ppt.js` (pptxgenjs), `build_doc.js` (docx; uses the helper `lib.js` from the handbook scripts) – outputs.
 
 Whole range 350–2500 nm is used (contact probe), texture features/TTFI are omitted (non-imaging data), and no SHAP is used.
+
+## Update: all dates pooled, DT-EDNet vs CNNs
+
+5. `dtednet.py` – DT-EDNet re-implemented from Ma et al. (2026) (SE block, Kernel Transformer Block with CBAM, 4 Token
+   Transformer Blocks, class token) plus EfficientNet-B0 / ResNet18 / ConvNeXt V2-Atto from timm; paper training settings.
+6. `dl_run.py leaf_clean.pkl results_dl.pkl` – pools the 4 dates, plot-grouped 7:3 split with 10% validation, feature
+   selection on training leaves, trains 4 networks x 6 inputs + 3 ablations (4 parallel CPU jobs, ~2 h), classical reference.
+7. `export_dl.py`, `figures_dl.py`, `build_excel_dl.py`, `build_ppt_dl.js`, `build_doc_dl.js` – updated outputs.
