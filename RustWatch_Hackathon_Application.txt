@@ -1,0 +1,524 @@
+================================================================================
+   HACKATHON ON AI FOR AGRI-FOOD SYSTEMS — 8-9 OCTOBER 2026, NEW DELHI
+                         APPLICATION FORM RESPONSES
+================================================================================
+   Project: RustWatch
+   Prepared by: Animesh Panda, ICAR-IARI, New Delhi
+================================================================================
+
+
+--------------------------------------------------------------------------------
+SECTION A: APPLICANT INFORMATION
+--------------------------------------------------------------------------------
+
+1. Team Name *
+   RustWatch
+
+2. Team Leader / Primary Contact – Full Name *
+   Animesh Panda
+
+3. Email Address *
+   animesh270799@gmail.com
+
+4. Organization, University, Startup, or Institution *
+   ICAR - Indian Agricultural Research Institute, New Delhi
+
+5. Current Role / Position *
+   PhD Scholar (Agricultural Physics)
+
+6. Applicant Category *
+   [x] Student
+   [x] Researcher / Academic
+   [ ] Startup / Entrepreneur
+   [ ] Software Developer / AI Engineer
+   [ ] Agricultural Scientist
+   [ ] Farmer / Farmer Producer Organization (FPO)
+   [ ] Industry Professional
+   [ ] NGO / Development Practitioner
+
+7. Number of Team Members *
+   [YOU NEED TO FILL THIS — select 1-6 based on your actual team]
+
+8. Which expertise is represented within your team? *
+   [x] Artificial Intelligence / Machine Learning
+   [ ] Software Development
+   [x] Agriculture / Agronomy
+   [ ] Agricultural Economics
+   [ ] Agricultural Engineering
+   [ ] Food Science / Post-Harvest
+   [x] Remote Sensing / GIS
+   [ ] IoT / Robotics
+
+
+--------------------------------------------------------------------------------
+SECTION B: PROBLEM & CHALLENGE
+--------------------------------------------------------------------------------
+
+9. What specific agri-food system problem are you addressing? Clearly describe
+   the problem, its causes, and why existing approaches are insufficient. *
+
+   White rust, caused by Albugo candida, is the most damaging disease of Indian
+   mustard (Brassica juncea), causing 20-60% yield loss under favourable
+   conditions. India cultivates over 6 million hectares of mustard, contributing
+   27% of national oilseed production, and the National Mission on Edible Oils
+   (NMEO-OS) has prioritised mustard for reducing edible-oil import dependency.
+   White rust is therefore a direct threat to national food and oilseed security.
+
+   The disease presents a unique detection challenge: pustules form on the lower
+   (abaxial) leaf surface, making them invisible to overhead UAV sensors. By the
+   time secondary symptoms (chlorosis, staghead) become visible from above, yield
+   loss is already locked in. The biotrophic oomycete produces oospores that
+   survive 20+ years in soil, and favourable conditions (12-24 deg C, morning RH
+   >97%) trigger rapid epidemics with a latent period of just 9-12 days.
+
+   Current approaches are insufficient for three reasons:
+   (1) Manual scouting is slow, subjective, and covers <5% of fields. By the
+       time scouts identify infected plots, the window for effective fungicide
+       application has often passed.
+   (2) Existing UAV-based disease detection studies overwhelmingly focus on
+       single-sensor approaches (RGB or multispectral alone), missing the
+       complementary information that thermal, hyperspectral, and texture
+       features provide about different dimensions of the disease response.
+   (3) No multimodal sensor fusion framework exists for white rust in mustard.
+       While fusion has shown 10-15% accuracy improvement for wheat diseases
+       (Feng et al., 2022; Liu et al., 2024), no study has applied this to the
+       mustard-white rust pathosystem, which has fundamentally different
+       symptomatology (abaxial pustules, staghead formation).
+
+   The result: mustard farmers either spray entire fields uniformly (wasting
+   fungicide and money) or spray too late (losing yield). There is no precision
+   tool that tells them where disease is, how severe it is, and where to spray.
+
+
+10. Which Hackathon Challenge Theme are you applying under? *
+    (o) Crop Intelligence and Decision Support
+
+11. Does your solution also address another challenge theme? *
+    (o) Smart and Climate-Resilient Agriculture
+
+
+--------------------------------------------------------------------------------
+SECTION C: BENEFICIARIES & RELEVANCE
+--------------------------------------------------------------------------------
+
+12. Who are the primary beneficiaries or users? *
+    [x] Small and marginal farmers
+    [ ] Women farmers
+    [x] Farmer organizations / FPOs / Cooperatives
+    [x] Extension and advisory services
+    [ ] Agri-food SMEs
+    [ ] Processors
+    [ ] Traders / Supply-chain actors
+    [ ] Consumers
+    [x] Government / Policymakers
+
+13. Project / Solution Title *
+    RustWatch: AI-Powered Multimodal UAV Sensing for White Rust Severity
+    Mapping in Mustard
+
+14. Where is this problem most relevant? Specify countries, regions,
+    production systems, or value chains as applicable. *
+
+    Most relevant to the rapeseed-mustard production belt of South Asia:
+    - India: Rajasthan, Madhya Pradesh, Uttar Pradesh, Haryana, Gujarat, and
+      West Bengal — together accounting for >90% of India's 6+ million hectares.
+      White rust is endemic across these states, with epidemic years causing
+      20-60% yield loss.
+    - Nepal and Bangladesh: Significant mustard acreage with similar
+      agro-climatic conditions favouring Albugo candida.
+    - Pakistan: Punjab province grows rapeseed-mustard under irrigated
+      conditions where white rust pressure is high.
+
+    The production system is predominantly smallholder: average mustard holdings
+    in Rajasthan and UP are 1-2 hectares, managed by resource-constrained
+    farmers who cannot afford blanket fungicide application.
+
+    The solution extends to any Brassica production system globally — canola in
+    Canada and Australia, oilseed rape in Europe — where white rust (A. candida)
+    or other foliar diseases require UAV-based monitoring. The multimodal fusion
+    framework is crop-agnostic: the same pipeline (feature extraction, selection,
+    fusion, classification) transfers directly to wheat rust, rice blast, or
+    any pathosystem where multiple sensor modalities capture complementary
+    disease signatures.
+
+
+--------------------------------------------------------------------------------
+SECTION D: PROPOSED SOLUTION
+--------------------------------------------------------------------------------
+
+15. Describe your proposed solution, including what you propose to develop, how
+    it works, the role of AI, intended users, and expected outcomes. *
+
+    RustWatch is a drone-based AI pipeline that fuses data from four UAV sensors
+    to detect white rust and map its severity across mustard fields, producing
+    actionable spray prescriptions for farmers.
+
+    What we propose to develop:
+    An end-to-end system that takes multi-sensor UAV imagery as input and
+    produces a geo-referenced disease severity map with zone-wise spray
+    recommendations (spray / monitor / skip) as output.
+
+    How it works (4 stages):
+    Stage 1 — Multi-sensor data acquisition: Four UAV-mounted sensors capture
+    complementary disease signals: RGB (canopy texture and visual symptoms),
+    multispectral (chlorophyll and pigment changes), hyperspectral (subtle
+    biochemical shifts), and thermal (stomatal closure and transpiration stress).
+
+    Stage 2 — Disease-specific feature extraction and selection: From each
+    sensor, we extract candidate features (GLCM texture from RGB, vegetation
+    indices from multispectral/hyperspectral, temperature parameters from
+    thermal). A rigorous selection pipeline (ANOVA screening, spectral
+    separability analysis, VIF for multicollinearity, and Sequential Floating
+    Forward Selection) identifies the minimal set of Disease-Specific Features
+    (DSFs) that maximally separate severity classes.
+
+    Stage 3 — AI-based feature-level fusion and classification: DSFs from all
+    four sensors are concatenated into a unified feature matrix, normalised,
+    and passed through a second round of SFFS to find the optimal cross-modal
+    feature combination. Machine learning classifiers (Random Forest, SVM, KNN)
+    then classify each plot into one of six severity classes (Healthy to Very
+    High) based on this fused feature set.
+
+    Stage 4 — Severity map and spray prescription: Classification results are
+    mapped back to plot geo-coordinates, producing a colour-coded severity map.
+    Each severity zone is translated into a spray recommendation: Healthy/Low =
+    no action, Moderate = monitor, High/Very High = spray immediately.
+
+    Role of AI:
+    AI drives the entire analytical pipeline — from automated feature selection
+    (SFFS uses classifier accuracy as its objective function) to multi-class
+    severity classification. The feature-level fusion is AI-guided: the algorithm
+    discovers which cross-sensor feature combinations provide the greatest
+    discriminative power, a task impossible through manual analysis of 50+
+    candidate features.
+
+    Intended users:
+    - Drone service providers and FPOs who fly UAVs over farmer fields and need
+      automated disease diagnosis
+    - Agricultural extension officers (KVKs) who advise farmers on spray timing
+    - Researchers studying crop disease epidemiology
+    - State agriculture departments for district-level crop health monitoring
+
+    Expected outcomes:
+    - A validated multimodal fusion pipeline achieving higher classification
+      accuracy than any single-sensor approach (target: 10-15% improvement,
+      consistent with Feng et al., 2022)
+    - A geo-referenced severity map with 6-class resolution
+    - Spray prescriptions that reduce fungicide use by 15-30% through targeted
+      application
+    - A benchmark dataset and methodology transferable to other crop-disease
+      systems
+
+
+16. What is the current stage of your solution? *
+    (o) Early-stage development
+
+    [NOTE: We have completed the experimental design, sensor procurement,
+    field experiment setup (48-plot factorial RBD at IARI), and first-season
+    data collection (Season 1: 2025-26). Feature extraction and ML pipeline
+    development are underway. No classification results yet — the hackathon
+    will be used to build and demonstrate the fusion pipeline on our Season 1
+    data.]
+
+
+17. Briefly describe your proposed technical approach. *
+
+    Our technical approach has two objectives executed sequentially:
+
+    Objective 1 — Characterise white rust through disease-specific features:
+    We fly four UAV sensors (RGB: DJI Phantom 4 Pro; Multispectral: MicaSense
+    RedEdge MX, 5 bands; Hyperspectral: Headwall Co-Aligned VNIR-SWIR, 491
+    bands; Thermal: FLIR Vue Pro R) over a controlled field experiment at IARI
+    (3 varieties x 4 inoculation timings x 3 replications = 48 plots). From
+    each sensor we extract candidate features:
+    - RGB: 8 GLCM texture features (mean, variance, homogeneity, contrast,
+      dissimilarity, entropy, second moment, correlation)
+    - Multispectral: 12 vegetation indices (NDVI, GNDVI, NDRE, SAVI, OSAVI,
+      CIrededge, CIgreen, TCARI, MCARI, MTCI, PSRI, MSR)
+    - Hyperspectral: 30+ VIs (PRI, WI, ARI, SIPI, NPQI, RARSa/b/c, etc.),
+      spectral derivatives, and continuum removal features
+    - Thermal: CTD, CTR, NRCT, and thermal GLCM features
+
+    These 50+ candidate features are then screened through a 4-step selection
+    pipeline (ANOVA at p<0.05, Bhattacharyya separability analysis, VIF<10 for
+    multicollinearity, SFFS with classifier objectives) to identify
+    Disease-Specific Features (DSFs) per sensor — following the DSSF framework
+    of Tian et al. (2021).
+
+    Objective 2 — Detect and discriminate severity through feature-level fusion:
+    DSFs from all four sensors are concatenated into a unified feature matrix
+    (plot-level tabular data, n=48). After normalisation and a second VIF pass,
+    SFFS selects the optimal cross-modal feature combination using RF/SVM/KNN
+    classifier accuracy as the objective. We systematically compare:
+    - 4 single-sensor baselines (RGB only, MS only, HS only, Thermal only)
+    - 4 fusion combinations (RGB+Thermal, MS+Thermal, HS+Thermal, all four)
+    Each combination is evaluated with 5-fold stratified cross-validation using
+    OA, F1-score, ROC-AUC for classification (6 severity classes) and R², RMSE
+    for continuous DI regression.
+
+    Ground truth: 0-6 pustule rating scale scored on 20 plants per plot at 5
+    sampling points, converted to Disease Index (DI%), grouped into 6 severity
+    classes. Validated with ASD FieldSpec 4 handheld spectroradiometer
+    (2151 bands, 350-2500 nm).
+
+    The final output is a geo-referenced severity classification map with
+    spray/monitor/skip zones.
+
+    Key references: Tian et al. (2021) — DSSF framework; Feng et al. (2022) —
+    multi-source fusion R²=0.872; Liu et al. (2024) — thermal+spectral fusion;
+    Maimaitijiang et al. (2020) — multi-sensor advantage for crop assessment.
+
+
+18. What data will your solution require? *
+
+    (1) UAV imagery from four sensors, collected over the experimental field:
+        - RGB (DJI Phantom 4 Pro): 3-band, 8.2 cm GSD at 30 m AGL
+        - Multispectral (MicaSense RedEdge MX): 5 bands (Blue, Green, Red,
+          Red-Edge, NIR), 2 cm GSD, radiometrically calibrated
+        - Hyperspectral (Headwall Co-Aligned VNIR-SWIR): 491 bands, 400-2500 nm,
+          9.7 cm GSD (VNIR), radiometrically and atmospherically corrected
+        - Thermal (FLIR Vue Pro R): 7.5-13.5 um, 2 cm GSD, with atmospheric
+          temperature correction for absolute canopy temperature
+
+    (2) Ground truth disease severity data: visual pustule ratings (0-6 scale)
+        scored on 20 plants per plot at 5 sampling points per plot, recorded at
+        multiple growth stages during the crop season.
+
+    (3) Ground-truth spectral measurements: ASD FieldSpec 4 handheld
+        spectroradiometer readings (2151 bands, 350-2500 nm) for calibrating
+        UAV-derived features against laboratory-grade spectra.
+
+    (4) Field metadata: plot coordinates (GPS), inoculation treatment details,
+        variety information, sowing and scoring dates, weather data (temperature,
+        humidity, rainfall) from the IARI meteorological observatory.
+
+    (5) For validation (Tier 1 and Tier 2): UAV imagery and ground-truth data
+        from IIRMR Bharatpur, Rajasthan (Season 2) and from farmers' fields in
+        the Bharatpur region (Season 2), to test model transferability across
+        sites, genotypes, and management practices.
+
+    All data is collected as part of the ongoing PhD research at ICAR-IARI.
+    No external or third-party datasets are required for the core pipeline.
+
+
+--------------------------------------------------------------------------------
+SECTION E: GI-AI4AFS OPEN REFERENCE ARCHITECTURE
+--------------------------------------------------------------------------------
+
+19. Are you interested in building your solution on or integrating it with
+    the GI-AI4AFS Open Reference Architecture? *
+    (o) Possibly – I would like to learn more
+
+20. Do you have any specific technical questions or support requirements
+    regarding the GI-AI4AFS Open Reference Architecture?
+
+    We would like to understand how the Open Reference Architecture handles
+    geospatial raster data pipelines (UAV ortho-mosaics, multi-band imagery)
+    and whether it provides standard interfaces for connecting drone data
+    acquisition services with downstream AI inference and farm advisory
+    delivery. Specifically: (1) Is there a standard data format or API for
+    ingesting multi-sensor UAV imagery into the architecture? (2) Can the
+    classification outputs (severity maps) be served through the architecture
+    to mobile-based advisory platforms that farmers already use?
+
+
+--------------------------------------------------------------------------------
+SECTION F: IMPACT & SCALABILITY
+--------------------------------------------------------------------------------
+
+21. What impact could your solution create? *
+
+    For farmers: RustWatch replaces subjective, untimely manual scouting with
+    an objective, repeatable, UAV-based disease assessment. The severity map
+    tells farmers exactly where disease pressure is high and where to spray —
+    enabling targeted fungicide application that can reduce chemical use by
+    15-30% while protecting yield. Early detection (before staghead) preserves
+    the intervention window, preventing the 20-60% yield losses that occur
+    when disease is caught late.
+
+    For science: RustWatch produces the first systematic benchmark of
+    multimodal sensor fusion for white rust in mustard. By comparing single-
+    sensor baselines against multi-sensor fusion combinations, we establish
+    which sensor pairs (and which disease-specific features) provide the
+    greatest discriminative power. This fills a critical knowledge gap
+    identified by Terentev et al. (2022) and Maimaitijiang et al. (2020).
+
+    For policy: District-level severity maps aggregated from UAV flights
+    support evidence-based crop insurance assessment, disease surveillance
+    by state agriculture departments, and targeted allocation of plant
+    protection resources. This aligns with India's Digital Agriculture Mission
+    and the NMEO-OS goal of strengthening mustard productivity.
+
+    For the environment: Precision spraying based on severity zones reduces
+    the total volume of fungicide applied per season, lowering chemical
+    residues in soil and groundwater, and reducing farmer exposure to
+    agrochemicals.
+
+    SDG alignment: SDG 2 (Zero Hunger) — protecting crop yield; SDG 12
+    (Responsible Production) — precision input use; SDG 15 (Life on Land) —
+    reduced chemical pollution.
+
+
+22. How will your solution benefit small and marginal farmers and/or other
+    underserved actors in agri-food systems? *
+
+    Small and marginal mustard farmers (1-2 ha holdings, typical of Rajasthan
+    and UP) cannot afford blanket fungicide application, and they lack the
+    expertise to judge disease severity accurately. RustWatch is designed to
+    reach them through the intermediaries they already interact with:
+
+    (1) Drone service providers: Custom Hiring Centres (CHCs) and private drone
+        operators can offer disease diagnosis as a paid service. The farmer pays
+        for one UAV flight; RustWatch processes the imagery and delivers a spray
+        map. The output is not a spectral index but a plain-language
+        recommendation: "spray here, skip there."
+
+    (2) FPOs and cooperatives: Farmer Producer Organizations can pool resources
+        for a single drone survey covering all member fields, making per-farmer
+        cost negligible. The severity map enables collective procurement of the
+        exact quantity of fungicide needed — no more, no less.
+
+    (3) KVKs and extension officers: Krishi Vigyan Kendras can use the severity
+        maps for village-level crop health advisories, replacing the current
+        approach of issuing district-wide blanket spray recommendations.
+
+    (4) Language and literacy: The final output is a colour-coded map (green =
+        safe, yellow = watch, red = spray). No technical literacy is required to
+        interpret it. At the hackathon, we will add plain-language advisory text
+        in Hindi alongside the map.
+
+    By reducing unnecessary spraying and catching disease early, even a 10%
+    yield saving on a 1-hectare mustard plot (average yield ~1.5 t/ha, MSP
+    Rs 5,650/quintal) translates to Rs 8,000-10,000 additional income per
+    farmer per season — significant for smallholders.
+
+
+23. How could the solution be scaled or replicated across other regions,
+    countries, commodities, or value chains? *
+
+    Geographic scaling: The core pipeline (feature extraction, selection,
+    fusion, classification) is not hard-coded to IARI's field conditions. By
+    retraining the ML models on local data, the system adapts to any mustard-
+    growing region. Our three-tier validation plan (IARI → IIRMR Bharatpur →
+    farmers' fields) explicitly tests this transferability across agro-climatic
+    zones, genotypes, and management practices.
+
+    Commodity scaling: The multimodal fusion framework is crop- and disease-
+    agnostic. The same 4-sensor acquisition, DSF extraction, and feature-level
+    fusion pipeline transfers directly to:
+    - Wheat rust (Puccinia spp.) — the largest cereal disease globally
+    - Rice blast (Magnaporthe oryzae) — major threat in Asian rice systems
+    - Alternaria blight in mustard — another major Brassica disease
+    - Downy mildew in rapeseed-mustard — co-occurs with white rust
+    Only the ground-truth labelling and DSF selection need retraining; the
+    pipeline architecture remains identical.
+
+    Sensor scaling: The feature-level fusion approach works with any combination
+    of sensors. For large-area monitoring, multispectral satellite data
+    (Sentinel-2, 10 m resolution) can replace UAV multispectral for district-
+    level screening, with UAV deployed only for confirmed hotspots — a
+    hierarchical surveillance model.
+
+    Delivery scaling: The severity map output can be served through existing
+    farmer advisory platforms (Kisan Suvidha, mKisan, IFFCO Kisan) or through
+    drone service providers operating under India's Drone Rules 2021. One
+    trained drone operator with a processing laptop can serve 50-100 farmers
+    per season.
+
+
+24. How could the solution be sustained beyond the Hackathon? *
+
+    (1) Research continuity: RustWatch is the core of an ongoing PhD thesis at
+        ICAR-IARI under the supervision of Dr. Rabi Narayan Sahoo (Principal
+        Scientist, Division of Agricultural Physics). The research has
+        institutional funding, sensor infrastructure, and a multi-season,
+        multi-location validation plan extending to 2027-28. The hackathon
+        accelerates, but does not create, this research programme.
+
+    (2) Institutional embedding: ICAR-IARI is India's premier agricultural
+        research institute with direct linkages to the ICAR extension network
+        (700+ KVKs), state agriculture departments, and ICAR research stations
+        across the mustard belt. Validated models and protocols will be
+        disseminated through ICAR's existing technology transfer mechanisms.
+
+    (3) Publication and open science: The fusion benchmark, DSF database, and
+        trained models will be published in peer-reviewed journals (target:
+        2027) and released as open-source code, enabling other researchers and
+        developers to build upon the work.
+
+    (4) Service model: Drone service providers and FPOs can offer per-acre
+        disease diagnosis and spray prescription as a paid service, creating a
+        sustainable revenue model. The processing pipeline runs on a standard
+        laptop — no cloud infrastructure or subscription is required.
+
+    (5) Policy integration: IARI's proximity to policymakers (DARE, Ministry
+        of Agriculture) and Dr. Sahoo's role as a co-organiser of this
+        hackathon positions RustWatch for integration into national crop health
+        surveillance programmes and the Digital Agriculture Mission.
+
+
+--------------------------------------------------------------------------------
+SECTION G: PARTICIPATION & LOGISTICS
+--------------------------------------------------------------------------------
+
+25. If selected, can you participate in the two-day International Hackathon
+    Boot Camp in New Delhi, India? *
+    (o) Yes
+
+26. Would you require a visa invitation or support letter? *
+    (o) No
+
+27. If remote participation becomes available, would you be interested? *
+    (o) Yes
+
+
+--------------------------------------------------------------------------------
+SECTION H: DECLARATIONS
+--------------------------------------------------------------------------------
+
+28. Applicant Declaration *
+    [x] I confirm that the information provided in this application is accurate.
+    [x] I confirm that I am authorized to submit this application on behalf of
+        the team, where applicable.
+    [x] I understand that submission of an application does not guarantee
+        selection.
+    [x] I understand that selected participants will be expected to comply with
+        the Hackathon rules and Code of Conduct.
+    [x] I confirm that, to the best of my knowledge, the proposed submission
+        does not infringe third-party intellectual property rights.
+
+29. Open Licence Acknowledgement *
+    (o) I understand that solutions considered for piloting through the Global
+        Initiative may be expected to be made available under an open licence,
+        subject to applicable terms and agreements.
+
+30. Data Privacy / Processing Consent *
+    (o) I acknowledge and consent to the processing of the information provided
+        for the purposes of administering and evaluating this Hackathon
+        application.
+
+31. How did you hear about this Hackathon? *
+    (o) ICAR
+
+32. GI-AI4AFS Open Reference Architecture acknowledgement
+    I have read the information provided above. *
+    (o) Yes
+
+
+================================================================================
+END OF APPLICATION
+================================================================================
+
+NOTES FOR ANIMESH:
+- Question 7 (Number of Team Members): Fill in based on your actual team size.
+  If it's just you, select 1. If you have lab mates joining, update accordingly.
+- Question 16 (Current stage): I selected "Early-stage development" since you
+  mentioned you don't have results yet. If you feel "Proof of concept" is more
+  accurate (since you have the experimental setup, data collection done, and
+  pipeline designed), you can change it.
+- The registration deadline was 2 October 2026. If the form is still accepting
+  late submissions, submit as soon as possible. If not, contact the organisers
+  directly (rabi.sahoo@icar.org.in — your chairperson is listed as a contact).
+- Review the long-text answers and adjust any details based on your latest
+  research progress.
+================================================================================
