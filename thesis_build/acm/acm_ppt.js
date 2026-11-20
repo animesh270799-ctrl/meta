@@ -200,6 +200,21 @@ hbox(s, 0.45, 3.15, 6.1, 2.85, 'Next steps (agreed methodology)', ['Label endmem
 hbox(s, 6.75, 3.15, 6.13, 2.85, 'Open question: keep or remove flowers?', ['Proposal: remove flower pixels/endmembers from the leaf spectrum, because yellow petals dominate 500–650 nm and flowering differs with sowing date and variety (Sulik and Long, 2016)', 'Keep the flower fraction as a covariate', 'Keep inflorescence pixels for staghead severity after flowering', 'For advisory committee decision'], X.glass, X.lglass, { fs: 12 });
 refl(s, 'Gruninger et al., 2004; Sulik and Long, 2016; Winter, 1999.', { y: 6.15, h: 0.3 });
 
+// ---------- dataset structure (2025-26) ----------
+s = slide('2025-26 drone dataset: structure and sample size');
+{ const lv = [['7 flight dates', 'each with all four sensors'], ['4 sensors per date', 'Hyperspectral, multispectral, RGB, thermal (28 images)'], ['48 plots per image', '12 treatments × 3 replications + 12 healthy'], ['4 subplots per plot', 'quadrants inside the eroded crop mask']];
+  lv.forEach((l, i) => { const y = 1.25 + i * 1.12; box(s, 0.45 + i * 0.3, y, 4.1, 0.9, [{ text: l[0], options: { bold: true, fontSize: 14, breakLine: true } }, { text: l[1], options: { fontSize: 11 } }], { fill: [X.navy, X.blue, X.field, X.glass][i], line: [X.navy, X.blue, X.field, X.glass][i], color: 'FFFFFF' });
+    if (i < 3) arrow(s, 2.5 + i * 0.3, y + 0.9, 2.8 + i * 0.3, y + 1.12, X.grey); }); }
+[['336', 'plot-dates (7 × 48)'], ['1344', 'labelled subplot-dates per sensor (7 × 48 × 4)'], ['5376', 'sensor × subplot-date records (4 × 1344)']].forEach((c, i) => { const x = 5.75 + i * 2.4;
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 1.25, w: 2.25, h: 1.25, fill: { color: X.lcom }, line: { color: X.lcom }, rectRadius: 0.08 });
+  txt(s, c[0], { x, y: 1.3, w: 2.25, h: 0.6, fontSize: 28, bold: true, color: X.navy, align: 'center', fontFace: 'Cambria', margin: 0 }); txt(s, c[1], { x: x + 0.1, y: 1.9, w: 2.05, h: 0.55, fontSize: 11, align: 'center', margin: 0 }); });
+hbox(s, 5.75, 2.75, 7.13, 3.3, 'How the subplots are used', ['Modelling unit = subplot-date: features = mean of crop pixels in each subplot (after the SAM × NDVI mask)',
+  'Label = canopy-level disease severity score recorded in the field for every subplot → 1344 labelled subplot-dates (the same labels serve all four sensors)',
+  'Validation: the four subplots of a plot always stay in the same fold (leave-one-replication-out), so they never leak between training and test',
+  'Statistics (ANOVA, Tukey): on plot means, or a mixed model with plot as a random effect, because subplots are not independent replicates',
+  'Plot prediction = mean of its four subplot predictions; their spread gives within-plot variability'], X.field, X.lfield, { fs: 11.5 });
+banner(s, 'Pre- and post-symptomatic sets are split by flight date (dates before the first visible pustule → Objective 3).', X.gold, X.out, 6.2, 0.4);
+
 // =========================== FRAMEWORK ===========================
 section('Overall research framework', 'Two experimental platforms, one methodology');
 s = slide('Overall research framework');

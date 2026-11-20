@@ -59,7 +59,7 @@ sens.forEach((t, i) => { box(s, 0.45 + i * 2.5, 1.45, 2.3, 1.1, step(t[0], t[1])
 box(s, 4.15, 3.05, 5.0, 0.8, step('IARI field, 48 plots', '12 treatments (D1–D4 × V1–V3) × 3 replications + 12 healthy'), { fill: X.ldone, line: X.done });
 arrow(s, 6.65, 3.85, 6.65, 4.25, X.done);
 ['11 Feb 2026', '24 Feb 2026', '13 Mar 2026'].forEach((d, i) => box(s, 2.9 + i * 2.6, 4.25, 2.35, 0.7, d, { fill: X.done, line: X.done, color: 'FFFFFF', bold: true, fs: 14 }));
-txt(s, 'Flight dates processed so far', { x: 2.9, y: 5.0, w: 7.6, h: 0.3, fontSize: 11, italic: true, color: X.grey, align: 'center' });
+txt(s, 'Hyperspectral dates processed so far (7 flight dates acquired per sensor)', { x: 2.9, y: 5.0, w: 7.6, h: 0.3, fontSize: 11, italic: true, color: X.grey, align: 'center' });
 note(s, 'Checks noted: multispectral pixel values — DN, radiance or scaled reflectance? (read the metadata); thermal images — has emissivity correction been applied?', 5.55, 0.6, X.red, X.lred);
 
 // ============ 4 BAND SELECTION ============
@@ -148,6 +148,26 @@ box(s, 6.88, 1.45, 6.0, 1.7, [{ text: 'SMACC outputs (per plot)', options: { bol
 box(s, 6.88, 3.4, 6.0, 1.5, [{ text: 'Why SMACC', options: { bold: true, fontSize: 13.5, breakLine: true } }, { text: 'Finds the purest spectra (endmembers) of a plot automatically — crop, chlorotic/pustule leaf, soil, shadow, flower — and their abundance in each pixel (Gruninger et al., 2004)', options: { fontSize: 12 } }], { fill: X.lenvi, line: X.envi, align: 'left', margin: 8 });
 note(s, 'Issue noted: ROI drawn by hand around a plot was not proper → use the plot boundary shapefile to create plot ROIs.', 5.75, 0.55, X.red, X.lred);
 
+
+// ============ 12b DATASET + CUBE CHECK ============
+s = slide('Dataset structure: dates, sensors, plots and subplots');
+{ const lv = [['7 flight dates', 'all four sensors on each date'], ['4 sensors', 'HS, MS, RGB, thermal → 28 images'], ['48 plots per image', '12 treatments × 3 replications + 12 healthy'], ['4 subplots per plot', 'quadrants inside the crop mask']];
+  lv.forEach((l, i) => { const y = 1.45 + i * 1.1; box(s, 0.45 + i * 0.35, y, 4.3, 0.88, [{ text: l[0], options: { bold: true, fontSize: 14, breakLine: true } }, { text: l[1], options: { fontSize: 11 } }], { fill: X.done, line: X.done, color: 'FFFFFF' });
+    if (i < 3) arrow(s, 2.6 + i * 0.35, y + 0.88, 2.95 + i * 0.35, y + 1.1, X.grey); }); }
+s.addTable([[{ text: 'Level', options: { bold: true, color: 'FFFFFF', fill: { color: X.navy } } }, { text: 'Per sensor', options: { bold: true, color: 'FFFFFF', fill: { color: X.navy } } }, { text: 'All 4 sensors', options: { bold: true, color: 'FFFFFF', fill: { color: X.navy } } }],
+  ['Images', '7', '28'], ['Plot-dates', '336', '1344'], ['Subplot-dates', '1344', '5376'], ['Subplot-dates per date', '192', '768']], { x: 5.9, y: 1.45, w: 6.98, colW: [2.98, 2.0, 2.0], fontSize: 13, border: { type: 'solid', pt: 0.5, color: 'C9CED6' }, rowH: 0.45, align: 'center' });
+bul(s, ['Unit for models: subplot-date (mean of crop pixels in each subplot)', 'Label: canopy-level disease severity score of each subplot, recorded in the field (1344 labelled subplot-dates)', 'The four subplots of a plot stay in the same validation fold; statistics use plot means or a mixed model'], { x: 5.9, y: 3.95, w: 6.98, h: 1.8, fontSize: 13 });
+note(s, 'Status: 7 images per sensor available; hyperspectral cubes processed so far are listed in Steps 2–10.', 6.15, 0.5);
+
+s = slide('Hyperspectral cube check (24 Feb 2026 header)'); tag(s, 'CHECK', X.red); sw(s, 'File subset_200526.hdr: Applied Mask Result, 20 May 2026');
+s.addTable([[{ text: 'Item', options: { bold: true, color: 'FFFFFF', fill: { color: X.envi } } }, { text: 'Value in the header', options: { bold: true, color: 'FFFFFF', fill: { color: X.envi } } }],
+  ['Size', '2355 × 2142 pixels × 483 bands; float32; BIL; ≈ 9.75 GB per date'], ['VNIR', '399.4–919.7 nm, 288 bands at 1.76 nm (gap 898.6–916.2 nm)'], ['SWIR', '921.4–2397.6 nm, 195 bands at 6 nm (gaps 1329.4–1461.4 and 1779.5–1971.5 nm)'],
+  ['Pixel', '≈ 2.2 cm × 2.2 cm (resampled grid; native ≈ 9.7 cm VNIR, 36 cm SWIR)'], ['Coordinates', 'Geographic Lat/Lon, WGS-84 (not UTM)']], { x: 0.45, y: 1.5, w: 6.3, colW: [1.35, 4.95], fontSize: 12, border: { type: 'solid', pt: 0.5, color: 'C9CED6' }, rowH: 0.5 });
+const fixes = [['Smoothing across gaps', 'SG (width 5) was run on the reduced cube, so each window near 899–916, 919.7/921.4, 1329–1461 and 1779–1971 nm mixes distant wavelengths → smooth each segment separately, or drop 2 bands on each side of every gap'],
+  ['Isolated bands', '916.2–919.7 nm (3 VNIR bands at the detector edge) → drop'], ['Projection', 'Re-project to WGS 84 / UTM 43N before erosion and subplot splitting in metres'],
+  ['Resolution', 'Do not compute texture on HS (2.2 cm grid over 9.7–36 cm pixels); use subplot mean spectra'], ['Data volume', '≈ 68 GB for 7 dates → extract subplot means date by date with a script']];
+fixes.forEach((f, i) => box(s, 7.0, 1.5 + i * 0.93, 5.88, 0.82, [{ text: f[0] + ': ', options: { bold: true, color: X.red } }, { text: f[1] }], { fill: X.lred, line: X.red, fs: 10.5, align: 'left', margin: 6 }));
+note(s, 'Band selection and the 483-band count match the notebook; the points on the right should be fixed before features are extracted.', 6.35, 0.5, X.done, X.ldone);
 // ============ 13 NEXT ============
 s = slide('Next steps and open questions'); tag(s, 'NEXT', X.next);
 const nx = [['Label endmembers', 'crop (green, chlorotic, pustule) vs non-crop (soil, shadow, grass) by NDVI and spectral angle'], ['Plot spectrum', 'remove non-crop endmembers; average crop endmembers'], ['All dates and sensors', 'repeat for 11 Feb, 24 Feb, 13 Mar; RGB, MS, TIR, Nano'], ['Features and tiers', 'Objective 1: bands, derivatives, indices, White Rust Index …'], ['Healthy vs diseased', 'compare endmember spectra of healthy (H) and diseased (D1, D2) plots']];
