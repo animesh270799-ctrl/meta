@@ -143,3 +143,7 @@ Classes are cuts of continuous DI → neighbours overlap (literature: Meng 2020 
 - Vegetation mask rule: SAM mustard/flower classes × (NDVI > 0.6 OR flower class) with edge erosion (NDVI > 0.6 alone drops flower pixels). Flower % and canopy cover % per subplot (SAM class counts) saved as covariates/checks only.
 - Feature table: 1344 rows per sensor (ID, label, spectral features from subplot spectrum, covariates) → Objective 1 tiers.
 - Deck: `outputs/Subplot_spectra_hourglass_SAM_workflow.pptx` (10 slides, `acm/subplot_ppt.js`); advisory and processing decks updated accordingly.
+
+### 4m. Resampling to HS grid + vegetation mask (20 Nov 2026, user)
+- All images (RGB, MS, TIR, Nano) are co-registered and resampled to the hyperspectral grid (≈ 2.2 cm, UTM 43N); one HS vegetation mask (hourglass + SAM: keep canopy, stressed canopy, flower; remove soil, grass/weeds, shadow; NDVI > 0.6 OR flower; 1-pixel erosion) is applied to every sensor. Resampling: RGB pixel aggregate (mean), MS bilinear/nearest, TIR nearest neighbour; registration RMSE < 1 HS pixel; mask accuracy by confusion matrix (Congalton 1991).
+- Deck `outputs/Resampling_to_HS_grid_vegetation_mask.pptx` (15 slides, `acm/resample_ppt.js`); every method step carries an in-text citation; 16 references cross-checked (no missing or uncited).
