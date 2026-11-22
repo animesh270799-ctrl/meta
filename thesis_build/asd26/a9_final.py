@@ -64,7 +64,7 @@ if part == 'dl':
     R = json.load(open(D + 'dl_main.json')); rec = []
     for task in 'ABC':
         cols = DSF[task]; X = ALL[cols].values.astype(np.float32); mu, sd = X.mean(0), X.std(0) + 1e-6; X = (X - mu) / sd; y = target(task); K = {'A': 2, 'B': 6, 'C': 1}[task]
-        for net in ['DNN-F1', 'DT-EDNet', 'EfficientNet-B0', 'ResNet18', 'ConvNeXt V2-Atto']:
+        for net in (sys.argv[2].split(',') if len(sys.argv) > 2 else ['DNN-F1', 'DT-EDNet', 'EfficientNet-B0', 'ResNet18', 'ConvNeXt V2-Atto']):
             runs = [r for r in R if r['net'] == net and r['task'] == task]
             if not runs: continue
             E = int(np.median([int(np.array(r['hist'])[:, 3].argmax()) + 1 for r in runs])); E = max(E, 10); lr = runs[0]['lr']
@@ -89,6 +89,7 @@ if part == 'dl':
                             grades=GRADES, input='pseudo-image k x k (features in order, zero padded)' if net != 'DNN-F1' else 'feature vector', torch=torch.__version__), OUT + 'dl/' + fn)
             rec.append(dict(file='dl/' + fn, task=task, model=net, n_features=len(cols), features=', '.join(cols), epochs=E, lr=lr, pseudo_image_k=k, n_parameters=sum(p.numel() for p in model.parameters())))
             print(task, net, 'epochs', E, '%.0fs' % (time.time() - t0), 'train-subset check %.3f' % tr_s, flush=True)
-    pd.DataFrame(rec).to_csv(OUT + 'dl_models_index.csv', index=False); print('DL final models saved')
+    tag = sys.argv[3] if len(sys.argv) > 3 else 'all'
+    pd.DataFrame(rec).to_csv(OUT + 'dl_models_index_%s.csv' % tag, index=False); print('DL final models saved', tag)
 for f in ('wr_features.py', 'wr_networks.py'):
     if os.path.exists(B + f): shutil.copy(B + f, OUT + f)
