@@ -352,6 +352,6 @@ ax.text(x0 + 5.1 * sc, 3.62, '3 dates\n576 samples', ha='center', va='center', f
 ax.add_patch(FancyBboxPatch((x0 + 10 * sc, 2.75), 65 * sc, 0.55, boxstyle='round,pad=0.01,rounding_size=0.05', fc=L['o2'], ec=C['o2']))
 ax.text(x0 + 42.5 * sc, 3.02, 'post-symptomatic: 10 dates, 1920 samples (label = severity score observed on the same date)', ha='center', va='center', fontsize=8.2, fontweight='bold', color=C['o2'])
 ax.text(0.4, 0.55, 'pre-symptomatic label = later status of the same subplot (healthy control vs inoculated subplot that becomes diseased)', ha='left', fontsize=8)
-ax.text(0.4, 0.2, 'all four cameras (red–green–blue, multispectral, thermal, hyperspectral) and visual severity scoring on every date', ha='left', fontsize=8, style='italic')
+ax.text(0.4, 0.2, 'all four cameras (red–green–blue, multispectral, thermal, hyperspectral), ASD leaf spectra and visual severity scoring on every date', ha='left', fontsize=8, style='italic')
 save(fig, 'g27_obj3.png')
 print('figures ok')

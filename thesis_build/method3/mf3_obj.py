@@ -38,7 +38,7 @@ STEP('1.1.2', 'Correlation of each feature with the severity score',
      'Correlation of indices and texture with severity: Ma et al. (2026), Guo et al. (2021); univariate feature screening: Liu et al. (2020).')
 STEP('1.1.3', 'Response by variety, inoculation timing, growth stage, days after inoculation and weather',
      'A feature may respond in one variety, crop age or growth stage and not in another; treatments, stage and weather must be considered.',
-     'Responsive features; covariates (Step A5).',
+     'Responsive features; covariates (Step A6).',
      'Treatment-wise response figures → Step 1.6.3 and Objective 2 robustness (Activity 2.6).',
      ['Plot the main features against days after inoculation for each variety (V1 PM 26, V2 Pusa Vijay, V3 PM 37) and inoculation timing (D1–D4).', 'Draw the response curves separately for the three growth stages (vegetative, flowering, pod formation), because yellow flowers and pods change canopy reflectance.', 'Compare inoculated plots with healthy plots of the same variety on every date.', 'Plot the disease progress (mean severity per date) together with the 7-day weather summaries and the favourable days since inoculation.'],
      'Treatment-wise and stage-wise disease response: Liu et al. (2024), Blasch et al. (2023), Feng et al. (2022); flowering effects on Brassica canopy spectra: Sulik and Long (2016); weather and white rust development: Chattopadhyay et al. (2011).')
@@ -253,7 +253,7 @@ TAB('o2act', [['Activity', 'Steps', 'Main output'], ['2.1 Tasks and inputs', '2.
 H2('Activity 2.1 – Tasks and inputs')
 STEP('2.1.1', 'Three tasks and class balance',
      'Defines the three prediction problems and handles unequal class sizes.',
-     'Post-symptomatic dataset with labels (Step A4).',
+     'Post-symptomatic dataset with labels (Step A5).',
      'Three labelled task datasets → all models.',
      ['Task A, detection: healthy (grade 0) vs diseased (grade above 0).', 'Task B, severity classes: grades 0, 1, 3, 5, 7, 9 (merged if a class has fewer than 5% of samples).', 'Task C, regression: severity score.', 'Class weights (Step E4) for all classifiers; macro-averaged metrics.'],
      'Detection, severity classes and regression together: Tian et al. (2021), Feng et al. (2022), Abdulridha et al. (2023); three-class healthy, mild and severe classification: Yuan et al. (2025).')
@@ -505,12 +505,12 @@ CARD('ablation', 'Ablation and Shapley interpretation', 'Ablation removes one pa
 # ---------------------------------------------------------------- 2.6
 STEP('2.5.5', 'Covariate baseline and sensor + covariate models',
      'Severity rises with days after inoculation and differs with variety, inoculation timing, growth stage and weather; a sensor model could look accurate only because it learns time or stage. The cameras must add information beyond these known factors.',
-     'Covariates (Step A5); fused feature sets of the sensor sets; same folds.',
+     'Covariates (Step A6); fused feature sets of the sensor sets; same folds.',
      'Accuracy of the covariate-only model, of the sensor models and of the sensor + covariate models → evidence of what the cameras add.',
      ['Covariate-only model: the best machine-learning model (Activity 2.2) with days after inoculation, variety, inoculation timing, growth stage and the weather summaries as the only inputs, for Tasks A, B and C.',
       'Sensor models (main results, Activities 2.2–2.3): a sensor set is reported as useful only if it is better than the covariate-only model.',
       'Sensor + covariate models: the best three sensor sets with the covariates added (one-hot variety and inoculation timing, ordinal growth stage, numeric days after inoculation and weather), to show whether known context improves prediction.',
-      'Report all three side by side for every task; label models that contain weather as "within-season" (Step A5).'],
+      'Report all three side by side for every task; label models that contain weather as "within-season" (Step A6).'],
      'Combining weather with remote sensing compared with a weather-only model: Zhang et al. (2014); weather-based white rust forecasting: Chattopadhyay et al. (2011); stage-dependent disease signals: Blasch et al. (2023); simple baseline models as a reference for predictive models: Kuhn and Johnson (2013).')
 TAB('covex', [['Model (dummy results, Task B)', 'Inputs', 'Macro-F1', 'Gain over covariate model'], ['Covariate-only', 'days after inoculation, variety, timing, stage, weather', '0.41', '—'], ['Hyperspectral (S1)', 'S1 fused features', '0.66', '+0.25'],
     ['Hyperspectral + thermal (S7)', 'S7 fused features', '0.69', '+0.28'], ['Hyperspectral + thermal + covariates', 'S7 features + covariates', '0.71', '+0.30 (within-season)']],
@@ -580,7 +580,7 @@ STEP('3.5.2', 'Risk maps',
      'Zarco-Tejada et al. (2018); Yu et al. (2025).')
 STEP('3.5.3', 'Covariate baseline for the pre-symptomatic stage',
      'Before symptoms, infection depends strongly on weather after inoculation and on variety; the cameras must be shown to detect more than these factors.',
-     'Covariates (Step A5) of the pre-symptomatic dates; pre-symptomatic models.',
+     'Covariates (Step A6) of the pre-symptomatic dates; pre-symptomatic models.',
      'Accuracy of the covariate-only model compared with the sensor models → evidence that the early signal comes from the plants.',
      ['Fit the best machine-learning model with days after inoculation, variety, inoculation timing, growth stage and the weather summaries only.', 'Report the sensor models and the best sensor set + covariates next to it, as in Step 2.5.5.'],
      'Zhang et al. (2014); Chattopadhyay et al. (2011); Zhu et al. (2017).')
