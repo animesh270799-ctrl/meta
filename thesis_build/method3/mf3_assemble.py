@@ -30,7 +30,7 @@ for r in pool:
     k = rk(r)
     if k in cites and k not in seen: seen.add(k); used.append(r)
 used.sort(key=lambda r: r.lower())
-skip = {'November', 'December', 'IARI', 'ICAR', 'Table', 'Figure', 'Chapter', 'Section', 'Step', 'Stage', 'Month', 'Objective', 'Jan', 'January', 'Nov', 'Dec', 'Varuna', 'PM', 'Pusa', 'Headwall', 'MicaSense', 'DJI', 'FLIR', 'Tair', 'rabi', 'Ph'}
+skip = {'November', 'December', 'Feb', 'Mar', 'March', 'Post-symptomatic', 'IARI', 'ICAR', 'Table', 'Figure', 'Chapter', 'Section', 'Step', 'Stage', 'Month', 'Objective', 'Jan', 'January', 'Nov', 'Dec', 'Varuna', 'PM', 'Pusa', 'Headwall', 'MicaSense', 'DJI', 'FLIR', 'Tair', 'rabi', 'Ph'}
 fp = {('Šikonja', '2003'), ('Kononenko', '2003'), ('Rudnicki', '2010'), ('Golay', '1964'), ('Philpot', '1998'), ('Milton', '1999'), ('Peñuelas', '1994'), ('Rock', '1989'), ('Kalha', '2005'), ('McLachlan', '2002'), ('Simon', '2006'),
       ('Flusser', '2003'), ('Khorram', '1998'), ('Knapp', '2001'), ('Curran', '2004'), ('Rayens', '2003'), ('Vapnik', '1995'), ('Hart', '1967'), ('Guestrin', '2016'), ('Lapalme', '2009'), ('Lee', '2017'), ('Ba', '2015'), ('Szegedy', '2015'),
       ('Long', '2016'), ('Neto', '2008'), ('Elisseeff', '2003'), ('Bühlmann', '2010'), ('Chattopadhyay', '2013'), ('Hutter', '2019'), ('Hutter', '2017')}

@@ -1,7 +1,7 @@
 # Objectives 1-3 (executed inside mf3_body.py)
 # =====================================================================================
 H1('3. Objective 1 – Characterisation of white rust through multimodal UAV sensing')
-P('Objective 1 describes how each camera sees white rust and selects the features that carry disease information. It uses the 1536 post-symptomatic samples of each camera. For description and interpretation the steps are run on all post-symptomatic samples; for prediction (Objectives 2 and 3) exactly the same steps are repeated inside the training part of every fold (Step F2), so the test replication never chooses a feature.')
+P('Objective 1 describes how each camera sees white rust and selects the features that carry disease information. It uses the 1920 post-symptomatic samples of each camera. For description and interpretation the steps are run on all post-symptomatic samples; for prediction (Objectives 2 and 3) exactly the same steps are repeated inside the training part of every fold (Step F2), so the test replication never chooses a feature.')
 FIG('obj1', 'g05_obj1.png', 'Flow chart of Objective 1 (Activities 1.1–1.6).', 540)
 TAB('o1act', [['Activity', 'Steps', 'Technique (one per feature type)', 'Output'],
     ['1.1 Response analysis', '1.1.1–1.1.3', 'mean spectra, first derivative, Pearson correlation', 'response figures; responsive regions'],
@@ -241,7 +241,7 @@ BOX('Link to satellite monitoring (optional extension, not part of the six-month
 
 # =====================================================================================
 H1('4. Objective 2 – Detection and severity discrimination through AI-based multimodal data fusion')
-P('Objective 2 builds and compares predictive models on the 1536 post-symptomatic samples of each camera. For every single camera and for every combination of cameras (15 sensor sets), classification models (Task A, healthy vs diseased; Task B, severity classes) and regression models (Task C, severity score) are developed with all model families, so that the performance of every camera and every combination can be compared on the same folds ([[T:modelmatrix]]). In combinations, thermal, multispectral and red–green–blue features are added to the hyperspectral features by feature-level fusion for all models, including DT-EDNet and the comparison networks. A second comparison repeats the design of Ma et al. (2026) on the hyperspectral feature groups, with plot-grouped validation.')
+P('Objective 2 builds and compares predictive models on the 1920 post-symptomatic samples of each camera. For every single camera and for every combination of cameras (15 sensor sets), classification models (Task A, healthy vs diseased; Task B, severity classes) and regression models (Task C, severity score) are developed with all model families, so that the performance of every camera and every combination can be compared on the same folds ([[T:modelmatrix]]). In combinations, thermal, multispectral and red–green–blue features are added to the hyperspectral features by feature-level fusion for all models, including DT-EDNet and the comparison networks. A second comparison repeats the design of Ma et al. (2026) on the hyperspectral feature groups, with plot-grouped validation.')
 FIG('obj2', 'g06_obj2.png', 'Flow chart of Objective 2 (Activities 2.1–2.6).', 540)
 TAB('o2act', [['Activity', 'Steps', 'Main output'], ['2.1 Tasks and inputs', '2.1.1–2.1.5', 'task labels; fused feature sets of 15 sensor sets; hyperspectral feature-group configurations'],
     ['2.2 Machine-learning models', '2.2.1–2.2.6', 'tuned support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares models'],
@@ -295,7 +295,7 @@ TAB('sffsex', [['Iteration (dummy)', 'Action', 'Subset', 'Inner macro-F1'], ['1'
     'Worked example (dummy data): sequential floating forward selection adds features and removes a feature when it becomes redundant.', [1600, 3600, 2500, 1606])
 CARD('sffs', 'Sequential floating forward selection (SFFS)', 'Adds the feature that most improves the model; after every addition it tries to remove previously added features and removes one if the model improves ("floating").',
      'Finds a small feature set suited to each model and corrects early choices that later become redundant.', 'Wrapped around each machine-learning model; criterion macro-F1 or root-mean-square error in the inner folds; at most 15 features; smallest subset within 1% of the best.',
-     'Maximum subset size (15) and tolerance (1%); fixed to keep at least about 60 training samples per feature.', 'Moderate candidate sets (20–40 features) after the earlier stages; not for hundreds of features.',
+     'Maximum subset size (15) and tolerance (1%); fixed to keep at least about 85 training samples per feature.', 'Moderate candidate sets (20–40 features) after the earlier stages; not for hundreds of features.',
      'Gives the model-specific final set recommended in the staged approach while keeping the number of candidates small.', 'Pudil et al. (1994); Tian et al. (2021)')
 STEP('2.1.5', 'Hyperspectral feature-group configurations for the network comparison',
      'The DT-EDNet study compared networks on separate feature groups and on their combinations; the same design shows which hyperspectral feature types help each network.',
@@ -535,7 +535,7 @@ STEP('2.6.3', 'Severity maps',
 H1('5. Objective 3 – Prediction of white rust at the pre-symptomatic stage')
 P('Objective 3 uses the 576 pre-symptomatic samples of each camera. The question is whether subplots that will develop white rust can be separated from healthy subplots before pustules are visible, and whether their later severity can be predicted. Machine-learning models and the feature-fusion networks (DNN-F1, DNN-F2) are used; the pseudo-image networks are not used here because about 384 training samples per fold are too few for them.')
 FIG('obj3', 'g07_obj3.png', 'Flow chart of Objective 3 (Activities 3.1–3.5).', 540)
-FIG('obj3time', 'g27_obj3.png', 'Pre-symptomatic and post-symptomatic periods and how pre-symptomatic samples are labelled from the later status of the same subplot.', 520)
+FIG('obj3time', 'g27_obj3.png', 'Pre-symptomatic and post-symptomatic periods and how pre-symptomatic samples are labelled from the later status of the same subplot.', 600)
 H2('Activity 3.1 – Pre-symptomatic samples and labels')
 STEP('3.1.1', 'Labels from the later status of each subplot',
      'Before symptoms the visual score is zero everywhere; labels must come from what happens later.',
@@ -567,8 +567,8 @@ STEP('3.5.1', 'Pre-symptomatic metrics, area under the curve (AUC) and earliest 
      ['Classification: sensitivity, specificity, balanced accuracy and AUC; regression: R² and RMSE of the later score.', 'Compute balanced accuracy separately for each pre-symptomatic date; the earliest detection day is the first date on which it reaches 0.70 ([[F:earliest]]).', 'Report the earliest detection day separately for each variety and inoculation timing.'],
      'Fawcett (2006); Mahlein et al. (2019); Zarco-Tejada et al. (2018).')
 FIG('earliest', 'g23_dummy_earliest.png', 'Dummy example of balanced accuracy by days after inoculation and the earliest detection day of each sensor set.', 460)
-TAB('earlyex', [['Days after inoculation (dummy)', '3', '6', '9', '12', '15'], ['Hyperspectral + thermal: balanced accuracy', '0.55', '0.62', '0.71', '0.78', '0.81'], ['Red–green–blue: balanced accuracy', '0.45', '0.47', '0.55', '0.65', '0.69']],
-    'Worked example (dummy data): the hyperspectral + thermal set reaches 0.70 at 9 days after inoculation (earliest detection day = 9), while the red–green–blue set does not reach it before symptoms.', [3400, 1180, 1180, 1180, 1180, 1186])
+TAB('earlyex', [['Pre-symptomatic flight (days after inoculation)', '12 Jan (2)', '15 Jan (5)', '18 Jan (8)'], ['Hyperspectral + thermal: balanced accuracy (dummy)', '0.58', '0.66', '0.74'], ['Red–green–blue: balanced accuracy (dummy)', '0.48', '0.52', '0.57']],
+    'Worked example (dummy data): the hyperspectral + thermal set reaches 0.70 on 18 January (earliest detection day = 8 days after inoculation), while the red–green–blue set does not reach it before symptoms.', [3700, 1868, 1868, 1870])
 CARD('roc', 'Receiver operating characteristic analysis and earliest detection day', 'The receiver operating characteristic curve plots sensitivity against 1 − specificity for all thresholds; its area (AUC) is the probability that an infected sample scores higher than a healthy one. The earliest detection day is the first date on which balanced accuracy reaches a set level.',
      'Measures early-warning ability independently of the class balance and threshold; gives a simple "how early" answer.', 'AUC and balanced accuracy per date; level 0.70.',
      'Level 0.70 (fixed in advance; 0.65 and 0.75 reported as checks).', 'Binary early-warning problems with unequal classes.',

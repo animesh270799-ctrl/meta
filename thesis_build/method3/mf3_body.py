@@ -86,8 +86,8 @@ H1('1. Objectives, data and overall design')
 H2('1.1 Background and objectives')
 P('White rust, caused by the obligate oomycete Albugo candida, produces white pustules on the leaves, chlorosis and, after systemic infection, distorted inflorescences (staghead) in Indian mustard, and it can reduce yield by 20–60% (Kumar and Kalha, 2005; Saharan et al., 2014). The disease develops under cool and humid weather (Chattopadhyay et al., 2011). Visual scoring is slow and possible only after symptoms appear. Cameras on an unmanned aerial vehicle (UAV) record the changes in pigments, leaf structure, water and temperature that accompany infection, sometimes before symptoms are visible (Mahlein, 2016; Terentev et al., 2022), and combining several cameras usually improves accuracy (Maimaitijiang et al., 2020; Feng et al., 2022).')
 TAB('objectives', [['Objective', 'Question answered', 'Data used', 'Main output'],
-    ['1. To characterise white rust of mustard through multimodal sensing from a UAV platform', 'Which wavelengths, vegetation indices, texture features and thermal features of each camera respond to white rust severity, and does the response change with variety and inoculation timing?', '1536 post-symptomatic subplot samples per camera', 'Optimal wavelengths, White Rust Index, selected indices, Tri-band Texture Fusion Index and the disease-specific feature set of each camera'],
-    ['2. To detect and discriminate disease severity of white rust in mustard through AI-based multimodal data fusion', 'How accurately can (a) healthy vs diseased subplots, (b) severity classes and (c) the severity score be predicted by each of the 15 sensor sets with machine learning and deep learning?', '1536 post-symptomatic subplot samples per camera', 'Best sensor set and model for each task; contribution of each camera; comparison of DT-EDNet with EfficientNet, ResNet18 and ConvNeXt V2; severity maps'],
+    ['1. To characterise white rust of mustard through multimodal sensing from a UAV platform', 'Which wavelengths, vegetation indices, texture features and thermal features of each camera respond to white rust severity, and does the response change with variety and inoculation timing?', '1920 post-symptomatic subplot samples per camera', 'Optimal wavelengths, White Rust Index, selected indices, Tri-band Texture Fusion Index and the disease-specific feature set of each camera'],
+    ['2. To detect and discriminate disease severity of white rust in mustard through AI-based multimodal data fusion', 'How accurately can (a) healthy vs diseased subplots, (b) severity classes and (c) the severity score be predicted by each of the 15 sensor sets with machine learning and deep learning?', '1920 post-symptomatic subplot samples per camera', 'Best sensor set and model for each task; contribution of each camera; comparison of DT-EDNet with EfficientNet, ResNet18 and ConvNeXt V2; severity maps'],
     ['3. To predict white rust at the pre-symptomatic stage using machine learning', 'Can subplots that will develop white rust be separated from healthy subplots before symptoms, and can their later severity be predicted?', '576 pre-symptomatic subplot samples per camera', 'Pre-symptomatic models; earliest detection day; risk maps']],
     'Objectives, questions, data and outputs.', [2600, 3000, 1600, 2106], 16)
 H2('1.2 Overall design')
@@ -102,8 +102,8 @@ NL(['One sample is one subplot on one date. The four subplots of a plot always s
     'Severity increases with time, so every sensor model is compared with a covariate-only model (days after inoculation, variety, inoculation timing, growth stage, weather); a sensor model is useful only if it is better than this baseline.',
     'The same folds are used for all sensor sets and all models, so that their accuracies are directly comparable.'])
 H2('1.3 Dataset')
-TAB('dataset', [['Item', 'Value'], ['Plots × subplots', '48 × 4 = 192 subplots in each image'], ['Cameras', '4: hyperspectral, multispectral, red–green–blue and thermal'], ['Images', '8 flight dates × 4 cameras for the post-symptomatic period; pre-symptomatic flight dates in addition'],
-    ['Post-symptomatic samples per camera', '1536 (8 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'],
+TAB('dataset', [['Item', 'Value'], ['Plots × subplots', '48 × 4 = 192 subplots in each image'], ['Cameras', '4: hyperspectral, multispectral, red–green–blue and thermal'], ['Images', '13 flight dates × 4 cameras = 52 images (3 pre-symptomatic + 10 post-symptomatic dates)'], ['Inoculation and flight dates', 'inoculation 10 Jan 2027; flights 12, 15, 18 Jan (pre-symptomatic) and 21, 28 Jan, 4, 11, 18, 25 Feb, 4, 11, 18, 25 Mar 2027 (post-symptomatic)'],
+    ['Post-symptomatic samples per camera', '1920 (10 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'],
     ['Sensor sets analysed', '15 (4 single cameras, 6 pairs, 4 triples, all four)'], ['Tasks', 'detection (healthy vs diseased), severity classes, severity score'], ['Time for the analysis', '6 months']], 'Dataset used in this methodology (numbers as recorded by the researcher).', [3300, 6006])
 FIG('dataset', 'g26_dataset.png', 'Structure of the dataset: flight dates → cameras → plots → scored subplots, and the two datasets used by the objectives.', 520)
 H2('1.4 Main published studies used to build the methodology')
@@ -138,7 +138,7 @@ STEP('A1', 'Experimental design and treatments',
      'Defines the sources of variation (inoculation timing, variety, replication) so that disease effects can be separated from crop-age and variety effects.',
      'IARI research farm, New Delhi, rabi 2026-27; field 48 m × 24 m (9.4 m healthy block + 10 m buffer + 28.6 m inoculated block); plots 5 m × 3 m with 0.2 m bunds and 2 m channels.',
      '48 plots with known treatment, replication and plot number → subplots (Step A3) and validation folds (Activity F).',
-     ['Four sowing dates at 8-day intervals: D1 = 19 November, D2 = 27 November, D3 = 5 December and D4 = 13 December 2026, with one inoculation date, so the crop is inoculated at four different ages.',
+     ['Four sowing dates at 8-day intervals: D1 = 19 November, D2 = 27 November, D3 = 5 December and D4 = 13 December 2026, with one inoculation on 10 January 2027, so the crop is inoculated at four different ages: 52, 44, 36 and 28 days after sowing.',
       'Three varieties: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37.',
       'The 12 treatments (4 × 3) are inoculated in three replications (R1: plots 37–48, R2: plots 25–36, R3: plots 13–24) with a zoosporangial suspension of 1.5 × 10^{5} zoosporangia mL^{−1} (Mishra et al., 2009).',
       'One uninoculated healthy plot of every treatment (plots 1–12) is sown in a separate healthy block, 10 m away from the inoculated block, so that inoculum does not spread to the controls: 36 inoculated + 12 healthy = 48 plots.',
@@ -153,8 +153,18 @@ STEP('A2', 'UAV flights and cameras',
       'Multispectral camera: MicaSense RedEdge-MX (475, 560, 668, 717 and 840 nm; about 2 cm).',
       'Red–green–blue camera: DJI camera (about 0.8 cm). Thermal camera: FLIR Vue Pro R, 7.5–13.5 µm (about 3.9 cm).',
       'Place reflectance panels and ground control points before every flight; record air temperature and relative humidity during the flight.',
+      'Fly on 13 dates: 12, 15 and 18 January 2027 (pre-symptomatic) and 21 and 28 January, 4, 11, 18 and 25 February, 4, 11, 18 and 25 March 2027 (post-symptomatic); all four cameras on every date.',
       'Score the subplots on the day of the flight (or within one day).'],
      'The same four camera types were combined for wheat powdery mildew (Feng et al., 2022) and soybean yield (Maimaitijiang et al., 2020); flight protocols with panels and solar-noon windows are reviewed by Aasen et al. (2018); thermal flight practice: Messina and Modica (2020).')
+TAB('flights', [['Flight', 'Date', 'Days after inoculation', 'Period', 'Cameras and scoring'],
+    ['1', '12 Jan 2027', '2', 'pre-symptomatic', 'RGB (DJI Phantom), multispectral (MicaSense RedEdge), thermal (FLIR), hyperspectral (Headwall co-aligned), visual severity'],
+    ['2', '15 Jan 2027', '5', 'pre-symptomatic', 'all four cameras + visual severity'], ['3', '18 Jan 2027', '8', 'pre-symptomatic', 'all four cameras + visual severity'],
+    ['4', '21 Jan 2027', '11', 'post-symptomatic', 'all four cameras + visual severity'], ['5', '28 Jan 2027', '18', 'post-symptomatic', 'all four cameras + visual severity'],
+    ['6', '4 Feb 2027', '25', 'post-symptomatic', 'all four cameras + visual severity'], ['7', '11 Feb 2027', '32', 'post-symptomatic', 'all four cameras + visual severity'],
+    ['8', '18 Feb 2027', '39', 'post-symptomatic', 'all four cameras + visual severity'], ['9', '25 Feb 2027', '46', 'post-symptomatic', 'all four cameras + visual severity'],
+    ['10', '4 Mar 2027', '53', 'post-symptomatic', 'all four cameras + visual severity'], ['11', '11 Mar 2027', '60', 'post-symptomatic', 'all four cameras + visual severity'],
+    ['12', '18 Mar 2027', '67', 'post-symptomatic', 'all four cameras + visual severity'], ['13', '25 Mar 2027', '74', 'post-symptomatic', 'all four cameras + visual severity']],
+    'Timeline of data collection in the field (inoculation on 10 January 2027): 3 pre-symptomatic and 10 post-symptomatic dates.', [900, 1500, 1700, 1700, 3506], 16)
 STEP('A3', 'Subplots and canopy severity score',
      'Gives every sampling unit its label.',
      'Plot boundaries; field scoring sheets.',
@@ -167,15 +177,15 @@ EQ('PDI = Σ_{i} grade_{i} / (n × 9) × 100      (n = 4 subplots per plot)')
 TAB('pdiex', [['Subplot', '1', '2', '3', '4', 'Plot PDI'], ['Grade (dummy)', '3', '5', '1', '3', '(3 + 5 + 1 + 3) / (4 × 9) × 100 = 33.3%']], 'Worked example (dummy data): percent disease index of one plot.', [1800, 900, 900, 900, 900, 3906])
 STEP('A4', 'Labels and the two datasets',
      'Defines exactly what each model predicts and which samples belong to which objective.',
-     'Subplot scores of all dates; date of the first visible pustule.',
-     'Post-symptomatic dataset (1536 samples per camera) and pre-symptomatic dataset (576 samples per camera) with their labels → all objectives.',
-     ['Post-symptomatic dates: on or after the first visible pustule; pre-symptomatic dates: before it.',
+     'Subplot scores of all 13 flight dates.',
+     'Post-symptomatic dataset (1920 samples per camera) and pre-symptomatic dataset (576 samples per camera) with their labels → all objectives.',
+     ['Pre-symptomatic dates: the first three flights (12, 15 and 18 January 2027; 2, 5 and 8 days after inoculation). Post-symptomatic dates: the next ten flights (21 January to 25 March 2027; 11–74 days after inoculation).',
       'Detection label: healthy (grade 0) or diseased (grade above 0), taken from the observed score, not from the treatment.',
       'Severity classes: the six grades 0, 1, 3, 5, 7 and 9; a grade with fewer than 5% of the samples is merged with its neighbour (for example 7 + 9).',
       'Severity score: the grade treated as a continuous number for regression.',
       'Pre-symptomatic labels (Objective 3): healthy = subplots of the healthy plots; infected = inoculated subplots that show pustules on a later date; inoculated subplots that never show symptoms are kept out of the infected class.'],
      'Detection, severity classes and regression were analysed together for rice blast (Tian et al., 2021) and wheat powdery mildew (Feng et al., 2022); labels from the later status for pre-symptomatic samples: Zhu et al. (2017), Tian et al. (2021).')
-TAB('classex', [['Grade', '0', '1', '3', '5', '7', '9'], ['Detection label', 'healthy', 'diseased', 'diseased', 'diseased', 'diseased', 'diseased'], ['Severity class', '0', '1', '3', '5', '7', '9'], ['Dummy count (1536 samples)', '410', '330', '290', '250', '160', '96']],
+TAB('classex', [['Grade', '0', '1', '3', '5', '7', '9'], ['Detection label', 'healthy', 'diseased', 'diseased', 'diseased', 'diseased', 'diseased'], ['Severity class', '0', '1', '3', '5', '7', '9'], ['Dummy count (1920 samples)', '512', '413', '362', '313', '200', '120']],
     'How one score gives the three labels (dummy class counts).', [2500, 1134, 1134, 1134, 1134, 1134, 1136])
 STEP('A5', 'Covariates: days after inoculation, variety, inoculation timing, growth stage and weather',
      'Disease severity changes with time, crop stage, variety and weather. These known factors must be recorded so that their effect can be separated from what the cameras add.',
@@ -195,7 +205,7 @@ TAB('covtab', [['Covariate', 'Type and coding', 'Varies between subplots on one 
     ['Growth stage (1 vegetative, 2 flowering, 3 pod formation)', 'ordinal from BBCH', 'yes (staggered sowing)', 'baseline; results by stage; flowering check'],
     ['Weather (T_{max}, T_{min}, RH I, RH II, rainfall; favourable days)', 'numeric, 7-day summaries', 'no (one value per date)', 'interpretation; baseline (time effect only)']],
     'Covariates recorded for every subplot-date. Weather is the same for all subplots on a date, so it can explain differences between dates but not between subplots.', [2900, 2200, 1900, 2306])
-NOTE('Weather has only one value per flight date (eight values in the post-symptomatic period), so in a single season it cannot be separated from the date itself. It is therefore used for interpretation and inside the covariate baseline, and results of models that contain weather are labelled "within-season"; their transfer to another season must be tested with data of that season (Zhang et al., 2014; Ma et al., 2026).')
+NOTE('Weather has only one value per flight date (ten values in the post-symptomatic period), so in a single season it cannot be separated from the date itself. It is therefore used for interpretation and inside the covariate baseline, and results of models that contain weather are labelled "within-season"; their transfer to another season must be tested with data of that season (Zhang et al., 2014; Ma et al., 2026).')
 
 # ---------------------------------------------------------------- B
 H2('Activity B – Image pre-processing')
@@ -476,12 +486,12 @@ CARD('zscore', 'z-score standardisation', 'Subtracts the mean and divides by the
      'No hyper-parameters.', 'Mixed feature types (reflectance, indices, texture, temperature).',
      'Required by support vector machines, k-nearest neighbours, partial least squares and neural networks.', 'Kuhn and Johnson (2013)')
 STEP('E4', 'Class weights',
-     'The severity classes have unequal sizes (for example 410 healthy vs 96 grade-9 samples); models tend to ignore small classes.',
+     'The severity classes have unequal sizes (for example 512 healthy vs 120 grade-9 samples); models tend to ignore small classes.',
      'Class counts of the training part.',
      'Class weights for the loss functions of all classifiers → Objectives 2–3.',
      ['Weight of class c: w_{c} = N / (k × n_{c}), where N is the number of training samples, k the number of classes and n_{c} the size of class c.', 'Use the weights in the loss (support vector machine, random forest, extreme gradient boosting, neural networks).', 'Report macro-averaged metrics, which give each class equal importance.'],
      'Class imbalance in deep learning: Johnson and Khoshgoftaar (2019); macro-averaged metrics: Sokolova and Lapalme (2009).')
-P('**Worked example (dummy data).** With N = 1024 training samples, k = 6 classes and 64 samples of grade 9, the weight of grade 9 is 1024 / (6 × 64) = 2.67, while the weight of a class with 273 samples is 1024 / (6 × 273) = 0.63.')
+P('**Worked example (dummy data).** With N = 1280 training samples, k = 6 classes and 80 samples of grade 9, the weight of grade 9 is 1280 / (6 × 80) = 2.67, while the weight of a class with 341 samples is 1280 / (6 × 341) = 0.63.')
 
 # ---------------------------------------------------------------- F
 H2('Activity F – Validation design and tuning')
@@ -491,7 +501,7 @@ STEP('F1', 'Leave-one-replication-out (LORO) outer folds',
      'Three outer folds → all models of Objectives 2 and 3.',
      ['Fold 1 tests replication R1, fold 2 tests R2, fold 3 tests R3 (leave-one-replication-out, LORO).',
       'The 12 healthy plots are rotated so that every fold contains one healthy plot of each inoculation timing and at least one of each variety ([[T:healthyrot]]). Every training part then holds two or three healthy plots of every variety, which the healthy-plot normalisation (Step E2) needs, and every test fold contains healthy samples of all three varieties.',
-      'All dates and all four subplots of a plot stay in the same fold; each test fold has about 512 post-symptomatic (or 192 pre-symptomatic) samples.',
+      'All dates and all four subplots of a plot stay in the same fold; each test fold has about 640 post-symptomatic (or 192 pre-symptomatic) samples.',
       'The same three folds are used for every sensor set, task and model.'],
      'Grouped (blocked) cross-validation: Roberts et al. (2017); healthy references of the same variety needed for normalisation: Oerke et al. (2006), Zarco-Tejada et al. (2018); spatial validation shows that random splits overestimate accuracy: Ploton et al. (2020); the random 7:3 split of Ma et al. (2026) is the optimistic design this step avoids, while its cross-year test supports testing on independent units.')
 TAB('healthyrot', [['Outer fold', 'Inoculated plots tested', 'Healthy plots tested (variety–timing, plot number)'], ['1', 'replication R1 (plots 37–48)', 'V1-D1 (7), V2-D2 (2), V3-D3 (10), V1-D4 (12)'], ['2', 'replication R2 (plots 25–36)', 'V2-D1 (5), V3-D2 (8), V1-D3 (4), V2-D4 (1)'], ['3', 'replication R3 (plots 13–24)', 'V3-D1 (3), V1-D2 (9), V2-D3 (11), V3-D4 (6)']],
@@ -521,7 +531,7 @@ TAB('leak', [['Step', 'Uses labels?', 'Where it is run'], ['Activities B–D (pr
     ['Within-group redundancy (|r| ≥ 0.95), variance inflation factor', 'no', 'training part of each fold'], ['NDSI/RSI and White Rust Index search, SHAP-CARS, ReliefF, mRMR, TTFI search', 'yes', 'inner folds only'],
     ['Sequential floating forward selection, hyper-parameter tuning, early stopping', 'yes', 'inner folds only'], ['Final evaluation', 'yes', 'test replication, once']],
     'Where each step is run so that no information from the test replication enters the model.', [4300, 1900, 3106])
-TAB('foldsize', [['Dataset', 'Training part per outer fold', 'Test part per outer fold', 'Inner folds'], ['Post-symptomatic (1536 per camera)', '≈ 1024 samples', '≈ 512 samples', '3, grouped by plot'], ['Pre-symptomatic (576 per camera)', '≈ 384 samples', '≈ 192 samples', '3, grouped by plot']],
+TAB('foldsize', [['Dataset', 'Training part per outer fold', 'Test part per outer fold', 'Inner folds'], ['Post-symptomatic (1920 per camera)', '≈ 1280 samples', '≈ 640 samples', '3, grouped by plot'], ['Pre-symptomatic (576 per camera)', '≈ 384 samples', '≈ 192 samples', '3, grouped by plot']],
     'Approximate sizes of the training and test parts.', [2800, 2600, 1900, 2006])
 
 exec(open(B + 'mf3_obj.py').read())

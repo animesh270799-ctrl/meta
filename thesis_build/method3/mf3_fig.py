@@ -48,7 +48,7 @@ rows = [('Common Activity A – Field experiment, ground truth, covariates and d
         ('Common Activity E – Normalisation and data preparation', 'thermal normalisation → healthy-plot normalisation (healthy plots rotated across folds)\n→ standardisation with training statistics → class weights', 'gold'),
         ('Common Activity F – Validation design and tuning', 'leave-one-replication-out outer folds grouped by plot; inner grouped folds for selection and tuning; leakage checklist', 'gold'),
         ('Objective 1 – Characterisation (Activities 1.1–1.6)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and Tri-band Texture Fusion Index → feature sets', 'o1'),
-        ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.6), 1536 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
+        ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.6), 1920 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
         ('Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5), 576 pre-symptomatic samples', 'labels from the later status of each subplot | normalisation to healthy plots | same feature selection | machine learning and\nfeature-fusion neural networks | earliest detection day and risk maps', 'o3')]
 y = 14.3
 for i, (t, b, k) in enumerate(rows):
@@ -126,7 +126,7 @@ for f in range(3):
     y = 4.4 - f * 1.25; ax.text(0.35, y + 0.3, 'Outer fold %d' % (f + 1), fontsize=10, fontweight='bold', va='center')
     for j in range(3):
         test = j == f; box(ax, 1.9 + j * 2.0, y, 1.85, 0.6, 'R%d + 4 healthy\n(V1–V3 rotated)' % (j + 1), '', 'o3' if test else 'o1', tfs=8.5, filled=test)
-    ax.text(8.1, y + 0.3, 'test = replication %d (≈ 512 samples)\ntrain = other two (≈ 1024)' % (f + 1), fontsize=8.5, va='center')
+    ax.text(8.1, y + 0.3, 'test = replication %d (≈ 640 samples)\ntrain = other two (≈ 1280)' % (f + 1), fontsize=8.5, va='center')
 box(ax, 0.3, 0.15, 10.4, 0.95, 'Inside each training part', 'inner 3-fold cross-validation grouped by plot: feature selection, tuning, early stopping (validation plots, not random samples)\nthe test replication is used only once, for the final evaluation', 'gold', fs=8.4)
 save(fig, 'g09_validation.png')
 
@@ -305,12 +305,14 @@ fig.text(0.5, -0.02, 'Dummy data for illustration only', ha='center', fontsize=8
 np.save(F + 'cm.npy', cm)
 
 # earliest detection
-fig, ax = plt.subplots(figsize=(7, 3.6)); dai = np.array([3, 6, 9, 12, 15])
-for lab, c, sh in (('hyperspectral + thermal', '#7030A0', 0), ('hyperspectral', '#00838F', -0.03), ('thermal', '#C62828', -0.06), ('red–green–blue', '#2E7D32', -0.13)):
-    ba = 0.5 + 0.32 / (1 + np.exp(-(dai - 9) / 2.2)) + sh; ax.plot(dai, ba, 'o-', color=c, label=lab)
-ax.axhline(0.7, color='k', ls='--', lw=.8); ax.text(3.1, 0.71, 'chosen reliability level', fontsize=8)
-ax.set(xlabel='days after inoculation (pre-symptomatic dates)', ylabel='balanced accuracy', title='Accuracy by day after inoculation'); ax.legend(fontsize=7.5); ax.grid(alpha=.3)
-fig.text(0.5, -0.03, 'Dummy data for illustration only', ha='center', fontsize=8, style='italic', color='#777'); plt.tight_layout(); save(fig, 'g23_dummy_earliest.png')
+fig, ax = plt.subplots(figsize=(7, 3.6)); dai = np.array([2, 5, 8])
+for lab, c, vals in (('hyperspectral + thermal', '#7030A0', [0.58, 0.66, 0.74]), ('hyperspectral', '#00838F', [0.56, 0.63, 0.71]), ('thermal', '#C62828', [0.56, 0.62, 0.68]), ('red–green–blue', '#2E7D32', [0.48, 0.52, 0.57])):
+    ax.plot(dai, vals, 'o-', color=c, label=lab)
+ax.axhline(0.7, color='k', ls='--', lw=.8); ax.text(5.0, 0.705, 'chosen reliability level (0.70)', fontsize=8, ha='center')
+ax.set_xticks(dai); ax.set_xticklabels(['12 Jan\n(2 DAI)', '15 Jan\n(5 DAI)', '18 Jan\n(8 DAI)'])
+ax.set(xlabel='pre-symptomatic flight date (days after inoculation)', ylabel='balanced accuracy', title='Accuracy on the three pre-symptomatic dates', ylim=(0.4, 0.8)); ax.legend(fontsize=7.5, loc='lower right'); ax.grid(alpha=.3)
+fig.text(0.5, -0.03, 'Dummy data for illustration only', ha='center', fontsize=8, style='italic', color='#777'); plt.tight_layout()
+save(fig, 'g23_dummy_earliest.png')
 
 # Gantt
 fig, ax = canvas(11, 5.4)
@@ -322,4 +324,34 @@ for i, (t, a, b, k) in enumerate(tasks):
     y = 4.4 - i * 0.52; ax.text(0.15, y + 0.17, t, fontsize=8.4, va='center')
     ax.add_patch(FancyBboxPatch((4.6 + a * 1.03, y), (b - a) * 1.03, 0.34, boxstyle='round,pad=0.01,rounding_size=0.05', fc=C[k], ec=C[k]))
 save(fig, 'g24_gantt.png')
+
+# dataset structure (13 flight dates)
+fig, ax = canvas(11, 4.6)
+lv = [('13 flight dates\n(3 pre- and 10 post-\nsymptomatic)', 'nav'), ('4 cameras\nper date', 'ms'), ('48 plots\nper image', 'rgb'), ('4 scored\nsubplots\nper plot', 'tir')]
+for i, (t, k) in enumerate(lv):
+    box(ax, 0.3 + i * 2.7, 2.7, 2.45, 1.4, t, '', k, tfs=10, filled=True)
+    if i < 3: arr(ax, 2.75 + i * 2.7, 3.4, 3.0 + i * 2.7, 3.4)
+box(ax, 0.3, 0.4, 5.1, 1.8, 'Post-symptomatic set (Objectives 1 and 2)', '1920 subplot samples per camera\n(10 dates × 48 plots × 4 subplots; 21 Jan – 25 Mar 2027)\nlabels: severity score, class, healthy / diseased', 'o2', fs=9)
+box(ax, 5.7, 0.4, 5.0, 1.8, 'Pre-symptomatic set (Objective 3)', '576 subplot samples per camera\n(3 dates × 48 plots × 4 subplots; 12, 15, 18 Jan 2027)\nlabels: healthy / infected (later status), later severity', 'o3', fs=9)
+save(fig, 'g26_dataset.png')
+
+# timeline of the 13 flights
+fig, ax = canvas(12, 4.2)
+dates = [('12 Jan', 2), ('15 Jan', 5), ('18 Jan', 8), ('21 Jan', 11), ('28 Jan', 18), ('4 Feb', 25), ('11 Feb', 32), ('18 Feb', 39), ('25 Feb', 46), ('4 Mar', 53), ('11 Mar', 60), ('18 Mar', 67), ('25 Mar', 74)]
+x0, sc = 1.6, 0.135
+ax.annotate('', xy=(11.85, 2.3), xytext=(1.45, 2.3), arrowprops=dict(arrowstyle='-|>', color='#333', lw=1.5))
+ax.plot([x0, x0], [2.05, 2.55], color='k', lw=2); ax.text(x0 - 0.12, 2.3, 'inoculation\n10 Jan 2027', ha='right', va='center', fontsize=7.8)
+for i, (d, dai) in enumerate(dates):
+    x = x0 + dai * sc; c = C['o3'] if i < 3 else C['o2']
+    ax.plot(x, 2.3, 'o', color=c, ms=8)
+    yl = 1.45 if i in (1, 3) else 1.95
+    ax.text(x, yl, '%s\n%d DAI' % (d, dai), ha='center', va='top', fontsize=7.2)
+ax.add_patch(FancyBboxPatch((x0 + 1.0 * sc, 2.75), 8.2 * sc, 0.55, boxstyle='round,pad=0.01,rounding_size=0.05', fc=L['o3'], ec=C['o3']))
+ax.text(x0 + 5.1 * sc, 3.02, 'pre-\nsymptomatic', ha='center', va='center', fontsize=7.0, fontweight='bold', color=C['o3'])
+ax.text(x0 + 5.1 * sc, 3.62, '3 dates\n576 samples', ha='center', va='center', fontsize=7.4, color=C['o3'])
+ax.add_patch(FancyBboxPatch((x0 + 10 * sc, 2.75), 65 * sc, 0.55, boxstyle='round,pad=0.01,rounding_size=0.05', fc=L['o2'], ec=C['o2']))
+ax.text(x0 + 42.5 * sc, 3.02, 'post-symptomatic: 10 dates, 1920 samples (label = severity score observed on the same date)', ha='center', va='center', fontsize=8.2, fontweight='bold', color=C['o2'])
+ax.text(0.4, 0.55, 'pre-symptomatic label = later status of the same subplot (healthy control vs inoculated subplot that becomes diseased)', ha='left', fontsize=8)
+ax.text(0.4, 0.2, 'all four cameras (red–green–blue, multispectral, thermal, hyperspectral) and visual severity scoring on every date', ha='left', fontsize=8, style='italic')
+save(fig, 'g27_obj3.png')
 print('figures ok')
