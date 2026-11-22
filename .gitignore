@@ -3,3 +3,7 @@ thesis_build/final/f_docx.js
 __pycache__/
 thesis_build/obj1/o1_docx.js
 thesis_build/obj1/o1_sim.npz
+thesis_build/asd26/data/
+thesis_build/asd26/fig/
+thesis_build/asd26/a10_build.js
+thesis_build/asd26/a6_figs_old.py
