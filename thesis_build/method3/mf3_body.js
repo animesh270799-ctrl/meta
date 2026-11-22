@@ -3,7 +3,7 @@ K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 },
 K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: 'Hyperspectral, multispectral, red–green–blue and thermal unmanned aerial vehicle (UAV) data | 15 sensor sets | feature-level fusion | machine learning, feature-fusion neural networks, DT-EDNet, EfficientNet, ResNet18 and ConvNeXt V2', font: FONT, size: 21, italics: true })] }));
 K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [new TextRun({ text: 'Animesh Panda (Roll No. 13098) | Ph.D. Agricultural Physics | ICAR-Indian Agricultural Research Institute, New Delhi', font: FONT, size: 20 })] }));
 K.push(BOX(`How to read this document.`, `The work is organised in three levels. (1) Six common activities (A to F) prepare the data once for all objectives. (2) Each objective is divided into activities (for example Activity 1.2). (3) Each activity is divided into numbered steps (for example Step 1.2.3). Every step has a heading and the same layout: purpose, input, output, procedure and supporting studies. Every technique used in a step is described in a method card that gives its principle, the problem it solves, its specification, its hyper-parameters and how they are tuned, the data on which it works well, why it was selected and its references. Flow charts are given for every objective and for the main activities, and small dummy datasets are used to show how each calculation works. Full names are written with their abbreviation in brackets.`, 'EEF3E8', '2C5F2D'));
-K.push(BOX(`What is new in this revision.`, `(1) The methods of the DT-EDNet study on rice blast (Ma et al., 2026) are included: effective wavelength ranges from normalised difference and ratio spectral index maps, optimal wavelengths by SHAP-CARS, vegetation index selection by ReliefF, texture from principal-component images selected by minimum redundancy maximum relevance (mRMR), the Tri-band Texture Fusion Index (TTFI) and the DT-EDNet network with EfficientNet, ResNet18 and ConvNeXt V2 as comparison networks for the post-symptomatic data. (2) One feature-selection method is used for each type of feature. (3) The second derivative is not used. (4) A separate activity on normalisation and data preparation is added. (5) The endmember extraction is described step by step. (6) Each technique has a method card.`, 'FFF6E0', 'C98A00'));
+K.push(BOX(`What is new in this revision.`, `(1) The methods of the DT-EDNet study on rice blast (Ma et al., 2026) are included: effective wavelength ranges from normalised difference and ratio spectral index maps, optimal wavelengths by SHAP-CARS, vegetation index selection by ReliefF, texture from principal-component images selected by minimum redundancy maximum relevance (mRMR), the Tri-band Texture Fusion Index (TTFI) and the DT-EDNet network with EfficientNet, ResNet18 and ConvNeXt V2 as comparison networks for the post-symptomatic data. (2) One feature-selection method is used for each type of feature. (3) The second derivative is not used. (4) A separate activity on normalisation and data preparation is added. (5) The endmember extraction is described step by step. (6) Each technique has a method card. (7) Covariates are days after inoculation, variety, inoculation timing, growth stage and weather; they are used for a covariate-only baseline and for sensor + covariate models, not as disease features. (8) Healthy plots are rotated across the folds so that every fold contains healthy plots of all three varieties. (9) SHAP-CARS standardises the bands and always keeps the red-edge first derivative. (10) All models, including DT-EDNet and the comparison networks, are built for every single camera and every camera combination, for classification and regression.`, 'FFF6E0', 'C98A00'));
 K.push(new Paragraph({ children: [new PageBreak()] }));
 K.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: 'Contents', font: FONT, size: 32, bold: true, color: '1E3A1F' })] }));
 K.push(new TableOfContents('Contents', { hyperlink: true, headingStyleRange: '1-3' }));
@@ -13,6 +13,7 @@ K.push(P(`The text always gives the full name with the abbreviation in brackets.
 K.push(...tab2('abbr', [[`Abbreviation`, `Full name`, `Abbreviation`, `Full name`],
 [`AdamW`, `adaptive moment estimation with decoupled weight decay`, `MNF`, `minimum noise fraction`],
 [`AUC`, `area under the receiver operating characteristic curve`, `mRMR`, `minimum redundancy maximum relevance`],
+[`BBCH`, `decimal scale of plant growth stages (Biologische Bundesanstalt, Bundessortenamt und Chemische Industrie)`, `RH`, `relative humidity`],
 [`CARS`, `competitive adaptive reweighted sampling`, `MS`, `multispectral`],
 [`CBAM`, `convolutional block attention module`, `NDSI`, `normalised difference spectral index`],
 [`CWSI`, `crop water stress index`, `NDVI`, `normalised difference vegetation index`],
@@ -33,7 +34,7 @@ K.push(...tab2('abbr', [[`Abbreviation`, `Full name`, `Abbreviation`, `Full name
 [`TTB`, `Token Transformer Block`, `TTFI`, `Tri-band Texture Fusion Index`],
 [`UAV`, `unmanned aerial vehicle`, `VI`, `vegetation index`],
 [`VIF`, `variance inflation factor`, `WRI`, `White Rust Index`],
-[`XGBoost`, `extreme gradient boosting`, ``, ``]], [1500, 3150, 1500, 3156], `Full names of the abbreviations used.`, 16));
+[`XGBoost`, `extreme gradient boosting`, `T_{max}, T_{min}`, `daily maximum and minimum air temperature`]], [1500, 3150, 1500, 3156], `Full names of the abbreviations used.`, 16));
 K.push(H1(`1. Objectives, data and overall design`));
 K.push(H2(`1.1 Background and objectives`));
 K.push(P(`White rust, caused by the obligate oomycete Albugo candida, produces white pustules on the leaves, chlorosis and, after systemic infection, distorted inflorescences (staghead) in Indian mustard, and it can reduce yield by 20–60% (Kumar and Kalha, 2005; Saharan et al., 2014). The disease develops under cool and humid weather (Chattopadhyay et al., 2011). Visual scoring is slow and possible only after symptoms appear. Cameras on an unmanned aerial vehicle (UAV) record the changes in pigments, leaf structure, water and temperature that accompany infection, sometimes before symptoms are visible (Mahlein, 2016; Terentev et al., 2022), and combining several cameras usually improves accuracy (Maimaitijiang et al., 2020; Feng et al., 2022).`));
@@ -42,7 +43,7 @@ K.push(...tab2('objectives', [[`Objective`, `Question answered`, `Data used`, `M
 [`2. To detect and discriminate disease severity of white rust in mustard through AI-based multimodal data fusion`, `How accurately can (a) healthy vs diseased subplots, (b) severity classes and (c) the severity score be predicted by each of the 15 sensor sets with machine learning and deep learning?`, `1536 post-symptomatic subplot samples per camera`, `Best sensor set and model for each task; contribution of each camera; comparison of DT-EDNet with EfficientNet, ResNet18 and ConvNeXt V2; severity maps`],
 [`3. To predict white rust at the pre-symptomatic stage using machine learning`, `Can subplots that will develop white rust be separated from healthy subplots before symptoms, and can their later severity be predicted?`, `576 pre-symptomatic subplot samples per camera`, `Pre-symptomatic models; earliest detection day; risk maps`]], [2600, 3000, 1600, 2106], `Objectives, questions, data and outputs.`, 16));
 K.push(H2(`1.2 Overall design`));
-K.push(P(`All objectives use the same field data and the same preparation. The common activities A to F are carried out once (Figure ${F('overall')}). Objective 1 then describes and selects the features of each camera, Objective 2 builds the detection and severity models on the post-symptomatic data and Objective 3 builds the early-warning models on the pre-symptomatic data.`));
+K.push(P(`All objectives use the same field data and the same preparation. The common activities A to F are carried out once (${F('overall')}). Objective 1 then describes and selects the features of each camera, Objective 2 builds the detection and severity models on the post-symptomatic data and Objective 3 builds the early-warning models on the pre-symptomatic data.`));
 K.push(...fig2('overall', 'g01_overall.png', `Overall workflow. Common activities A–F prepare the data once; each objective is divided into activities and steps.`, 560));
 K.push(P(`**Six rules apply to every activity.** They come from the methodological literature and from the weaknesses reported in recent disease-sensing studies (Ambroise and McLachlan, 2002; Varma and Simon, 2006; Cawley and Talbot, 2010; Roberts et al., 2017; Ma et al., 2026).`));
 K.push(NL(`One sample is one subplot on one date. The four subplots of a plot always stay together in the training part or in the test part.`));
@@ -50,6 +51,7 @@ K.push(NL(`All cameras are measured on the same vegetation pixels of each subplo
 K.push(NL(`Features are grouped by type, and one selection method is used for each type of feature (Objective 1).`));
 K.push(NL(`Every step that uses the severity labels (index search, feature selection, tuning, early stopping) runs inside the training part only.`));
 K.push(NL(`All normalisation constants (means, standard deviations, healthy-plot references) are computed on the training part and then applied to the test part.`));
+K.push(NL(`Severity increases with time, so every sensor model is compared with a covariate-only model (days after inoculation, variety, inoculation timing, growth stage, weather); a sensor model is useful only if it is better than this baseline.`));
 K.push(NL(`The same folds are used for all sensor sets and all models, so that their accuracies are directly comparable.`));
 K.push(H2(`1.3 Dataset`));
 K.push(...tab2('dataset', [[`Item`, `Value`],
@@ -59,12 +61,16 @@ K.push(...tab2('dataset', [[`Item`, `Value`],
 [`Post-symptomatic samples per camera`, `1536 (8 dates × 192 subplots)`],
 [`Pre-symptomatic samples per camera`, `576 (3 dates × 192 subplots)`],
 [`Label of every sample`, `canopy severity score of the subplot (0–9 grade key) recorded on the flight day`],
+[`Varieties`, `V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37`],
+[`Sowing dates (2026)`, `D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec`],
+[`Field layout`, `48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m`],
+[`Covariates`, `days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)`],
 [`Sensor sets analysed`, `15 (4 single cameras, 6 pairs, 4 triples, all four)`],
 [`Tasks`, `detection (healthy vs diseased), severity classes, severity score`],
 [`Time for the analysis`, `6 months`]], [3300, 6006], `Dataset used in this methodology (numbers as recorded by the researcher).`, 17));
 K.push(...fig2('dataset', 'g26_dataset.png', `Structure of the dataset: flight dates → cameras → plots → scored subplots, and the two datasets used by the objectives.`, 520));
 K.push(H2(`1.4 Main published studies used to build the methodology`));
-K.push(P(`Each step was chosen because it was used and tested for crop-disease sensing or for the specific data problem it solves. Table ${T('literature')} lists the main disease studies; the methodological references are given in every step and method card.`));
+K.push(P(`Each step was chosen because it was used and tested for crop-disease sensing or for the specific data problem it solves. ${T('literature')} lists the main disease studies; the methodological references are given in every step and method card.`));
 K.push(...tab2('literature', [[`Study`, `Crop and disease`, `Sensors`, `What it contributes to this methodology`],
 [`Ma et al. (2026)`, `rice; blast`, `UAV hyperspectral`, `effective ranges from NDSI and RSI maps; SHAP-CARS; ReliefF for indices; principal-component texture with mRMR; TTFI; DT-EDNet vs EfficientNet, ResNet18, ConvNeXt V2; module ablation`],
 [`Guo et al. (2021)`, `wheat; yellow rust`, `UAV hyperspectral`, `texture from principal-component images; vegetation index + texture fusion; NDVI soil mask; disease index`],
@@ -83,22 +89,23 @@ K.push(...tab2('literature', [[`Study`, `Crop and disease`, `Sensors`, `What it 
 K.push(H1(`2. Common activities (carried out once for all objectives)`));
 K.push(P(`The six common activities turn the raw images into clean, normalised feature tables with one row per subplot-date and prepare the validation folds. Each activity is described as a sequence of steps.`));
 K.push(...tab2('commonact', [[`Activity`, `Steps`, `Main output`],
-[`A. Field experiment, ground truth and datasets`, `A1–A4`, `labelled subplot list; post- and pre-symptomatic datasets`],
+[`A. Field experiment, ground truth and datasets`, `A1–A5`, `labelled subplot list; covariates; post- and pre-symptomatic datasets`],
 [`B. Image pre-processing`, `B1–B5`, `calibrated, aligned images on the hyperspectral grid`],
 [`C. Endmember extraction and vegetation mask`, `C1–C8`, `endmember library; vegetation mask applied to all cameras`],
 [`D. Subplot spectra and feature extraction`, `D1–D8`, `feature table of each camera`],
-[`E. Normalisation and data preparation`, `E1–E6`, `normalised, screened and standardised features`],
+[`E. Normalisation and data preparation`, `E1–E4`, `normalised and standardised features; class weights`],
 [`F. Validation design and tuning`, `F1–F3`, `outer and inner folds; tuning plan; leakage checklist`]], [3500, 1300, 4506], `Common activities and their outputs.`, 17));
 K.push(H2(`Activity A – Field experiment, ground truth and datasets`));
 K.push(H3(`Step A1 – Experimental design and treatments`));
 K.push(...tab2('sa1', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Defines the sources of variation (inoculation timing, variety, replication) so that disease effects can be separated from crop-age and variety effects.`],
-[`Input`, `IARI research farm, rabi season; factorial randomised block design.`],
+[`Input`, `IARI research farm, New Delhi, rabi 2026-27; field 48 m × 24 m (9.4 m healthy block + 10 m buffer + 28.6 m inoculated block); plots 5 m × 3 m with 0.2 m bunds and 2 m channels.`],
 [`Output → next step`, `48 plots with known treatment, replication and plot number → subplots (Step A3) and validation folds (Activity F).`]], [2200, 7106], `Step A1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Four sowing dates at 10-day intervals (D1–D4) with one inoculation date, so the crop is inoculated at four different ages.`));
-K.push(NL(`Three varieties of different susceptibility (V1 highly susceptible, V2 moderately susceptible, V3 resistant; names as recorded in the field book).`));
-K.push(NL(`The 12 treatments (4 × 3) are inoculated in three replications (R1–R3) with a zoosporangial suspension (Mishra et al., 2009), and one healthy (uninoculated) plot is kept for every treatment: 36 inoculated + 12 healthy = 48 plots.`));
+K.push(NL(`Four sowing dates at 8-day intervals: D1 = 19 November, D2 = 27 November, D3 = 5 December and D4 = 13 December 2026, with one inoculation date, so the crop is inoculated at four different ages.`));
+K.push(NL(`Three varieties: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37.`));
+K.push(NL(`The 12 treatments (4 × 3) are inoculated in three replications (R1: plots 37–48, R2: plots 25–36, R3: plots 13–24) with a zoosporangial suspension of 1.5 × 10^{5} zoosporangia mL^{−1} (Mishra et al., 2009).`));
+K.push(NL(`One uninoculated healthy plot of every treatment (plots 1–12) is sown in a separate healthy block, 10 m away from the inoculated block, so that inoculum does not spread to the controls: 36 inoculated + 12 healthy = 48 plots.`));
 K.push(NL(`Each plot carries a code (treatment, replication, plot number) that is stored with every sample.`));
 K.push(P(`**Supporting studies.** Staggered sowing or inoculation and healthy controls were used to create severity gradients for wheat yellow rust (Guo et al., 2021), wheat powdery mildew (Feng et al., 2022; Liu et al., 2024) and rice blast (Tian et al., 2021; Ma et al., 2026); a randomised trial with varieties of different resistance was used for wheat rusts by Blasch et al. (2023).`));
 K.push(H3(`Step A2 – UAV flights and cameras`));
@@ -143,8 +150,28 @@ K.push(...tab2('classex', [[`Grade`, `0`, `1`, `3`, `5`, `7`, `9`],
 [`Detection label`, `healthy`, `diseased`, `diseased`, `diseased`, `diseased`, `diseased`],
 [`Severity class`, `0`, `1`, `3`, `5`, `7`, `9`],
 [`Dummy count (1536 samples)`, `410`, `330`, `290`, `250`, `160`, `96`]], [2500, 1134, 1134, 1134, 1134, 1134, 1136], `How one score gives the three labels (dummy class counts).`, 17));
+K.push(H3(`Step A5 – Covariates: days after inoculation, variety, inoculation timing, growth stage and weather`));
+K.push(...tab2('sa5', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Disease severity changes with time, crop stage, variety and weather. These known factors must be recorded so that their effect can be separated from what the cameras add.`],
+[`Input`, `Field book (sowing, inoculation and flight dates; variety; growth stage on each flight date); daily weather from the IARI agrometeorological observatory.`],
+[`Output → next step`, `Covariate table with one row per subplot-date → response analysis (Step 1.1.3), covariate baseline and sensor + covariate models (Steps 2.5.5 and 3.5.3), results by stage and treatment.`]], [2200, 7106], `Step A5 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Days after inoculation (DAI): flight date minus inoculation date (numeric).`));
+K.push(NL(`Variety: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37 (categorical, one-hot coded in models).`));
+K.push(NL(`Inoculation timing: D1–D4, also expressed as crop age at inoculation in days (numeric).`));
+K.push(NL(`Growth stage of each plot on each flight date, read with the BBCH scale and coded as 1 = vegetative (BBCH 10–59), 2 = flowering (BBCH 60–69), 3 = pod formation (BBCH 70–79 and later) (ordinal).`));
+K.push(NL(`Weather: daily maximum and minimum air temperature (T_{max}, T_{min}), morning and afternoon relative humidity (RH I, RH II) and rainfall, summarised as the mean (rainfall: total) of the 7 days before each flight, plus the number of favourable days since inoculation (T_{max} 16–24 °C, RH I > 97% and RH II > 40%, the conditions reported to favour white rust on leaves).`));
+K.push(NL(`Covariates are not features of any camera and are not used in feature selection; they enter only the covariate models and the stratified results.`));
+K.push(P(`**Supporting studies.** Weather conditions that favour white rust of Indian mustard and weather-based forecasting: Chattopadhyay et al. (2011), Saharan et al. (2014); BBCH growth stages: Lancashire et al. (1991), Meier (2018); stage-dependent spectral disease signals: Blasch et al. (2023), Liu et al. (2024); combining weather with remote sensing improved disease forecasts over weather alone: Zhang et al. (2014); days after inoculation in early detection: Mahlein et al. (2019), Zhu et al. (2017).`));
+K.push(...tab2('covtab', [[`Covariate`, `Type and coding`, `Varies between subplots on one date?`, `Main use`],
+[`Days after inoculation`, `numeric (days)`, `no (same inoculation date)`, `time trend; baseline model`],
+[`Variety (V1 PM 26, V2 Pusa Vijay, V3 PM 37)`, `categorical, one-hot`, `yes`, `baseline; stratified results; transfer test`],
+[`Inoculation timing (D1–D4)`, `categorical, or crop age at inoculation (days)`, `yes`, `baseline; stratified results; transfer test`],
+[`Growth stage (1 vegetative, 2 flowering, 3 pod formation)`, `ordinal from BBCH`, `yes (staggered sowing)`, `baseline; results by stage; flowering check`],
+[`Weather (T_{max}, T_{min}, RH I, RH II, rainfall; favourable days)`, `numeric, 7-day summaries`, `no (one value per date)`, `interpretation; baseline (time effect only)`]], [2900, 2200, 1900, 2306], `Covariates recorded for every subplot-date. Weather is the same for all subplots on a date, so it can explain differences between dates but not between subplots.`, 17));
+K.push(NOTE(`Weather has only one value per flight date (eight values in the post-symptomatic period), so in a single season it cannot be separated from the date itself. It is therefore used for interpretation and inside the covariate baseline, and results of models that contain weather are labelled "within-season"; their transfer to another season must be tested with data of that season (Zhang et al., 2014; Ma et al., 2026).`));
 K.push(H2(`Activity B – Image pre-processing`));
-K.push(P(`Activity B turns raw images into calibrated, aligned images on one common grid (Figure ${F('preproc')}).`));
+K.push(P(`Activity B turns raw images into calibrated, aligned images on one common grid (${F('preproc')}).`));
 K.push(...fig2('preproc', 'g02_preproc.png', `Flow chart of Activity B (Steps B1–B5).`, 540));
 K.push(H3(`Step B1 – Radiometric calibration`));
 K.push(...tab2('sb1', [[`Item`, `Description`],
@@ -222,7 +249,7 @@ K.push(...tab2('cresample', [[`Aspect`, `Resampling (pixel aggregate, bilinear, 
 [`Why it was selected`, `Avoids aliasing when coarsening and avoids inventing new temperatures when refining.`],
 [`Key references`, `Richards (2013); Guo et al. (2021)`]], [2300, 7006], `Method card – Resampling (pixel aggregate, bilinear, nearest neighbour).`, 16));
 K.push(H2(`Activity C – Endmember extraction and vegetation mask`));
-K.push(P(`Soil, grass, weeds and shadow inside a subplot change reflectance, texture and temperature and must be removed before disease features are extracted. Activity C builds one field-wide library of pure spectra (endmembers) with the hourglass workflow, classifies every pixel with the spectral angle mapper and keeps the canopy pixels (Figure ${F('endmember')}). Flowers are kept because the canopy score includes the inflorescence; no spectral unmixing is done.`));
+K.push(P(`Soil, grass, weeds and shadow inside a subplot change reflectance, texture and temperature and must be removed before disease features are extracted. Activity C builds one field-wide library of pure spectra (endmembers) with the hourglass workflow, classifies every pixel with the spectral angle mapper and keeps the canopy pixels (${F('endmember')}). Flowers are kept because the canopy score includes the inflorescence; no spectral unmixing is done.`));
 K.push(...fig2('endmember', 'g03_endmember.png', `Flow chart of Activity C: endmember extraction (Steps C1–C5) and vegetation mask (Steps C6–C8).`, 540));
 K.push(H3(`Step C1 – Sampling of pixels from all dates`));
 K.push(...tab2('sc1', [[`Item`, `Description`],
@@ -241,7 +268,7 @@ K.push(...tab2('sc2', [[`Item`, `Description`],
 K.push(P(`**Procedure.**`));
 K.push(NL(`Estimate the noise from the differences between neighbouring pixels (shift difference) in a homogeneous area.`));
 K.push(NL(`Whiten the noise (rescale so the noise has unit variance in every direction) and then apply principal component analysis.`));
-K.push(NL(`Plot the eigenvalues (Figure ${F('dummyem')}a); keep the components whose eigenvalue is clearly above 1 (here about 8–10); components with eigenvalues near 1 contain only noise.`));
+K.push(NL(`Plot the eigenvalues (${F('dummyem')}a); keep the components whose eigenvalue is clearly above 1 (here about 8–10); components with eigenvalues near 1 contain only noise.`));
 K.push(P(`**Supporting studies.** Green et al. (1988); Boardman and Kruse (2011); Bioucas-Dias et al. (2012).`));
 K.push(...tab2('cmnf', [[`Aspect`, `Minimum noise fraction (MNF) transformation`],
 [`Principle (how it works)`, `Two principal component analyses in sequence: the first whitens the noise, the second orders the components by signal-to-noise ratio. Eigenvalue 1 means a component is pure noise.`],
@@ -276,7 +303,7 @@ K.push(...tab2('sc4', [[`Item`, `Description`],
 [`Output → next step`, `Endmember spectra (mean reflectance of each cluster) → Step C5.`]], [2200, 7106], `Step C4 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Display the candidates in two- and three-dimensional scatter plots of MNF components and rotate them (n-dimensional visualiser).`));
-K.push(NL(`Mark the clusters at the corners of the cloud (Figure ${F('dummyem')}b).`));
+K.push(NL(`Mark the clusters at the corners of the cloud (${F('dummyem')}b).`));
 K.push(NL(`Compute the endmember spectrum as the mean reflectance (original bands) of the pixels in each cluster.`));
 K.push(P(`**Supporting studies.** Boardman and Kruse (2011); Bioucas-Dias et al. (2012).`));
 K.push(H3(`Step C5 – Endmember identification and library`));
@@ -286,7 +313,7 @@ K.push(...tab2('sc5', [[`Item`, `Description`],
 [`Output → next step`, `Labelled endmember library (green canopy, stressed canopy, flower, soil, grass, shadow) → Step C6.`]], [2200, 7106], `Step C5 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Locate the pixels of each endmember in the red–green–blue image and in field photographs.`));
-K.push(NL(`Compare their shapes with known spectra: green canopy (red edge, high near-infrared), stressed canopy (higher red, lower near-infrared), yellow flower (high green–red reflectance), soil (rising, featureless), shadow (low everywhere) (Figure ${F('dummyem')}c).`));
+K.push(NL(`Compare their shapes with known spectra: green canopy (red edge, high near-infrared), stressed canopy (higher red, lower near-infrared), yellow flower (high green–red reflectance), soil (rising, featureless), shadow (low everywhere) (${F('dummyem')}c).`));
 K.push(NL(`Merge duplicates and store the final library.`));
 K.push(P(`**Supporting studies.** Identification by spectral shape and image context: Boardman and Kruse (2011); flowers in Brassica canopies: Sulik and Long (2016).`));
 K.push(...fig2('dummyem', 'g12_dummy_endmember.png', `Dummy example of endmember extraction: (a) MNF eigenvalues; (b) pure pixels at the corners of the MNF cloud; (c) endmember library.`, 560));
@@ -345,7 +372,7 @@ K.push(...tab2('cerosion', [[`Aspect`, `Morphological erosion and mask accuracy 
 [`Why it was selected`, `Simple and widely used; accuracy assessment is required to report a mask.`],
 [`Key references`, `Soille (2003); Congalton (1991)`]], [2300, 7006], `Method card – Morphological erosion and mask accuracy assessment.`, 16));
 K.push(H2(`Activity D – Subplot spectra and feature extraction`));
-K.push(P(`Features are calculated for every subplot-date and kept in groups by type (Figure ${F('features')}). The grouping matters because one selection method is later used for each type of feature (Objective 1).`));
+K.push(P(`Features are calculated for every subplot-date and kept in groups by type (${F('features')}). The grouping matters because one selection method is later used for each type of feature (Objective 1).`));
 K.push(...fig2('features', 'g04_features.png', `Flow chart of Activity D (Steps D1–D6; Steps D7–D8 complete the feature table).`, 540));
 K.push(H3(`Step D1 – Plot and subplot polygons`));
 K.push(...tab2('sd1', [[`Item`, `Description`],
@@ -361,10 +388,10 @@ K.push(H3(`Step D2 – Subplot mean spectra`));
 K.push(...tab2('sd2', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Models need one value per feature and subplot that represents the scored canopy.`],
 [`Input`, `Masked layers of all cameras; subplot polygons.`],
-[`Output → next step`, `One mean spectrum (and mean band values) per subplot, date and camera; vegetation pixel count, flower % and canopy cover % → Steps D3–D7 and Activity E.`]], [2200, 7106], `Step D2 at a glance.`, 17));
+[`Output → next step`, `One mean spectrum (and mean band values) per subplot, date and camera → Steps D3–D7 and Activity E.`]], [2200, 7106], `Step D2 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Average the masked vegetation pixels inside each subplot for every band of every camera.`));
-K.push(NL(`Save the number of vegetation pixels, the flower % and the canopy cover % (from the class map) as quality and confounding checks.`));
+K.push(NL(`Join the covariates of Step A5 by the subplot code and date.`));
 K.push(P(`**Supporting studies.** Plot-mean spectra after masking: Guo et al. (2021), Mustafa et al. (2023), Ma et al. (2026).`));
 K.push(...fig2('dummyspec', 'g11_dummy_spectra.png', `Dummy example of subplot mean spectra by severity grade (a) and the first derivative in the red-edge region (b). The water-vapour regions are removed.`, 560));
 K.push(H3(`Step D3 – Hyperspectral spectral features`));
@@ -378,7 +405,7 @@ K.push(NL(`First derivative of each smoothed segment: FD(λ_{i}) = [R(λ_{i+1}) 
 K.push(NL(`Red-edge parameters: red-edge position (wavelength of the maximum first derivative between 680 and 760 nm), red-edge amplitude (that maximum value) and red-edge area (sum of the first derivative from 680 to 760 nm).`));
 K.push(NL(`The second derivative is not used, because it amplifies noise at UAV signal-to-noise levels and adds hundreds of unstable variables.`));
 K.push(P(`**Supporting studies.** Derivative analysis: Tsai and Philpot (1998); red edge: Horler et al. (1983), Filella and Peñuelas (1994); red-edge parameters best for the early stage of pine wilt disease from UAV hyperspectral data: Yu et al. (2021); noise amplification by derivatives: Rinnan et al. (2009).`));
-K.push(P(`**Worked example (dummy data).** If R(700 nm) = 0.10 and R(704 nm) = 0.14, the first derivative at 702 nm is (0.14 − 0.10) / 4 = 0.010 nm^{−1}. If the largest first derivative between 680 and 760 nm is 0.012 nm^{−1} at 718 nm, the red-edge position is 718 nm and the amplitude is 0.012 nm^{−1}. In diseased canopies the red-edge position moves to shorter wavelengths (Figure ${F('dummyspec')}b).`));
+K.push(P(`**Worked example (dummy data).** If R(700 nm) = 0.10 and R(704 nm) = 0.14, the first derivative at 702 nm is (0.14 − 0.10) / 4 = 0.010 nm^{−1}. If the largest first derivative between 680 and 760 nm is 0.012 nm^{−1} at 718 nm, the red-edge position is 718 nm and the amplitude is 0.012 nm^{−1}. In diseased canopies the red-edge position moves to shorter wavelengths (${F('dummyspec')}b).`));
 K.push(...tab2('cfd', [[`Aspect`, `First derivative and red-edge parameters`],
 [`Principle (how it works)`, `The derivative measures the slope of the spectrum; it removes constant offsets (for example brightness differences) and turns the red edge into a peak whose position and height can be measured.`],
 [`Problem it solves`, `Makes the chlorophyll-related red-edge shift measurable and reduces background effects.`],
@@ -395,7 +422,7 @@ K.push(...tab2('sd4', [[`Item`, `Description`],
 K.push(P(`**Procedure.**`));
 K.push(NL(`Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, MSI, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.`));
 K.push(NL(`Check every formula against the original paper and use the nearest available band.`));
-K.push(NL(`Index definitions are given in Chapter 7 (Table ${T('hsidx')}).`));
+K.push(NL(`Index definitions are given in Chapter 7 (${T('hsidx')}).`));
 K.push(P(`**Supporting studies.** Index groups for disease detection: Mahlein et al. (2013), Huang et al. (2014), Ma et al. (2026); pigment indices: Gamon et al. (1992), Gitelson et al. (2003), Merzlyak et al. (1999); water and disease indices: Gao (1996), Apan et al. (2004); PSRI and PSSRb for rice bacterial leaf blight: Das et al. (2015).`));
 K.push(...tab2('cvi', [[`Aspect`, `Vegetation indices`],
 [`Principle (how it works)`, `Arithmetic combinations (differences, ratios, normalised differences) of reflectance at wavelengths sensitive to a plant property, which cancel part of the illumination and background effect.`],
@@ -434,7 +461,7 @@ K.push(...tab2('cpca', [[`Aspect`, `Principal component analysis (PCA)`],
 [`Principle (how it works)`, `Rotates correlated variables into uncorrelated components ordered by the variance they explain.`],
 [`Problem it solves`, `Reduces 483 correlated bands to three images that keep most of the information, so texture is computed on 3 images instead of 483.`],
 [`Specification in this study`, `Computed on the masked vegetation pixels of all dates (training data); first three components kept (cumulative variance above 95%).`],
-[`Hyper-parameters and how they are tuned`, `Number of components: the smallest number with at least 95% cumulative variance (Figure ${F('dummyrelief')}b).`],
+[`Hyper-parameters and how they are tuned`, `Number of components: the smallest number with at least 95% cumulative variance (${F('dummyrelief')}b).`],
 [`Data on which it works well`, `Many highly correlated variables, such as hyperspectral bands.`],
 [`Why it was selected`, `Used in exactly this role by Guo et al. (2021) and Ma et al. (2026).`],
 [`Key references`, `Jolliffe and Cadima (2016); Guo et al. (2021); Ma et al. (2026)`]], [2300, 7006], `Method card – Principal component analysis (PCA).`, 16));
@@ -455,7 +482,7 @@ K.push(...tab2('sd7', [[`Item`, `Description`],
 [`Output → next step`, `Thermal group → Activity E (normalisation) and Activity 1.6.`]], [2200, 7106], `Step D7 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Canopy temperature: mean, median, standard deviation, 10th and 90th percentiles of the vegetation pixels.`));
-K.push(NL(`Normalised thermal features (Step E2): canopy minus air temperature, normalised relative canopy temperature, crop water stress index and difference from the healthy plots of the same date and variety.`));
+K.push(NL(`Normalised thermal features (Step E1): canopy minus air temperature, normalised relative canopy temperature, crop water stress index and difference from the healthy plots of the same date and variety.`));
 K.push(NL(`Thermal texture (Step D5).`));
 K.push(P(`**Supporting studies.** Thermal features for powdery mildew: Feng et al. (2022), Liu et al. (2024); canopy minus air temperature for downy mildew from a UAV: Calderón et al. (2014); reviews: Pineda et al. (2021), Messina and Modica (2020).`));
 K.push(H3(`Step D8 – Feature table`));
@@ -464,7 +491,7 @@ K.push(...tab2('sd8', [[`Item`, `Description`],
 [`Input`, `Features of Steps D3–D7.`],
 [`Output → next step`, `One table per camera with identifiers, labels, covariates and features → Activities E and F.`]], [2200, 7106], `Step D8 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Columns: identifiers (date, days after inoculation, plot, subplot, replication, treatment, variety, inoculation timing, fold), labels (score, class, detection label), covariates (vegetation pixel count, flower %, canopy cover %) and features with a group prefix (R_, FD_, RE_, VI_, TX_, TH_).`));
+K.push(NL(`Columns: identifiers (date, days after inoculation, plot, subplot, replication, treatment, variety, inoculation timing, fold), labels (score, class, detection label), covariates (days after inoculation, variety, inoculation timing, growth stage, weather summaries) and features with a group prefix (R_, FD_, RE_, VI_, TX_, TH_).`));
 K.push(NL(`Rows: one per subplot-date.`));
 K.push(P(`**Supporting studies.** Structured multi-sensor feature tables: Maimaitijiang et al. (2020), Feng et al. (2022).`));
 K.push(...tab2('featcount', [[`Camera`, `Feature groups`, `Approximate number`],
@@ -472,39 +499,29 @@ K.push(...tab2('featcount', [[`Camera`, `Feature groups`, `Approximate number`],
 [`Multispectral`, `5 bands, 12 indices, 10 normalised differences, 40 texture`, `67`],
 [`Red–green–blue`, `6 colour indices, 3 colour means, 24 texture`, `33`],
 [`Thermal`, `5 temperature statistics, 4 normalised temperatures, 8 texture`, `17`],
-[`Covariates`, `flower %, canopy cover %, vegetation pixel count, days after inoculation, variety, inoculation timing`, `not used as disease features`]], [1800, 5600, 1906], `Feature groups before selection.`, 17));
+[`Covariates`, `days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)`, `not used as disease features`]], [1800, 5600, 1906], `Feature groups before selection.`, 17));
 K.push(H2(`Activity E – Normalisation and data preparation`));
-K.push(P(`Normalisation removes effects that are not caused by the disease (illumination, weather, date, variety, units) and prepares the features for the models (Figure ${F('normal')}). Steps E1–E2 and E4 are done once on all data because they do not use the labels; Steps E3, E5 and E6 use statistics that are computed on the training part of each fold only.`));
-K.push(...fig2('normal', 'g25_normalisation.png', `Flow chart of Activity E (Steps E1–E6).`, 540));
-K.push(H3(`Step E1 – Radiometric consistency between dates`));
+K.push(P(`Normalisation removes effects that are not caused by the disease (weather, date, variety, units) and prepares the features for the models (${F('normal')}). Step E1 is done once on all data because it does not use the labels; Steps E2–E4 use statistics that are computed on the training part of each fold only. Date-to-date consistency of reflectance relies on the calibration panels flown on every date (Step B1).`));
+K.push(...fig2('normal', 'g25_normalisation.png', `Flow chart of Activity E (Steps E1–E4).`, 540));
+K.push(H3(`Step E1 – Thermal normalisation`));
 K.push(...tab2('se1', [[`Item`, `Description`],
-[`Purpose (problem it solves)`, `Even after calibration, small differences between flights (panel shading, haze, sensor drift) can look like a disease effect when dates are pooled.`],
-[`Input`, `Reflectance images of all dates; invariant targets.`],
-[`Output → next step`, `Checked reflectance on all dates (re-calibrated where needed) → Activity D.`]], [2200, 7106], `Step E1 at a glance.`, 17));
-K.push(P(`**Procedure.**`));
-K.push(NL(`Place the calibration panels on every flight and record their reflectance in every image.`));
-K.push(NL(`Compare the reflectance of invariant targets (panels, concrete, bare road) between dates; differences above 5% in any band flag the date.`));
-K.push(NL(`Re-calibrate a flagged date with its own panels or, if they failed, with a linear fit to the invariant targets of a reference date.`));
-K.push(P(`**Supporting studies.** Panels on every flight for relative radiometric calibration: Yuan et al. (2025), Blasch et al. (2023); scaling and consistency between UAV and satellite reflectance: Revill et al. (2020); UAV spectroscopy correction workflow: Aasen et al. (2018).`));
-K.push(H3(`Step E2 – Thermal normalisation`));
-K.push(...tab2('se2', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Canopy temperature changes with air temperature, radiation and time of flight, which can hide the disease effect.`],
 [`Input`, `Canopy temperature statistics; air temperature; wet and dry reference temperatures.`],
-[`Output → next step`, `Normalised thermal features → Activity 1.6 and Objectives 2–3.`]], [2200, 7106], `Step E2 at a glance.`, 17));
+[`Output → next step`, `Normalised thermal features → Activity 1.6 and Objectives 2–3.`]], [2200, 7106], `Step E1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Canopy minus air temperature: CTD = T_{c} − T_{air}.`));
 K.push(NL(`Normalised relative canopy temperature over the field on that date: NRCT = (T_{c} − T_{min}) / (T_{max} − T_{min}).`));
 K.push(NL(`Crop water stress index: CWSI = (T_{c} − T_{wet}) / (T_{dry} − T_{wet}) with wet and dry references in the field.`));
-K.push(NL(`Difference from healthy plots of the same date and variety (Step E3).`));
+K.push(NL(`Difference from healthy plots of the same date and variety (Step E2).`));
 K.push(P(`**Supporting studies.** Normalisation of canopy temperature by air temperature: Idso et al. (1981), Pineda et al. (2021); canopy minus air temperature for downy mildew detection from a UAV: Calderón et al. (2014); thermal indices and environmental effects: Jones et al. (2009), Maes and Steppe (2012), Oerke et al. (2006).`));
 K.push(P(`**Worked example (dummy data).** A subplot has T_{c} = 24.6 °C when T_{air} = 22.0 °C, so CTD = +2.6 °C. On that date the field minimum and maximum canopy temperatures are 21.8 and 26.2 °C, so NRCT = (24.6 − 21.8) / (26.2 − 21.8) = 0.64.`));
-K.push(H3(`Step E3 – Healthy-plot normalisation`));
-K.push(...tab2('se3', [[`Item`, `Description`],
+K.push(H3(`Step E2 – Healthy-plot normalisation`));
+K.push(...tab2('se2', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Early disease effects are small compared with the differences caused by date, crop age and variety; a same-day, same-variety healthy reference removes most of them.`],
-[`Input`, `Features of all subplots; features of the healthy plots of the same date and variety (training replications only).`],
-[`Output → next step`, `Healthy-normalised features → Objective 3 (all features) and thermal difference features (Objectives 1–2).`]], [2200, 7106], `Step E3 at a glance.`, 17));
+[`Input`, `Features of all subplots; features of the healthy plots of the same date and variety in the training part (two or three plots of different inoculation timings, Step F1).`],
+[`Output → next step`, `Healthy-normalised features → Objective 3 (all features) and thermal difference features (Objectives 1–2).`]], [2200, 7106], `Step E2 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`For every feature, date and variety, compute the mean and standard deviation of the healthy plots of the training replications.`));
+K.push(NL(`For every feature, date and variety, compute the mean and standard deviation of the healthy subplots of that variety in the training part (8–12 subplots).`));
 K.push(NL(`Normalised value: z_{h} = (x − mean_{healthy}) / SD_{healthy}.`));
 K.push(NL(`Apply the same healthy-plot reference to the test samples of that date and variety.`));
 K.push(P(`**Supporting studies.** Healthy references for thermal disease detection: Oerke et al. (2006); healthy references in pre-visual detection: Zarco-Tejada et al. (2018), Poblete et al. (2023); pre-symptomatic hyperspectral detection: Zhu et al. (2017).`));
@@ -512,26 +529,16 @@ K.push(P(`**Worked example (dummy data).** On one date the healthy plots of vari
 K.push(...tab2('chealthy', [[`Aspect`, `Healthy-plot (control) normalisation`],
 [`Principle (how it works)`, `Expresses each value as its distance from healthy plants measured on the same day, of the same variety and age, in units of their natural variation.`],
 [`Problem it solves`, `Removes date, weather, crop-age and variety effects so that only the disease effect remains; essential when symptoms are not yet visible.`],
-[`Specification in this study`, `Reference: healthy plots of the same date and variety in the training replications; mean and standard deviation per feature.`],
+[`Specification in this study`, `Reference: healthy plots of the same date and variety in the training part (rotated across folds, Step F1); mean and standard deviation per feature.`],
 [`Hyper-parameters and how they are tuned`, `No hyper-parameters.`],
 [`Data on which it works well`, `Experiments with healthy controls on every date; thermal and early-stage spectral data.`],
 [`Why it was selected`, `Simple and directly justified by the design (one healthy plot for every treatment).`],
 [`Key references`, `Oerke et al. (2006); Zarco-Tejada et al. (2018)`]], [2300, 7006], `Method card – Healthy-plot (control) normalisation.`, 16));
-K.push(H3(`Step E4 – Sample quality screening`));
-K.push(...tab2('se4', [[`Item`, `Description`],
-[`Purpose (problem it solves)`, `Subplots with very few vegetation pixels, cloud shadow or missing data give unreliable mean spectra.`],
-[`Input`, `Subplot tables with vegetation pixel count and covariates.`],
-[`Output → next step`, `Clean sample list (flagged samples documented) → Activity F.`]], [2200, 7106], `Step E4 at a glance.`, 17));
-K.push(P(`**Procedure.**`));
-K.push(NL(`Flag subplots with fewer than 30% vegetation pixels, with cloud shadow or with missing data in any camera.`));
-K.push(NL(`Check visually the spectra that lie more than three standard deviations from the mean of their date and grade.`));
-K.push(NL(`Remove a sample only for a documented technical reason, never because of its label; report the number removed.`));
-K.push(P(`**Supporting studies.** Quality checks of UAV spectral data: Aasen et al. (2018); data screening before modelling: Kuhn and Johnson (2013).`));
-K.push(H3(`Step E5 – Standardisation (z-score) with training statistics`));
-K.push(...tab2('se5', [[`Item`, `Description`],
+K.push(H3(`Step E3 – Standardisation (z-score) with training statistics`));
+K.push(...tab2('se3', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Features have different units and ranges (reflectance 0–1, temperature 15–30 °C, texture 0–1000); distance- and gradient-based models are dominated by large-range features.`],
 [`Input`, `Selected features of the training part and test part of each fold.`],
-[`Output → next step`, `Standardised features (mean 0, standard deviation 1 in the training part) → all models.`]], [2200, 7106], `Step E5 at a glance.`, 17));
+[`Output → next step`, `Standardised features (mean 0, standard deviation 1 in the training part) → all models.`]], [2200, 7106], `Step E3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Compute the mean and standard deviation of every feature on the training part of the fold.`));
 K.push(NL(`Standardise: z = (x − mean_{train}) / SD_{train}, for training and test samples alike.`));
@@ -546,11 +553,11 @@ K.push(...tab2('czscore', [[`Aspect`, `z-score standardisation`],
 [`Data on which it works well`, `Mixed feature types (reflectance, indices, texture, temperature).`],
 [`Why it was selected`, `Required by support vector machines, k-nearest neighbours, partial least squares and neural networks.`],
 [`Key references`, `Kuhn and Johnson (2013)`]], [2300, 7006], `Method card – z-score standardisation.`, 16));
-K.push(H3(`Step E6 – Class weights`));
-K.push(...tab2('se6', [[`Item`, `Description`],
+K.push(H3(`Step E4 – Class weights`));
+K.push(...tab2('se4', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `The severity classes have unequal sizes (for example 410 healthy vs 96 grade-9 samples); models tend to ignore small classes.`],
 [`Input`, `Class counts of the training part.`],
-[`Output → next step`, `Class weights for the loss functions of all classifiers → Objectives 2–3.`]], [2200, 7106], `Step E6 at a glance.`, 17));
+[`Output → next step`, `Class weights for the loss functions of all classifiers → Objectives 2–3.`]], [2200, 7106], `Step E4 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Weight of class c: w_{c} = N / (k × n_{c}), where N is the number of training samples, k the number of classes and n_{c} the size of class c.`));
 K.push(NL(`Use the weights in the loss (support vector machine, random forest, extreme gradient boosting, neural networks).`));
@@ -561,15 +568,19 @@ K.push(H2(`Activity F – Validation design and tuning`));
 K.push(H3(`Step F1 – Leave-one-replication-out (LORO) outer folds`));
 K.push(...tab2('sf1', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Subplots of one plot, and plots of one replication, are similar; random splits put near-identical samples in training and test data and inflate accuracy.`],
-[`Input`, `Clean, labelled feature tables.`],
+[`Input`, `Labelled feature tables.`],
 [`Output → next step`, `Three outer folds → all models of Objectives 2 and 3.`]], [2200, 7106], `Step F1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Fold 1 tests replication R1, fold 2 tests R2, fold 3 tests R3 (leave-one-replication-out, LORO).`));
-K.push(NL(`The 12 healthy plots are divided by variety (V1 → fold 1, V2 → fold 2, V3 → fold 3) so that every test fold contains healthy samples.`));
+K.push(NL(`The 12 healthy plots are rotated so that every fold contains one healthy plot of each inoculation timing and at least one of each variety (${T('healthyrot')}). Every training part then holds two or three healthy plots of every variety, which the healthy-plot normalisation (Step E2) needs, and every test fold contains healthy samples of all three varieties.`));
 K.push(NL(`All dates and all four subplots of a plot stay in the same fold; each test fold has about 512 post-symptomatic (or 192 pre-symptomatic) samples.`));
 K.push(NL(`The same three folds are used for every sensor set, task and model.`));
-K.push(P(`**Supporting studies.** Grouped (blocked) cross-validation: Roberts et al. (2017); spatial validation shows that random splits overestimate accuracy: Ploton et al. (2020); the random 7:3 split of Ma et al. (2026) is the optimistic design this step avoids, while its cross-year test supports testing on independent units.`));
-K.push(...fig2('validation', 'g09_validation.png', `Leave-one-replication-out outer folds and the inner cross-validation used for selection and tuning.`, 520));
+K.push(P(`**Supporting studies.** Grouped (blocked) cross-validation: Roberts et al. (2017); healthy references of the same variety needed for normalisation: Oerke et al. (2006), Zarco-Tejada et al. (2018); spatial validation shows that random splits overestimate accuracy: Ploton et al. (2020); the random 7:3 split of Ma et al. (2026) is the optimistic design this step avoids, while its cross-year test supports testing on independent units.`));
+K.push(...tab2('healthyrot', [[`Outer fold`, `Inoculated plots tested`, `Healthy plots tested (variety–timing, plot number)`],
+[`1`, `replication R1 (plots 37–48)`, `V1-D1 (7), V2-D2 (2), V3-D3 (10), V1-D4 (12)`],
+[`2`, `replication R2 (plots 25–36)`, `V2-D1 (5), V3-D2 (8), V1-D3 (4), V2-D4 (1)`],
+[`3`, `replication R3 (plots 13–24)`, `V3-D1 (3), V1-D2 (9), V2-D3 (11), V3-D4 (6)`]], [1500, 3300, 4506], `Rotation of the 12 healthy plots across the outer folds: each fold has every inoculation timing once and every variety at least once.`, 17));
+K.push(...fig2('validation', 'g09_validation.png', `Leave-one-replication-out outer folds with the rotated healthy plots, and the inner cross-validation used for selection and tuning.`, 520));
 K.push(H3(`Step F2 – Nested inner cross-validation and hyper-parameter tuning`));
 K.push(...tab2('sf2', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Feature selection and tuning done on all data (or on the test fold) give over-optimistic accuracy.`],
@@ -584,7 +595,7 @@ K.push(P(`**Supporting studies.** Nested cross-validation: Varma and Simon (2006
 K.push(...tab2('cnested', [[`Aspect`, `Grouped nested cross-validation with grid search`],
 [`Principle (how it works)`, `An outer loop estimates accuracy on unseen replications; an inner loop inside the training part chooses features and hyper-parameters. Grid search tries every combination in a small grid.`],
 [`Problem it solves`, `Gives an almost unbiased accuracy estimate and prevents information from the test replication entering the model.`],
-[`Specification in this study`, `Outer: 3 folds (leave-one-replication-out); inner: 3 folds grouped by plot; grids in Table ${T('mlgrid')} and Step 2.3.8.`],
+[`Specification in this study`, `Outer: 3 folds (leave-one-replication-out); inner: 3 folds grouped by plot; grids in ${T('mlgrid')} and Step 2.3.8.`],
 [`Hyper-parameters and how they are tuned`, `The grids themselves; kept small (2–5 values per parameter) to limit overfitting of the selection.`],
 [`Data on which it works well`, `Small, grouped datasets such as plots × dates.`],
 [`Why it was selected`, `Standard practice for honest accuracy; required because many label-based steps are used.`],
@@ -593,7 +604,7 @@ K.push(H3(`Step F3 – Leakage checklist`));
 K.push(...tab2('sf3', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `A single step done on all data can leak test information into the model.`],
 [`Input`, `All steps of the methodology.`],
-[`Output → next step`, `Checklist of where every step is run (Table ${T('leak')}) → applied in all objectives.`]], [2200, 7106], `Step F3 at a glance.`, 17));
+[`Output → next step`, `Checklist of where every step is run (${T('leak')}) → applied in all objectives.`]], [2200, 7106], `Step F3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`List every step that uses labels or data statistics.`));
 K.push(NL(`Assign it to "once on all data" (no labels), "training part" (statistics) or "inner folds" (labels).`));
@@ -601,9 +612,10 @@ K.push(NL(`Check the code of every objective against the list before running the
 K.push(P(`**Supporting studies.** Ambroise and McLachlan (2002); Kuhn and Johnson (2013).`));
 K.push(...tab2('leak', [[`Step`, `Uses labels?`, `Where it is run`],
 [`Activities B–D (pre-processing, mask, features)`, `no`, `once, on all data`],
-[`E1–E2 (date consistency, thermal normalisation)`, `no`, `once, on all data`],
-[`E3 (healthy-plot normalisation)`, `no (uses healthy plots)`, `training healthy plots → applied to test data`],
-[`E5–E6 (standardisation, class weights)`, `no (statistics)`, `training part of each fold`],
+[`E1 (thermal normalisation)`, `no`, `once, on all data`],
+[`E2 (healthy-plot normalisation)`, `no (uses healthy plots)`, `training healthy plots → applied to test data`],
+[`E3–E4 (standardisation, class weights)`, `no (statistics)`, `training part of each fold`],
+[`Covariate coding (Step A5)`, `no`, `once; standardised with training statistics`],
 [`Within-group redundancy (|r| ≥ 0.95), variance inflation factor`, `no`, `training part of each fold`],
 [`NDSI/RSI and White Rust Index search, SHAP-CARS, ReliefF, mRMR, TTFI search`, `yes`, `inner folds only`],
 [`Sequential floating forward selection, hyper-parameter tuning, early stopping`, `yes`, `inner folds only`],
@@ -622,7 +634,7 @@ K.push(...tab2('o1act', [[`Activity`, `Steps`, `Technique (one per feature type)
 [`1.5 Texture selection and TTFI`, `1.5.1–1.5.4`, `principal-component texture → mRMR → TTFI`, `6 texture features + best TTFI`],
 [`1.6 Disease-specific feature sets`, `1.6.1–1.6.4`, `same rules for other cameras → variance inflation factor`, `feature set of each camera; treatment response`]], [2400, 1100, 3000, 2806], `Activities of Objective 1.`, 17));
 K.push(H2(`The feature-selection rule: one method for each type of feature`));
-K.push(P(`Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) (Figure ${F('selection')}).`));
+K.push(P(`Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) (${F('selection')}).`));
 K.push(...tab2('stages', [[`Stage`, `What is done`, `Uses labels?`, `Where in this document`],
 [`0. Build groups`, `calculate features with physical meaning (no second derivative)`, `no`, `Activity D`],
 [`1. Redundancy within groups`, `remove near-constant features; keep one feature of every cluster with |r| ≥ 0.95 (indices, texture, thermal, multispectral and colour groups)`, `no`, `Steps 1.4.2, 1.5.3, 1.6.1`],
@@ -635,7 +647,7 @@ K.push(H3(`Step 1.1.1 – Mean spectra and first-derivative curves by severity g
 K.push(...tab2('s111', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Shows how the spectrum changes with severity before any selection and gives the physiological basis for later results.`],
 [`Input`, `Subplot mean reflectance and first derivative (post-symptomatic).`],
-[`Output → next step`, `Response figures (Figure ${F('dummyspec')}) and a list of responsive regions → Activities 1.2–1.3 (interpretation).`]], [2200, 7106], `Step 1.1.1 at a glance.`, 17));
+[`Output → next step`, `Response figures (${F('dummyspec')}) and a list of responsive regions → Activities 1.2–1.3 (interpretation).`]], [2200, 7106], `Step 1.1.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Average the subplot spectra of each grade (0, 1, 3, 5, 7, 9) and plot them with ± one standard deviation.`));
 K.push(NL(`Plot the first derivative in the red edge (680–760 nm) for each grade.`));
@@ -651,15 +663,17 @@ K.push(NL(`Compute the Pearson correlation coefficient r between each feature an
 K.push(NL(`Plot r against wavelength for reflectance and first derivative (correlation curve).`));
 K.push(NL(`Report r with its sign; p-values are not used for selection because subplots of one plot are related.`));
 K.push(P(`**Supporting studies.** Correlation of indices and texture with severity: Ma et al. (2026), Guo et al. (2021); univariate feature screening: Liu et al. (2020).`));
-K.push(H3(`Step 1.1.3 – Response by variety, inoculation timing and days after inoculation`));
+K.push(H3(`Step 1.1.3 – Response by variety, inoculation timing, growth stage, days after inoculation and weather`));
 K.push(...tab2('s113', [[`Item`, `Description`],
-[`Purpose (problem it solves)`, `A feature may respond in one variety or crop age and not in another; treatments must be considered.`],
-[`Input`, `Responsive features; treatment codes.`],
+[`Purpose (problem it solves)`, `A feature may respond in one variety, crop age or growth stage and not in another; treatments, stage and weather must be considered.`],
+[`Input`, `Responsive features; covariates (Step A5).`],
 [`Output → next step`, `Treatment-wise response figures → Step 1.6.3 and Objective 2 robustness (Activity 2.6).`]], [2200, 7106], `Step 1.1.3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Plot the main features against days after inoculation for each variety (V1–V3) and inoculation timing (D1–D4).`));
-K.push(NL(`Compare inoculated plots with their healthy plot of the same treatment on every date.`));
-K.push(P(`**Supporting studies.** Treatment-wise disease response: Liu et al. (2024), Blasch et al. (2023), Feng et al. (2022).`));
+K.push(NL(`Plot the main features against days after inoculation for each variety (V1 PM 26, V2 Pusa Vijay, V3 PM 37) and inoculation timing (D1–D4).`));
+K.push(NL(`Draw the response curves separately for the three growth stages (vegetative, flowering, pod formation), because yellow flowers and pods change canopy reflectance.`));
+K.push(NL(`Compare inoculated plots with healthy plots of the same variety on every date.`));
+K.push(NL(`Plot the disease progress (mean severity per date) together with the 7-day weather summaries and the favourable days since inoculation.`));
+K.push(P(`**Supporting studies.** Treatment-wise and stage-wise disease response: Liu et al. (2024), Blasch et al. (2023), Feng et al. (2022); flowering effects on Brassica canopy spectra: Sulik and Long (2016); weather and white rust development: Chattopadhyay et al. (2011).`));
 K.push(H2(`Activity 1.2 – Optimal wavelengths with Shapley additive explanations and competitive adaptive reweighted sampling (SHAP-CARS)`));
 K.push(P(`The hyperspectral camera gives 483 reflectance bands and 483 first-derivative bands. Activity 1.2 reduces them to 10–15 optimal wavelengths (OW) in two stages: first the effective ranges are found from two-band index maps, then Shapley additive explanations combined with competitive adaptive reweighted sampling (SHAP-CARS) select the optimal wavelengths inside these ranges (Ma et al., 2026).`));
 K.push(H3(`Step 1.2.1 – Effective wavelength ranges from normalised difference spectral index (NDSI) and ratio spectral index (RSI) maps`));
@@ -669,7 +683,7 @@ K.push(...tab2('s121', [[`Item`, `Description`],
 [`Output → next step`, `Effective wavelength ranges (regions where index pairs relate strongly to severity) → Step 1.2.2; the best pairs → Step 1.3.1.`]], [2200, 7106], `Step 1.2.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`For every pair of bands (λ_{1}, λ_{2}) compute the normalised difference spectral index NDSI and the ratio spectral index RSI (equations below); with 483 bands there are 116 403 pairs for each index.`));
-K.push(NL(`Compute the coefficient of determination R² between each index and the severity score and draw R² contour maps (Figure ${F('dummyndsi')}).`));
+K.push(NL(`Compute the coefficient of determination R² between each index and the severity score and draw R² contour maps (${F('dummyndsi')}).`));
 K.push(NL(`Effective ranges = the wavelength regions that take part in pairs with R² ≥ 0.5 (as in Ma et al., 2026); if no pair reaches 0.5, use the regions of the top 5% of pairs.`));
 K.push(P(`**Supporting studies.** Two-band NDSI and RSI searches and R² contour maps: Ma et al. (2026); optimised two-band indices for wheat diseases: Huang et al. (2014).`));
 K.push(EQ(`NDSI(λ_{1}, λ_{2}) = (R_{λ1} − R_{λ2}) / (R_{λ1} + R_{λ2});      RSI(λ_{1}, λ_{2}) = R_{λ1} / R_{λ2}`));
@@ -686,13 +700,15 @@ K.push(...tab2('cndsi', [[`Aspect`, `Exhaustive two-band index search (NDSI and 
 K.push(H3(`Step 1.2.2 – Shapley additive explanations (SHAP) pre-screening of the bands`));
 K.push(...tab2('s122', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Inside the effective ranges there are still hundreds of correlated bands; a quick, model-based ranking removes clearly unimportant bands before the slower CARS step.`],
-[`Input`, `Reflectance and first-derivative bands inside the effective ranges (training part).`],
+[`Input`, `Reflectance and first-derivative bands inside the effective ranges, plus the first-derivative bands of the red edge (680–760 nm), which are always kept as candidates (training part).`],
 [`Output → next step`, `Top 40% of bands by mean absolute Shapley value → Step 1.2.3.`]], [2200, 7106], `Step 1.2.2 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Train a tree ensemble (extreme gradient boosting, 300 trees, depth 4, learning rate 0.05) to predict the severity score from the bands.`));
+K.push(NL(`Put the reflectance and first-derivative bands in one pool, because they are two forms of the same spectral information (one feature type); label each band as R_{λ} (reflectance) or FD_{λ} (first derivative).`));
+K.push(NL(`Add the red-edge first-derivative bands (680–760 nm) even if the effective ranges miss part of the red edge, because the red-edge shift is a known disease indicator.`));
+K.push(NL(`Train a tree ensemble (extreme gradient boosting, 300 trees, depth 4, learning rate 0.05) to predict the severity score from the bands; tree models do not need standardised inputs.`));
 K.push(NL(`Compute the Shapley additive explanation (SHAP) value of every band for every training sample with the tree explainer.`));
-K.push(NL(`Rank bands by the mean absolute SHAP value and keep the top 40% (Figure ${F('dummyshap')}a).`));
-K.push(P(`**Supporting studies.** Shapley values: Lundberg and Lee (2017), Lundberg et al. (2020); SHAP-based band selection: Ma et al. (2026).`));
+K.push(NL(`Rank bands by the mean absolute SHAP value and keep the top 40% (${F('dummyshap')}a).`));
+K.push(P(`**Supporting studies.** Shapley values: Lundberg and Lee (2017), Lundberg et al. (2020); SHAP-based band selection: Ma et al. (2026); red edge as a disease indicator: Filella and Peñuelas (1994), Yu et al. (2021).`));
 K.push(...tab2('cshap', [[`Aspect`, `Shapley additive explanations (SHAP)`],
 [`Principle (how it works)`, `From cooperative game theory: the contribution of a feature is its average effect on the prediction over all possible orders in which features are added to the model; for tree models it is computed exactly and quickly.`],
 [`Problem it solves`, `Ranks bands by their real contribution to a non-linear model, including interactions, which simple correlation misses.`],
@@ -707,15 +723,16 @@ K.push(...tab2('s123', [[`Item`, `Description`],
 [`Input`, `Pre-screened bands (training part).`],
 [`Output → next step`, `Optimal wavelength subset with the lowest cross-validated error → Step 1.2.4.`]], [2200, 7106], `Step 1.2.3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
+K.push(NL(`Standardise every pre-screened band (mean 0 and standard deviation 1 on the training part). CARS ranks bands by the size of their PLS coefficients, which depend on units: reflectance is about 0–0.6, first-derivative values about 0.001–0.01 nm^{−1}; without standardising, one form would be favoured for numerical, not biological, reasons.`));
 K.push(NL(`Choose the number of partial least squares (PLS) components (1–15) by Monte Carlo cross-validation (MCCV: 50 random 80/20 splits of the training plots).`));
 K.push(NL(`Run competitive adaptive reweighted sampling (CARS) for 50 iterations: in each iteration, fit PLS on a random 80% of the samples, weight every band by the absolute value of its PLS regression coefficient, remove bands by an exponentially decreasing function and then by adaptive reweighted sampling.`));
-K.push(NL(`After every iteration compute the root-mean-square error of cross-validation (RMSECV); the subset with the minimum RMSECV is the optimal subset (Figure ${F('dummyshap')}b, c).`));
+K.push(NL(`After every iteration compute the root-mean-square error of cross-validation (RMSECV); the subset with the minimum RMSECV is the optimal subset (${F('dummyshap')}b, c).`));
 K.push(P(`**Supporting studies.** CARS: Li et al. (2009); variable selection in PLS: Mehmood et al. (2012); SHAP-CARS with MCCV for the PLS components: Ma et al. (2026).`));
 K.push(...fig2('dummyshap', 'g15_dummy_shapcars.png', `Dummy example of SHAP-CARS: (a) Shapley pre-screening; (b) number of wavelengths kept in each CARS iteration; (c) the iteration with the minimum cross-validated error defines the optimal wavelengths.`, 560));
 K.push(...tab2('ccars', [[`Aspect`, `Competitive adaptive reweighted sampling (CARS) with partial least squares (PLS)`],
 [`Principle (how it works)`, `Imitates "survival of the fittest": bands with large PLS regression coefficients survive, bands with small coefficients are removed step by step; the subset with the lowest cross-validated error is kept. PLS itself projects correlated bands onto a few latent components that best predict the target.`],
 [`Problem it solves`, `Selects a small set of non-redundant, informative wavelengths from highly collinear spectra.`],
-[`Specification in this study`, `50 iterations; 80% sampling per iteration; PLS components by MCCV (50 splits, maximum 15); CARS repeated 20 times with different random seeds.`],
+[`Specification in this study`, `Bands standardised before PLS; 50 iterations; 80% sampling per iteration; PLS components by MCCV (50 splits, maximum 15); CARS repeated 20 times with different random seeds.`],
 [`Hyper-parameters and how they are tuned`, `Number of PLS components (by MCCV) and number of iterations (50); because results vary between runs, wavelengths selected in at least 50% of the 20 runs are kept (stability rule).`],
 [`Data on which it works well`, `Spectra with many correlated bands and a continuous target.`],
 [`Why it was selected`, `Designed for spectra, fast and the best of the three band-selection methods in the DT-EDNet study (Ma et al., 2026); the Shapley pre-screening adds a non-linear view.`],
@@ -728,6 +745,7 @@ K.push(...tab2('s124', [[`Item`, `Description`],
 K.push(P(`**Procedure.**`));
 K.push(NL(`Count how often each wavelength is selected over the 20 runs; keep those selected in at least 50%.`));
 K.push(NL(`If more than 15 remain, keep the 15 most frequent.`));
+K.push(NL(`Report every selected wavelength with its label (R_{λ} or FD_{λ}) and the number of each type, so that it is clear which form carries the white rust signal.`));
 K.push(NL(`Link each wavelength to a known absorption feature (chlorophyll, red edge, water, structure) for interpretation.`));
 K.push(P(`**Supporting studies.** Stability of selection: Meinshausen and Bühlmann (2010), Nogueira et al. (2018); optimal wavelengths for rice blast: Ma et al. (2026).`));
 K.push(H2(`Activity 1.3 – Spectral index construction`));
@@ -802,7 +820,7 @@ K.push(...tab2('s143', [[`Item`, `Description`],
 K.push(P(`**Procedure.**`));
 K.push(NL(`Classes: run ReliefF with k = 10 nearest neighbours on standardised indices; neighbours from the same plot are excluded so that a subplot is not compared with its own plot.`));
 K.push(NL(`Severity score: run RReliefF, the regression version, in the same way.`));
-K.push(NL(`Rank the indices by their weight and keep the top five (as in Ma et al., 2026); check 3–8 in the inner folds (Figure ${F('dummyrelief')}a).`));
+K.push(NL(`Rank the indices by their weight and keep the top five (as in Ma et al., 2026); check 3–8 in the inner folds (${F('dummyrelief')}a).`));
 K.push(P(`**Supporting studies.** ReliefF and RReliefF: Robnik-Šikonja and Kononenko (2003), Urbanowicz et al. (2018); ReliefF for disease indices: Mahlein et al. (2013), Huang et al. (2014); Relief for vegetation indices in rice blast: Ma et al. (2026).`));
 K.push(EQ(`W_{j} ← W_{j} − diff(j, x, H)/m + Σ_{c≠class(x)} [P(c)/(1 − P(class(x)))] diff(j, x, M_{c})/m`));
 K.push(P(`For each sampled subplot x, H is its nearest neighbour of the same class (nearest hit) and M_{c} its nearest neighbour of another class c (nearest miss); diff is the absolute difference of feature j. A feature gains weight when it differs between classes and loses weight when it differs within a class. **Worked example (dummy data):** for one sample, index A differs by 0.05 from its hit and by 0.40 from its misses, so its weight rises by about (0.40 − 0.05)/m; index B differs by 0.30 from both and gains nothing.`));
@@ -822,7 +840,7 @@ K.push(...tab2('s151', [[`Item`, `Description`],
 [`Input`, `Masked hyperspectral cube (Step D5).`],
 [`Output → next step`, `24 texture features (8 measures × 3 principal components, for example PC2-Dis = dissimilarity of component 2) → Step 1.5.2.`]], [2200, 7106], `Step 1.5.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Fit principal component analysis on vegetation pixels of the training data and keep the first three components (cumulative variance above 95%; Figure ${F('dummyrelief')}b).`));
+K.push(NL(`Fit principal component analysis on vegetation pixels of the training data and keep the first three components (cumulative variance above 95%; ${F('dummyrelief')}b).`));
 K.push(NL(`Compute the eight GLCM measures on each component image (Step D5) and average them over the vegetation pixels of each subplot.`));
 K.push(P(`**Supporting studies.** Texture from principal-component images: Guo et al. (2021), Ma et al. (2026); GLCM: Haralick et al. (1973), Hall-Beyer (2017).`));
 K.push(H3(`Step 1.5.2 – Within-group redundancy filter`));
@@ -840,7 +858,7 @@ K.push(...tab2('s153', [[`Item`, `Description`],
 [`Output → next step`, `Top six texture features (TF1–TF6) → Step 1.5.4 and the "TF" group of Step 2.1.5.`]], [2200, 7106], `Step 1.5.3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Estimate the relevance of each texture feature as its mutual information with the severity class (or score).`));
-K.push(NL(`Select features one at a time: the next feature is the one with the largest relevance minus its mean mutual information with the features already selected (Figure ${F('dummyrelief')}c).`));
+K.push(NL(`Select features one at a time: the next feature is the one with the largest relevance minus its mean mutual information with the features already selected (${F('dummyrelief')}c).`));
 K.push(NL(`Stop at six features (as in Ma et al., 2026); check 4–8 in the inner folds.`));
 K.push(P(`**Supporting studies.** mRMR: Peng et al. (2005); mRMR for texture features of rice blast: Ma et al. (2026); mRMR for UAV and satellite disease features: Yuan et al. (2025).`));
 K.push(EQ(`next feature = arg max_{j} [ I(f_{j}; y) − (1/|S|) Σ_{s∈S} I(f_{j}; f_{s}) ]`));
@@ -865,7 +883,7 @@ K.push(...tab2('s154', [[`Item`, `Description`],
 K.push(P(`**Procedure.**`));
 K.push(NL(`Form all ordered triplets (TF1, TF2, TF3) of the six texture features: 6 × 5 × 4 = 120 triplets.`));
 K.push(NL(`For every triplet compute the three Tri-band Texture Fusion Indices (equations below), giving 360 candidates.`));
-K.push(NL(`Compute the correlation of every candidate with the severity score; keep the best candidate of each formula for description (Figure ${F('dummyttfi')}) and the overall best TTFI as the texture index used in modelling.`));
+K.push(NL(`Compute the correlation of every candidate with the severity score; keep the best candidate of each formula for description (${F('dummyttfi')}) and the overall best TTFI as the texture index used in modelling.`));
 K.push(P(`**Supporting studies.** Tri-band Texture Fusion Index: Ma et al. (2026).`));
 K.push(EQ(`TTFI1 = (TF1 + TF2) / TF3;      TTFI2 = TF1 × TF2 / TF3;      TTFI3 = TF1 × (TF1 + TF2) / (TF2 + TF3)`));
 K.push(P(`**Worked example (dummy data).** With TF1 = 0.8, TF2 = 1.2 and TF3 = 0.5: TTFI1 = (0.8 + 1.2) / 0.5 = 4.00; TTFI2 = 0.8 × 1.2 / 0.5 = 1.92; TTFI3 = 0.8 × (0.8 + 1.2) / (1.2 + 0.5) = 0.94. Texture values are used on their original (positive) scale; a small constant is added to a denominator that can approach zero.`));
@@ -916,7 +934,7 @@ K.push(...tab2('s163', [[`Item`, `Description`],
 K.push(P(`**Procedure.**`));
 K.push(NL(`Plot the selected features against days after inoculation for each variety and inoculation timing.`));
 K.push(NL(`Compute the correlation matrix between the selected features of the four cameras (for example thermal difference vs short-wave-infrared water indices).`));
-K.push(NL(`Check that selected features do not simply follow flower % or canopy cover (correlation with the covariates).`));
+K.push(NL(`Check that the selected features respond within each growth stage (vegetative, flowering, pod formation), so that they are not only flowering or stage effects.`));
 K.push(P(`**Supporting studies.** Sensor complementarity: Mahlein et al. (2019), Maimaitijiang et al. (2020); flowering effects in Brassica: Sulik and Long (2016).`));
 K.push(H3(`Step 1.6.4 – Outputs of Objective 1`));
 K.push(...tab2('s164', [[`Item`, `Description`],
@@ -932,14 +950,14 @@ K.push(NL(`Disease-specific feature set of each camera and the correlation betwe
 K.push(P(`**Supporting studies.** Ma et al. (2026); Mahlein et al. (2013).`));
 K.push(BOX(`Link to satellite monitoring (optional extension, not part of the six-month plan).`, `The subplot hyperspectral spectra can be convolved with the relative spectral response functions of Sentinel-2 and Resourcesat LISS-IV to simulate satellite band reflectance, and the selected wavelengths and indices can then be tested with these simulated bands. This approach was used for yellow rust with Sentinel-2 (Zheng et al., 2018) and for rice bacterial leaf blight with LISS-IV (Das et al., 2015); UAV data have also been used to bridge field and satellite scales (Revill et al., 2020; Blasch et al., 2023; Poblete et al., 2023; Yuan et al., 2025).`, 'EEF3E8', '2C5F2D'));
 K.push(H1(`4. Objective 2 – Detection and severity discrimination through AI-based multimodal data fusion`));
-K.push(P(`Objective 2 builds and compares predictive models on the 1536 post-symptomatic samples of each camera. Three tasks are modelled: (A) healthy vs diseased, (B) severity classes and (C) severity score. Two comparisons are made: (1) all 15 sensor sets with machine learning, feature-fusion neural networks and the pseudo-image networks; (2) on the hyperspectral feature groups, DT-EDNet against EfficientNet, ResNet18 and ConvNeXt V2, repeating the design of Ma et al. (2026) with plot-grouped validation.`));
+K.push(P(`Objective 2 builds and compares predictive models on the 1536 post-symptomatic samples of each camera. For every single camera and for every combination of cameras (15 sensor sets), classification models (Task A, healthy vs diseased; Task B, severity classes) and regression models (Task C, severity score) are developed with all model families, so that the performance of every camera and every combination can be compared on the same folds (${T('modelmatrix')}). In combinations, thermal, multispectral and red–green–blue features are added to the hyperspectral features by feature-level fusion for all models, including DT-EDNet and the comparison networks. A second comparison repeats the design of Ma et al. (2026) on the hyperspectral feature groups, with plot-grouped validation.`));
 K.push(...fig2('obj2', 'g06_obj2.png', `Flow chart of Objective 2 (Activities 2.1–2.6).`, 540));
 K.push(...tab2('o2act', [[`Activity`, `Steps`, `Main output`],
 [`2.1 Tasks and inputs`, `2.1.1–2.1.5`, `task labels; fused feature sets of 15 sensor sets; hyperspectral feature-group configurations`],
 [`2.2 Machine-learning models`, `2.2.1–2.2.6`, `tuned support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares models`],
 [`2.3 Deep-learning models`, `2.3.1–2.3.8`, `feature-fusion networks and pseudo-image networks (DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2)`],
 [`2.4 Evaluation`, `2.4.1–2.4.3`, `metric tables`],
-[`2.5 Comparison, ablation and interpretation`, `2.5.1–2.5.4`, `best sensor set and model; contribution of each camera; module ablation; Shapley explanation`],
+[`2.5 Comparison, ablation and interpretation`, `2.5.1–2.5.5`, `best sensor set and model; contribution of each camera; module ablation; Shapley explanation; gain over the covariate baseline`],
 [`2.6 Robustness and maps`, `2.6.1–2.6.3`, `results by treatment; transfer tests; severity maps`]], [2900, 1300, 5106], `Activities of Objective 2.`, 17));
 K.push(H2(`Activity 2.1 – Tasks and inputs`));
 K.push(H3(`Step 2.1.1 – Three tasks and class balance`));
@@ -951,7 +969,7 @@ K.push(P(`**Procedure.**`));
 K.push(NL(`Task A, detection: healthy (grade 0) vs diseased (grade above 0).`));
 K.push(NL(`Task B, severity classes: grades 0, 1, 3, 5, 7, 9 (merged if a class has fewer than 5% of samples).`));
 K.push(NL(`Task C, regression: severity score.`));
-K.push(NL(`Class weights (Step E6) for all classifiers; macro-averaged metrics.`));
+K.push(NL(`Class weights (Step E4) for all classifiers; macro-averaged metrics.`));
 K.push(P(`**Supporting studies.** Detection, severity classes and regression together: Tian et al. (2021), Feng et al. (2022), Abdulridha et al. (2023); three-class healthy, mild and severe classification: Yuan et al. (2025).`));
 K.push(H3(`Step 2.1.2 – Fold-wise feature selection for each camera`));
 K.push(...tab2('s212', [[`Item`, `Description`],
@@ -969,8 +987,9 @@ K.push(...tab2('s213', [[`Item`, `Description`],
 [`Output → next step`, `Fused feature set of each sensor set, fold and task → all models.`]], [2200, 7106], `Step 2.1.3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Single camera (S1–S4): its disease-specific feature set is the input.`));
-K.push(NL(`Combination (S5–S15): concatenate the feature sets of its cameras and apply the variance inflation factor rule (below 10) again across cameras.`));
-K.push(NL(`Standardise with training statistics (Step E5).`));
+K.push(NL(`Combination (S5–S15): concatenate the feature sets of its cameras (thermal, multispectral and red–green–blue features added to the hyperspectral features) and apply the variance inflation factor rule (below 10) again across cameras.`));
+K.push(NL(`Standardise with training statistics (Step E3).`));
+K.push(NL(`The same fused set is the input of every model: machine learning, DNN-F1, DNN-F2 and the pseudo-image networks.`));
 K.push(P(`**Supporting studies.** Feature-level fusion of spectral, thermal and texture features: Feng et al. (2022), Liu et al. (2024); fusion levels: Ghamisi et al. (2019); input- and intermediate-level fusion: Maimaitijiang et al. (2020).`));
 K.push(...fig2('combinations', 'g10_combinations.png', `The 15 sensor sets: 4 single cameras, 6 pairs, 4 triples and all four.`, 520));
 K.push(...tab2('sets', [[`Set`, `Cameras`, `Question it answers`],
@@ -989,6 +1008,12 @@ K.push(...tab2('sets', [[`Set`, `Cameras`, `Question it answers`],
 [`S13`, `hyperspectral + red–green–blue + thermal`, `is multispectral needed when hyperspectral is present?`],
 [`S14`, `multispectral + red–green–blue + thermal`, `all low-cost cameras`],
 [`S15`, `all four`, `full system; basis of the drop-one-camera ablation`]], [900, 3600, 4806], `The 15 sensor sets.`, 17));
+K.push(...tab2('modelmatrix', [[`Model family`, `Models`, `Sensor sets`, `Classification (Tasks A, B)`, `Regression (Task C)`],
+[`Machine learning`, `support vector machine / regression, random forest, extreme gradient boosting, k-nearest neighbours, partial least squares (discriminant analysis / regression)`, `all 15`, `yes`, `yes`],
+[`Feature-fusion networks`, `DNN-F1`, `all 15`, `yes`, `yes`],
+[``, `DNN-F2 (one branch per camera)`, `the 11 combinations (S5–S15)`, `yes`, `yes`],
+[`Pseudo-image networks`, `DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2-Atto`, `all 15 (fused features of all cameras in the set)`, `yes`, `yes (linear output)`],
+[`Covariate models (Step 2.5.5)`, `best machine-learning model`, `covariates only; best sensor sets + covariates`, `yes`, `yes`]], [1800, 3200, 1800, 1300, 1206], `Every model is built for every sensor set and task on the same folds, so that single cameras and combinations can be compared directly.`, 17));
 K.push(H3(`Step 2.1.4 – Final compact set by sequential floating forward selection (SFFS) for the machine-learning models`));
 K.push(...tab2('s214', [[`Item`, `Description`],
 [`Purpose (problem it solves)`, `Different models use features differently, and a small final set improves generalisation and interpretation.`],
@@ -1036,7 +1061,7 @@ K.push(...tab2('s221', [[`Item`, `Description`],
 [`Output → next step`, `Predictions on the test replication → Activity 2.4.`]], [2200, 7106], `Step 2.2.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Radial basis function kernel; class weights for classes; one-vs-one for several classes.`));
-K.push(NL(`Tune C, γ (and ε for regression) by grid search in the inner folds (Table ${T('mlgrid')}).`));
+K.push(NL(`Tune C, γ (and ε for regression) by grid search in the inner folds (${T('mlgrid')}).`));
 K.push(P(`**Supporting studies.** Cortes and Vapnik (1995); Mountrakis et al. (2011); disease applications: Tian et al. (2021), Mustafa et al. (2023), Yuan et al. (2025).`));
 K.push(...tab2('csvm', [[`Aspect`, `Support vector machine (SVM) and support vector regression (SVR)`],
 [`Principle (how it works)`, `Finds the boundary with the largest margin between classes (or a tube of width ε around the regression line); the kernel maps the data so that curved boundaries become possible.`],
@@ -1116,7 +1141,7 @@ K.push(...tab2('s226', [[`Item`, `Description`],
 [`Input`, `Inner folds (Step F2).`],
 [`Output → next step`, `Tuned hyper-parameters of every model, fold and sensor set → final training.`]], [2200, 7106], `Step 2.2.6 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Use the grids in Table ${T('mlgrid')}; choose the combination with the best mean inner score.`));
+K.push(NL(`Use the grids in ${T('mlgrid')}; choose the combination with the best mean inner score.`));
 K.push(P(`**Supporting studies.** Kuhn and Johnson (2013); Cawley and Talbot (2010).`));
 K.push(...tab2('mlgrid', [[`Model`, `Tasks`, `Hyper-parameters tuned (inner cross-validation)`],
 [`Support vector machine / regression`, `A, B / C`, `C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5} (regression)`],
@@ -1161,11 +1186,12 @@ K.push(...tab2('s233', [[`Item`, `Description`],
 [`Input`, `Fused feature set or hyperspectral configuration (standardised).`],
 [`Output → next step`, `One-channel pseudo-image of k × k pixels per sample → Steps 2.3.4–2.3.7.`]], [2200, 7106], `Step 2.3.3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Order the features by group and, within the spectral group, by wavelength (optimal wavelengths, indices, texture, TTFI, then other cameras), so that neighbouring pixels hold related features.`));
-K.push(NL(`Choose k = the smallest integer with k² ≥ number of features (minimum 3); fill the k × k grid row by row.`));
+K.push(NL(`Order the features by camera (hyperspectral, multispectral, red–green–blue, thermal) and, within the hyperspectral camera, by group and wavelength (optimal wavelengths, indices, texture, TTFI), so that neighbouring pixels hold related features.`));
+K.push(NL(`Choose k so that the k × k grid holds all features when every camera starts on a new row (minimum 3); fill the grid row by row. A small group such as the thermal features then stays together in one row and is not split.`));
 K.push(NL(`Fill the remaining pixels with zeros (zero is the training mean after standardisation, so padding adds no information).`));
-K.push(NL(`Example: 22 features → 5 × 5 image with 3 padded pixels (Figure ${F('pseudo')}).`));
-K.push(P(`**Supporting studies.** Pseudo-two-dimensional input of spectral features: Ma et al. (2026); arranging non-image features as images for convolutional networks: Sharma et al. (2019).`));
+K.push(NL(`Example (hyperspectral only): 22 features → 5 × 5 image with 3 padded pixels (${F('pseudo')}). Example (S7, hyperspectral + thermal): 16 hyperspectral features fill three rows of six, the 6 thermal features fill the fourth row and two empty rows complete a 6 × 6 image.`));
+K.push(P(`**Supporting studies.** Pseudo-two-dimensional input of spectral features: Ma et al. (2026); arranging non-image features as images for convolutional networks: Sharma et al. (2019); attention relates features regardless of their position: Vaswani et al. (2017).`));
+K.push(NOTE(`Ma et al. (2026) used DT-EDNet with hyperspectral features only. Its use with thermal, multispectral and red–green–blue features is an extension made in this study; whether it helps is shown by comparing each fused set with the hyperspectral set (S1) and with DNN-F2, which processes each camera in its own branch.`));
 K.push(...fig2('pseudo', 'g18_pseudoimage.png', `Construction of a pseudo-image from a standardised feature vector (dummy values).`, 540));
 K.push(...tab2('cpseudo', [[`Aspect`, `Pseudo-image (feature-to-image) representation`],
 [`Principle (how it works)`, `Places the features of one sample on a small grid so that convolution and attention can relate neighbouring and distant features.`],
@@ -1193,7 +1219,7 @@ K.push(P(`In self-attention every token forms a query Q, a key K and a value V; 
 K.push(...tab2('cdtednet', [[`Aspect`, `DT-EDNet (Dual Transformer Early Detection Network)`],
 [`Principle (how it works)`, `A hybrid network: convolution embeds the pseudo-image, squeeze-and-excitation re-weights channels, the Kernel Transformer Block (convolution + CBAM) learns local spatial–channel patterns and the Token Transformer Blocks (multi-head self-attention) learn global relations; the class token summarises the sample.`],
 [`Problem it solves`, `Models both local and long-range interactions among selected spectral, index and texture features.`],
-[`Specification in this study`, `Embedding 128; SE block; 1 Kernel Transformer Block + 4 Token Transformer Blocks; 4 heads; dropout 0.03; trained from scratch.`],
+[`Specification in this study`, `Embedding 128; SE block; 1 Kernel Transformer Block + 4 Token Transformer Blocks; 4 heads; dropout 0.03; trained from scratch; input = fused features of all cameras in the sensor set (each camera on its own rows).`],
 [`Hyper-parameters and how they are tuned`, `Fixed architecture as published; learning rate and dropout tuned in the inner folds (Step 2.3.8).`],
 [`Data on which it works well`, `Sets of a few to a few tens of ordered features with complex interactions; best with thousands of samples.`],
 [`Why it was selected`, `Highest accuracy on rice blast (overall accuracy 95.25% with optimal wavelengths + indices + TTFI) against EfficientNet, ResNet18 and ConvNeXt V2 (Ma et al., 2026); tested here under plot-grouped validation.`],
@@ -1246,7 +1272,7 @@ K.push(NL(`Optimiser: AdamW, initial learning rate 6 × 10^{−4}, weight decay 
 K.push(NL(`Loss: cross-entropy with label smoothing 0.01 and class weights (classes); mean squared error (score).`));
 K.push(NL(`Gradient clipping at a maximum norm of 1.2; early stopping with patience 60 epochs and minimum improvement 5 × 10^{−5}.`));
 K.push(NL(`Model selection on the inner validation plots (macro-F1 for classes because the classes are unequal; root-mean-square error for the score), not on a random 10% of samples.`));
-K.push(NL(`Tuning: learning rate ∈ {3 × 10^{−4}, 6 × 10^{−4}, 1 × 10^{−3}} and dropout ∈ {0.03, 0.1, 0.3}, same grid for all four networks.`));
+K.push(NL(`Tuning: learning rate ∈ {3 × 10^{−4}, 6 × 10^{−4}, 1 × 10^{−3}} and dropout ∈ {0.03, 0.1, 0.3}, same grid for all four networks. To keep the computing load feasible (about 34 000 runs if every case were tuned), each network is tuned once, on outer fold 1, sensor set S15 and Task B with one seed, and the chosen values are then used for all sensor sets, tasks and folds (about 3800 runs).`));
 K.push(NL(`Five random seeds (42 and four others); report mean ± standard deviation.`));
 K.push(P(`**Supporting studies.** Training settings: Ma et al. (2026); AdamW: Loshchilov and Hutter (2019); cosine annealing: Loshchilov and Hutter (2017); label smoothing: Szegedy et al. (2016), Müller et al. (2019); gradient clipping: Pascanu et al. (2013).`));
 K.push(...tab2('ctrain', [[`Aspect`, `Training techniques (AdamW, cosine annealing, label smoothing, gradient clipping, early stopping)`],
@@ -1284,7 +1310,7 @@ K.push(...tab2('s243', [[`Item`, `Description`],
 [`Input`, `Dummy confusion matrix and dummy predictions.`],
 [`Output → next step`, `Example values (below).`]], [2200, 7106], `Step 2.4.3 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Classification: from the confusion matrix in Figure ${F('dummycm')} (532 test samples), 396 are on the diagonal, so overall accuracy = 396 / 532 = 0.744; chance agreement p_{e} = 0.182, so κ = (0.744 − 0.182) / (1 − 0.182) = 0.687; quadratic-weighted kappa = 0.937 (most errors are between neighbouring grades); macro-F1 = 0.733; 97.4% of predictions are within one grade.`));
+K.push(NL(`Classification: from the confusion matrix in ${F('dummycm')} (532 test samples), 396 are on the diagonal, so overall accuracy = 396 / 532 = 0.744; chance agreement p_{e} = 0.182, so κ = (0.744 − 0.182) / (1 − 0.182) = 0.687; quadratic-weighted kappa = 0.937 (most errors are between neighbouring grades); macro-F1 = 0.733; 97.4% of predictions are within one grade.`));
 K.push(NL(`Regression: for eight dummy subplots with observed scores 0, 1, 3, 5, 7, 9, 3, 5 and predictions 0.4, 1.6, 2.5, 5.8, 6.1, 8.2, 3.9, 4.4: R² = 0.94, RMSE = 0.71 and RPD = 3.00 / 0.71 = 4.2.`));
 K.push(P(`**Supporting studies.** Cohen (1960); Sokolova and Lapalme (2009); Chang et al. (2001).`));
 K.push(...fig2('dummycm', 'g22_dummy_cm.png', `Dummy confusion matrix of one test replication (six grades).`, 360));
@@ -1349,6 +1375,22 @@ K.push(...tab2('cablation', [[`Aspect`, `Ablation and Shapley interpretation`],
 [`Data on which it works well`, `Any trained model on the same folds.`],
 [`Why it was selected`, `Direct, easy-to-explain evidence of contribution; both used in the DT-EDNet study.`],
 [`Key references`, `Ma et al. (2026); Lundberg and Lee (2017)`]], [2300, 7006], `Method card – Ablation and Shapley interpretation.`, 16));
+K.push(H3(`Step 2.5.5 – Covariate baseline and sensor + covariate models`));
+K.push(...tab2('s255', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Severity rises with days after inoculation and differs with variety, inoculation timing, growth stage and weather; a sensor model could look accurate only because it learns time or stage. The cameras must add information beyond these known factors.`],
+[`Input`, `Covariates (Step A5); fused feature sets of the sensor sets; same folds.`],
+[`Output → next step`, `Accuracy of the covariate-only model, of the sensor models and of the sensor + covariate models → evidence of what the cameras add.`]], [2200, 7106], `Step 2.5.5 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Covariate-only model: the best machine-learning model (Activity 2.2) with days after inoculation, variety, inoculation timing, growth stage and the weather summaries as the only inputs, for Tasks A, B and C.`));
+K.push(NL(`Sensor models (main results, Activities 2.2–2.3): a sensor set is reported as useful only if it is better than the covariate-only model.`));
+K.push(NL(`Sensor + covariate models: the best three sensor sets with the covariates added (one-hot variety and inoculation timing, ordinal growth stage, numeric days after inoculation and weather), to show whether known context improves prediction.`));
+K.push(NL(`Report all three side by side for every task; label models that contain weather as "within-season" (Step A5).`));
+K.push(P(`**Supporting studies.** Combining weather with remote sensing compared with a weather-only model: Zhang et al. (2014); weather-based white rust forecasting: Chattopadhyay et al. (2011); stage-dependent disease signals: Blasch et al. (2023); simple baseline models as a reference for predictive models: Kuhn and Johnson (2013).`));
+K.push(...tab2('covex', [[`Model (dummy results, Task B)`, `Inputs`, `Macro-F1`, `Gain over covariate model`],
+[`Covariate-only`, `days after inoculation, variety, timing, stage, weather`, `0.41`, `—`],
+[`Hyperspectral (S1)`, `S1 fused features`, `0.66`, `+0.25`],
+[`Hyperspectral + thermal (S7)`, `S7 fused features`, `0.69`, `+0.28`],
+[`Hyperspectral + thermal + covariates`, `S7 features + covariates`, `0.71`, `+0.30 (within-season)`]], [2700, 3200, 1300, 2106], `Worked example (dummy data): how the covariate baseline is used to show what the cameras add.`, 17));
 K.push(H2(`Activity 2.6 – Robustness and maps`));
 K.push(H3(`Step 2.6.1 – Performance by treatment`));
 K.push(...tab2('s261', [[`Item`, `Description`],
@@ -1364,8 +1406,9 @@ K.push(...tab2('s262', [[`Item`, `Description`],
 [`Input`, `Best machine-learning and best deep-learning model of the three best sensor sets.`],
 [`Output → next step`, `Transfer results → conclusions on robustness.`]], [2200, 7106], `Step 2.6.2 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Train on two varieties and test on the third (mainly V1 ↔ V2, because the resistant variety has few diseased samples).`));
+K.push(NL(`Train on two varieties and test on the third, for each variety in turn (V1 PM 26, V2 Pusa Vijay, V3 PM 37); a variety with very few diseased samples is used only for the detection task.`));
 K.push(NL(`Train on three inoculation timings and test on the fourth.`));
+K.push(NL(`All results come from one season; transfer to another season needs an independent test with data of that season, as done across years by Ma et al. (2026).`));
 K.push(P(`**Supporting studies.** Blocked validation for extrapolation: Roberts et al. (2017); independent-year test: Ma et al. (2026).`));
 K.push(H3(`Step 2.6.3 – Severity maps`));
 K.push(...tab2('s263', [[`Item`, `Description`],
@@ -1398,7 +1441,7 @@ K.push(...tab2('s321', [[`Item`, `Description`],
 [`Input`, `Pre-symptomatic features; healthy-plot features of the same date and variety (training replications).`],
 [`Output → next step`, `Healthy-normalised features → Activity 3.3.`]], [2200, 7106], `Step 3.2.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Apply Step E3 to every feature: z_{h} = (x − mean_{healthy}) / SD_{healthy}, with the healthy plots of the same date and variety in the training replications.`));
+K.push(NL(`Apply Step E2 to every feature: z_{h} = (x − mean_{healthy}) / SD_{healthy}, with the healthy plots of the same date and variety in the training part (rotated healthy plots, ${T('healthyrot')}).`));
 K.push(NL(`Apply the same reference to the test samples.`));
 K.push(P(`**Supporting studies.** Oerke et al. (2006); Zarco-Tejada et al. (2018); Calderón et al. (2014); Poblete et al. (2023).`));
 K.push(H2(`Activity 3.3 – Pre-symptomatic feature selection`));
@@ -1418,7 +1461,7 @@ K.push(...tab2('s341', [[`Item`, `Description`],
 [`Input`, `Pre-symptomatic feature sets.`],
 [`Output → next step`, `Trained models and test predictions → Activity 3.5.`]], [2200, 7106], `Step 3.4.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Machine learning: support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares, with the grids of Table ${T('mlgrid')}.`));
+K.push(NL(`Machine learning: support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares, with the grids of ${T('mlgrid')}.`));
 K.push(NL(`Feature-fusion networks: DNN-F1 and DNN-F2 with smaller layers (32 and 16 units) and stronger dropout (0.4).`));
 K.push(NL(`Same folds as Objective 2.`));
 K.push(P(`**Supporting studies.** Zhu et al. (2017); Tian et al. (2021); Yu et al. (2025); Srivastava et al. (2014).`));
@@ -1430,7 +1473,7 @@ K.push(...tab2('s351', [[`Item`, `Description`],
 [`Output → next step`, `Accuracy tables; earliest detection day of every sensor set.`]], [2200, 7106], `Step 3.5.1 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Classification: sensitivity, specificity, balanced accuracy and AUC; regression: R² and RMSE of the later score.`));
-K.push(NL(`Compute balanced accuracy separately for each pre-symptomatic date; the earliest detection day is the first date on which it reaches 0.70 (Figure ${F('earliest')}).`));
+K.push(NL(`Compute balanced accuracy separately for each pre-symptomatic date; the earliest detection day is the first date on which it reaches 0.70 (${F('earliest')}).`));
 K.push(NL(`Report the earliest detection day separately for each variety and inoculation timing.`));
 K.push(P(`**Supporting studies.** Fawcett (2006); Mahlein et al. (2019); Zarco-Tejada et al. (2018).`));
 K.push(...fig2('earliest', 'g23_dummy_earliest.png', `Dummy example of balanced accuracy by days after inoculation and the earliest detection day of each sensor set.`, 460));
@@ -1454,23 +1497,33 @@ K.push(P(`**Procedure.**`));
 K.push(NL(`Map the predicted probability of later infection for every subplot and pre-symptomatic date.`));
 K.push(NL(`Compare the maps with the later observed severity.`));
 K.push(P(`**Supporting studies.** Zarco-Tejada et al. (2018); Yu et al. (2025).`));
+K.push(H3(`Step 3.5.3 – Covariate baseline for the pre-symptomatic stage`));
+K.push(...tab2('s353', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Before symptoms, infection depends strongly on weather after inoculation and on variety; the cameras must be shown to detect more than these factors.`],
+[`Input`, `Covariates (Step A5) of the pre-symptomatic dates; pre-symptomatic models.`],
+[`Output → next step`, `Accuracy of the covariate-only model compared with the sensor models → evidence that the early signal comes from the plants.`]], [2200, 7106], `Step 3.5.3 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Fit the best machine-learning model with days after inoculation, variety, inoculation timing, growth stage and the weather summaries only.`));
+K.push(NL(`Report the sensor models and the best sensor set + covariates next to it, as in Step 2.5.5.`));
+K.push(P(`**Supporting studies.** Zhang et al. (2014); Chattopadhyay et al. (2011); Zhu et al. (2017).`));
 K.push(H1(`6. Cross-check of the methodology`));
 K.push(P(`This chapter checks that no step is missing, that every output is used by a later step, and that the methodology agrees with the feature-selection approach note for multi-sensor UAV data and with the DT-EDNet study (Ma et al., 2026). Where the methodology deliberately differs, the reason is given.`));
 K.push(H2(`6.1 Input–output chain of all steps`));
 K.push(...tab2('chain', [[`Step(s)`, `Input`, `Output`, `Used by`],
 [`A1–A4`, `field design, scores`, `labelled subplot list; post- and pre-symptomatic datasets`, `D8, F1, all objectives`],
+[`A5`, `field book, weather records`, `covariate table (days after inoculation, variety, timing, growth stage, weather)`, `D2, 1.1.3, 2.5.5, 3.5.3`],
 [`B1–B2`, `raw images, panels, control points`, `calibrated, georeferenced mosaics`, `B3, B4`],
 [`B3`, `hyperspectral cube`, `clean, smoothed 483-band cube`, `B4, C1, D3`],
 [`B4–B5`, `mosaics of all cameras`, `aligned layers on the hyperspectral grid`, `C6–C8, D2`],
 [`C1–C5`, `pixel samples of all dates`, `labelled endmember library`, `C6`],
 [`C6–C8`, `library, cubes, NDVI`, `accepted vegetation mask applied to all cameras`, `D2, D5`],
-[`D1–D2`, `masked layers, polygons`, `subplot mean spectra and band values; pixel counts`, `D3–D7, E4`],
-[`D3–D7`, `subplot values`, `spectral, index, texture, colour and thermal groups`, `D8, E2`],
+[`D1–D2`, `masked layers, polygons`, `subplot mean spectra and band values joined with covariates`, `D3–D7`],
+[`D3–D7`, `subplot values`, `spectral, index, texture, colour and thermal groups`, `D8, E1`],
 [`D8`, `all features`, `feature table of each camera`, `E, F, Objective 1`],
-[`E1–E2`, `reflectance and temperatures`, `date-consistent reflectance; normalised thermal features`, `D, Objective 1`],
-[`E3`, `features, healthy plots`, `healthy-normalised features`, `Objective 3; thermal difference features`],
-[`E4–E6`, `feature tables`, `clean samples; standardised features; class weights`, `all models`],
-[`F1–F3`, `clean labelled tables`, `outer and inner folds; tuning plan; leakage checklist`, `Objectives 2–3`],
+[`E1`, `temperatures`, `normalised thermal features`, `D7, Objective 1`],
+[`E2`, `features, healthy plots (rotated across folds)`, `healthy-normalised features`, `Objective 3; thermal difference features`],
+[`E3–E4`, `feature tables`, `standardised features; class weights`, `all models`],
+[`F1–F3`, `labelled tables`, `outer and inner folds with rotated healthy plots; tuning plan; leakage checklist`, `E2, Objectives 2–3`],
 [`1.1.1–1.1.3`, `post-symptomatic features`, `response figures`, `interpretation, 1.6.3`],
 [`1.2.1–1.2.4`, `reflectance and first derivative`, `effective ranges; optimal wavelengths`, `1.3, 1.6.2, 2.1.5`],
 [`1.3.1–1.3.3`, `NDSI/RSI maps, bands`, `best NDSI, RSI, White Rust Index; multispectral indices`, `1.4.1, 1.6.1`],
@@ -1481,13 +1534,13 @@ K.push(...tab2('chain', [[`Step(s)`, `Input`, `Output`, `Used by`],
 [`2.2.1–2.2.6`, `optimum feature combinations`, `tuned machine-learning predictions`, `2.4`],
 [`2.3.1–2.3.8`, `fused sets; pseudo-images`, `neural-network predictions`, `2.4`],
 [`2.4.1–2.4.3`, `predictions`, `metric tables`, `2.5`],
-[`2.5.1–2.5.4`, `metric tables, models`, `best sensor set and model; contributions; ablation; explanation`, `2.6, conclusions`],
+[`2.5.1–2.5.5`, `metric tables, models, covariates`, `best sensor set and model; contributions; ablation; explanation; gain over the covariate baseline`, `2.6, conclusions`],
 [`2.6.1–2.6.3`, `best models`, `robustness results; maps`, `conclusions`],
 [`3.1.1–3.5.2`, `pre-symptomatic features, later labels`, `pre-symptomatic models; earliest detection day; risk maps`, `conclusions`]], [1300, 2700, 3400, 1906], `Input and output of every step and the step that uses each output.`, 15));
-K.push(P(`**Result of the check.** Every output is used by at least one later step, every input is produced by an earlier step, and every label-based step runs inside the training folds (Table ${T('leak')}). No step is missing between the raw images and the three objectives.`));
+K.push(P(`**Result of the check.** Every output is used by at least one later step, every input is produced by an earlier step, and every label-based step runs inside the training folds (${T('leak')}). No step is missing between the raw images and the three objectives.`));
 K.push(H2(`6.2 Agreement with the feature-selection approach note`));
 K.push(...tab2('fscheck', [[`Recommendation of the note`, `In this methodology`, `Status`],
-[`Do not select from one big pool; select in stages, group by group`, `four stages; one method per feature type (Table ${T('stages')})`, `included`],
+[`Do not select from one big pool; select in stages, group by group`, `four stages; one method per feature type (${T('stages')})`, `included`],
 [`Stage 0: build groups with physical meaning; red-edge parameters instead of all derivative bands`, `Activity D; red-edge parameters added; second derivative removed`, `included (second derivative removed on request)`],
 [`Stage 1: remove near-constant features; keep one per cluster with |r| > 0.95`, `Steps 1.4.2, 1.5.2, 1.6.1; spectral bands go directly to SHAP-CARS, which handles collinearity`, `included (adapted for bands)`],
 [`Stage 2: SPA or CARS for spectra; Boruta or RReliefF for indices; mRMR for texture; two-band search on training plots`, `SHAP-CARS for spectra; ReliefF/RReliefF for indices; mRMR for texture; NDSI/RSI and White Rust Index search in the inner folds`, `included (one method per type, as in Ma et al., 2026)`],
@@ -1497,7 +1550,7 @@ K.push(...tab2('fscheck', [[`Recommendation of the note`, `In this methodology`,
 [`Limit the final number of features (about n/10 to n/20)`, `15 features for about 1024 training samples (10 for about 384)`, `included`],
 [`Check stability of selection`, `CARS repeated 20 times; selection frequency over folds (Step 2.5.4)`, `included`],
 [`Ablation by group and by camera`, `drop-one-camera, six hyperspectral configurations, DT-EDNet module ablation`, `included`],
-[`Normalise thermal values against healthy plots or air temperature on each date`, `Steps E2 and E3`, `included`],
+[`Normalise thermal values against healthy plots or air temperature on each date`, `Steps E1 and E2`, `included`],
 [`Outer loop of 5 folds repeated 10 times`, `three leave-one-replication-out folds (replication is the natural block of the design); five seeds for networks`, `adapted`],
 [`Compare with decision-level fusion (stacking)`, `not done: the study is limited to feature-level fusion by design`, `not used (scope)`]], [3500, 4200, 1606], `Cross-check against the feature-selection approach note for multi-sensor UAV data.`, 15));
 K.push(H2(`6.3 Agreement with the DT-EDNet study (Ma et al., 2026)`));
@@ -1525,7 +1578,22 @@ K.push(...tab2('changes', [[`Item`, `Previous version`, `This version`, `Reason`
 [`Deep learning (post-symptomatic)`, `DNN-F1, DNN-F2`, `DNN-F1, DNN-F2 + DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2`, `user request; comparison of Ma et al. (2026)`],
 [`Normalisation`, `inside other steps`, `separate Activity E (six steps)`, `clarity; user request`],
 [`Endmember extraction`, `one step`, `Activity C with eight steps`, `clarity; user request`],
+[`Covariates`, `flower %, canopy cover %, vegetation pixel count`, `days after inoculation, variety, inoculation timing, growth stage, weather`, `user request; covariate baseline`],
+[`Radiometric consistency between dates; sample quality screening`, `Steps E1 and E4`, `not performed`, `user request; panels on every flight (Step B1)`],
+[`Varieties`, `V1 susceptible, V2 moderately susceptible, V3 resistant (assumed)`, `V1 PM 26, V2 Pusa Vijay, V3 PM 37 (no susceptibility assumed)`, `field record`],
 [`Technique descriptions`, `short`, `method card for every technique`, `user request`]], [2000, 2300, 2900, 2106], `Main changes in this revision.`, 15));
+K.push(H2(`6.5 Drawbacks found and corrected in this version`));
+K.push(...tab2('drawbacks', [[`Drawback in the previous version`, `Correction`, `Supporting studies`],
+[`Healthy plots were assigned to folds by variety (V1 → fold 1, …), so the training part of each fold had no healthy plots of the test variety. Healthy-plot normalisation with the same variety was then impossible, and healthy samples of the test variety were never seen in training.`, `Healthy plots rotated across folds: every fold has each inoculation timing once and every variety at least once (${T('healthyrot')}).`, `Roberts et al. (2017); Oerke et al. (2006); Zarco-Tejada et al. (2018)`],
+[`Severity rises with time and stage, so a model could appear accurate by learning days after inoculation or growth stage instead of disease.`, `Covariate-only baseline and sensor + covariate models (Steps 2.5.5 and 3.5.3); results by growth stage.`, `Zhang et al. (2014); Blasch et al. (2023); Kuhn and Johnson (2013)`],
+[`Flowering effects were checked with flower %, which mixes flowers with disease-related colour changes.`, `Growth stage recorded with the BBCH scale; responses and results reported for each stage.`, `Lancashire et al. (1991); Meier (2018); Sulik and Long (2016)`],
+[`Pooled reflectance and first-derivative bands in CARS without standardisation would favour one form for numerical reasons; the effective ranges could miss the red edge.`, `Bands standardised before PLS; red-edge first derivative always kept; bands labelled R_{λ} or FD_{λ}.`, `Li et al. (2009); Mehmood et al. (2012); Filella and Peñuelas (1994); Yu et al. (2021)`],
+[`Multi-camera pseudo-images could split a small camera group (thermal) across rows.`, `Each camera starts on a new row of the pseudo-image.`, `Sharma et al. (2019); Ma et al. (2026)`],
+[`Tuning every network for every case needed about 34 000 runs.`, `Tune once (fold 1, S15, Task B, one seed) and reuse the settings: about 3800 runs.`, `Ma et al. (2026); Cawley and Talbot (2010)`],
+[`Weather has one value per date and cannot be separated from the date in one season.`, `Weather used for interpretation and in covariate models labelled "within-season".`, `Zhang et al. (2014); Chattopadhyay et al. (2011)`],
+[`A variety was assumed to be resistant without field evidence.`, `Variety names from the field record; transfer test run for each variety in turn.`, `Blasch et al. (2023)`],
+[`The healthy plots lie in a separate block, so healthy vs inoculated differences can include a small block (location) effect.`, `Detection labels come from the observed score, so inoculated subplots with no pustules are also healthy samples; detection accuracy is reported separately for healthy-block samples and for symptom-free inoculated subplots; healthy-plot normalisation is done by date.`, `Roberts et al. (2017); Oerke et al. (2006)`],
+[`All results come from one season.`, `Stated as a limitation; leave-one-variety-out and leave-one-timing-out tests used as internal transfer tests.`, `Ma et al. (2026); Roberts et al. (2017)`]], [3500, 3500, 2306], `Drawbacks of the previous version and how they are corrected.`, 15));
 K.push(H1(`7. Definitions of indices and features`));
 K.push(P(`R_{λ} is the reflectance at λ nm (nearest available band). Formulas were checked against the original papers.`));
 K.push(...tab2('hsidx', [[`Group`, `Index`, `Formula`, `Reference`],
@@ -1590,7 +1658,7 @@ K.push(...tab2('msidx', [[`Feature`, `Formula (B, G, R, RE, NIR = 475, 560, 668,
 [`MSR`, `(NIR/R − 1)/√(NIR/R + 1)`, `Chen 1996`],
 [`PSRI`, `(R − G)/NIR`, `Merzlyak et al. 1999`],
 [`Normalised differences (10)`, `(B_{i} − B_{j})/(B_{i} + B_{j}) for all band pairs`, `Ma et al. 2026`],
-[`Texture (40)`, `8 GLCM measures (Table ${T('rgbfeat')}) of each of the 5 bands`, `Haralick et al. 1973; Liu et al. 2024`]], [2200, 4800, 2306], `Multispectral features.`, 15));
+[`Texture (40)`, `8 GLCM measures (${T('rgbfeat')}) of each of the 5 bands`, `Haralick et al. 1973; Liu et al. 2024`]], [2200, 4800, 2306], `Multispectral features.`, 15));
 K.push(...tab2('rgbfeat', [[`Feature`, `Equation`, `Reference`],
 [`Chromatic coordinates`, `r = R/(R+G+B), g = G/(R+G+B), b = B/(R+G+B)`, `Woebbecke et al. 1995`],
 [`Excess green (ExG)`, `2g − r − b`, `Woebbecke et al. 1995`],
@@ -1619,7 +1687,7 @@ K.push(H1(`8. Six-month work plan`));
 K.push(...fig2('gantt', 'g24_gantt.png', `Six-month work plan for the analysis.`, 540));
 K.push(...tab2('plan', [[`Month`, `Work`, `Deliverable`],
 [`1`, `Common Activities A–C for all dates and cameras; mask accuracy`, `calibrated, masked images; endmember library`],
-[`2`, `Activities D–F: features, normalisation, folds; Activity 1.1`, `feature tables; response curves`],
+[`2`, `Activities D–F: features, covariates, normalisation, folds; Activity 1.1`, `feature and covariate tables; response curves`],
 [`3`, `Activities 1.2–1.6; selection code tested inside folds`, `optimal wavelengths, White Rust Index, selected indices, TTFI; Objective 1 draft`],
 [`4`, `Objective 2: machine learning and feature-fusion networks for 15 sensor sets`, `results of 15 sensor sets`],
 [`5`, `Objective 2: DT-EDNet and comparison networks; ablation; Shapley explanation; maps`, `network comparison; ablation; maps`],
@@ -1641,6 +1709,7 @@ K.push(P(`**Q. What is the Tri-band Texture Fusion Index?** A combination of thr
 K.push(P(`**Q. Why compare DT-EDNet with EfficientNet, ResNet18 and ConvNeXt V2?** These were the comparison networks of the DT-EDNet study; repeating the comparison under plot-grouped validation shows whether its advantage holds for white rust when accuracy is not inflated by random splits.`));
 K.push(P(`**Q. Is the dataset large enough for a transformer?** About 1024 training samples per fold is small for a transformer, which is why identical folds, early stopping, a small tuning grid, five seeds and strong machine-learning baselines are used; the pseudo-image networks are not used for the smaller pre-symptomatic dataset.`));
 K.push(P(`**Q. Why are the folds grouped by replication?** Subplots of a plot and plots of a replication are similar; random splits put near-identical samples in training and test data and inflate accuracy (Roberts et al., 2017; Ploton et al., 2020).`));
-K.push(P(`**Q. Why are flowers kept in the subplot spectrum?** The canopy score includes the inflorescence and staghead; flower % is recorded and checked so that selected features are not only flowering effects (Sulik and Long, 2016).`));
+K.push(P(`**Q. Why are flowers kept in the subplot spectrum?** The canopy score includes the inflorescence and staghead; the growth stage (vegetative, flowering, pod formation) is recorded with the BBCH scale and results are reported for each stage, so that selected features are not only flowering effects (Sulik and Long, 2016; Meier, 2018).`));
+K.push(P(`**Q. How are weather and other covariates used?** Days after inoculation, variety, inoculation timing, growth stage and weather form a covariate-only baseline; a camera is useful only if it beats this baseline. Weather has one value per date, so models that contain it are labelled within-season (Zhang et al., 2014; Chattopadhyay et al., 2011).`));
 K.push(P(`**Q. How is pre-symptomatic infection known if no symptoms are visible?** From the later status of the same subplot; inoculated subplots that never develop symptoms are excluded (Zhu et al., 2017; Tian et al., 2021).`));
 K.push(P(`**Q. How can these results be used with satellite data?** The selected wavelengths and indices can be simulated for Sentinel-2 or LISS-IV bands from the hyperspectral spectra, as done for yellow rust and rice bacterial leaf blight (Zheng et al., 2018; Das et al., 2015).`));

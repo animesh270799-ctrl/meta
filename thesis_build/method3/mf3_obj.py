@@ -12,7 +12,7 @@ TAB('o1act', [['Activity', 'Steps', 'Technique (one per feature type)', 'Output'
     ['1.6 Disease-specific feature sets', '1.6.1–1.6.4', 'same rules for other cameras → variance inflation factor', 'feature set of each camera; treatment response']],
     'Activities of Objective 1.', [2400, 1100, 3000, 2806])
 H2('The feature-selection rule: one method for each type of feature')
-P('Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) (Figure [[F:selection]]).')
+P('Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) ([[F:selection]]).')
 TAB('stages', [['Stage', 'What is done', 'Uses labels?', 'Where in this document'],
     ['0. Build groups', 'calculate features with physical meaning (no second derivative)', 'no', 'Activity D'],
     ['1. Redundancy within groups', 'remove near-constant features; keep one feature of every cluster with |r| ≥ 0.95 (indices, texture, thermal, multispectral and colour groups)', 'no', 'Steps 1.4.2, 1.5.3, 1.6.1'],
@@ -27,7 +27,7 @@ H2('Activity 1.1 – Response analysis')
 STEP('1.1.1', 'Mean spectra and first-derivative curves by severity grade',
      'Shows how the spectrum changes with severity before any selection and gives the physiological basis for later results.',
      'Subplot mean reflectance and first derivative (post-symptomatic).',
-     'Response figures (Figure [[F:dummyspec]]) and a list of responsive regions → Activities 1.2–1.3 (interpretation).',
+     'Response figures ([[F:dummyspec]]) and a list of responsive regions → Activities 1.2–1.3 (interpretation).',
      ['Average the subplot spectra of each grade (0, 1, 3, 5, 7, 9) and plot them with ± one standard deviation.', 'Plot the first derivative in the red edge (680–760 nm) for each grade.', 'Describe the changes: visible rise from chlorophyll loss, shift of the red edge to shorter wavelengths, near-infrared fall from leaf damage, short-wave-infrared rise from water loss.'],
      'Spectral response by severity level: Mahlein et al. (2013), Guo et al. (2021), Ma et al. (2026); red-edge shift under stress: Horler et al. (1983), Filella and Peñuelas (1994).')
 STEP('1.1.2', 'Correlation of each feature with the severity score',
@@ -36,12 +36,12 @@ STEP('1.1.2', 'Correlation of each feature with the severity score',
      'Correlation table and correlation curves → interpretation; used again in Steps 1.3 and 1.5.',
      ['Compute the Pearson correlation coefficient r between each feature and the severity score.', 'Plot r against wavelength for reflectance and first derivative (correlation curve).', 'Report r with its sign; p-values are not used for selection because subplots of one plot are related.'],
      'Correlation of indices and texture with severity: Ma et al. (2026), Guo et al. (2021); univariate feature screening: Liu et al. (2020).')
-STEP('1.1.3', 'Response by variety, inoculation timing and days after inoculation',
-     'A feature may respond in one variety or crop age and not in another; treatments must be considered.',
-     'Responsive features; treatment codes.',
+STEP('1.1.3', 'Response by variety, inoculation timing, growth stage, days after inoculation and weather',
+     'A feature may respond in one variety, crop age or growth stage and not in another; treatments, stage and weather must be considered.',
+     'Responsive features; covariates (Step A5).',
      'Treatment-wise response figures → Step 1.6.3 and Objective 2 robustness (Activity 2.6).',
-     ['Plot the main features against days after inoculation for each variety (V1–V3) and inoculation timing (D1–D4).', 'Compare inoculated plots with their healthy plot of the same treatment on every date.'],
-     'Treatment-wise disease response: Liu et al. (2024), Blasch et al. (2023), Feng et al. (2022).')
+     ['Plot the main features against days after inoculation for each variety (V1 PM 26, V2 Pusa Vijay, V3 PM 37) and inoculation timing (D1–D4).', 'Draw the response curves separately for the three growth stages (vegetative, flowering, pod formation), because yellow flowers and pods change canopy reflectance.', 'Compare inoculated plots with healthy plots of the same variety on every date.', 'Plot the disease progress (mean severity per date) together with the 7-day weather summaries and the favourable days since inoculation.'],
+     'Treatment-wise and stage-wise disease response: Liu et al. (2024), Blasch et al. (2023), Feng et al. (2022); flowering effects on Brassica canopy spectra: Sulik and Long (2016); weather and white rust development: Chattopadhyay et al. (2011).')
 
 # ---------------------------------------------------------------- 1.2
 H2('Activity 1.2 – Optimal wavelengths with Shapley additive explanations and competitive adaptive reweighted sampling (SHAP-CARS)')
@@ -51,7 +51,7 @@ STEP('1.2.1', 'Effective wavelength ranges from normalised difference spectral i
      'Subplot reflectance (training part).',
      'Effective wavelength ranges (regions where index pairs relate strongly to severity) → Step 1.2.2; the best pairs → Step 1.3.1.',
      ['For every pair of bands (λ_{1}, λ_{2}) compute the normalised difference spectral index NDSI and the ratio spectral index RSI (equations below); with 483 bands there are 116 403 pairs for each index.',
-      'Compute the coefficient of determination R² between each index and the severity score and draw R² contour maps (Figure [[F:dummyndsi]]).',
+      'Compute the coefficient of determination R² between each index and the severity score and draw R² contour maps ([[F:dummyndsi]]).',
       'Effective ranges = the wavelength regions that take part in pairs with R² ≥ 0.5 (as in Ma et al., 2026); if no pair reaches 0.5, use the regions of the top 5% of pairs.'],
      'Two-band NDSI and RSI searches and R² contour maps: Ma et al. (2026); optimised two-band indices for wheat diseases: Huang et al. (2014).')
 EQ('NDSI(λ_{1}, λ_{2}) = (R_{λ1} − R_{λ2}) / (R_{λ1} + R_{λ2});      RSI(λ_{1}, λ_{2}) = R_{λ1} / R_{λ2}')
@@ -63,12 +63,14 @@ CARD('ndsi', 'Exhaustive two-band index search (NDSI and RSI maps)', 'Every pair
      'Simple, visual and directly linked to index construction (Step 1.3.1).', 'Ma et al. (2026); Huang et al. (2014)')
 STEP('1.2.2', 'Shapley additive explanations (SHAP) pre-screening of the bands',
      'Inside the effective ranges there are still hundreds of correlated bands; a quick, model-based ranking removes clearly unimportant bands before the slower CARS step.',
-     'Reflectance and first-derivative bands inside the effective ranges (training part).',
+     'Reflectance and first-derivative bands inside the effective ranges, plus the first-derivative bands of the red edge (680–760 nm), which are always kept as candidates (training part).',
      'Top 40% of bands by mean absolute Shapley value → Step 1.2.3.',
-     ['Train a tree ensemble (extreme gradient boosting, 300 trees, depth 4, learning rate 0.05) to predict the severity score from the bands.',
+     ['Put the reflectance and first-derivative bands in one pool, because they are two forms of the same spectral information (one feature type); label each band as R_{λ} (reflectance) or FD_{λ} (first derivative).',
+      'Add the red-edge first-derivative bands (680–760 nm) even if the effective ranges miss part of the red edge, because the red-edge shift is a known disease indicator.',
+      'Train a tree ensemble (extreme gradient boosting, 300 trees, depth 4, learning rate 0.05) to predict the severity score from the bands; tree models do not need standardised inputs.',
       'Compute the Shapley additive explanation (SHAP) value of every band for every training sample with the tree explainer.',
-      'Rank bands by the mean absolute SHAP value and keep the top 40% (Figure [[F:dummyshap]]a).'],
-     'Shapley values: Lundberg and Lee (2017), Lundberg et al. (2020); SHAP-based band selection: Ma et al. (2026).')
+      'Rank bands by the mean absolute SHAP value and keep the top 40% ([[F:dummyshap]]a).'],
+     'Shapley values: Lundberg and Lee (2017), Lundberg et al. (2020); SHAP-based band selection: Ma et al. (2026); red edge as a disease indicator: Filella and Peñuelas (1994), Yu et al. (2021).')
 CARD('shap', 'Shapley additive explanations (SHAP)', 'From cooperative game theory: the contribution of a feature is its average effect on the prediction over all possible orders in which features are added to the model; for tree models it is computed exactly and quickly.',
      'Ranks bands by their real contribution to a non-linear model, including interactions, which simple correlation misses.', 'Tree explainer on an extreme gradient boosting model trained on the training part; ranking by mean |SHAP|; top 40% kept.',
      'Model settings (300 trees, depth 4, learning rate 0.05) fixed, because the model is only used for ranking; the kept share (30–50%) checked in the inner folds.', 'Tabular data with many correlated features and non-linear relations.',
@@ -77,20 +79,21 @@ STEP('1.2.3', 'Competitive adaptive reweighted sampling (CARS) with partial leas
      'The pre-screened bands are still strongly collinear; a small set of complementary wavelengths is needed.',
      'Pre-screened bands (training part).',
      'Optimal wavelength subset with the lowest cross-validated error → Step 1.2.4.',
-     ['Choose the number of partial least squares (PLS) components (1–15) by Monte Carlo cross-validation (MCCV: 50 random 80/20 splits of the training plots).',
+     ['Standardise every pre-screened band (mean 0 and standard deviation 1 on the training part). CARS ranks bands by the size of their PLS coefficients, which depend on units: reflectance is about 0–0.6, first-derivative values about 0.001–0.01 nm^{−1}; without standardising, one form would be favoured for numerical, not biological, reasons.',
+      'Choose the number of partial least squares (PLS) components (1–15) by Monte Carlo cross-validation (MCCV: 50 random 80/20 splits of the training plots).',
       'Run competitive adaptive reweighted sampling (CARS) for 50 iterations: in each iteration, fit PLS on a random 80% of the samples, weight every band by the absolute value of its PLS regression coefficient, remove bands by an exponentially decreasing function and then by adaptive reweighted sampling.',
-      'After every iteration compute the root-mean-square error of cross-validation (RMSECV); the subset with the minimum RMSECV is the optimal subset (Figure [[F:dummyshap]]b, c).'],
+      'After every iteration compute the root-mean-square error of cross-validation (RMSECV); the subset with the minimum RMSECV is the optimal subset ([[F:dummyshap]]b, c).'],
      'CARS: Li et al. (2009); variable selection in PLS: Mehmood et al. (2012); SHAP-CARS with MCCV for the PLS components: Ma et al. (2026).')
 FIG('dummyshap', 'g15_dummy_shapcars.png', 'Dummy example of SHAP-CARS: (a) Shapley pre-screening; (b) number of wavelengths kept in each CARS iteration; (c) the iteration with the minimum cross-validated error defines the optimal wavelengths.', 560)
 CARD('cars', 'Competitive adaptive reweighted sampling (CARS) with partial least squares (PLS)', 'Imitates "survival of the fittest": bands with large PLS regression coefficients survive, bands with small coefficients are removed step by step; the subset with the lowest cross-validated error is kept. PLS itself projects correlated bands onto a few latent components that best predict the target.',
-     'Selects a small set of non-redundant, informative wavelengths from highly collinear spectra.', '50 iterations; 80% sampling per iteration; PLS components by MCCV (50 splits, maximum 15); CARS repeated 20 times with different random seeds.',
+     'Selects a small set of non-redundant, informative wavelengths from highly collinear spectra.', 'Bands standardised before PLS; 50 iterations; 80% sampling per iteration; PLS components by MCCV (50 splits, maximum 15); CARS repeated 20 times with different random seeds.',
      'Number of PLS components (by MCCV) and number of iterations (50); because results vary between runs, wavelengths selected in at least 50% of the 20 runs are kept (stability rule).', 'Spectra with many correlated bands and a continuous target.',
      'Designed for spectra, fast and the best of the three band-selection methods in the DT-EDNet study (Ma et al., 2026); the Shapley pre-screening adds a non-linear view.', 'Li et al. (2009); Mehmood et al. (2012); Ma et al. (2026)')
 STEP('1.2.4', 'Optimal wavelengths (OW) and their stability',
      'The final wavelength set must be stable and physiologically interpretable.',
      'Optimal subsets of the 20 CARS runs.',
      'Optimal wavelengths (OW, 10–15 bands of reflectance and first derivative) → Activity 1.3, fused inputs of Objective 2 and the network configurations (Step 2.1.5).',
-     ['Count how often each wavelength is selected over the 20 runs; keep those selected in at least 50%.', 'If more than 15 remain, keep the 15 most frequent.', 'Link each wavelength to a known absorption feature (chlorophyll, red edge, water, structure) for interpretation.'],
+     ['Count how often each wavelength is selected over the 20 runs; keep those selected in at least 50%.', 'If more than 15 remain, keep the 15 most frequent.', 'Report every selected wavelength with its label (R_{λ} or FD_{λ}) and the number of each type, so that it is clear which form carries the white rust signal.', 'Link each wavelength to a known absorption feature (chlorophyll, red edge, water, structure) for interpretation.'],
      'Stability of selection: Meinshausen and Bühlmann (2010), Nogueira et al. (2018); optimal wavelengths for rice blast: Ma et al. (2026).')
 
 # ---------------------------------------------------------------- 1.3
@@ -145,7 +148,7 @@ STEP('1.4.3', 'ReliefF ranking of the indices',
      'Top five to eight indices (number chosen in the inner folds) → Step 1.6.2 and the "VI" group of Step 2.1.5.',
      ['Classes: run ReliefF with k = 10 nearest neighbours on standardised indices; neighbours from the same plot are excluded so that a subplot is not compared with its own plot.',
       'Severity score: run RReliefF, the regression version, in the same way.',
-      'Rank the indices by their weight and keep the top five (as in Ma et al., 2026); check 3–8 in the inner folds (Figure [[F:dummyrelief]]a).'],
+      'Rank the indices by their weight and keep the top five (as in Ma et al., 2026); check 3–8 in the inner folds ([[F:dummyrelief]]a).'],
      'ReliefF and RReliefF: Robnik-Šikonja and Kononenko (2003), Urbanowicz et al. (2018); ReliefF for disease indices: Mahlein et al. (2013), Huang et al. (2014); Relief for vegetation indices in rice blast: Ma et al. (2026).')
 EQ('W_{j} ← W_{j} − diff(j, x, H)/m + Σ_{c≠class(x)} [P(c)/(1 − P(class(x)))] diff(j, x, M_{c})/m')
 P('For each sampled subplot x, H is its nearest neighbour of the same class (nearest hit) and M_{c} its nearest neighbour of another class c (nearest miss); diff is the absolute difference of feature j. A feature gains weight when it differs between classes and loses weight when it differs within a class. **Worked example (dummy data):** for one sample, index A differs by 0.05 from its hit and by 0.40 from its misses, so its weight rises by about (0.40 − 0.05)/m; index B differs by 0.30 from both and gains nothing.')
@@ -161,7 +164,7 @@ STEP('1.5.1', 'Principal component analysis (PCA) texture of the hyperspectral c
      'Texture of 483 bands would give almost 4000 redundant features.',
      'Masked hyperspectral cube (Step D5).',
      '24 texture features (8 measures × 3 principal components, for example PC2-Dis = dissimilarity of component 2) → Step 1.5.2.',
-     ['Fit principal component analysis on vegetation pixels of the training data and keep the first three components (cumulative variance above 95%; Figure [[F:dummyrelief]]b).', 'Compute the eight GLCM measures on each component image (Step D5) and average them over the vegetation pixels of each subplot.'],
+     ['Fit principal component analysis on vegetation pixels of the training data and keep the first three components (cumulative variance above 95%; [[F:dummyrelief]]b).', 'Compute the eight GLCM measures on each component image (Step D5) and average them over the vegetation pixels of each subplot.'],
      'Texture from principal-component images: Guo et al. (2021), Ma et al. (2026); GLCM: Haralick et al. (1973), Hall-Beyer (2017).')
 STEP('1.5.2', 'Within-group redundancy filter',
      'Some texture measures are almost identical (for example contrast and dissimilarity).',
@@ -173,7 +176,7 @@ STEP('1.5.3', 'Minimum redundancy maximum relevance (mRMR) selection of texture'
      'Thinned texture group (training part).',
      'Top six texture features (TF1–TF6) → Step 1.5.4 and the "TF" group of Step 2.1.5.',
      ['Estimate the relevance of each texture feature as its mutual information with the severity class (or score).',
-      'Select features one at a time: the next feature is the one with the largest relevance minus its mean mutual information with the features already selected (Figure [[F:dummyrelief]]c).',
+      'Select features one at a time: the next feature is the one with the largest relevance minus its mean mutual information with the features already selected ([[F:dummyrelief]]c).',
       'Stop at six features (as in Ma et al., 2026); check 4–8 in the inner folds.'],
      'mRMR: Peng et al. (2005); mRMR for texture features of rice blast: Ma et al. (2026); mRMR for UAV and satellite disease features: Yuan et al. (2025).')
 EQ('next feature = arg max_{j} [ I(f_{j}; y) − (1/|S|) Σ_{s∈S} I(f_{j}; f_{s}) ]')
@@ -190,7 +193,7 @@ STEP('1.5.4', 'Construction of the Tri-band Texture Fusion Index (TTFI)',
      'Best TTFI (strongest correlation with severity) → Step 1.6.2 and the network configurations (Step 2.1.5).',
      ['Form all ordered triplets (TF1, TF2, TF3) of the six texture features: 6 × 5 × 4 = 120 triplets.',
       'For every triplet compute the three Tri-band Texture Fusion Indices (equations below), giving 360 candidates.',
-      'Compute the correlation of every candidate with the severity score; keep the best candidate of each formula for description (Figure [[F:dummyttfi]]) and the overall best TTFI as the texture index used in modelling.'],
+      'Compute the correlation of every candidate with the severity score; keep the best candidate of each formula for description ([[F:dummyttfi]]) and the overall best TTFI as the texture index used in modelling.'],
      'Tri-band Texture Fusion Index: Ma et al. (2026).')
 EQ('TTFI1 = (TF1 + TF2) / TF3;      TTFI2 = TF1 × TF2 / TF3;      TTFI3 = TF1 × (TF1 + TF2) / (TF2 + TF3)')
 P('**Worked example (dummy data).** With TF1 = 0.8, TF2 = 1.2 and TF3 = 0.5: TTFI1 = (0.8 + 1.2) / 0.5 = 4.00; TTFI2 = 0.8 × 1.2 / 0.5 = 1.92; TTFI3 = 0.8 × (0.8 + 1.2) / (1.2 + 0.5) = 0.94. Texture values are used on their original (positive) scale; a small constant is added to a denominator that can approach zero.')
@@ -226,7 +229,7 @@ STEP('1.6.3', 'Response by treatment and complementarity of cameras',
      'Shows whether the selected features behave the same in all varieties and inoculation timings and whether the cameras carry different information.',
      'Disease-specific feature sets; treatment codes.',
      'Treatment-wise response figures; correlation matrix between the cameras → Objective 2 interpretation.',
-     ['Plot the selected features against days after inoculation for each variety and inoculation timing.', 'Compute the correlation matrix between the selected features of the four cameras (for example thermal difference vs short-wave-infrared water indices).', 'Check that selected features do not simply follow flower % or canopy cover (correlation with the covariates).'],
+     ['Plot the selected features against days after inoculation for each variety and inoculation timing.', 'Compute the correlation matrix between the selected features of the four cameras (for example thermal difference vs short-wave-infrared water indices).', 'Check that the selected features respond within each growth stage (vegetative, flowering, pod formation), so that they are not only flowering or stage effects.'],
      'Sensor complementarity: Mahlein et al. (2019), Maimaitijiang et al. (2020); flowering effects in Brassica: Sulik and Long (2016).')
 STEP('1.6.4', 'Outputs of Objective 1',
      'Summarises what Objective 1 delivers to the other objectives.',
@@ -238,12 +241,12 @@ BOX('Link to satellite monitoring (optional extension, not part of the six-month
 
 # =====================================================================================
 H1('4. Objective 2 – Detection and severity discrimination through AI-based multimodal data fusion')
-P('Objective 2 builds and compares predictive models on the 1536 post-symptomatic samples of each camera. Three tasks are modelled: (A) healthy vs diseased, (B) severity classes and (C) severity score. Two comparisons are made: (1) all 15 sensor sets with machine learning, feature-fusion neural networks and the pseudo-image networks; (2) on the hyperspectral feature groups, DT-EDNet against EfficientNet, ResNet18 and ConvNeXt V2, repeating the design of Ma et al. (2026) with plot-grouped validation.')
+P('Objective 2 builds and compares predictive models on the 1536 post-symptomatic samples of each camera. For every single camera and for every combination of cameras (15 sensor sets), classification models (Task A, healthy vs diseased; Task B, severity classes) and regression models (Task C, severity score) are developed with all model families, so that the performance of every camera and every combination can be compared on the same folds ([[T:modelmatrix]]). In combinations, thermal, multispectral and red–green–blue features are added to the hyperspectral features by feature-level fusion for all models, including DT-EDNet and the comparison networks. A second comparison repeats the design of Ma et al. (2026) on the hyperspectral feature groups, with plot-grouped validation.')
 FIG('obj2', 'g06_obj2.png', 'Flow chart of Objective 2 (Activities 2.1–2.6).', 540)
 TAB('o2act', [['Activity', 'Steps', 'Main output'], ['2.1 Tasks and inputs', '2.1.1–2.1.5', 'task labels; fused feature sets of 15 sensor sets; hyperspectral feature-group configurations'],
     ['2.2 Machine-learning models', '2.2.1–2.2.6', 'tuned support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares models'],
     ['2.3 Deep-learning models', '2.3.1–2.3.8', 'feature-fusion networks and pseudo-image networks (DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2)'],
-    ['2.4 Evaluation', '2.4.1–2.4.3', 'metric tables'], ['2.5 Comparison, ablation and interpretation', '2.5.1–2.5.4', 'best sensor set and model; contribution of each camera; module ablation; Shapley explanation'],
+    ['2.4 Evaluation', '2.4.1–2.4.3', 'metric tables'], ['2.5 Comparison, ablation and interpretation', '2.5.1–2.5.5', 'best sensor set and model; contribution of each camera; module ablation; Shapley explanation; gain over the covariate baseline'],
     ['2.6 Robustness and maps', '2.6.1–2.6.3', 'results by treatment; transfer tests; severity maps']], 'Activities of Objective 2.', [2900, 1300, 5106])
 
 # ---------------------------------------------------------------- 2.1
@@ -252,7 +255,7 @@ STEP('2.1.1', 'Three tasks and class balance',
      'Defines the three prediction problems and handles unequal class sizes.',
      'Post-symptomatic dataset with labels (Step A4).',
      'Three labelled task datasets → all models.',
-     ['Task A, detection: healthy (grade 0) vs diseased (grade above 0).', 'Task B, severity classes: grades 0, 1, 3, 5, 7, 9 (merged if a class has fewer than 5% of samples).', 'Task C, regression: severity score.', 'Class weights (Step E6) for all classifiers; macro-averaged metrics.'],
+     ['Task A, detection: healthy (grade 0) vs diseased (grade above 0).', 'Task B, severity classes: grades 0, 1, 3, 5, 7, 9 (merged if a class has fewer than 5% of samples).', 'Task C, regression: severity score.', 'Class weights (Step E4) for all classifiers; macro-averaged metrics.'],
      'Detection, severity classes and regression together: Tian et al. (2021), Feng et al. (2022), Abdulridha et al. (2023); three-class healthy, mild and severe classification: Yuan et al. (2025).')
 STEP('2.1.2', 'Fold-wise feature selection for each camera',
      'Features must be selected without the test replication.',
@@ -264,7 +267,7 @@ STEP('2.1.3', 'Feature-level fusion for the 15 sensor sets',
      'Combinations of cameras need one input vector per sample.',
      'Disease-specific feature sets of the cameras.',
      'Fused feature set of each sensor set, fold and task → all models.',
-     ['Single camera (S1–S4): its disease-specific feature set is the input.', 'Combination (S5–S15): concatenate the feature sets of its cameras and apply the variance inflation factor rule (below 10) again across cameras.', 'Standardise with training statistics (Step E5).'],
+     ['Single camera (S1–S4): its disease-specific feature set is the input.', 'Combination (S5–S15): concatenate the feature sets of its cameras (thermal, multispectral and red–green–blue features added to the hyperspectral features) and apply the variance inflation factor rule (below 10) again across cameras.', 'Standardise with training statistics (Step E3).', 'The same fused set is the input of every model: machine learning, DNN-F1, DNN-F2 and the pseudo-image networks.'],
      'Feature-level fusion of spectral, thermal and texture features: Feng et al. (2022), Liu et al. (2024); fusion levels: Ghamisi et al. (2019); input- and intermediate-level fusion: Maimaitijiang et al. (2020).')
 FIG('combinations', 'g10_combinations.png', 'The 15 sensor sets: 4 single cameras, 6 pairs, 4 triples and all four.', 520)
 TAB('sets', [['Set', 'Cameras', 'Question it answers'], ['S1', 'hyperspectral', 'reference: what the most detailed camera achieves'], ['S2', 'multispectral', 'what a low-cost, satellite-like camera achieves'], ['S3', 'red–green–blue', 'what a consumer camera achieves'], ['S4', 'thermal', 'what canopy temperature alone achieves'],
@@ -272,6 +275,13 @@ TAB('sets', [['Set', 'Cameras', 'Question it answers'], ['S1', 'hyperspectral', 
     ['S9', 'multispectral + thermal', 'low-cost spectral + thermal pair'], ['S10', 'red–green–blue + thermal', 'cheapest pair'], ['S11', 'hyperspectral + multispectral + red–green–blue', 'all optical cameras (is thermal needed?)'], ['S12', 'hyperspectral + multispectral + thermal', 'is red–green–blue needed?'],
     ['S13', 'hyperspectral + red–green–blue + thermal', 'is multispectral needed when hyperspectral is present?'], ['S14', 'multispectral + red–green–blue + thermal', 'all low-cost cameras'], ['S15', 'all four', 'full system; basis of the drop-one-camera ablation']],
     'The 15 sensor sets.', [900, 3600, 4806])
+TAB('modelmatrix', [['Model family', 'Models', 'Sensor sets', 'Classification (Tasks A, B)', 'Regression (Task C)'],
+    ['Machine learning', 'support vector machine / regression, random forest, extreme gradient boosting, k-nearest neighbours, partial least squares (discriminant analysis / regression)', 'all 15', 'yes', 'yes'],
+    ['Feature-fusion networks', 'DNN-F1', 'all 15', 'yes', 'yes'],
+    ['', 'DNN-F2 (one branch per camera)', 'the 11 combinations (S5–S15)', 'yes', 'yes'],
+    ['Pseudo-image networks', 'DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2-Atto', 'all 15 (fused features of all cameras in the set)', 'yes', 'yes (linear output)'],
+    ['Covariate models (Step 2.5.5)', 'best machine-learning model', 'covariates only; best sensor sets + covariates', 'yes', 'yes']],
+    'Every model is built for every sensor set and task on the same folds, so that single cameras and combinations can be compared directly.', [1800, 3200, 1800, 1300, 1206])
 STEP('2.1.4', 'Final compact set by sequential floating forward selection (SFFS) for the machine-learning models',
      'Different models use features differently, and a small final set improves generalisation and interpretation.',
      'Fused feature set (training part).',
@@ -300,7 +310,7 @@ P('Five machine-learning model families are used for classification and their re
 STEP('2.2.1', 'Support vector machine (SVM) and support vector regression (SVR)',
      'A robust classifier and regressor for a few hundred to a few thousand samples with correlated features.',
      'Optimum feature combination (standardised).', 'Predictions on the test replication → Activity 2.4.',
-     ['Radial basis function kernel; class weights for classes; one-vs-one for several classes.', 'Tune C, γ (and ε for regression) by grid search in the inner folds (Table [[T:mlgrid]]).'],
+     ['Radial basis function kernel; class weights for classes; one-vs-one for several classes.', 'Tune C, γ (and ε for regression) by grid search in the inner folds ([[T:mlgrid]]).'],
      'Cortes and Vapnik (1995); Mountrakis et al. (2011); disease applications: Tian et al. (2021), Mustafa et al. (2023), Yuan et al. (2025).')
 CARD('svm', 'Support vector machine (SVM) and support vector regression (SVR)', 'Finds the boundary with the largest margin between classes (or a tube of width ε around the regression line); the kernel maps the data so that curved boundaries become possible.',
      'Non-linear classification and regression with limited samples.', 'Radial basis function kernel; class weights; standardised inputs.',
@@ -342,7 +352,7 @@ CARD('pls', 'Partial least squares discriminant analysis (PLS-DA) and regression
      'Linear reference used in most hyperspectral disease studies (for example yellow rust monitoring by Guo et al., 2021).', 'Wold et al. (2001); Barker and Rayens (2003)')
 STEP('2.2.6', 'Tuning grids of the machine-learning models',
      'All models must be tuned in the same honest way.', 'Inner folds (Step F2).', 'Tuned hyper-parameters of every model, fold and sensor set → final training.',
-     ['Use the grids in Table [[T:mlgrid]]; choose the combination with the best mean inner score.'], 'Kuhn and Johnson (2013); Cawley and Talbot (2010).')
+     ['Use the grids in [[T:mlgrid]]; choose the combination with the best mean inner score.'], 'Kuhn and Johnson (2013); Cawley and Talbot (2010).')
 TAB('mlgrid', [['Model', 'Tasks', 'Hyper-parameters tuned (inner cross-validation)'], ['Support vector machine / regression', 'A, B / C', 'C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5} (regression)'],
     ['Random forest', 'A, B, C', '500 trees; features per split ∈ {√p, 0.3p}; minimum leaf size ∈ {1, 3, 5}'], ['Extreme gradient boosting', 'A, B, C', 'trees ∈ {200, 500}; depth ∈ {3, 5}; learning rate ∈ {0.05, 0.1}; subsample 0.8'],
     ['k-nearest neighbours', 'A, B, C', 'k ∈ {3, 5, 7, 9, 11}; uniform or distance weights'], ['Partial least squares (discriminant analysis / regression)', 'A, B / C', 'number of latent variables 1–15']],
@@ -370,11 +380,12 @@ STEP('2.3.3', 'Pseudo-image construction',
      'Convolutional and transformer networks need a two-dimensional input, but each sample is a feature vector.',
      'Fused feature set or hyperspectral configuration (standardised).',
      'One-channel pseudo-image of k × k pixels per sample → Steps 2.3.4–2.3.7.',
-     ['Order the features by group and, within the spectral group, by wavelength (optimal wavelengths, indices, texture, TTFI, then other cameras), so that neighbouring pixels hold related features.',
-      'Choose k = the smallest integer with k² ≥ number of features (minimum 3); fill the k × k grid row by row.',
+     ['Order the features by camera (hyperspectral, multispectral, red–green–blue, thermal) and, within the hyperspectral camera, by group and wavelength (optimal wavelengths, indices, texture, TTFI), so that neighbouring pixels hold related features.',
+      'Choose k so that the k × k grid holds all features when every camera starts on a new row (minimum 3); fill the grid row by row. A small group such as the thermal features then stays together in one row and is not split.',
       'Fill the remaining pixels with zeros (zero is the training mean after standardisation, so padding adds no information).',
-      'Example: 22 features → 5 × 5 image with 3 padded pixels (Figure [[F:pseudo]]).'],
-     'Pseudo-two-dimensional input of spectral features: Ma et al. (2026); arranging non-image features as images for convolutional networks: Sharma et al. (2019).')
+      'Example (hyperspectral only): 22 features → 5 × 5 image with 3 padded pixels ([[F:pseudo]]). Example (S7, hyperspectral + thermal): 16 hyperspectral features fill three rows of six, the 6 thermal features fill the fourth row and two empty rows complete a 6 × 6 image.'],
+     'Pseudo-two-dimensional input of spectral features: Ma et al. (2026); arranging non-image features as images for convolutional networks: Sharma et al. (2019); attention relates features regardless of their position: Vaswani et al. (2017).',
+     note='Ma et al. (2026) used DT-EDNet with hyperspectral features only. Its use with thermal, multispectral and red–green–blue features is an extension made in this study; whether it helps is shown by comparing each fused set with the hyperspectral set (S1) and with DNN-F2, which processes each camera in its own branch.')
 FIG('pseudo', 'g18_pseudoimage.png', 'Construction of a pseudo-image from a standardised feature vector (dummy values).', 540)
 CARD('pseudo', 'Pseudo-image (feature-to-image) representation', 'Places the features of one sample on a small grid so that convolution and attention can relate neighbouring and distant features.',
      'Allows image networks to be applied to tabular features.', 'Group-and-wavelength ordering; k = ⌈√p⌉ (minimum 3); zero padding after standardisation; one channel.',
@@ -393,7 +404,7 @@ FIG('dtednet', 'g19_dtednet.png', 'Architecture of DT-EDNet (after Ma et al., 20
 EQ('Attention(Q, K, V) = softmax( Q K^{T} / √d ) V')
 P('In self-attention every token forms a query Q, a key K and a value V; the softmax of the scaled products Q K^{T} decides how much each token takes from every other token, d being the token length per head (128 / 4 = 32). This is how a red-edge wavelength can be related directly to a texture feature placed far away on the pseudo-image.')
 CARD('dtednet', 'DT-EDNet (Dual Transformer Early Detection Network)', 'A hybrid network: convolution embeds the pseudo-image, squeeze-and-excitation re-weights channels, the Kernel Transformer Block (convolution + CBAM) learns local spatial–channel patterns and the Token Transformer Blocks (multi-head self-attention) learn global relations; the class token summarises the sample.',
-     'Models both local and long-range interactions among selected spectral, index and texture features.', 'Embedding 128; SE block; 1 Kernel Transformer Block + 4 Token Transformer Blocks; 4 heads; dropout 0.03; trained from scratch.',
+     'Models both local and long-range interactions among selected spectral, index and texture features.', 'Embedding 128; SE block; 1 Kernel Transformer Block + 4 Token Transformer Blocks; 4 heads; dropout 0.03; trained from scratch; input = fused features of all cameras in the sensor set (each camera on its own rows).',
      'Fixed architecture as published; learning rate and dropout tuned in the inner folds (Step 2.3.8).', 'Sets of a few to a few tens of ordered features with complex interactions; best with thousands of samples.',
      'Highest accuracy on rice blast (overall accuracy 95.25% with optimal wavelengths + indices + TTFI) against EfficientNet, ResNet18 and ConvNeXt V2 (Ma et al., 2026); tested here under plot-grouped validation.', 'Ma et al. (2026); Hu et al. (2018); Woo et al. (2018); Vaswani et al. (2017)')
 STEP('2.3.5', 'EfficientNet (comparison network)',
@@ -424,7 +435,7 @@ STEP('2.3.8', 'Common training protocol and tuning of the pseudo-image networks'
       'Loss: cross-entropy with label smoothing 0.01 and class weights (classes); mean squared error (score).',
       'Gradient clipping at a maximum norm of 1.2; early stopping with patience 60 epochs and minimum improvement 5 × 10^{−5}.',
       'Model selection on the inner validation plots (macro-F1 for classes because the classes are unequal; root-mean-square error for the score), not on a random 10% of samples.',
-      'Tuning: learning rate ∈ {3 × 10^{−4}, 6 × 10^{−4}, 1 × 10^{−3}} and dropout ∈ {0.03, 0.1, 0.3}, same grid for all four networks.',
+      'Tuning: learning rate ∈ {3 × 10^{−4}, 6 × 10^{−4}, 1 × 10^{−3}} and dropout ∈ {0.03, 0.1, 0.3}, same grid for all four networks. To keep the computing load feasible (about 34 000 runs if every case were tuned), each network is tuned once, on outer fold 1, sensor set S15 and Task B with one seed, and the chosen values are then used for all sensor sets, tasks and folds (about 3800 runs).',
       'Five random seeds (42 and four others); report mean ± standard deviation.'],
      'Training settings: Ma et al. (2026); AdamW: Loshchilov and Hutter (2019); cosine annealing: Loshchilov and Hutter (2017); label smoothing: Szegedy et al. (2016), Müller et al. (2019); gradient clipping: Pascanu et al. (2013).')
 CARD('train', 'Training techniques (AdamW, cosine annealing, label smoothing, gradient clipping, early stopping)', 'AdamW adapts the step size of every weight and applies weight decay separately; cosine annealing lowers the learning rate smoothly; label smoothing replaces hard 0/1 targets with slightly softened ones; gradient clipping limits very large updates; early stopping ends training when the validation score stops improving.',
@@ -450,7 +461,7 @@ STEP('2.4.2', 'Regression metrics',
 EQ('R^{2} = 1 − Σ (y − ŷ)^{2} / Σ (y − ȳ)^{2};    RMSE = √[ (1/n) Σ (y − ŷ)^{2} ];    RPD = SD_{y} / RMSE')
 STEP('2.4.3', 'Worked example of the metrics',
      'Shows how the numbers in the result tables are obtained.', 'Dummy confusion matrix and dummy predictions.', 'Example values (below).',
-     ['Classification: from the confusion matrix in Figure [[F:dummycm]] (532 test samples), 396 are on the diagonal, so overall accuracy = 396 / 532 = 0.744; chance agreement p_{e} = 0.182, so κ = (0.744 − 0.182) / (1 − 0.182) = 0.687; quadratic-weighted kappa = 0.937 (most errors are between neighbouring grades); macro-F1 = 0.733; 97.4% of predictions are within one grade.',
+     ['Classification: from the confusion matrix in [[F:dummycm]] (532 test samples), 396 are on the diagonal, so overall accuracy = 396 / 532 = 0.744; chance agreement p_{e} = 0.182, so κ = (0.744 − 0.182) / (1 − 0.182) = 0.687; quadratic-weighted kappa = 0.937 (most errors are between neighbouring grades); macro-F1 = 0.733; 97.4% of predictions are within one grade.',
       'Regression: for eight dummy subplots with observed scores 0, 1, 3, 5, 7, 9, 3, 5 and predictions 0.4, 1.6, 2.5, 5.8, 6.1, 8.2, 3.9, 4.4: R² = 0.94, RMSE = 0.71 and RPD = 3.00 / 0.71 = 4.2.'],
      'Cohen (1960); Sokolova and Lapalme (2009); Chang et al. (2001).')
 FIG('dummycm', 'g22_dummy_cm.png', 'Dummy confusion matrix of one test replication (six grades).', 360)
@@ -492,6 +503,18 @@ CARD('ablation', 'Ablation and Shapley interpretation', 'Ablation removes one pa
      'Direct, easy-to-explain evidence of contribution; both used in the DT-EDNet study.', 'Ma et al. (2026); Lundberg and Lee (2017)')
 
 # ---------------------------------------------------------------- 2.6
+STEP('2.5.5', 'Covariate baseline and sensor + covariate models',
+     'Severity rises with days after inoculation and differs with variety, inoculation timing, growth stage and weather; a sensor model could look accurate only because it learns time or stage. The cameras must add information beyond these known factors.',
+     'Covariates (Step A5); fused feature sets of the sensor sets; same folds.',
+     'Accuracy of the covariate-only model, of the sensor models and of the sensor + covariate models → evidence of what the cameras add.',
+     ['Covariate-only model: the best machine-learning model (Activity 2.2) with days after inoculation, variety, inoculation timing, growth stage and the weather summaries as the only inputs, for Tasks A, B and C.',
+      'Sensor models (main results, Activities 2.2–2.3): a sensor set is reported as useful only if it is better than the covariate-only model.',
+      'Sensor + covariate models: the best three sensor sets with the covariates added (one-hot variety and inoculation timing, ordinal growth stage, numeric days after inoculation and weather), to show whether known context improves prediction.',
+      'Report all three side by side for every task; label models that contain weather as "within-season" (Step A5).'],
+     'Combining weather with remote sensing compared with a weather-only model: Zhang et al. (2014); weather-based white rust forecasting: Chattopadhyay et al. (2011); stage-dependent disease signals: Blasch et al. (2023); simple baseline models as a reference for predictive models: Kuhn and Johnson (2013).')
+TAB('covex', [['Model (dummy results, Task B)', 'Inputs', 'Macro-F1', 'Gain over covariate model'], ['Covariate-only', 'days after inoculation, variety, timing, stage, weather', '0.41', '—'], ['Hyperspectral (S1)', 'S1 fused features', '0.66', '+0.25'],
+    ['Hyperspectral + thermal (S7)', 'S7 fused features', '0.69', '+0.28'], ['Hyperspectral + thermal + covariates', 'S7 features + covariates', '0.71', '+0.30 (within-season)']],
+    'Worked example (dummy data): how the covariate baseline is used to show what the cameras add.', [2700, 3200, 1300, 2106])
 H2('Activity 2.6 – Robustness and maps')
 STEP('2.6.1', 'Performance by treatment',
      'A model may work for one variety or crop age and fail for another.',
@@ -500,7 +523,7 @@ STEP('2.6.1', 'Performance by treatment',
 STEP('2.6.2', 'Leave-one-variety-out and leave-one-timing-out tests',
      'Tests whether models transfer to a variety or crop age not seen in training.',
      'Best machine-learning and best deep-learning model of the three best sensor sets.', 'Transfer results → conclusions on robustness.',
-     ['Train on two varieties and test on the third (mainly V1 ↔ V2, because the resistant variety has few diseased samples).', 'Train on three inoculation timings and test on the fourth.'],
+     ['Train on two varieties and test on the third, for each variety in turn (V1 PM 26, V2 Pusa Vijay, V3 PM 37); a variety with very few diseased samples is used only for the detection task.', 'Train on three inoculation timings and test on the fourth.', 'All results come from one season; transfer to another season needs an independent test with data of that season, as done across years by Ma et al. (2026).'],
      'Blocked validation for extrapolation: Roberts et al. (2017); independent-year test: Ma et al. (2026).')
 STEP('2.6.3', 'Severity maps',
      'Field users need maps rather than tables.',
@@ -523,7 +546,7 @@ H2('Activity 3.2 – Normalisation to healthy plots')
 STEP('3.2.1', 'Healthy-plot normalisation of all features',
      'Early disease changes are small compared with date, weather, variety and crop-age differences.',
      'Pre-symptomatic features; healthy-plot features of the same date and variety (training replications).', 'Healthy-normalised features → Activity 3.3.',
-     ['Apply Step E3 to every feature: z_{h} = (x − mean_{healthy}) / SD_{healthy}, with the healthy plots of the same date and variety in the training replications.', 'Apply the same reference to the test samples.'],
+     ['Apply Step E2 to every feature: z_{h} = (x − mean_{healthy}) / SD_{healthy}, with the healthy plots of the same date and variety in the training part (rotated healthy plots, [[T:healthyrot]]).', 'Apply the same reference to the test samples.'],
      'Oerke et al. (2006); Zarco-Tejada et al. (2018); Calderón et al. (2014); Poblete et al. (2023).')
 H2('Activity 3.3 – Pre-symptomatic feature selection')
 STEP('3.3.1', 'Selection with the pre-symptomatic labels',
@@ -535,13 +558,13 @@ H2('Activity 3.4 – Pre-symptomatic models')
 STEP('3.4.1', 'Models for the 15 sensor sets',
      'Detection must be tested for each camera and combination.',
      'Pre-symptomatic feature sets.', 'Trained models and test predictions → Activity 3.5.',
-     ['Machine learning: support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares, with the grids of Table [[T:mlgrid]].', 'Feature-fusion networks: DNN-F1 and DNN-F2 with smaller layers (32 and 16 units) and stronger dropout (0.4).', 'Same folds as Objective 2.'],
+     ['Machine learning: support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares, with the grids of [[T:mlgrid]].', 'Feature-fusion networks: DNN-F1 and DNN-F2 with smaller layers (32 and 16 units) and stronger dropout (0.4).', 'Same folds as Objective 2.'],
      'Zhu et al. (2017); Tian et al. (2021); Yu et al. (2025); Srivastava et al. (2014).')
 H2('Activity 3.5 – Evaluation, earliest detection day and risk maps')
 STEP('3.5.1', 'Pre-symptomatic metrics, area under the curve (AUC) and earliest detection day',
      'Shows how early, with which sensor set and with what reliability white rust can be predicted.',
      'Test predictions with days after inoculation.', 'Accuracy tables; earliest detection day of every sensor set.',
-     ['Classification: sensitivity, specificity, balanced accuracy and AUC; regression: R² and RMSE of the later score.', 'Compute balanced accuracy separately for each pre-symptomatic date; the earliest detection day is the first date on which it reaches 0.70 (Figure [[F:earliest]]).', 'Report the earliest detection day separately for each variety and inoculation timing.'],
+     ['Classification: sensitivity, specificity, balanced accuracy and AUC; regression: R² and RMSE of the later score.', 'Compute balanced accuracy separately for each pre-symptomatic date; the earliest detection day is the first date on which it reaches 0.70 ([[F:earliest]]).', 'Report the earliest detection day separately for each variety and inoculation timing.'],
      'Fawcett (2006); Mahlein et al. (2019); Zarco-Tejada et al. (2018).')
 FIG('earliest', 'g23_dummy_earliest.png', 'Dummy example of balanced accuracy by days after inoculation and the earliest detection day of each sensor set.', 460)
 TAB('earlyex', [['Days after inoculation (dummy)', '3', '6', '9', '12', '15'], ['Hyperspectral + thermal: balanced accuracy', '0.55', '0.62', '0.71', '0.78', '0.81'], ['Red–green–blue: balanced accuracy', '0.45', '0.47', '0.55', '0.65', '0.69']],
@@ -555,3 +578,9 @@ STEP('3.5.2', 'Risk maps',
      'Best pre-symptomatic model; subplot features of each pre-symptomatic date.', 'Maps of the predicted infection probability of every subplot.',
      ['Map the predicted probability of later infection for every subplot and pre-symptomatic date.', 'Compare the maps with the later observed severity.'],
      'Zarco-Tejada et al. (2018); Yu et al. (2025).')
+STEP('3.5.3', 'Covariate baseline for the pre-symptomatic stage',
+     'Before symptoms, infection depends strongly on weather after inoculation and on variety; the cameras must be shown to detect more than these factors.',
+     'Covariates (Step A5) of the pre-symptomatic dates; pre-symptomatic models.',
+     'Accuracy of the covariate-only model compared with the sensor models → evidence that the early signal comes from the plants.',
+     ['Fit the best machine-learning model with days after inoculation, variety, inoculation timing, growth stage and the weather summaries only.', 'Report the sensor models and the best sensor set + covariates next to it, as in Step 2.5.5.'],
+     'Zhang et al. (2014); Chattopadhyay et al. (2011); Zhu et al. (2017).')

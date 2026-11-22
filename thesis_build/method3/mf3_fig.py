@@ -41,11 +41,11 @@ def chain(name, title, steps, k, w=11):
 
 # ======================= FLOW CHARTS =======================
 fig, ax = canvas(11, 14.6)
-rows = [('Common Activity A – Field experiment, ground truth and datasets', 'four inoculation timings × three varieties × three replications + twelve healthy plots = 48 plots; four scored subplots per plot\nflight dates with hyperspectral, multispectral, red–green–blue and thermal cameras; post-symptomatic and pre-symptomatic datasets', 'nav'),
+rows = [('Common Activity A – Field experiment, ground truth, covariates and datasets', 'four inoculation timings × three varieties (PM 26, Pusa Vijay, PM 37) × three replications + twelve healthy plots = 48 plots; four scored subplots\ncovariates: days after inoculation, variety, timing, growth stage, weather; post-symptomatic and pre-symptomatic datasets', 'nav'),
         ('Common Activity B – Image pre-processing', 'radiometric calibration → mosaics → hyperspectral cube quality control → projection and co-registration → resampling to the hyperspectral grid', 'nav'),
         ('Common Activity C – Endmember extraction and vegetation mask', 'minimum noise fraction → pixel purity index → n-dimensional visualisation → endmember library → spectral angle mapper classes\n→ vegetation mask (soil, grass and shadow removed; leaves and flowers kept)', 'nav'),
         ('Common Activity D – Subplot spectra and feature extraction', 'mean of vegetation pixels per subplot → reflectance, first derivative, red-edge parameters, vegetation indices,\nprincipal-component texture, multispectral, colour and thermal features', 'nav'),
-        ('Common Activity E – Normalisation and data preparation', 'consistency between dates → thermal normalisation → healthy-plot normalisation → sample quality screening\n→ standardisation with training statistics → class weights', 'gold'),
+        ('Common Activity E – Normalisation and data preparation', 'thermal normalisation → healthy-plot normalisation (healthy plots rotated across folds)\n→ standardisation with training statistics → class weights', 'gold'),
         ('Common Activity F – Validation design and tuning', 'leave-one-replication-out outer folds grouped by plot; inner grouped folds for selection and tuning; leakage checklist', 'gold'),
         ('Objective 1 – Characterisation (Activities 1.1–1.6)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and Tri-band Texture Fusion Index → feature sets', 'o1'),
         ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.6), 1536 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
@@ -94,7 +94,7 @@ chain('g06_obj2.png', 'Objective 2 – Detection and severity discrimination (Ac
     ('Activity 2.2  Machine-learning models', 'support vector machine, random forest, extreme gradient boosting, k-nearest\nneighbours, partial least squares', 'predictions'),
     ('Activity 2.3  Deep-learning models', 'feature-fusion networks (DNN-F1, DNN-F2) and pseudo-image networks\n(DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2)', 'predictions'),
     ('Activity 2.4  Evaluation', 'overall accuracy, kappa, macro recall and F1, per-class scores; R², RMSE, RPD', 'metric tables'),
-    ('Activity 2.5  Comparison, ablation and interpretation', 'best model per sensor set; fusion gain; drop-one-sensor; DT-EDNet module ablation; SHAP', 'best sensor set and model'),
+    ('Activity 2.5  Comparison, ablation and interpretation', 'best model per sensor set; fusion gain; drop-one-sensor; DT-EDNet ablation;\nSHAP; gain over the covariate-only baseline', 'best sensor set and model'),
     ('Activity 2.6  Robustness and maps', 'results by variety and inoculation timing; leave-one-variety-out; subplot maps', 'robustness tables, maps')], 'o2')
 
 chain('g07_obj3.png', 'Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5)', [
@@ -102,7 +102,7 @@ chain('g07_obj3.png', 'Objective 3 – Pre-symptomatic prediction (Activities 3.
     ('Activity 3.2  Normalisation to healthy plots', 'feature minus mean of healthy plots of the same date and variety', 'normalised features'),
     ('Activity 3.3  Feature selection', 'same one-method-per-feature-type procedure with pre-symptomatic labels', 'pre-symptomatic feature sets'),
     ('Activity 3.4  Models for 15 sensor sets', 'machine-learning models and feature-fusion neural networks (smaller)', 'predictions'),
-    ('Activity 3.5  Earliest detection and risk maps', 'sensitivity, specificity, balanced accuracy, AUC by day after inoculation', 'earliest detection day; maps')], 'o3')
+    ('Activity 3.5  Earliest detection and risk maps', 'sensitivity, specificity, balanced accuracy, AUC by day after inoculation;\ncovariate-only baseline', 'earliest detection day; maps')], 'o3')
 
 chain('g08_selection.png', 'One feature-selection method for each feature type (inside each training fold)', [
     ('Spectral bands (reflectance + first derivative)', 'SHAP-CARS: Shapley pre-screening, then competitive adaptive reweighted sampling', '10–15 optimal wavelengths'),
@@ -114,20 +114,18 @@ chain('g08_selection.png', 'One feature-selection method for each feature type (
     ('Across groups', 'variance inflation factor below 10', 'disease-specific feature set')], 'o1')
 
 
-chain('g25_normalisation.png', 'Common Activity E – Normalisation and data preparation (Steps E1–E6)', [
-    ('E1  Consistency between dates', 'reflectance panels on every flight; invariant targets (panels, bare road, concrete)\ncompared across dates; a date is re-calibrated if its targets differ by more than 5%', 'comparable reflectance on all dates'),
-    ('E2  Thermal normalisation', 'canopy minus air temperature; normalised relative canopy temperature over the field;\ncrop water stress index with wet and dry references', 'weather-independent thermal features'),
-    ('E3  Healthy-plot normalisation', 'feature minus the mean of the healthy plots of the same date and variety\n(divided by their standard deviation); healthy plots of the training replications only', 'date- and variety-free features\n(used in Objective 3)'),
-    ('E4  Sample quality screening', 'subplots with fewer than 30% vegetation pixels or with clouds, shadows or\nmissing data are flagged and checked; extreme spectra checked visually', 'clean sample list'),
-    ('E5  Standardisation with training statistics', 'z-score of every feature with the mean and standard deviation of the training part;\nthe same values applied to the test part', 'standardised features'),
-    ('E6  Class weights', 'weight of each class inversely proportional to its size in the training part', 'balanced loss functions')], 'gold')
+chain('g25_normalisation.png', 'Common Activity E – Normalisation and data preparation (Steps E1–E4)', [
+    ('E1  Thermal normalisation', 'canopy minus air temperature; normalised relative canopy temperature over the field;\ncrop water stress index with wet and dry references', 'weather-independent thermal features'),
+    ('E2  Healthy-plot normalisation', 'feature minus the mean of the healthy plots of the same date and variety\n(divided by their standard deviation); healthy plots of the training part only', 'date- and variety-free features\n(used in Objective 3)'),
+    ('E3  Standardisation with training statistics', 'z-score of every feature with the mean and standard deviation of the training part;\nthe same values applied to the test part', 'standardised features'),
+    ('E4  Class weights', 'weight of each class inversely proportional to its size in the training part', 'balanced loss functions')], 'gold')
 
 # validation
 fig, ax = canvas(11, 5.6)
 for f in range(3):
     y = 4.4 - f * 1.25; ax.text(0.35, y + 0.3, 'Outer fold %d' % (f + 1), fontsize=10, fontweight='bold', va='center')
     for j in range(3):
-        test = j == f; box(ax, 1.9 + j * 2.0, y, 1.85, 0.6, 'R%d + healthy V%d' % (j + 1, j + 1), '', 'o3' if test else 'o1', tfs=8.5, filled=test)
+        test = j == f; box(ax, 1.9 + j * 2.0, y, 1.85, 0.6, 'R%d + 4 healthy\n(V1–V3 rotated)' % (j + 1), '', 'o3' if test else 'o1', tfs=8.5, filled=test)
     ax.text(8.1, y + 0.3, 'test = replication %d (≈ 512 samples)\ntrain = other two (≈ 1024)' % (f + 1), fontsize=8.5, va='center')
 box(ax, 0.3, 0.15, 10.4, 0.95, 'Inside each training part', 'inner 3-fold cross-validation grouped by plot: feature selection, tuning, early stopping (validation plots, not random samples)\nthe test replication is used only once, for the final evaluation', 'gold', fs=8.4)
 save(fig, 'g09_validation.png')

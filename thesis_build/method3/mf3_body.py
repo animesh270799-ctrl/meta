@@ -46,7 +46,7 @@ K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { aft
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: 'Hyperspectral, multispectral, red–green–blue and thermal unmanned aerial vehicle (UAV) data | 15 sensor sets | feature-level fusion | machine learning, feature-fusion neural networks, DT-EDNet, EfficientNet, ResNet18 and ConvNeXt V2', font: FONT, size: 21, italics: true })] }));")
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [new TextRun({ text: 'Animesh Panda (Roll No. 13098) | Ph.D. Agricultural Physics | ICAR-Indian Agricultural Research Institute, New Delhi', font: FONT, size: 20 })] }));")
 BOX('How to read this document.', 'The work is organised in three levels. (1) Six common activities (A to F) prepare the data once for all objectives. (2) Each objective is divided into activities (for example Activity 1.2). (3) Each activity is divided into numbered steps (for example Step 1.2.3). Every step has a heading and the same layout: purpose, input, output, procedure and supporting studies. Every technique used in a step is described in a method card that gives its principle, the problem it solves, its specification, its hyper-parameters and how they are tuned, the data on which it works well, why it was selected and its references. Flow charts are given for every objective and for the main activities, and small dummy datasets are used to show how each calculation works. Full names are written with their abbreviation in brackets.', 'EEF3E8', '2C5F2D')
-BOX('What is new in this revision.', '(1) The methods of the DT-EDNet study on rice blast (Ma et al., 2026) are included: effective wavelength ranges from normalised difference and ratio spectral index maps, optimal wavelengths by SHAP-CARS, vegetation index selection by ReliefF, texture from principal-component images selected by minimum redundancy maximum relevance (mRMR), the Tri-band Texture Fusion Index (TTFI) and the DT-EDNet network with EfficientNet, ResNet18 and ConvNeXt V2 as comparison networks for the post-symptomatic data. (2) One feature-selection method is used for each type of feature. (3) The second derivative is not used. (4) A separate activity on normalisation and data preparation is added. (5) The endmember extraction is described step by step. (6) Each technique has a method card.')
+BOX('What is new in this revision.', '(1) The methods of the DT-EDNet study on rice blast (Ma et al., 2026) are included: effective wavelength ranges from normalised difference and ratio spectral index maps, optimal wavelengths by SHAP-CARS, vegetation index selection by ReliefF, texture from principal-component images selected by minimum redundancy maximum relevance (mRMR), the Tri-band Texture Fusion Index (TTFI) and the DT-EDNet network with EfficientNet, ResNet18 and ConvNeXt V2 as comparison networks for the post-symptomatic data. (2) One feature-selection method is used for each type of feature. (3) The second derivative is not used. (4) A separate activity on normalisation and data preparation is added. (5) The endmember extraction is described step by step. (6) Each technique has a method card. (7) Covariates are days after inoculation, variety, inoculation timing, growth stage and weather; they are used for a covariate-only baseline and for sensor + covariate models, not as disease features. (8) Healthy plots are rotated across the folds so that every fold contains healthy plots of all three varieties. (9) SHAP-CARS standardises the bands and always keeps the red-edge first derivative. (10) All models, including DT-EDNet and the comparison networks, are built for every single camera and every camera combination, for classification and regression.')
 PB()
 K.append("K.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: 'Contents', font: FONT, size: 32, bold: true, color: '1E3A1F' })] }));")
 K.append("K.push(new TableOfContents('Contents', { hyperlink: true, headingStyleRange: '1-3' }));")
@@ -57,6 +57,7 @@ P('The text always gives the full name with the abbreviation in brackets. This l
 TAB('abbr', [['Abbreviation', 'Full name', 'Abbreviation', 'Full name'],
  ['AdamW', 'adaptive moment estimation with decoupled weight decay', 'MNF', 'minimum noise fraction'],
  ['AUC', 'area under the receiver operating characteristic curve', 'mRMR', 'minimum redundancy maximum relevance'],
+ ['BBCH', 'decimal scale of plant growth stages (Biologische Bundesanstalt, Bundessortenamt und Chemische Industrie)', 'RH', 'relative humidity'],
  ['CARS', 'competitive adaptive reweighted sampling', 'MS', 'multispectral'],
  ['CBAM', 'convolutional block attention module', 'NDSI', 'normalised difference spectral index'],
  ['CWSI', 'crop water stress index', 'NDVI', 'normalised difference vegetation index'],
@@ -77,7 +78,7 @@ TAB('abbr', [['Abbreviation', 'Full name', 'Abbreviation', 'Full name'],
  ['TTB', 'Token Transformer Block', 'TTFI', 'Tri-band Texture Fusion Index'],
  ['UAV', 'unmanned aerial vehicle', 'VI', 'vegetation index'],
  ['VIF', 'variance inflation factor', 'WRI', 'White Rust Index'],
- ['XGBoost', 'extreme gradient boosting', '', '']],
+ ['XGBoost', 'extreme gradient boosting', 'T_{max}, T_{min}', 'daily maximum and minimum air temperature']],
  'Full names of the abbreviations used.', [1500, 3150, 1500, 3156], 16)
 
 # =====================================================================================
@@ -90,7 +91,7 @@ TAB('objectives', [['Objective', 'Question answered', 'Data used', 'Main output'
     ['3. To predict white rust at the pre-symptomatic stage using machine learning', 'Can subplots that will develop white rust be separated from healthy subplots before symptoms, and can their later severity be predicted?', '576 pre-symptomatic subplot samples per camera', 'Pre-symptomatic models; earliest detection day; risk maps']],
     'Objectives, questions, data and outputs.', [2600, 3000, 1600, 2106], 16)
 H2('1.2 Overall design')
-P('All objectives use the same field data and the same preparation. The common activities A to F are carried out once (Figure [[F:overall]]). Objective 1 then describes and selects the features of each camera, Objective 2 builds the detection and severity models on the post-symptomatic data and Objective 3 builds the early-warning models on the pre-symptomatic data.')
+P('All objectives use the same field data and the same preparation. The common activities A to F are carried out once ([[F:overall]]). Objective 1 then describes and selects the features of each camera, Objective 2 builds the detection and severity models on the post-symptomatic data and Objective 3 builds the early-warning models on the pre-symptomatic data.')
 FIG('overall', 'g01_overall.png', 'Overall workflow. Common activities A–F prepare the data once; each objective is divided into activities and steps.', 560)
 P('**Six rules apply to every activity.** They come from the methodological literature and from the weaknesses reported in recent disease-sensing studies (Ambroise and McLachlan, 2002; Varma and Simon, 2006; Cawley and Talbot, 2010; Roberts et al., 2017; Ma et al., 2026).')
 NL(['One sample is one subplot on one date. The four subplots of a plot always stay together in the training part or in the test part.',
@@ -98,14 +99,15 @@ NL(['One sample is one subplot on one date. The four subplots of a plot always s
     'Features are grouped by type, and one selection method is used for each type of feature (Objective 1).',
     'Every step that uses the severity labels (index search, feature selection, tuning, early stopping) runs inside the training part only.',
     'All normalisation constants (means, standard deviations, healthy-plot references) are computed on the training part and then applied to the test part.',
+    'Severity increases with time, so every sensor model is compared with a covariate-only model (days after inoculation, variety, inoculation timing, growth stage, weather); a sensor model is useful only if it is better than this baseline.',
     'The same folds are used for all sensor sets and all models, so that their accuracies are directly comparable.'])
 H2('1.3 Dataset')
 TAB('dataset', [['Item', 'Value'], ['Plots × subplots', '48 × 4 = 192 subplots in each image'], ['Cameras', '4: hyperspectral, multispectral, red–green–blue and thermal'], ['Images', '8 flight dates × 4 cameras for the post-symptomatic period; pre-symptomatic flight dates in addition'],
-    ['Post-symptomatic samples per camera', '1536 (8 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'],
+    ['Post-symptomatic samples per camera', '1536 (8 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'],
     ['Sensor sets analysed', '15 (4 single cameras, 6 pairs, 4 triples, all four)'], ['Tasks', 'detection (healthy vs diseased), severity classes, severity score'], ['Time for the analysis', '6 months']], 'Dataset used in this methodology (numbers as recorded by the researcher).', [3300, 6006])
 FIG('dataset', 'g26_dataset.png', 'Structure of the dataset: flight dates → cameras → plots → scored subplots, and the two datasets used by the objectives.', 520)
 H2('1.4 Main published studies used to build the methodology')
-P('Each step was chosen because it was used and tested for crop-disease sensing or for the specific data problem it solves. Table [[T:literature]] lists the main disease studies; the methodological references are given in every step and method card.')
+P('Each step was chosen because it was used and tested for crop-disease sensing or for the specific data problem it solves. [[T:literature]] lists the main disease studies; the methodological references are given in every step and method card.')
 TAB('literature', [['Study', 'Crop and disease', 'Sensors', 'What it contributes to this methodology'],
  ['Ma et al. (2026)', 'rice; blast', 'UAV hyperspectral', 'effective ranges from NDSI and RSI maps; SHAP-CARS; ReliefF for indices; principal-component texture with mRMR; TTFI; DT-EDNet vs EfficientNet, ResNet18, ConvNeXt V2; module ablation'],
  ['Guo et al. (2021)', 'wheat; yellow rust', 'UAV hyperspectral', 'texture from principal-component images; vegetation index + texture fusion; NDVI soil mask; disease index'],
@@ -126,19 +128,20 @@ TAB('literature', [['Study', 'Crop and disease', 'Sensors', 'What it contributes
 # =====================================================================================
 H1('2. Common activities (carried out once for all objectives)')
 P('The six common activities turn the raw images into clean, normalised feature tables with one row per subplot-date and prepare the validation folds. Each activity is described as a sequence of steps.')
-TAB('commonact', [['Activity', 'Steps', 'Main output'], ['A. Field experiment, ground truth and datasets', 'A1–A4', 'labelled subplot list; post- and pre-symptomatic datasets'], ['B. Image pre-processing', 'B1–B5', 'calibrated, aligned images on the hyperspectral grid'],
+TAB('commonact', [['Activity', 'Steps', 'Main output'], ['A. Field experiment, ground truth and datasets', 'A1–A5', 'labelled subplot list; covariates; post- and pre-symptomatic datasets'], ['B. Image pre-processing', 'B1–B5', 'calibrated, aligned images on the hyperspectral grid'],
     ['C. Endmember extraction and vegetation mask', 'C1–C8', 'endmember library; vegetation mask applied to all cameras'], ['D. Subplot spectra and feature extraction', 'D1–D8', 'feature table of each camera'],
-    ['E. Normalisation and data preparation', 'E1–E6', 'normalised, screened and standardised features'], ['F. Validation design and tuning', 'F1–F3', 'outer and inner folds; tuning plan; leakage checklist']], 'Common activities and their outputs.', [3500, 1300, 4506])
+    ['E. Normalisation and data preparation', 'E1–E4', 'normalised and standardised features; class weights'], ['F. Validation design and tuning', 'F1–F3', 'outer and inner folds; tuning plan; leakage checklist']], 'Common activities and their outputs.', [3500, 1300, 4506])
 
 # ---------------------------------------------------------------- A
 H2('Activity A – Field experiment, ground truth and datasets')
 STEP('A1', 'Experimental design and treatments',
      'Defines the sources of variation (inoculation timing, variety, replication) so that disease effects can be separated from crop-age and variety effects.',
-     'IARI research farm, rabi season; factorial randomised block design.',
+     'IARI research farm, New Delhi, rabi 2026-27; field 48 m × 24 m (9.4 m healthy block + 10 m buffer + 28.6 m inoculated block); plots 5 m × 3 m with 0.2 m bunds and 2 m channels.',
      '48 plots with known treatment, replication and plot number → subplots (Step A3) and validation folds (Activity F).',
-     ['Four sowing dates at 10-day intervals (D1–D4) with one inoculation date, so the crop is inoculated at four different ages.',
-      'Three varieties of different susceptibility (V1 highly susceptible, V2 moderately susceptible, V3 resistant; names as recorded in the field book).',
-      'The 12 treatments (4 × 3) are inoculated in three replications (R1–R3) with a zoosporangial suspension (Mishra et al., 2009), and one healthy (uninoculated) plot is kept for every treatment: 36 inoculated + 12 healthy = 48 plots.',
+     ['Four sowing dates at 8-day intervals: D1 = 19 November, D2 = 27 November, D3 = 5 December and D4 = 13 December 2026, with one inoculation date, so the crop is inoculated at four different ages.',
+      'Three varieties: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37.',
+      'The 12 treatments (4 × 3) are inoculated in three replications (R1: plots 37–48, R2: plots 25–36, R3: plots 13–24) with a zoosporangial suspension of 1.5 × 10^{5} zoosporangia mL^{−1} (Mishra et al., 2009).',
+      'One uninoculated healthy plot of every treatment (plots 1–12) is sown in a separate healthy block, 10 m away from the inoculated block, so that inoculum does not spread to the controls: 36 inoculated + 12 healthy = 48 plots.',
       'Each plot carries a code (treatment, replication, plot number) that is stored with every sample.'],
      'Staggered sowing or inoculation and healthy controls were used to create severity gradients for wheat yellow rust (Guo et al., 2021), wheat powdery mildew (Feng et al., 2022; Liu et al., 2024) and rice blast (Tian et al., 2021; Ma et al., 2026); a randomised trial with varieties of different resistance was used for wheat rusts by Blasch et al. (2023).')
 STEP('A2', 'UAV flights and cameras',
@@ -174,10 +177,29 @@ STEP('A4', 'Labels and the two datasets',
      'Detection, severity classes and regression were analysed together for rice blast (Tian et al., 2021) and wheat powdery mildew (Feng et al., 2022); labels from the later status for pre-symptomatic samples: Zhu et al. (2017), Tian et al. (2021).')
 TAB('classex', [['Grade', '0', '1', '3', '5', '7', '9'], ['Detection label', 'healthy', 'diseased', 'diseased', 'diseased', 'diseased', 'diseased'], ['Severity class', '0', '1', '3', '5', '7', '9'], ['Dummy count (1536 samples)', '410', '330', '290', '250', '160', '96']],
     'How one score gives the three labels (dummy class counts).', [2500, 1134, 1134, 1134, 1134, 1134, 1136])
+STEP('A5', 'Covariates: days after inoculation, variety, inoculation timing, growth stage and weather',
+     'Disease severity changes with time, crop stage, variety and weather. These known factors must be recorded so that their effect can be separated from what the cameras add.',
+     'Field book (sowing, inoculation and flight dates; variety; growth stage on each flight date); daily weather from the IARI agrometeorological observatory.',
+     'Covariate table with one row per subplot-date → response analysis (Step 1.1.3), covariate baseline and sensor + covariate models (Steps 2.5.5 and 3.5.3), results by stage and treatment.',
+     ['Days after inoculation (DAI): flight date minus inoculation date (numeric).',
+      'Variety: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37 (categorical, one-hot coded in models).',
+      'Inoculation timing: D1–D4, also expressed as crop age at inoculation in days (numeric).',
+      'Growth stage of each plot on each flight date, read with the BBCH scale and coded as 1 = vegetative (BBCH 10–59), 2 = flowering (BBCH 60–69), 3 = pod formation (BBCH 70–79 and later) (ordinal).',
+      'Weather: daily maximum and minimum air temperature (T_{max}, T_{min}), morning and afternoon relative humidity (RH I, RH II) and rainfall, summarised as the mean (rainfall: total) of the 7 days before each flight, plus the number of favourable days since inoculation (T_{max} 16–24 °C, RH I > 97% and RH II > 40%, the conditions reported to favour white rust on leaves).',
+      'Covariates are not features of any camera and are not used in feature selection; they enter only the covariate models and the stratified results.'],
+     'Weather conditions that favour white rust of Indian mustard and weather-based forecasting: Chattopadhyay et al. (2011), Saharan et al. (2014); BBCH growth stages: Lancashire et al. (1991), Meier (2018); stage-dependent spectral disease signals: Blasch et al. (2023), Liu et al. (2024); combining weather with remote sensing improved disease forecasts over weather alone: Zhang et al. (2014); days after inoculation in early detection: Mahlein et al. (2019), Zhu et al. (2017).')
+TAB('covtab', [['Covariate', 'Type and coding', 'Varies between subplots on one date?', 'Main use'],
+    ['Days after inoculation', 'numeric (days)', 'no (same inoculation date)', 'time trend; baseline model'],
+    ['Variety (V1 PM 26, V2 Pusa Vijay, V3 PM 37)', 'categorical, one-hot', 'yes', 'baseline; stratified results; transfer test'],
+    ['Inoculation timing (D1–D4)', 'categorical, or crop age at inoculation (days)', 'yes', 'baseline; stratified results; transfer test'],
+    ['Growth stage (1 vegetative, 2 flowering, 3 pod formation)', 'ordinal from BBCH', 'yes (staggered sowing)', 'baseline; results by stage; flowering check'],
+    ['Weather (T_{max}, T_{min}, RH I, RH II, rainfall; favourable days)', 'numeric, 7-day summaries', 'no (one value per date)', 'interpretation; baseline (time effect only)']],
+    'Covariates recorded for every subplot-date. Weather is the same for all subplots on a date, so it can explain differences between dates but not between subplots.', [2900, 2200, 1900, 2306])
+NOTE('Weather has only one value per flight date (eight values in the post-symptomatic period), so in a single season it cannot be separated from the date itself. It is therefore used for interpretation and inside the covariate baseline, and results of models that contain weather are labelled "within-season"; their transfer to another season must be tested with data of that season (Zhang et al., 2014; Ma et al., 2026).')
 
 # ---------------------------------------------------------------- B
 H2('Activity B – Image pre-processing')
-P('Activity B turns raw images into calibrated, aligned images on one common grid (Figure [[F:preproc]]).')
+P('Activity B turns raw images into calibrated, aligned images on one common grid ([[F:preproc]]).')
 FIG('preproc', 'g02_preproc.png', 'Flow chart of Activity B (Steps B1–B5).', 540)
 STEP('B1', 'Radiometric calibration',
      'Raw digital numbers depend on illumination and camera settings and cannot be compared between dates or cameras.',
@@ -235,7 +257,7 @@ CARD('resample', 'Resampling (pixel aggregate, bilinear, nearest neighbour)', 'P
 
 # ---------------------------------------------------------------- C
 H2('Activity C – Endmember extraction and vegetation mask')
-P('Soil, grass, weeds and shadow inside a subplot change reflectance, texture and temperature and must be removed before disease features are extracted. Activity C builds one field-wide library of pure spectra (endmembers) with the hourglass workflow, classifies every pixel with the spectral angle mapper and keeps the canopy pixels (Figure [[F:endmember]]). Flowers are kept because the canopy score includes the inflorescence; no spectral unmixing is done.')
+P('Soil, grass, weeds and shadow inside a subplot change reflectance, texture and temperature and must be removed before disease features are extracted. Activity C builds one field-wide library of pure spectra (endmembers) with the hourglass workflow, classifies every pixel with the spectral angle mapper and keeps the canopy pixels ([[F:endmember]]). Flowers are kept because the canopy score includes the inflorescence; no spectral unmixing is done.')
 FIG('endmember', 'g03_endmember.png', 'Flow chart of Activity C: endmember extraction (Steps C1–C5) and vegetation mask (Steps C6–C8).', 540)
 STEP('C1', 'Sampling of pixels from all dates',
      'Endmember extraction on every full image would be slow, and endmembers extracted separately for each date or plot would not be comparable.',
@@ -250,7 +272,7 @@ STEP('C2', 'Minimum noise fraction (MNF) transformation',
      'Minimum noise fraction (MNF) components ordered by signal-to-noise ratio; components with eigenvalues clearly above 1 → Step C3.',
      ['Estimate the noise from the differences between neighbouring pixels (shift difference) in a homogeneous area.',
       'Whiten the noise (rescale so the noise has unit variance in every direction) and then apply principal component analysis.',
-      'Plot the eigenvalues (Figure [[F:dummyem]]a); keep the components whose eigenvalue is clearly above 1 (here about 8–10); components with eigenvalues near 1 contain only noise.'],
+      'Plot the eigenvalues ([[F:dummyem]]a); keep the components whose eigenvalue is clearly above 1 (here about 8–10); components with eigenvalues near 1 contain only noise.'],
      'Green et al. (1988); Boardman and Kruse (2011); Bioucas-Dias et al. (2012).')
 CARD('mnf', 'Minimum noise fraction (MNF) transformation', 'Two principal component analyses in sequence: the first whitens the noise, the second orders the components by signal-to-noise ratio. Eigenvalue 1 means a component is pure noise.',
      'Separates signal from noise and reduces 483 correlated bands to about 10 informative components.', 'Noise from shift differences in a homogeneous field area; components with eigenvalue above about 2 kept.',
@@ -273,7 +295,7 @@ STEP('C4', 'n-dimensional visualisation and endmember selection',
      'Pure-pixel candidates in MNF space.',
      'Endmember spectra (mean reflectance of each cluster) → Step C5.',
      ['Display the candidates in two- and three-dimensional scatter plots of MNF components and rotate them (n-dimensional visualiser).',
-      'Mark the clusters at the corners of the cloud (Figure [[F:dummyem]]b).',
+      'Mark the clusters at the corners of the cloud ([[F:dummyem]]b).',
       'Compute the endmember spectrum as the mean reflectance (original bands) of the pixels in each cluster.'],
      'Boardman and Kruse (2011); Bioucas-Dias et al. (2012).')
 STEP('C5', 'Endmember identification and library',
@@ -281,7 +303,7 @@ STEP('C5', 'Endmember identification and library',
      'Endmember spectra; field photographs; red–green–blue images; leaf spectra of the study.',
      'Labelled endmember library (green canopy, stressed canopy, flower, soil, grass, shadow) → Step C6.',
      ['Locate the pixels of each endmember in the red–green–blue image and in field photographs.',
-      'Compare their shapes with known spectra: green canopy (red edge, high near-infrared), stressed canopy (higher red, lower near-infrared), yellow flower (high green–red reflectance), soil (rising, featureless), shadow (low everywhere) (Figure [[F:dummyem]]c).',
+      'Compare their shapes with known spectra: green canopy (red edge, high near-infrared), stressed canopy (higher red, lower near-infrared), yellow flower (high green–red reflectance), soil (rising, featureless), shadow (low everywhere) ([[F:dummyem]]c).',
       'Merge duplicates and store the final library.'],
      'Identification by spectral shape and image context: Boardman and Kruse (2011); flowers in Brassica canopies: Sulik and Long (2016).')
 FIG('dummyem', 'g12_dummy_endmember.png', 'Dummy example of endmember extraction: (a) MNF eigenvalues; (b) pure pixels at the corners of the MNF cloud; (c) endmember library.', 560)
@@ -326,7 +348,7 @@ CARD('erosion', 'Morphological erosion and mask accuracy assessment', 'Erosion r
 
 # ---------------------------------------------------------------- D
 H2('Activity D – Subplot spectra and feature extraction')
-P('Features are calculated for every subplot-date and kept in groups by type (Figure [[F:features]]). The grouping matters because one selection method is later used for each type of feature (Objective 1).')
+P('Features are calculated for every subplot-date and kept in groups by type ([[F:features]]). The grouping matters because one selection method is later used for each type of feature (Objective 1).')
 FIG('features', 'g04_features.png', 'Flow chart of Activity D (Steps D1–D6; Steps D7–D8 complete the feature table).', 540)
 STEP('D1', 'Plot and subplot polygons',
      'Each sample must cover exactly the scored subplot.',
@@ -337,8 +359,8 @@ STEP('D1', 'Plot and subplot polygons',
 STEP('D2', 'Subplot mean spectra',
      'Models need one value per feature and subplot that represents the scored canopy.',
      'Masked layers of all cameras; subplot polygons.',
-     'One mean spectrum (and mean band values) per subplot, date and camera; vegetation pixel count, flower % and canopy cover % → Steps D3–D7 and Activity E.',
-     ['Average the masked vegetation pixels inside each subplot for every band of every camera.', 'Save the number of vegetation pixels, the flower % and the canopy cover % (from the class map) as quality and confounding checks.'],
+     'One mean spectrum (and mean band values) per subplot, date and camera → Steps D3–D7 and Activity E.',
+     ['Average the masked vegetation pixels inside each subplot for every band of every camera.', 'Join the covariates of Step A5 by the subplot code and date.'],
      'Plot-mean spectra after masking: Guo et al. (2021), Mustafa et al. (2023), Ma et al. (2026).')
 FIG('dummyspec', 'g11_dummy_spectra.png', 'Dummy example of subplot mean spectra by severity grade (a) and the first derivative in the red-edge region (b). The water-vapour regions are removed.', 560)
 STEP('D3', 'Hyperspectral spectral features',
@@ -350,7 +372,7 @@ STEP('D3', 'Hyperspectral spectral features',
       'Red-edge parameters: red-edge position (wavelength of the maximum first derivative between 680 and 760 nm), red-edge amplitude (that maximum value) and red-edge area (sum of the first derivative from 680 to 760 nm).',
       'The second derivative is not used, because it amplifies noise at UAV signal-to-noise levels and adds hundreds of unstable variables.'],
      'Derivative analysis: Tsai and Philpot (1998); red edge: Horler et al. (1983), Filella and Peñuelas (1994); red-edge parameters best for the early stage of pine wilt disease from UAV hyperspectral data: Yu et al. (2021); noise amplification by derivatives: Rinnan et al. (2009).')
-P('**Worked example (dummy data).** If R(700 nm) = 0.10 and R(704 nm) = 0.14, the first derivative at 702 nm is (0.14 − 0.10) / 4 = 0.010 nm^{−1}. If the largest first derivative between 680 and 760 nm is 0.012 nm^{−1} at 718 nm, the red-edge position is 718 nm and the amplitude is 0.012 nm^{−1}. In diseased canopies the red-edge position moves to shorter wavelengths (Figure [[F:dummyspec]]b).')
+P('**Worked example (dummy data).** If R(700 nm) = 0.10 and R(704 nm) = 0.14, the first derivative at 702 nm is (0.14 − 0.10) / 4 = 0.010 nm^{−1}. If the largest first derivative between 680 and 760 nm is 0.012 nm^{−1} at 718 nm, the red-edge position is 718 nm and the amplitude is 0.012 nm^{−1}. In diseased canopies the red-edge position moves to shorter wavelengths ([[F:dummyspec]]b).')
 CARD('fd', 'First derivative and red-edge parameters', 'The derivative measures the slope of the spectrum; it removes constant offsets (for example brightness differences) and turns the red edge into a peak whose position and height can be measured.',
      'Makes the chlorophyll-related red-edge shift measurable and reduces background effects.', 'Central difference on Savitzky–Golay smoothed segments; red-edge position, amplitude and area from 680–760 nm.',
      'No tuning; the smoothing window (Step B3) controls the noise of the derivative.', 'Smoothed hyperspectral spectra with dense band spacing.',
@@ -361,7 +383,7 @@ STEP('D4', 'Vegetation indices',
      'Index group (published indices + red-edge parameters; the searched indices of Activity 1.3 are added later) → Activity 1.4.',
      ['Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, MSI, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.',
       'Check every formula against the original paper and use the nearest available band.',
-      'Index definitions are given in Chapter 7 (Table [[T:hsidx]]).'],
+      'Index definitions are given in Chapter 7 ([[T:hsidx]]).'],
      'Index groups for disease detection: Mahlein et al. (2013), Huang et al. (2014), Ma et al. (2026); pigment indices: Gamon et al. (1992), Gitelson et al. (2003), Merzlyak et al. (1999); water and disease indices: Gao (1996), Apan et al. (2004); PSRI and PSSRb for rice bacterial leaf blight: Das et al. (2015).')
 CARD('vi', 'Vegetation indices', 'Arithmetic combinations (differences, ratios, normalised differences) of reflectance at wavelengths sensitive to a plant property, which cancel part of the illumination and background effect.',
      'Turns many bands into a few physiologically meaningful variables that can be compared with other studies and sensors.', 'About 48 published hyperspectral indices, 12 multispectral indices and 6 colour indices (Chapter 7).',
@@ -386,7 +408,7 @@ CARD('glcm', 'Grey-level co-occurrence matrix (GLCM) texture', 'Counts how often
      'The most widely used and best-understood texture method in remote sensing; used in the main white-rust-like disease studies.', 'Haralick et al. (1973); Hall-Beyer (2017); Guo et al. (2021)')
 CARD('pca', 'Principal component analysis (PCA)', 'Rotates correlated variables into uncorrelated components ordered by the variance they explain.',
      'Reduces 483 correlated bands to three images that keep most of the information, so texture is computed on 3 images instead of 483.', 'Computed on the masked vegetation pixels of all dates (training data); first three components kept (cumulative variance above 95%).',
-     'Number of components: the smallest number with at least 95% cumulative variance (Figure [[F:dummyrelief]]b).', 'Many highly correlated variables, such as hyperspectral bands.',
+     'Number of components: the smallest number with at least 95% cumulative variance ([[F:dummyrelief]]b).', 'Many highly correlated variables, such as hyperspectral bands.',
      'Used in exactly this role by Guo et al. (2021) and Ma et al. (2026).', 'Jolliffe and Cadima (2016); Guo et al. (2021); Ma et al. (2026)')
 STEP('D6', 'Multispectral and red–green–blue features',
      'The cheaper cameras need their own features so that their value can be compared with the hyperspectral camera.',
@@ -401,64 +423,48 @@ STEP('D7', 'Thermal features',
      'Masked thermal subplot values; air temperature; healthy-plot temperatures of the same date.',
      'Thermal group → Activity E (normalisation) and Activity 1.6.',
      ['Canopy temperature: mean, median, standard deviation, 10th and 90th percentiles of the vegetation pixels.',
-      'Normalised thermal features (Step E2): canopy minus air temperature, normalised relative canopy temperature, crop water stress index and difference from the healthy plots of the same date and variety.',
+      'Normalised thermal features (Step E1): canopy minus air temperature, normalised relative canopy temperature, crop water stress index and difference from the healthy plots of the same date and variety.',
       'Thermal texture (Step D5).'],
      'Thermal features for powdery mildew: Feng et al. (2022), Liu et al. (2024); canopy minus air temperature for downy mildew from a UAV: Calderón et al. (2014); reviews: Pineda et al. (2021), Messina and Modica (2020).')
 STEP('D8', 'Feature table',
      'All later steps need one table layout for every camera so that sensor sets are simple joins.',
      'Features of Steps D3–D7.',
      'One table per camera with identifiers, labels, covariates and features → Activities E and F.',
-     ['Columns: identifiers (date, days after inoculation, plot, subplot, replication, treatment, variety, inoculation timing, fold), labels (score, class, detection label), covariates (vegetation pixel count, flower %, canopy cover %) and features with a group prefix (R_, FD_, RE_, VI_, TX_, TH_).',
+     ['Columns: identifiers (date, days after inoculation, plot, subplot, replication, treatment, variety, inoculation timing, fold), labels (score, class, detection label), covariates (days after inoculation, variety, inoculation timing, growth stage, weather summaries) and features with a group prefix (R_, FD_, RE_, VI_, TX_, TH_).',
       'Rows: one per subplot-date.'],
      'Structured multi-sensor feature tables: Maimaitijiang et al. (2020), Feng et al. (2022).')
 TAB('featcount', [['Camera', 'Feature groups', 'Approximate number'], ['Hyperspectral', 'reflectance 483, first derivative 483, red-edge parameters 3, published indices about 48, principal-component texture 24 (+ searched indices and TTFI)', '≈ 1040'],
     ['Multispectral', '5 bands, 12 indices, 10 normalised differences, 40 texture', '67'], ['Red–green–blue', '6 colour indices, 3 colour means, 24 texture', '33'], ['Thermal', '5 temperature statistics, 4 normalised temperatures, 8 texture', '17'],
-    ['Covariates', 'flower %, canopy cover %, vegetation pixel count, days after inoculation, variety, inoculation timing', 'not used as disease features']], 'Feature groups before selection.', [1800, 5600, 1906])
+    ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)', 'not used as disease features']], 'Feature groups before selection.', [1800, 5600, 1906])
 
 # ---------------------------------------------------------------- E
 H2('Activity E – Normalisation and data preparation')
-P('Normalisation removes effects that are not caused by the disease (illumination, weather, date, variety, units) and prepares the features for the models (Figure [[F:normal]]). Steps E1–E2 and E4 are done once on all data because they do not use the labels; Steps E3, E5 and E6 use statistics that are computed on the training part of each fold only.')
-FIG('normal', 'g25_normalisation.png', 'Flow chart of Activity E (Steps E1–E6).', 540)
-STEP('E1', 'Radiometric consistency between dates',
-     'Even after calibration, small differences between flights (panel shading, haze, sensor drift) can look like a disease effect when dates are pooled.',
-     'Reflectance images of all dates; invariant targets.',
-     'Checked reflectance on all dates (re-calibrated where needed) → Activity D.',
-     ['Place the calibration panels on every flight and record their reflectance in every image.',
-      'Compare the reflectance of invariant targets (panels, concrete, bare road) between dates; differences above 5% in any band flag the date.',
-      'Re-calibrate a flagged date with its own panels or, if they failed, with a linear fit to the invariant targets of a reference date.'],
-     'Panels on every flight for relative radiometric calibration: Yuan et al. (2025), Blasch et al. (2023); scaling and consistency between UAV and satellite reflectance: Revill et al. (2020); UAV spectroscopy correction workflow: Aasen et al. (2018).')
-STEP('E2', 'Thermal normalisation',
+P('Normalisation removes effects that are not caused by the disease (weather, date, variety, units) and prepares the features for the models ([[F:normal]]). Step E1 is done once on all data because it does not use the labels; Steps E2–E4 use statistics that are computed on the training part of each fold only. Date-to-date consistency of reflectance relies on the calibration panels flown on every date (Step B1).')
+FIG('normal', 'g25_normalisation.png', 'Flow chart of Activity E (Steps E1–E4).', 540)
+STEP('E1', 'Thermal normalisation',
      'Canopy temperature changes with air temperature, radiation and time of flight, which can hide the disease effect.',
      'Canopy temperature statistics; air temperature; wet and dry reference temperatures.',
      'Normalised thermal features → Activity 1.6 and Objectives 2–3.',
      ['Canopy minus air temperature: CTD = T_{c} − T_{air}.',
       'Normalised relative canopy temperature over the field on that date: NRCT = (T_{c} − T_{min}) / (T_{max} − T_{min}).',
       'Crop water stress index: CWSI = (T_{c} − T_{wet}) / (T_{dry} − T_{wet}) with wet and dry references in the field.',
-      'Difference from healthy plots of the same date and variety (Step E3).'],
+      'Difference from healthy plots of the same date and variety (Step E2).'],
      'Normalisation of canopy temperature by air temperature: Idso et al. (1981), Pineda et al. (2021); canopy minus air temperature for downy mildew detection from a UAV: Calderón et al. (2014); thermal indices and environmental effects: Jones et al. (2009), Maes and Steppe (2012), Oerke et al. (2006).')
 P('**Worked example (dummy data).** A subplot has T_{c} = 24.6 °C when T_{air} = 22.0 °C, so CTD = +2.6 °C. On that date the field minimum and maximum canopy temperatures are 21.8 and 26.2 °C, so NRCT = (24.6 − 21.8) / (26.2 − 21.8) = 0.64.')
-STEP('E3', 'Healthy-plot normalisation',
+STEP('E2', 'Healthy-plot normalisation',
      'Early disease effects are small compared with the differences caused by date, crop age and variety; a same-day, same-variety healthy reference removes most of them.',
-     'Features of all subplots; features of the healthy plots of the same date and variety (training replications only).',
+     'Features of all subplots; features of the healthy plots of the same date and variety in the training part (two or three plots of different inoculation timings, Step F1).',
      'Healthy-normalised features → Objective 3 (all features) and thermal difference features (Objectives 1–2).',
-     ['For every feature, date and variety, compute the mean and standard deviation of the healthy plots of the training replications.',
+     ['For every feature, date and variety, compute the mean and standard deviation of the healthy subplots of that variety in the training part (8–12 subplots).',
       'Normalised value: z_{h} = (x − mean_{healthy}) / SD_{healthy}.',
       'Apply the same healthy-plot reference to the test samples of that date and variety.'],
      'Healthy references for thermal disease detection: Oerke et al. (2006); healthy references in pre-visual detection: Zarco-Tejada et al. (2018), Poblete et al. (2023); pre-symptomatic hyperspectral detection: Zhu et al. (2017).')
 P('**Worked example (dummy data).** On one date the healthy plots of variety V1 have mean canopy temperature 23.8 °C (standard deviation 0.4 °C). An inoculated V1 subplot at 24.6 °C gets z_{h} = (24.6 − 23.8) / 0.4 = +2.0, that is, two healthy standard deviations warmer.')
 CARD('healthy', 'Healthy-plot (control) normalisation', 'Expresses each value as its distance from healthy plants measured on the same day, of the same variety and age, in units of their natural variation.',
-     'Removes date, weather, crop-age and variety effects so that only the disease effect remains; essential when symptoms are not yet visible.', 'Reference: healthy plots of the same date and variety in the training replications; mean and standard deviation per feature.',
+     'Removes date, weather, crop-age and variety effects so that only the disease effect remains; essential when symptoms are not yet visible.', 'Reference: healthy plots of the same date and variety in the training part (rotated across folds, Step F1); mean and standard deviation per feature.',
      'No hyper-parameters.', 'Experiments with healthy controls on every date; thermal and early-stage spectral data.',
      'Simple and directly justified by the design (one healthy plot for every treatment).', 'Oerke et al. (2006); Zarco-Tejada et al. (2018)')
-STEP('E4', 'Sample quality screening',
-     'Subplots with very few vegetation pixels, cloud shadow or missing data give unreliable mean spectra.',
-     'Subplot tables with vegetation pixel count and covariates.',
-     'Clean sample list (flagged samples documented) → Activity F.',
-     ['Flag subplots with fewer than 30% vegetation pixels, with cloud shadow or with missing data in any camera.',
-      'Check visually the spectra that lie more than three standard deviations from the mean of their date and grade.',
-      'Remove a sample only for a documented technical reason, never because of its label; report the number removed.'],
-     'Quality checks of UAV spectral data: Aasen et al. (2018); data screening before modelling: Kuhn and Johnson (2013).')
-STEP('E5', 'Standardisation (z-score) with training statistics',
+STEP('E3', 'Standardisation (z-score) with training statistics',
      'Features have different units and ranges (reflectance 0–1, temperature 15–30 °C, texture 0–1000); distance- and gradient-based models are dominated by large-range features.',
      'Selected features of the training part and test part of each fold.',
      'Standardised features (mean 0, standard deviation 1 in the training part) → all models.',
@@ -469,7 +475,7 @@ CARD('zscore', 'z-score standardisation', 'Subtracts the mean and divides by the
      'Puts features with different units on one scale so that no feature dominates distances, kernels or gradient steps.', 'Training statistics of each fold; applied to all models (tree models do not need it but receive the same input for simplicity).',
      'No hyper-parameters.', 'Mixed feature types (reflectance, indices, texture, temperature).',
      'Required by support vector machines, k-nearest neighbours, partial least squares and neural networks.', 'Kuhn and Johnson (2013)')
-STEP('E6', 'Class weights',
+STEP('E4', 'Class weights',
      'The severity classes have unequal sizes (for example 410 healthy vs 96 grade-9 samples); models tend to ignore small classes.',
      'Class counts of the training part.',
      'Class weights for the loss functions of all classifiers → Objectives 2–3.',
@@ -481,14 +487,16 @@ P('**Worked example (dummy data).** With N = 1024 training samples, k = 6 classe
 H2('Activity F – Validation design and tuning')
 STEP('F1', 'Leave-one-replication-out (LORO) outer folds',
      'Subplots of one plot, and plots of one replication, are similar; random splits put near-identical samples in training and test data and inflate accuracy.',
-     'Clean, labelled feature tables.',
+     'Labelled feature tables.',
      'Three outer folds → all models of Objectives 2 and 3.',
      ['Fold 1 tests replication R1, fold 2 tests R2, fold 3 tests R3 (leave-one-replication-out, LORO).',
-      'The 12 healthy plots are divided by variety (V1 → fold 1, V2 → fold 2, V3 → fold 3) so that every test fold contains healthy samples.',
+      'The 12 healthy plots are rotated so that every fold contains one healthy plot of each inoculation timing and at least one of each variety ([[T:healthyrot]]). Every training part then holds two or three healthy plots of every variety, which the healthy-plot normalisation (Step E2) needs, and every test fold contains healthy samples of all three varieties.',
       'All dates and all four subplots of a plot stay in the same fold; each test fold has about 512 post-symptomatic (or 192 pre-symptomatic) samples.',
       'The same three folds are used for every sensor set, task and model.'],
-     'Grouped (blocked) cross-validation: Roberts et al. (2017); spatial validation shows that random splits overestimate accuracy: Ploton et al. (2020); the random 7:3 split of Ma et al. (2026) is the optimistic design this step avoids, while its cross-year test supports testing on independent units.')
-FIG('validation', 'g09_validation.png', 'Leave-one-replication-out outer folds and the inner cross-validation used for selection and tuning.', 520)
+     'Grouped (blocked) cross-validation: Roberts et al. (2017); healthy references of the same variety needed for normalisation: Oerke et al. (2006), Zarco-Tejada et al. (2018); spatial validation shows that random splits overestimate accuracy: Ploton et al. (2020); the random 7:3 split of Ma et al. (2026) is the optimistic design this step avoids, while its cross-year test supports testing on independent units.')
+TAB('healthyrot', [['Outer fold', 'Inoculated plots tested', 'Healthy plots tested (variety–timing, plot number)'], ['1', 'replication R1 (plots 37–48)', 'V1-D1 (7), V2-D2 (2), V3-D3 (10), V1-D4 (12)'], ['2', 'replication R2 (plots 25–36)', 'V2-D1 (5), V3-D2 (8), V1-D3 (4), V2-D4 (1)'], ['3', 'replication R3 (plots 13–24)', 'V3-D1 (3), V1-D2 (9), V2-D3 (11), V3-D4 (6)']],
+    'Rotation of the 12 healthy plots across the outer folds: each fold has every inoculation timing once and every variety at least once.', [1500, 3300, 4506])
+FIG('validation', 'g09_validation.png', 'Leave-one-replication-out outer folds with the rotated healthy plots, and the inner cross-validation used for selection and tuning.', 520)
 STEP('F2', 'Nested inner cross-validation and hyper-parameter tuning',
      'Feature selection and tuning done on all data (or on the test fold) give over-optimistic accuracy.',
      'Training part of each outer fold.',
@@ -499,17 +507,17 @@ STEP('F2', 'Nested inner cross-validation and hyper-parameter tuning',
       'Retrain the model on the whole training part with these settings and predict the test replication once.'],
      'Nested cross-validation: Varma and Simon (2006), Cawley and Talbot (2010); selection bias when features are chosen outside the folds: Ambroise and McLachlan (2002).')
 CARD('nested', 'Grouped nested cross-validation with grid search', 'An outer loop estimates accuracy on unseen replications; an inner loop inside the training part chooses features and hyper-parameters. Grid search tries every combination in a small grid.',
-     'Gives an almost unbiased accuracy estimate and prevents information from the test replication entering the model.', 'Outer: 3 folds (leave-one-replication-out); inner: 3 folds grouped by plot; grids in Table [[T:mlgrid]] and Step 2.3.8.',
+     'Gives an almost unbiased accuracy estimate and prevents information from the test replication entering the model.', 'Outer: 3 folds (leave-one-replication-out); inner: 3 folds grouped by plot; grids in [[T:mlgrid]] and Step 2.3.8.',
      'The grids themselves; kept small (2–5 values per parameter) to limit overfitting of the selection.', 'Small, grouped datasets such as plots × dates.',
      'Standard practice for honest accuracy; required because many label-based steps are used.', 'Varma and Simon (2006); Cawley and Talbot (2010); Roberts et al. (2017)')
 STEP('F3', 'Leakage checklist',
      'A single step done on all data can leak test information into the model.',
      'All steps of the methodology.',
-     'Checklist of where every step is run (Table [[T:leak]]) → applied in all objectives.',
+     'Checklist of where every step is run ([[T:leak]]) → applied in all objectives.',
      ['List every step that uses labels or data statistics.', 'Assign it to "once on all data" (no labels), "training part" (statistics) or "inner folds" (labels).', 'Check the code of every objective against the list before running the final models.'],
      'Ambroise and McLachlan (2002); Kuhn and Johnson (2013).')
-TAB('leak', [['Step', 'Uses labels?', 'Where it is run'], ['Activities B–D (pre-processing, mask, features)', 'no', 'once, on all data'], ['E1–E2 (date consistency, thermal normalisation)', 'no', 'once, on all data'],
-    ['E3 (healthy-plot normalisation)', 'no (uses healthy plots)', 'training healthy plots → applied to test data'], ['E5–E6 (standardisation, class weights)', 'no (statistics)', 'training part of each fold'],
+TAB('leak', [['Step', 'Uses labels?', 'Where it is run'], ['Activities B–D (pre-processing, mask, features)', 'no', 'once, on all data'], ['E1 (thermal normalisation)', 'no', 'once, on all data'],
+    ['E2 (healthy-plot normalisation)', 'no (uses healthy plots)', 'training healthy plots → applied to test data'], ['E3–E4 (standardisation, class weights)', 'no (statistics)', 'training part of each fold'], ['Covariate coding (Step A5)', 'no', 'once; standardised with training statistics'],
     ['Within-group redundancy (|r| ≥ 0.95), variance inflation factor', 'no', 'training part of each fold'], ['NDSI/RSI and White Rust Index search, SHAP-CARS, ReliefF, mRMR, TTFI search', 'yes', 'inner folds only'],
     ['Sequential floating forward selection, hyper-parameter tuning, early stopping', 'yes', 'inner folds only'], ['Final evaluation', 'yes', 'test replication, once']],
     'Where each step is run so that no information from the test replication enters the model.', [4300, 1900, 3106])
