@@ -9,7 +9,8 @@ TAB('o1act', [['Activity', 'Steps', 'Technique (one per feature type)', 'Output'
     ['1.3 Spectral index construction', '1.3.1–1.3.3', 'exhaustive two-band and three-band search', 'best NDSI, RSI and White Rust Index (WRI)'],
     ['1.4 Vegetation index selection', '1.4.1–1.4.3', 'redundancy filter → ReliefF / RReliefF', '5–8 selected indices'],
     ['1.5 Texture selection and TTFI', '1.5.1–1.5.4', 'principal-component texture → mRMR → TTFI', '6 texture features + best TTFI'],
-    ['1.6 Disease-specific feature sets', '1.6.1–1.6.4', 'same rules for other cameras → variance inflation factor', 'feature set of each camera; treatment response']],
+    ['1.6 Disease-specific feature sets', '1.6.1–1.6.4', 'same rules for other cameras → variance inflation factor', 'feature set of each camera; treatment response'],
+    ['1.7 Biochemical and biophysical basis', '1.7.1–1.7.6', 'paired comparisons, analysis of variance, within-date correlation', 'disease effect by date and growth stage; parameter–feature links']],
     'Activities of Objective 1.', [2400, 1100, 3000, 2806])
 H2('The feature-selection rule: one method for each type of feature')
 P('Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) ([[F:selection]]).')
@@ -237,6 +238,68 @@ STEP('1.6.4', 'Outputs of Objective 1',
      'Feature lists and figures → Objectives 2 and 3; Objective 1 chapter of the thesis.',
      ['Response curves by grade, variety and inoculation timing.', 'Optimal wavelengths (OW) with their stability.', 'Best NDSI, RSI and the White Rust Index.', 'Selected vegetation indices, selected texture features and the best TTFI.', 'Disease-specific feature set of each camera and the correlation between cameras.'],
      'Ma et al. (2026); Mahlein et al. (2013).')
+H2('Activity 1.7 – Biochemical and biophysical basis of the camera responses')
+P('Activity 1.7 uses the parameters of Step A8 to show what white rust does to the plant and to explain the camera responses. The parameters are not inputs to any model; they are measured on one designated subplot per plot, which is the experimental unit of the field design (Hurlbert, 1984). Statistics are kept to what each question needs ([[F:obj1phys]]).')
+FIG('obj1phys', 'g29_physio.png', 'Flow chart of Activity 1.7 (Steps 1.7.1–1.7.6).', 540)
+STEP('1.7.1', 'Data preparation',
+     'Laboratory and field readings must be on one scale and joined to the image data before analysis.',
+     'Parameter table (Step A8); severity grades; covariates; UAV features of the designated subplots.',
+     'One analysis table: plot-date rows with the 11 parameters, plot percent disease index, designated-subplot canopy score and camera features, growth stage, variety and inoculation timing → Steps 1.7.2–1.7.6.',
+     ['Average technical replicates (duplicate absorbance or conductivity readings).', 'Express pigments, anthocyanin and protein per gram of fresh weight; keep the units of [[T:physio]].', 'Join by date, plot and designated subplot.'],
+     'Gomez and Gomez (1984).')
+STEP('1.7.2', 'Effect of white rust on the parameters',
+     'Shows whether, and how much, infection changes each parameter on each date.',
+     'Analysis table; the 12 treatments (variety × inoculation timing).',
+     'Mean difference (inoculated − healthy) with 95% confidence interval for each parameter and date → interpretation; 18 January → Step 3.1.2.',
+     ['For each treatment and date, pair the mean of its three inoculated plots with its healthy plot (12 pairs per date).', 'Test the paired differences with a paired t-test, or the Wilcoxon signed-rank test when the differences are clearly not normal.', 'Report the mean difference, its 95% confidence interval and the effect size (mean difference divided by the standard deviation of the differences).'],
+     'Paired designs and tests: Gomez and Gomez (1984), Wilcoxon (1945); effect sizes instead of p-values alone: Sullivan and Feinn (2012).')
+P('Pairing compares plots of the same variety and sowing date on the same day, which removes crop-age, date and weather effects. The healthy plots lie in a separate, fungicide-protected block, so the differences can also contain small block and fungicide effects; this is stated with the results.')
+STEP('1.7.3', 'Effect of variety and inoculation timing',
+     'Shows whether varieties or crop ages at inoculation differ in their physiological response, as expected from a factorial field experiment.',
+     'Inoculated plots (36 per date).',
+     'Two-way analysis of variance tables and treatment means → interpretation of variety and timing effects.',
+     ['For each parameter and date, fit a two-way analysis of variance for a randomised block design: replication + variety + inoculation timing + variety × inoculation timing.', 'Compare means with the least significant difference at 5% when the F-test is significant.'],
+     'Analysis of factorial experiments in randomised block designs: Gomez and Gomez (1984).')
+STEP('1.7.4', 'Comparison of growth stages',
+     'White rust may affect the plant more at one growth stage than at another; stage also changes the parameters in healthy plants.',
+     'Analysis table with the BBCH growth stage of every plot and date.',
+     'Parameter means by stage (healthy plots), disease effect by stage, and a test of whether the disease effect differs between stages → interpretation of stage-dependent camera responses.',
+     ['Healthy reference: mean ± standard error of each parameter for the vegetative, flowering and pod-formation stages, healthy plots only.',
+      'Disease effect by stage: the paired differences of Step 1.7.2 grouped by stage, each with its mean and 95% confidence interval.',
+      'Difference between stages: one-way analysis of variance on the paired differences with stage as the factor (Kruskal–Wallis test if the differences are not normal), followed by Tukey comparisons; a linear mixed model with plot as a random effect is the stricter alternative for the repeated dates.',
+      'Report the number of plots in every stage × date cell.'],
+     'Kruskal and Wallis (1952); Tukey (1949); mixed models for repeated measurements: Bates et al. (2015); growth-stage dependence of disease signals: Blasch et al. (2023); flowering and Brassica canopy spectra: Sulik and Long (2016).')
+TAB('stageex', [['Growth stage (dummy)', 'Healthy', 'Inoculated', 'Difference (95% confidence interval)'], ['Vegetative', '2.10', '1.95', '−0.15 (−0.30 to 0.00)'], ['Flowering', '1.85', '1.45', '−0.40 (−0.58 to −0.22)'], ['Pod formation', '1.30', '1.05', '−0.25 (−0.42 to −0.08)']],
+    'Worked example (dummy data): total chlorophyll (mg g⁻¹ fresh weight) by growth stage; the disease effect is largest at flowering.', [2200, 1800, 1800, 3506])
+STEP('1.7.5', 'Relation of the parameters with disease severity',
+     'Shows which parameters change in proportion to severity, not only between healthy and diseased plants.',
+     'Inoculated plots; plot percent disease index; designated-subplot canopy score.',
+     'Correlation coefficients with 95% confidence intervals for each parameter and post-symptomatic date → interpretation.',
+     ['Compute the Pearson correlation of each parameter with the plot percent disease index and with the canopy score of the designated subplot, separately for each post-symptomatic date (36 plots per date).', 'Do not pool dates directly: if a pooled value is wanted, remove the date means first (within-date correlation), because parameters and severity both change with time.'],
+     'Correlation with repeated observations: Bland and Altman (1995), Bakdash and Marusich (2017).')
+STEP('1.7.6', 'Relation of the parameters with the camera features',
+     'Links each camera feature to a plant process, which shows why the feature responds to white rust.',
+     'Parameters and the camera features of the designated subplots (selected features of Activities 1.2–1.6 and the indices of [[T:traitlinks]]).',
+     'Parameter × feature correlation heat maps for each date and growth stage; check of the expected links → interpretation of Objectives 1 and 2.',
+     ['Compute Pearson correlations between each parameter and each selected camera feature within each date (48 designated subplots), and within each growth stage.', 'Control false discoveries over the many pairs with the Benjamini–Hochberg procedure (5%).', 'Compare the strongest links with the expected links of [[T:traitlinks]].'],
+     'Benjamini and Hochberg (1995); physiological traits explaining spectral and thermal disease signals: Calderón et al. (2013), Zarco-Tejada et al. (2018), Poblete et al. (2023).')
+TAB('traitlinks', [['Parameter', 'Expected camera features', 'Why', 'References'],
+    ['Chlorophyll a, b', 'red-edge position, CIrededge, MTCI, NDRE, PSSR, White Rust Index', 'chlorophyll absorbs red light and sets the position of the red edge', 'Gitelson et al. (2003); Filella and Peñuelas (1994)'],
+    ['Carotenoids', 'PRI, PSRI', 'carotenoid/chlorophyll ratio changes with stress and senescence', 'Gamon et al. (1992); Merzlyak et al. (1999)'],
+    ['Anthocyanin', 'anthocyanin reflectance index (ARI)', 'anthocyanin absorbs green light near 550 nm', 'Gitelson et al. (2001)'],
+    ['Relative water content', 'NDWI, NDII, water index, moisture stress index; canopy minus air temperature', 'water absorbs near 970, 1200, 1450 and 1650 nm; water loss warms the canopy', 'Gao (1996); Peñuelas et al. (1997); Jones et al. (2009)'],
+    ['Stomatal conductance, transpiration', 'canopy minus air temperature, normalised relative canopy temperature, crop water stress index', 'transpiration cools the leaves', 'Jones et al. (2009); Calderón et al. (2013)'],
+    ['Net photosynthesis', 'PRI, chlorophyll indices', 'PRI follows xanthophyll changes linked to light use', 'Gamon et al. (1992)'],
+    ['Membrane stability index', 'near-infrared plateau, texture features', 'tissue damage around pustules changes leaf structure and canopy pattern', 'Mahlein (2016)'],
+    ['Protein', 'red-edge features', 'leaf protein follows leaf nitrogen and chlorophyll', 'Filella and Peñuelas (1994)'],
+    ['Leaf area index', 'NDVI, OSAVI, MSR, texture features', 'canopy size controls near-infrared scattering and canopy cover', 'Haboudane et al. (2004)']],
+    'Expected links between the parameters and the camera features, checked in Step 1.7.6.', [1900, 2900, 2700, 1806], 15)
+FIG('physdummy', 'g30_dummy_physio.png', 'Dummy example: (a) chlorophyll of healthy and inoculated plots by growth stage; (b) correlation heat map between parameters and camera features on one date.', 560)
+CARD('physstats', 'Statistical analysis of the biochemical and biophysical parameters', 'Paired comparisons isolate the disease effect within the same variety, sowing date and day; analysis of variance tests treatment factors in the randomised block design; within-date correlations measure the strength of relations without the time trend.',
+     'Answers whether white rust changes a parameter, at which growth stage most, and which camera features follow which parameter, without pseudo-replication.', 'Paired t-test or Wilcoxon signed-rank test (12 pairs per date); two-way analysis of variance (36 inoculated plots per date); one-way analysis of variance or Kruskal–Wallis test on paired differences by stage; Pearson correlation within dates; Benjamini–Hochberg control of false discoveries.',
+     'Significance level 5%; false discovery rate 5%; effect sizes and 95% confidence intervals reported with every test.', 'Plot-level measurements from designed field experiments with few replications.',
+     'Simple, standard in agricultural research and matched to the design; the plot is treated as the experimental unit.', 'Gomez and Gomez (1984); Hurlbert (1984); Benjamini and Hochberg (1995); Sullivan and Feinn (2012)')
+
 BOX('Link to satellite monitoring (optional extension, not part of the six-month plan).', 'The subplot hyperspectral spectra can be convolved with the relative spectral response functions of Sentinel-2 and Resourcesat LISS-IV to simulate satellite band reflectance, and the selected wavelengths and indices can then be tested with these simulated bands. This approach was used for yellow rust with Sentinel-2 (Zheng et al., 2018) and for rice bacterial leaf blight with LISS-IV (Das et al., 2015); UAV data have also been used to bridge field and satellite scales (Revill et al., 2020; Blasch et al., 2023; Poblete et al., 2023; Yuan et al., 2025).', 'EEF3E8', '2C5F2D')
 
 # =====================================================================================
@@ -495,7 +558,7 @@ TAB('ablationt', [['Model (template)', 'Overall accuracy', 'Kappa', 'Macro recal
 STEP('2.5.4', 'Shapley additive explanations (SHAP) and selection stability',
      'Shows which features drive the best models and how stable the selected features are.',
      'Best models; selected features of every fold.', 'Feature-importance figures; stability table → Objective 1 discussion.',
-     ['Compute SHAP values of the best machine-learning model of each task; summarise the mean |SHAP| per feature and per camera.', 'Count how often every feature is selected over the three folds; final feature lists contain features selected in at least two of three folds.'],
+     ['Compute SHAP values of the best machine-learning model of each task; summarise the mean |SHAP| per feature and per camera.', 'Compare the most important features with the biochemical and biophysical parameters that changed with disease (Activity 1.7), to give the model a physiological explanation.', 'Count how often every feature is selected over the three folds; final feature lists contain features selected in at least two of three folds.'],
      'Lundberg and Lee (2017); Lundberg et al. (2020); Nogueira et al. (2018).')
 CARD('ablation', 'Ablation and Shapley interpretation', 'Ablation removes one part (a camera, a feature group or a network module) and measures the loss; SHAP divides each prediction among the features.',
      'Shows what each camera, feature type and network module contributes.', 'Drop-one-camera from S15; DT-EDNet without SE, without Dual Transformer Group, without both; SHAP on the best machine-learning models.',
@@ -582,6 +645,12 @@ STEP('3.1.1', 'Labels from the later status of each subplot',
      'Pre-symptomatic subplot tables; scores of the first post-symptomatic date.', 'Labelled pre-symptomatic dataset → Activity 3.2.',
      ['Classification: healthy = subplots of the 12 healthy plots; infected = inoculated subplots that show pustules later; inoculated subplots that never show symptoms are excluded from the infected class.', 'Regression: target = severity score of the same subplot on the first post-symptomatic date.', 'Record days after inoculation for every sample.'],
      'Zhu et al. (2017); Tian et al. (2021); Mahlein et al. (2019); Yu et al. (2021) for the early stage of pine wilt disease.')
+STEP('3.1.2', 'Physiological changes before symptoms (18 January 2027)',
+     'If pigments, water status or gas exchange already change before pustules appear, there is a physiological reason why pre-symptomatic detection can work.',
+     'Biochemical and biophysical parameters of 18 January (Step A8); later severity of the same plots.',
+     'Inoculated − healthy differences on the pre-symptomatic date and their relation with later severity → interpretation of Objective 3.',
+     ['Compare inoculated and healthy plots for every parameter with the paired comparison of Step 1.7.2 (12 pairs).', 'Correlate the pre-symptomatic parameters of the inoculated plots with their percent disease index on 28 January (first post-symptomatic sampling date).', 'Report effect sizes and 95% confidence intervals; note the block and fungicide caveat of Step 1.7.2.'],
+     'Pre-visual physiological changes behind early detection: Zarco-Tejada et al. (2018), Calderón et al. (2013); pre-symptomatic hyperspectral detection: Zhu et al. (2017).')
 H2('Activity 3.2 – Normalisation to healthy plots')
 STEP('3.2.1', 'Healthy-plot normalisation of all features',
      'Early disease changes are small compared with date, weather, variety and crop-age differences.',

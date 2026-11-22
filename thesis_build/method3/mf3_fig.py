@@ -47,7 +47,7 @@ rows = [('Common Activity A – Field experiment, ground truth, covariates and d
         ('Common Activity D – Subplot spectra and feature extraction', 'mean of vegetation pixels per subplot → reflectance, first derivative, red-edge parameters, vegetation indices,\nprincipal-component texture, multispectral, colour and thermal features', 'nav'),
         ('Common Activity E – Normalisation and data preparation', 'thermal normalisation → healthy-plot normalisation (healthy plots rotated across folds)\n→ standardisation with training statistics → class weights', 'gold'),
         ('Common Activity F – Validation design and tuning', 'leave-one-replication-out outer folds grouped by plot; inner grouped folds for selection and tuning; leakage checklist', 'gold'),
-        ('Objective 1 – Characterisation (Activities 1.1–1.6)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and Tri-band Texture Fusion Index → feature sets', 'o1'),
+        ('Objective 1 – Characterisation (Activities 1.1–1.7)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and TTFI → feature sets → biochemical and biophysical basis', 'o1'),
         ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.7), 1920 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
         ('Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5), 576 pre-symptomatic samples', 'labels from the later status of each subplot | normalisation to healthy plots | same feature selection | machine learning and\nfeature-fusion neural networks | earliest detection day and risk maps', 'o3')]
 y = 14.3
@@ -81,13 +81,14 @@ chain('g04_features.png', 'Common Activity D – Subplot spectra and feature ext
     ('D5  Multispectral and red–green–blue features', 'band reflectance, indices, colour indices', 'multispectral and colour groups'),
     ('D6  Thermal features', 'canopy temperature statistics; canopy minus air temperature; normalised temperatures', 'thermal group')], 'nav')
 
-chain('g05_obj1.png', 'Objective 1 – Characterisation of white rust by each camera (Activities 1.1–1.6)', [
+chain('g05_obj1.png', 'Objective 1 – Characterisation of white rust by each camera (Activities 1.1–1.7)', [
     ('Activity 1.1  Response curves', 'spectra, indices, texture and temperature by severity class, variety, inoculation timing and date', 'response figures'),
     ('Activity 1.2  Optimal wavelengths (SHAP-CARS)', 'effective ranges from NDSI and RSI maps → Shapley values on a tree ensemble →\ncompetitive adaptive reweighted sampling with partial least squares', 'optimal wavelength set'),
     ('Activity 1.3  Spectral index construction', 'all-pair NDSI and RSI search; three-band White Rust Index', 'best spectral indices'),
     ('Activity 1.4  Vegetation index selection (ReliefF)', 'published indices + red-edge parameters + constructed indices → ReliefF weights', 'selected indices'),
     ('Activity 1.5  Texture selection (mRMR) and TTFI', 'principal-component texture → mRMR → ordered triplets → Tri-band Texture Fusion Index', 'selected texture + best TTFI'),
-    ('Activity 1.6  Disease-specific feature sets', 'union of selected groups per camera; variance inflation factor below 10; treatment response', 'disease-specific feature set\nof each camera')], 'o1')
+    ('Activity 1.6  Disease-specific feature sets', 'union of selected groups per camera; variance inflation factor below 10; treatment response', 'disease-specific feature set\nof each camera'),
+    ('Activity 1.7  Biochemical and biophysical basis', 'pigments, anthocyanin, protein, water content, membrane stability, gas exchange, leaf area index:\ndisease effect by date and growth stage; links with camera features', 'physiological explanation')], 'o1')
 
 chain('g06_obj2.png', 'Objective 2 – Detection and severity discrimination (Activities 2.1–2.7)', [
     ('Activity 2.1  Tasks and inputs', 'detection, severity classes, severity score; hyperspectral feature-group inputs;\n15 sensor sets with feature-level fusion', 'input matrices per fold'),
@@ -365,4 +366,27 @@ arr(ax, 7.75, 2.52, 8.2, 2.52)
 box(ax, 8.2, 1.85, 3.6, 1.35, 'Stage 2 – Bharatpur (independent)', 'research farms and farmers\' fields\nnatural infection, local varieties\nsame cameras, scoring and processing', 'o3', fs=8.2, tfs=9.4)
 box(ax, 0.2, 0.25, 11.6, 1.25, 'Reported for the second stage', 'same metrics as stage 1 (overall accuracy, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD) | loss of accuracy from stage 1 to stage 2\nresults by site type, variety and growth stage | label-free re-standardisation as a second result | covariate models with Bharatpur weather | farm maps', 'grey', fs=8.2, tfs=9.4)
 save(fig, 'g28_twostage.png')
+
+chain('g29_physio.png', 'Activity 1.7 – Biochemical and biophysical basis of the camera responses (Steps 1.7.1–1.7.6)', [
+    ('1.7.1  Data preparation', 'average technical replicates; units per gram fresh weight; join with severity, covariates\nand the camera features of the designated subplot', 'analysis table (48 plots × 4 dates)'),
+    ('1.7.2  Effect of white rust', 'inoculated − healthy, paired within treatment and date (12 pairs);\npaired t-test or Wilcoxon; mean difference, 95% confidence interval, effect size', 'disease effect per date'),
+    ('1.7.3  Variety and inoculation timing', 'two-way analysis of variance (randomised block design), inoculated plots;\nleast significant difference', 'treatment effects'),
+    ('1.7.4  Growth stages', 'healthy means by stage; paired differences by stage; one-way analysis of variance\nor Kruskal–Wallis on the differences; Tukey comparisons', 'disease effect by stage'),
+    ('1.7.5  Relation with severity', 'Pearson correlation with plot disease index and subplot score, within each date', 'severity relations'),
+    ('1.7.6  Relation with camera features', 'within-date and within-stage correlations; Benjamini–Hochberg; expected-link table', 'parameter–feature links')], 'o1')
+
+# dummy physiology figure
+fig, axs = plt.subplots(1, 2, figsize=(11.5, 4.0), gridspec_kw={'width_ratios': [1, 1.25]})
+st = ['vegetative', 'flowering', 'pod formation']; hv = [2.10, 1.85, 1.30]; iv = [1.95, 1.45, 1.05]; ci = [0.15, 0.18, 0.17]
+xx = np.arange(3); axs[0].bar(xx - 0.18, hv, 0.36, color='#2E7D32', label='healthy'); axs[0].bar(xx + 0.18, iv, 0.36, yerr=ci, capsize=4, color='#C62828', label='inoculated')
+axs[0].set_xticks(xx); axs[0].set_xticklabels(st); axs[0].set(ylabel='total chlorophyll (mg g⁻¹ fresh weight)', title='(a) Chlorophyll by growth stage'); axs[0].legend(fontsize=8); axs[0].grid(alpha=.3, axis='y')
+pars = ['Chlorophyll', 'Carotenoids', 'Anthocyanin', 'Protein', 'Relative water content', 'Membrane stability', 'Photosynthesis', 'Transpiration', 'Stomatal conductance', 'Leaf area index']
+feats = ['REP', 'CIrededge', 'PRI', 'ARI', 'NDWI', 'CTD', 'NIR', 'TTFI', 'NDVI']
+R = np.array([[.78, .81, .45, -.35, .30, -.40, .35, -.30, .55], [.40, .38, .62, -.20, .25, -.30, .20, -.20, .35], [-.35, -.30, -.25, .74, -.15, .20, -.15, .25, -.30],
+              [.55, .58, .30, -.25, .20, -.25, .25, -.20, .40], [.30, .25, .20, -.15, .76, -.68, .35, -.25, .35], [.35, .30, .25, -.20, .35, -.40, .58, -.55, .40],
+              [.50, .48, .66, -.30, .40, -.62, .35, -.35, .45], [.25, .20, .30, -.10, .45, -.79, .20, -.20, .25], [.30, .25, .35, -.15, .50, -.81, .25, -.25, .30], [.45, .50, .30, -.20, .35, -.30, .60, -.35, .82]])
+im = axs[1].imshow(R, cmap='RdBu_r', vmin=-1, vmax=1); plt.colorbar(im, ax=axs[1], fraction=0.04, label='r')
+axs[1].set_xticks(range(len(feats))); axs[1].set_xticklabels(feats, rotation=45, ha='right', fontsize=8); axs[1].set_yticks(range(len(pars))); axs[1].set_yticklabels(pars, fontsize=8)
+axs[1].set_title('(b) Parameter × camera feature correlations (one date)')
+fig.text(0.5, -0.02, 'Dummy data for illustration only', ha='center', fontsize=8, style='italic', color='#777'); plt.tight_layout(); save(fig, 'g30_dummy_physio.png')
 print('figures ok')

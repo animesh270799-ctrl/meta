@@ -6,6 +6,7 @@ H2('6.1 Input–output chain of all steps')
 TAB('chain', [['Step(s)', 'Input', 'Output', 'Used by'],
  ['A1–A3, A5', 'field design, scores', 'labelled subplot list; post- and pre-symptomatic datasets', 'D8, F1, all objectives'],
  ['A4', 'tagged plants, ASD spectroradiometer', 'leaf spectra with leaf grades and metadata', 'separate leaf-level analysis (not part of this document)'],
+ ['A8', 'designated subplots, laboratory and field instruments', 'biochemical and biophysical parameters (48 plots × 4 dates)', '1.7, 3.1.2'],
  ['A7', 'Bharatpur research farms and farmers\' fields', 'independent validation dataset (images, grades, covariates)', '2.7, 3.5.4'],
  ['A6', 'field book, weather records', 'covariate table (days after inoculation, variety, timing, growth stage, weather)', 'D2, 1.1.3, 2.5.5, 3.5.3'],
  ['B1–B2', 'raw images, panels, control points', 'calibrated, georeferenced mosaics', 'B3, B4'],
@@ -26,6 +27,7 @@ TAB('chain', [['Step(s)', 'Input', 'Output', 'Used by'],
  ['1.4.1–1.4.3', 'index group', 'selected indices', '1.6.2, 2.1.5'],
  ['1.5.1–1.5.4', 'principal-component texture', 'selected texture features; best TTFI', '1.6.2, 2.1.5'],
  ['1.6.1–1.6.4', 'survivors of all groups', 'disease-specific feature set of each camera', '2.1.2, 3.3.1'],
+ ['1.7.1–1.7.6', 'biochemical and biophysical parameters; camera features', 'disease effect by date and stage; parameter–feature links', 'interpretation of Objectives 1–3; 2.5.4'],
  ['2.1.1–2.1.5', 'feature sets, folds', 'task labels; fused sets of 15 sensor sets; six hyperspectral configurations', '2.2, 2.3'],
  ['2.2.1–2.2.6', 'optimum feature combinations', 'tuned machine-learning predictions', '2.4'],
  ['2.3.1–2.3.8', 'fused sets; pseudo-images', 'neural-network predictions', '2.4'],
@@ -78,6 +80,7 @@ TAB('changes', [['Item', 'Previous version', 'This version', 'Reason'],
  ['Deep learning (post-symptomatic)', 'DNN-F1, DNN-F2', 'DNN-F1, DNN-F2 + DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2', 'user request; comparison of Ma et al. (2026)'],
  ['Normalisation', 'inside other steps', 'separate Activity E (six steps)', 'clarity; user request'],
  ['Endmember extraction', 'one step', 'Activity C with eight steps', 'clarity; user request'],
+ ['Biochemical and biophysical parameters', 'not included', 'Step A8 and Activity 1.7: 11 parameters on 4 dates with paired comparisons, analysis of variance, growth-stage comparison and parameter–feature correlations', 'user request; physiological basis'],
  ['Validation', 'IARI field only', 'two stages: IARI field (internal) and Bharatpur research farms and farmers\' fields (independent)', 'user request; transferability'],
  ['Leaf spectra', 'not collected', 'ASD leaf spectra of L3, L5 and LL from 3 plants per subplot on every flight date (acquisition only)', 'user request; leaf–canopy link'],
  ['Covariates', 'flower %, canopy cover %, vegetation pixel count', 'days after inoculation, variety, inoculation timing, growth stage, weather', 'user request; covariate baseline'],
@@ -109,7 +112,7 @@ rededge = [['Red edge', 'CI_{rededge}', 'R_{790}/R_{720} − 1', 'Gitelson et al
            ['', 'MTCI', '(R_{754} − R_{709})/(R_{709} − R_{681})', 'Dash and Curran 2004'], ['', 'OSAVI', '1.16(R_{800} − R_{670})/(R_{800} + R_{670} + 0.16)', 'Rondeaux et al. 1996'], ['', 'MCARI', '[(R_{700} − R_{670}) − 0.2(R_{700} − R_{550})](R_{700}/R_{670})', 'Daughtry et al. 2000'],
            ['Red-edge parameters', 'REP; D_{r}; area', 'wavelength of the maximum first derivative (680–760 nm); its value; sum of the first derivative over 680–760 nm', 'Filella and Peñuelas 1994; Yu et al. 2021']]
 swir = [['SWIR disease–water', 'DWSI-2; DWSI-3', 'R_{1660}/R_{550};  R_{1660}/R_{680}', 'Apan et al. 2004'], ['', 'DWSI-5', '(R_{800} + R_{550})/(R_{1660} + R_{680})', 'Apan et al. 2004'],
-        ['', 'NDWI', '(R_{860} − R_{1240})/(R_{860} + R_{1240})', 'Gao 1996'], ['', 'MSI', 'R_{1600}/R_{820}', 'Hunt and Rock 1989'], ['', 'NDII', '(R_{819} − R_{1649})/(R_{819} + R_{1649})', 'Hardisky et al. 1983']]
+        ['', 'NDWI', '(R_{860} − R_{1240})/(R_{860} + R_{1240})', 'Gao 1996'], ['', 'Moisture stress index', 'R_{1600}/R_{820}', 'Hunt and Rock 1989'], ['', 'NDII', '(R_{819} − R_{1649})/(R_{819} + R_{1649})', 'Hardisky et al. 1983']]
 rows = [['Group', 'Index', 'Formula', 'Reference']] + hs[1:-1] + rededge + swir + [hs[-1]]
 P('R_{λ} is the reflectance at λ nm (nearest available band). Formulas were checked against the original papers.')
 TAB('hsidx', rows, 'Hyperspectral indices and red-edge parameters.', [1700, 1700, 4106, 1800], 15)
@@ -133,7 +136,7 @@ TAB('tirfeat', tir, 'Thermal features.', [2800, 4300, 2206], 15)
 H1('8. Six-month work plan')
 FIG('gantt', 'g24_gantt.png', 'Six-month work plan for the analysis.', 540)
 TAB('plan', [['Month', 'Work', 'Deliverable'], ['1', 'Common Activities A–C for all dates and cameras; mask accuracy', 'calibrated, masked images; endmember library'],
-    ['2', 'Activities D–F: features, covariates, normalisation, folds; Activity 1.1', 'feature and covariate tables; response curves'], ['3', 'Activities 1.2–1.6; selection code tested inside folds', 'optimal wavelengths, White Rust Index, selected indices, TTFI; Objective 1 draft'],
+    ['2', 'Activities D–F: features, covariates, normalisation, folds; Activity 1.1', 'feature and covariate tables; response curves'], ['3', 'Activities 1.2–1.7; selection code tested inside folds; analysis of the biochemical and biophysical parameters', 'optimal wavelengths, White Rust Index, selected indices, TTFI; Objective 1 draft'],
     ['4', 'Objective 2: machine learning and feature-fusion networks for 15 sensor sets', 'results of 15 sensor sets'], ['5', 'Objective 2: DT-EDNet and comparison networks; ablation; Shapley explanation; maps', 'network comparison; ablation; maps'],
     ['6', 'Objective 3; second-stage validation at Bharatpur (Activity 2.7); synthesis and writing', 'earliest detection day; risk maps; independent validation results; thesis chapters']], 'Month-wise plan.', [1000, 5000, 3306])
 NOTE('Computing load: 15 sensor sets × 3 tasks × 3 folds × 5 machine-learning models with floating forward selection; two feature-fusion networks and four pseudo-image networks × 5 seeds. Run the selection of each camera once per fold and reuse it for all combinations, and train the networks on a graphics processing unit.')
@@ -157,6 +160,7 @@ for q, a in [('Why one feature-selection method for each type of feature?', 'Eac
     ('Why are flowers kept in the subplot spectrum?', 'The canopy score includes the inflorescence and staghead; the growth stage (vegetative, flowering, pod formation) is recorded with the BBCH scale and results are reported for each stage, so that selected features are not only flowering effects (Sulik and Long, 2016; Meier, 2018).'),
     ('How are weather and other covariates used?', 'Days after inoculation, variety, inoculation timing, growth stage and weather form a covariate-only baseline; a camera is useful only if it beats this baseline. Weather has one value per date, so models that contain it are labelled within-season (Zhang et al., 2014; Chattopadhyay et al., 2011).'),
     ('How is pre-symptomatic infection known if no symptoms are visible?', 'From the later status of the same subplot; inoculated subplots that never develop symptoms are excluded (Zhu et al., 2017; Tian et al., 2021).'),
+    ('Why are the biochemical and biophysical parameters measured at plot level?', 'The plot is the experimental unit of the randomised block design (Hurlbert, 1984). One designated subplot per plot keeps the gas-exchange readings inside the mid-morning window and links each sample to the UAV features of that subplot; the parameters explain the camera responses and are not model inputs (Calderón et al., 2013).'),
     ('How do you know the models work outside the IARI field?', 'Validation has two stages: leave-one-replication-out inside the IARI field to choose and assess the models, then frozen final models tested once on independent research-farm and farmers\' field data from Bharatpur with natural infection, as the DT-EDNet study did with an independent naturally infected dataset (Ma et al., 2026; Ploton et al., 2020).'),
     ('How can these results be used with satellite data?', 'The selected wavelengths and indices can be simulated for Sentinel-2 or LISS-IV bands from the hyperspectral spectra, as done for yellow rust and rice bacterial leaf blight (Zheng et al., 2018; Das et al., 2015).')]:
     P('**Q. ' + q + '** ' + a)

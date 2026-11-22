@@ -57,6 +57,9 @@ P('The text always gives the full name with the abbreviation in brackets. This l
 TAB('abbr', [['Abbreviation', 'Full name', 'Abbreviation', 'Full name'],
  ['AdamW', 'adaptive moment estimation with decoupled weight decay', 'MNF', 'minimum noise fraction'],
  ['ASD', 'Analytical Spectral Devices field spectroradiometer (leaf spectra)', 'L3, L5, LL', '3rd and 5th fully expanded leaf from the top; lowest green leaf'],
+ ['DMSO', 'dimethyl sulfoxide (pigment extraction solvent)', 'IRGA', 'infrared gas analyser (LI-6400 portable gas exchange system)'],
+ ['LAI', 'leaf area index', 'RWC', 'relative water content'],
+ ['MSI', 'membrane stability index (the moisture stress index is written in full)', 'FW, TW, DW', 'fresh, turgid and dry weight'],
  ['AUC', 'area under the receiver operating characteristic curve', 'mRMR', 'minimum redundancy maximum relevance'],
  ['BBCH', 'decimal scale of plant growth stages (Biologische Bundesanstalt, Bundessortenamt und Chemische Industrie)', 'RH', 'relative humidity'],
  ['CARS', 'competitive adaptive reweighted sampling', 'MS', 'multispectral'],
@@ -105,7 +108,7 @@ NL(['One sample is one subplot on one date. The four subplots of a plot always s
     'Validation has two stages: first inside the IARI field (leave-one-replication-out, nested), then on independent data from research farms and farmers\' fields at Bharatpur with frozen models.'])
 H2('1.3 Dataset')
 TAB('dataset', [['Item', 'Value'], ['Plots × subplots', '48 × 4 = 192 subplots in each image'], ['Cameras', '4: hyperspectral, multispectral, red–green–blue and thermal'], ['Images', '13 flight dates × 4 cameras = 52 images (3 pre-symptomatic + 10 post-symptomatic dates)'], ['Inoculation and flight dates', 'inoculation 10 Jan 2027; flights 12, 15, 18 Jan (pre-symptomatic) and 21, 28 Jan, 4, 11, 18, 25 Feb, 4, 11, 18, 25 Mar 2027 (post-symptomatic)'],
-    ['Post-symptomatic samples per camera', '1920 (10 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'], ['ASD leaf spectra', '3 plants per subplot × leaves L3, L5, LL on every flight date (1728 leaf spectra per date)'], ['Validation', 'first stage: IARI field (leave-one-replication-out, nested); second stage: Bharatpur research farms and farmers\' fields (independent, natural infection, at least 300 quadrat-dates)'],
+    ['Post-symptomatic samples per camera', '1920 (10 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'], ['ASD leaf spectra', '3 plants per subplot × leaves L3, L5, LL on every flight date (1728 leaf spectra per date)'], ['Biochemical and biophysical parameters', 'chlorophyll a and b, carotenoids, anthocyanin, protein, relative water content, membrane stability index, photosynthesis, transpiration, stomatal conductance, leaf area index; 1 designated subplot per plot on 4 dates (1 pre-, 3 post-symptomatic)'], ['Validation', 'first stage: IARI field (leave-one-replication-out, nested); second stage: Bharatpur research farms and farmers\' fields (independent, natural infection, at least 300 quadrat-dates)'],
     ['Sensor sets analysed', '15 (4 single cameras, 6 pairs, 4 triples, all four)'], ['Tasks', 'detection (healthy vs diseased), severity classes, severity score'], ['Time for the analysis', '6 months']], 'Dataset used in this methodology (numbers as recorded by the researcher).', [3300, 6006])
 FIG('dataset', 'g26_dataset.png', 'Structure of the dataset: flight dates → cameras → plots → scored subplots, and the two datasets used by the objectives.', 520)
 H2('1.4 Main published studies used to build the methodology')
@@ -130,7 +133,7 @@ TAB('literature', [['Study', 'Crop and disease', 'Sensors', 'What it contributes
 # =====================================================================================
 H1('2. Common activities (carried out once for all objectives)')
 P('The six common activities turn the raw images into clean, normalised feature tables with one row per subplot-date and prepare the validation folds. Each activity is described as a sequence of steps.')
-TAB('commonact', [['Activity', 'Steps', 'Main output'], ['A. Field experiment, ground truth and datasets', 'A1–A7', 'labelled subplot list; ASD leaf spectra; covariates; post- and pre-symptomatic datasets; Bharatpur validation dataset'], ['B. Image pre-processing', 'B1–B5', 'calibrated, aligned images on the hyperspectral grid'],
+TAB('commonact', [['Activity', 'Steps', 'Main output'], ['A. Field experiment, ground truth and datasets', 'A1–A8', 'labelled subplot list; ASD leaf spectra; covariates; post- and pre-symptomatic datasets; Bharatpur validation dataset; biochemical and biophysical parameters'], ['B. Image pre-processing', 'B1–B5', 'calibrated, aligned images on the hyperspectral grid'],
     ['C. Endmember extraction and vegetation mask', 'C1–C8', 'endmember library; vegetation mask applied to all cameras'], ['D. Subplot spectra and feature extraction', 'D1–D8', 'feature table of each camera'],
     ['E. Normalisation and data preparation', 'E1–E4', 'normalised and standardised features; class weights'], ['F. Validation design and tuning', 'F1–F3', 'outer and inner folds; tuning plan; leakage checklist']], 'Common activities and their outputs.', [3500, 1300, 4506])
 
@@ -239,6 +242,49 @@ STEP('A7', 'Second-stage validation data at Bharatpur (research farms and farmer
       'Healthy reference: where possible, keep a fungicide-protected strip of the main variety at the research farm, so that features that need a healthy reference can also be tested.'],
      'Independent validation on naturally infected fields from another site and year: Ma et al. (2026); importance of testing on independent locations: Roberts et al. (2017), Ploton et al. (2020); Bharatpur as a white rust site for weather-based forecasting: Chattopadhyay et al. (2011); UAV disease monitoring of smallholder fields: Liu et al. (2026); transfer of UAV disease models to new areas: Yuan et al. (2025).',
      note='The Bharatpur data are never used for feature selection, tuning or training. They are used only once, for the second-stage validation of the final models.')
+
+STEP('A8', 'Biochemical and biophysical parameters',
+     'Spectral and thermal features are indirect. Measured pigments, water status, membrane damage, gas exchange and leaf area show what white rust does to the plant and give the camera responses a physiological explanation.',
+     'One designated subplot per plot; untagged plants of that subplot for destructive samples; leaf L3 (third fully expanded leaf from the top); spectrophotometer, conductivity meter, LI-6400 portable gas exchange system, plant canopy analyser.',
+     'Table of 11 parameters for 48 plots × 4 dates (192 samples per parameter; leaf area index for all 4 subplots) → Activity 1.7 and Step 3.1.2.',
+     ['Dates (all on UAV flight days): 18 January 2027 (pre-symptomatic, 8 days after inoculation) and 28 January, 18 February and 11 March 2027 (post-symptomatic, 18, 39 and 60 days after inoculation), covering early, peak and late disease and the vegetative, flowering and pod-formation stages.',
+      'Designated subplot: one subplot per plot, rotated so that each of the four subplot positions is sampled in 12 plots (position = plot number modulo 4, plus 1); its code is stored with every sample, so the parameters can be joined to the UAV features and canopy score of that subplot.',
+      'Gas exchange: on leaf L3 of one tagged plant (non-destructive, Step A4), between 09:30 and 11:30 h, before the flight.',
+      'Leaf samples for the laboratory: after the gas-exchange readings, collect L3 leaves from 3 untagged plants of the designated subplot, keep them in a cool box and process them the same day; the tagged plants are not damaged.',
+      'Leaf area index: in all four subplots, under diffuse light (early morning, late afternoon or overcast sky).',
+      'Record the BBCH growth stage of each plot on every sampling date (Step A6).',
+      'Methods and units are given in [[T:physio]]; the formulas are given below.'],
+     'Plant traits measured together with airborne and UAV imagery to explain disease-related spectral and thermal changes: Calderón et al. (2013), Zarco-Tejada et al. (2018), Poblete et al. (2023); leaf area index of mustard with a plant canopy analyser at IARI: Goyal et al. (2021).')
+TAB('physio', [['Parameter (unit)', 'Method', 'Sample', 'References'],
+    ['Chlorophyll a and b (mg g⁻¹ fresh weight)', 'extraction in dimethyl sulfoxide (DMSO) without grinding; absorbance at 665 and 649 nm; DMSO equations', '100 mg leaf discs in 10 mL DMSO, 65 °C until colourless', 'Hiscox and Israelstam (1979); Wellburn (1994)'],
+    ['Total carotenoids (mg g⁻¹ fresh weight)', 'same DMSO extract; absorbance at 480 nm; DMSO equation', 'same extract', 'Lichtenthaler and Wellburn (1983); Wellburn (1994)'],
+    ['Anthocyanin (µg g⁻¹ fresh weight)', 'pH differential method: absorbance at about 520 and 700 nm in pH 1.0 (potassium chloride) and pH 4.5 (sodium acetate) buffers', 'acidified-methanol extract of 0.5 g leaf tissue', 'Lee et al. (2005)'],
+    ['Total soluble protein (mg g⁻¹ fresh weight)', 'Bradford dye-binding method; absorbance at 595 nm against a bovine serum albumin standard curve', 'buffer extract of 0.5 g leaf tissue', 'Bradford (1976)'],
+    ['Relative water content (%)', 'fresh weight, turgid weight after 4 h floating on distilled water, dry weight after 48 h at 70 °C', '10 leaf discs', 'Barrs and Weatherley (1962)'],
+    ['Membrane stability index (%)', 'electrolyte leakage: conductivity after 30 min at 40 °C (C₁) and after 10 min at 100 °C (C₂)', 'two sets of 0.1 g leaf discs in 10 mL double-distilled water', 'Premachandra et al. (1990); Sairam (1994)'],
+    ['Net photosynthetic rate (µmol CO₂ m⁻² s⁻¹)', 'LI-6400 portable gas exchange system (infrared gas analyser): leaf chamber with LED light 1200 µmol m⁻² s⁻¹, reference CO₂ 400 µmol mol⁻¹, flow 500 µmol s⁻¹, leaf temperature near ambient; read after the values are stable', 'leaf L3 of a tagged plant', 'Long and Bernacchi (2003); Riches et al. (2020)'],
+    ['Transpiration rate (mmol H₂O m⁻² s⁻¹)', 'same reading', 'same leaf', 'Long and Bernacchi (2003)'],
+    ['Stomatal conductance (mol H₂O m⁻² s⁻¹)', 'same reading (intercellular CO₂ also recorded)', 'same leaf', 'Long and Bernacchi (2003)'],
+    ['Leaf area index (m² m⁻²)', 'plant canopy analyser: one reading above and four below the canopy across the rows, with a view cap that hides the operator', 'every subplot', 'Bréda (2003); Goyal et al. (2021)']],
+    'Biochemical and biophysical parameters, methods and units. Pigments, anthocyanin and protein are expressed per gram of fresh weight; µg mg⁻¹ equals mg g⁻¹.', [2400, 3200, 1800, 1906], 15)
+P('**Formulas.** Pigments in µg mL⁻¹ of DMSO extract for a spectrophotometer of 1–4 nm resolution (Wellburn, 1994); they are converted to mg g⁻¹ fresh weight with the extract volume and sample weight. The anthocyanin content is expressed as cyanidin-3-glucoside equivalents (molecular weight 449.2 g mol⁻¹, molar absorptivity 26 900 L mol⁻¹ cm⁻¹; Lee et al., 2005).')
+EQ('C_{a} = 12.47 A_{665} − 3.62 A_{649};    C_{b} = 25.06 A_{649} − 6.5 A_{665};    C_{x+c} = (1000 A_{480} − 1.29 C_{a} − 53.78 C_{b}) / 220')
+EQ('A = (A_{520} − A_{700})_{pH 1.0} − (A_{520} − A_{700})_{pH 4.5};    anthocyanin (mg L^{−1}) = A × 449.2 × dilution × 1000 / (26 900 × path length)')
+EQ('RWC (%) = (FW − DW) / (TW − DW) × 100;    membrane stability index (%) = [1 − (C_{1} / C_{2})] × 100')
+TAB('physex', [['Parameter (dummy data)', 'Readings', 'Result'],
+    ['Chlorophyll a, b and carotenoids', 'A₆₆₅ = 0.62, A₆₄₉ = 0.25, A₄₈₀ = 0.40; 0.1 g in 10 mL', 'C_a = 6.83, C_b = 2.24, C_x+c = 1.23 µg mL⁻¹ → 0.68, 0.22 and 0.12 mg g⁻¹ fresh weight'],
+    ['Anthocyanin', '(A₅₂₀ − A₇₀₀) = 0.230 at pH 1.0 and 0.045 at pH 4.5; 0.5 g in 5 mL', 'A = 0.185 → 3.09 mg L⁻¹ → 30.9 µg g⁻¹ fresh weight'],
+    ['Relative water content', 'FW = 0.52 g, TW = 0.60 g, DW = 0.10 g', '(0.52 − 0.10) / (0.60 − 0.10) × 100 = 84%'],
+    ['Membrane stability index', 'C₁ = 120 µS cm⁻¹, C₂ = 600 µS cm⁻¹', '[1 − 120/600] × 100 = 80%']],
+    'Worked examples of the calculations (dummy data).', [2400, 3800, 3106])
+CARD('irga', 'Leaf gas exchange with a portable infrared gas analyser (LI-6400)', 'Air of known CO₂ and water-vapour concentration flows through a leaf chamber; infrared gas analysers measure the concentrations before and after the leaf, and the differences give net photosynthesis, transpiration and stomatal conductance.',
+     'Measures the physiological activity of the leaf directly, which explains canopy temperature (transpiration) and photosynthesis-related spectral indices.', 'Leaf L3 of a tagged plant; LED light 1200 µmol m⁻² s⁻¹; reference CO₂ 400 µmol mol⁻¹; flow 500 µmol s⁻¹; readings after stabilisation; 09:30–11:30 h.',
+     'Chamber settings fixed for all dates; readings accepted when CO₂ and water differences are stable; instrument zeroed and matched before each session.', 'Field leaves under stable mid-morning light; one leaf per plot because each reading takes several minutes.',
+     'The standard method for leaf photosynthesis, transpiration and stomatal conductance; stomatal conductance explained canopy temperature in airborne disease detection (Calderón et al., 2013).', 'Long and Bernacchi (2003); Riches et al. (2020)')
+CARD('lai', 'Leaf area index with a plant canopy analyser', 'A fish-eye optical sensor compares diffuse light above and below the canopy at several view angles; the gap fraction is inverted to leaf area per ground area.',
+     'Gives canopy size, which changes with growth stage and with disease and affects every canopy spectral feature.', 'One above and four below readings per subplot, view cap, diffuse light.',
+     'No tuning; readings only under diffuse light, the same sensor and view cap on all dates.', 'Row crops with closed or nearly closed canopies.',
+     'Fast, non-destructive and used for mustard at IARI (Goyal et al., 2021); separates canopy-size effects from disease effects.', 'Bréda (2003); Goyal et al. (2021)')
 
 # ---------------------------------------------------------------- B
 H2('Activity B – Image pre-processing')
@@ -424,7 +470,7 @@ STEP('D4', 'Vegetation indices',
      'General physiological changes (pigments, structure, water) are captured best by published indices that have known meaning.',
      'Subplot mean reflectance.',
      'Index group (published indices + red-edge parameters; the searched indices of Activity 1.3 are added later) → Activity 1.4.',
-     ['Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, MSI, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.',
+     ['Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, moisture stress index, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.',
       'Check every formula against the original paper and use the nearest available band.',
       'Index definitions are given in Chapter 7 ([[T:hsidx]]).'],
      'Index groups for disease detection: Mahlein et al. (2013), Huang et al. (2014), Ma et al. (2026); pigment indices: Gamon et al. (1992), Gitelson et al. (2003), Merzlyak et al. (1999); water and disease indices: Gao (1996), Apan et al. (2004); PSRI and PSSRb for rice bacterial leaf blight: Das et al. (2015).')

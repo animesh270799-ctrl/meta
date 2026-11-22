@@ -41,3 +41,16 @@ Lancashire, P.D., Bleiholder, H., van den Boom, T., Langelüddeke, P., Stauss, R
 Meier, U. (ed.) (2018). Growth Stages of Mono- and Dicotyledonous Plants: BBCH Monograph. Julius Kühn-Institut, Quedlinburg. https://doi.org/10.5073/20180906-074619
 Zhang, J., Pu, R., Yuan, L., Huang, W., Nie, C., Yang, G. (2014). Integrating remotely sensed and meteorological observations to forecast wheat powdery mildew at a regional scale. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 7(11), 4328–4339. https://doi.org/10.1109/JSTARS.2014.2315875
 Milton, E.J., Schaepman, M.E., Anderson, K., Kneubühler, M., Fox, N. (2009). Progress in field spectroscopy. Remote Sensing of Environment 113 (Supplement 1), S92–S109.
+Bakdash, J.Z., Marusich, L.R. (2017). Repeated measures correlation. Frontiers in Psychology 8, 456. https://doi.org/10.3389/fpsyg.2017.00456
+Bates, D., Mächler, M., Bolker, B., Walker, S. (2015). Fitting linear mixed-effects models using lme4. Journal of Statistical Software 67(1), 1–48. https://doi.org/10.18637/jss.v067.i01
+Bland, J.M., Altman, D.G. (1995). Calculating correlation coefficients with repeated observations: Part 1 – correlation within subjects. BMJ 310(6977), 446.
+Bréda, N.J.J. (2003). Ground-based measurements of leaf area index: a review of methods, instruments and current controversies. Journal of Experimental Botany 54(392), 2403–2417. https://doi.org/10.1093/jxb/erg263
+Goyal, A., Vashisth, A., Sehgal, V.K., Das, D.K., Mukherjee, J. (2021). Evaluating InfoCrop model at mustard (Brassica juncea) crop field for multistage yield estimation. Indian Journal of Agricultural Sciences 91(12), 1801–1807.
+Hiscox, J.D., Israelstam, G.F. (1979). A method for the extraction of chlorophyll from leaf tissue without maceration. Canadian Journal of Botany 57(12), 1332–1334. https://doi.org/10.1139/b79-163
+Hurlbert, S.H. (1984). Pseudoreplication and the design of ecological field experiments. Ecological Monographs 54(2), 187–211. https://doi.org/10.2307/1942661
+Lee, J., Durst, R.W., Wrolstad, R.E. (2005). Determination of total monomeric anthocyanin pigment content of fruit juices, beverages, natural colorants, and wines by the pH differential method: collaborative study. Journal of AOAC International 88(5), 1269–1278.
+Long, S.P., Bernacchi, C.J. (2003). Gas exchange measurements, what can they tell us about the underlying limitations to photosynthesis? Procedures and sources of error. Journal of Experimental Botany 54(392), 2393–2401. https://doi.org/10.1093/jxb/erg262
+Premachandra, G.S., Saneoka, H., Ogata, S. (1990). Cell membrane stability, an indicator of drought tolerance, as affected by applied nitrogen in soyabean. Journal of Agricultural Science 115(1), 63–66.
+Sairam, R.K. (1994). Effect of moisture-stress on physiological activities of two contrasting wheat genotypes. Indian Journal of Experimental Biology 32, 594–597.
+Sullivan, G.M., Feinn, R. (2012). Using effect size – or why the P value is not enough. Journal of Graduate Medical Education 4(3), 279–282. https://doi.org/10.4300/JGME-D-12-00156.1
+Wilcoxon, F. (1945). Individual comparisons by ranking methods. Biometrics Bulletin 1(6), 80–83.

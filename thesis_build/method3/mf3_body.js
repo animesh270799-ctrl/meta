@@ -13,6 +13,9 @@ K.push(P(`The text always gives the full name with the abbreviation in brackets.
 K.push(...tab2('abbr', [[`Abbreviation`, `Full name`, `Abbreviation`, `Full name`],
 [`AdamW`, `adaptive moment estimation with decoupled weight decay`, `MNF`, `minimum noise fraction`],
 [`ASD`, `Analytical Spectral Devices field spectroradiometer (leaf spectra)`, `L3, L5, LL`, `3rd and 5th fully expanded leaf from the top; lowest green leaf`],
+[`DMSO`, `dimethyl sulfoxide (pigment extraction solvent)`, `IRGA`, `infrared gas analyser (LI-6400 portable gas exchange system)`],
+[`LAI`, `leaf area index`, `RWC`, `relative water content`],
+[`MSI`, `membrane stability index (the moisture stress index is written in full)`, `FW, TW, DW`, `fresh, turgid and dry weight`],
 [`AUC`, `area under the receiver operating characteristic curve`, `mRMR`, `minimum redundancy maximum relevance`],
 [`BBCH`, `decimal scale of plant growth stages (Biologische Bundesanstalt, Bundessortenamt und Chemische Industrie)`, `RH`, `relative humidity`],
 [`CARS`, `competitive adaptive reweighted sampling`, `MS`, `multispectral`],
@@ -69,6 +72,7 @@ K.push(...tab2('dataset', [[`Item`, `Value`],
 [`Field layout`, `48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m`],
 [`Covariates`, `days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)`],
 [`ASD leaf spectra`, `3 plants per subplot × leaves L3, L5, LL on every flight date (1728 leaf spectra per date)`],
+[`Biochemical and biophysical parameters`, `chlorophyll a and b, carotenoids, anthocyanin, protein, relative water content, membrane stability index, photosynthesis, transpiration, stomatal conductance, leaf area index; 1 designated subplot per plot on 4 dates (1 pre-, 3 post-symptomatic)`],
 [`Validation`, `first stage: IARI field (leave-one-replication-out, nested); second stage: Bharatpur research farms and farmers' fields (independent, natural infection, at least 300 quadrat-dates)`],
 [`Sensor sets analysed`, `15 (4 single cameras, 6 pairs, 4 triples, all four)`],
 [`Tasks`, `detection (healthy vs diseased), severity classes, severity score`],
@@ -94,7 +98,7 @@ K.push(...tab2('literature', [[`Study`, `Crop and disease`, `Sensors`, `What it 
 K.push(H1(`2. Common activities (carried out once for all objectives)`));
 K.push(P(`The six common activities turn the raw images into clean, normalised feature tables with one row per subplot-date and prepare the validation folds. Each activity is described as a sequence of steps.`));
 K.push(...tab2('commonact', [[`Activity`, `Steps`, `Main output`],
-[`A. Field experiment, ground truth and datasets`, `A1–A7`, `labelled subplot list; ASD leaf spectra; covariates; post- and pre-symptomatic datasets; Bharatpur validation dataset`],
+[`A. Field experiment, ground truth and datasets`, `A1–A8`, `labelled subplot list; ASD leaf spectra; covariates; post- and pre-symptomatic datasets; Bharatpur validation dataset; biochemical and biophysical parameters`],
 [`B. Image pre-processing`, `B1–B5`, `calibrated, aligned images on the hyperspectral grid`],
 [`C. Endmember extraction and vegetation mask`, `C1–C8`, `endmember library; vegetation mask applied to all cameras`],
 [`D. Subplot spectra and feature extraction`, `D1–D8`, `feature table of each camera`],
@@ -227,6 +231,56 @@ K.push(NL(`Covariates (as in Step A6): variety, sowing date, growth stage (BBCH)
 K.push(NL(`Healthy reference: where possible, keep a fungicide-protected strip of the main variety at the research farm, so that features that need a healthy reference can also be tested.`));
 K.push(P(`**Supporting studies.** Independent validation on naturally infected fields from another site and year: Ma et al. (2026); importance of testing on independent locations: Roberts et al. (2017), Ploton et al. (2020); Bharatpur as a white rust site for weather-based forecasting: Chattopadhyay et al. (2011); UAV disease monitoring of smallholder fields: Liu et al. (2026); transfer of UAV disease models to new areas: Yuan et al. (2025).`));
 K.push(NOTE(`The Bharatpur data are never used for feature selection, tuning or training. They are used only once, for the second-stage validation of the final models.`));
+K.push(H3(`Step A8 – Biochemical and biophysical parameters`));
+K.push(...tab2('sa8', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Spectral and thermal features are indirect. Measured pigments, water status, membrane damage, gas exchange and leaf area show what white rust does to the plant and give the camera responses a physiological explanation.`],
+[`Input`, `One designated subplot per plot; untagged plants of that subplot for destructive samples; leaf L3 (third fully expanded leaf from the top); spectrophotometer, conductivity meter, LI-6400 portable gas exchange system, plant canopy analyser.`],
+[`Output → next step`, `Table of 11 parameters for 48 plots × 4 dates (192 samples per parameter; leaf area index for all 4 subplots) → Activity 1.7 and Step 3.1.2.`]], [2200, 7106], `Step A8 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Dates (all on UAV flight days): 18 January 2027 (pre-symptomatic, 8 days after inoculation) and 28 January, 18 February and 11 March 2027 (post-symptomatic, 18, 39 and 60 days after inoculation), covering early, peak and late disease and the vegetative, flowering and pod-formation stages.`));
+K.push(NL(`Designated subplot: one subplot per plot, rotated so that each of the four subplot positions is sampled in 12 plots (position = plot number modulo 4, plus 1); its code is stored with every sample, so the parameters can be joined to the UAV features and canopy score of that subplot.`));
+K.push(NL(`Gas exchange: on leaf L3 of one tagged plant (non-destructive, Step A4), between 09:30 and 11:30 h, before the flight.`));
+K.push(NL(`Leaf samples for the laboratory: after the gas-exchange readings, collect L3 leaves from 3 untagged plants of the designated subplot, keep them in a cool box and process them the same day; the tagged plants are not damaged.`));
+K.push(NL(`Leaf area index: in all four subplots, under diffuse light (early morning, late afternoon or overcast sky).`));
+K.push(NL(`Record the BBCH growth stage of each plot on every sampling date (Step A6).`));
+K.push(NL(`Methods and units are given in ${T('physio')}; the formulas are given below.`));
+K.push(P(`**Supporting studies.** Plant traits measured together with airborne and UAV imagery to explain disease-related spectral and thermal changes: Calderón et al. (2013), Zarco-Tejada et al. (2018), Poblete et al. (2023); leaf area index of mustard with a plant canopy analyser at IARI: Goyal et al. (2021).`));
+K.push(...tab2('physio', [[`Parameter (unit)`, `Method`, `Sample`, `References`],
+[`Chlorophyll a and b (mg g⁻¹ fresh weight)`, `extraction in dimethyl sulfoxide (DMSO) without grinding; absorbance at 665 and 649 nm; DMSO equations`, `100 mg leaf discs in 10 mL DMSO, 65 °C until colourless`, `Hiscox and Israelstam (1979); Wellburn (1994)`],
+[`Total carotenoids (mg g⁻¹ fresh weight)`, `same DMSO extract; absorbance at 480 nm; DMSO equation`, `same extract`, `Lichtenthaler and Wellburn (1983); Wellburn (1994)`],
+[`Anthocyanin (µg g⁻¹ fresh weight)`, `pH differential method: absorbance at about 520 and 700 nm in pH 1.0 (potassium chloride) and pH 4.5 (sodium acetate) buffers`, `acidified-methanol extract of 0.5 g leaf tissue`, `Lee et al. (2005)`],
+[`Total soluble protein (mg g⁻¹ fresh weight)`, `Bradford dye-binding method; absorbance at 595 nm against a bovine serum albumin standard curve`, `buffer extract of 0.5 g leaf tissue`, `Bradford (1976)`],
+[`Relative water content (%)`, `fresh weight, turgid weight after 4 h floating on distilled water, dry weight after 48 h at 70 °C`, `10 leaf discs`, `Barrs and Weatherley (1962)`],
+[`Membrane stability index (%)`, `electrolyte leakage: conductivity after 30 min at 40 °C (C₁) and after 10 min at 100 °C (C₂)`, `two sets of 0.1 g leaf discs in 10 mL double-distilled water`, `Premachandra et al. (1990); Sairam (1994)`],
+[`Net photosynthetic rate (µmol CO₂ m⁻² s⁻¹)`, `LI-6400 portable gas exchange system (infrared gas analyser): leaf chamber with LED light 1200 µmol m⁻² s⁻¹, reference CO₂ 400 µmol mol⁻¹, flow 500 µmol s⁻¹, leaf temperature near ambient; read after the values are stable`, `leaf L3 of a tagged plant`, `Long and Bernacchi (2003); Riches et al. (2020)`],
+[`Transpiration rate (mmol H₂O m⁻² s⁻¹)`, `same reading`, `same leaf`, `Long and Bernacchi (2003)`],
+[`Stomatal conductance (mol H₂O m⁻² s⁻¹)`, `same reading (intercellular CO₂ also recorded)`, `same leaf`, `Long and Bernacchi (2003)`],
+[`Leaf area index (m² m⁻²)`, `plant canopy analyser: one reading above and four below the canopy across the rows, with a view cap that hides the operator`, `every subplot`, `Bréda (2003); Goyal et al. (2021)`]], [2400, 3200, 1800, 1906], `Biochemical and biophysical parameters, methods and units. Pigments, anthocyanin and protein are expressed per gram of fresh weight; µg mg⁻¹ equals mg g⁻¹.`, 15));
+K.push(P(`**Formulas.** Pigments in µg mL⁻¹ of DMSO extract for a spectrophotometer of 1–4 nm resolution (Wellburn, 1994); they are converted to mg g⁻¹ fresh weight with the extract volume and sample weight. The anthocyanin content is expressed as cyanidin-3-glucoside equivalents (molecular weight 449.2 g mol⁻¹, molar absorptivity 26 900 L mol⁻¹ cm⁻¹; Lee et al., 2005).`));
+K.push(EQ(`C_{a} = 12.47 A_{665} − 3.62 A_{649};    C_{b} = 25.06 A_{649} − 6.5 A_{665};    C_{x+c} = (1000 A_{480} − 1.29 C_{a} − 53.78 C_{b}) / 220`));
+K.push(EQ(`A = (A_{520} − A_{700})_{pH 1.0} − (A_{520} − A_{700})_{pH 4.5};    anthocyanin (mg L^{−1}) = A × 449.2 × dilution × 1000 / (26 900 × path length)`));
+K.push(EQ(`RWC (%) = (FW − DW) / (TW − DW) × 100;    membrane stability index (%) = [1 − (C_{1} / C_{2})] × 100`));
+K.push(...tab2('physex', [[`Parameter (dummy data)`, `Readings`, `Result`],
+[`Chlorophyll a, b and carotenoids`, `A₆₆₅ = 0.62, A₆₄₉ = 0.25, A₄₈₀ = 0.40; 0.1 g in 10 mL`, `C_a = 6.83, C_b = 2.24, C_x+c = 1.23 µg mL⁻¹ → 0.68, 0.22 and 0.12 mg g⁻¹ fresh weight`],
+[`Anthocyanin`, `(A₅₂₀ − A₇₀₀) = 0.230 at pH 1.0 and 0.045 at pH 4.5; 0.5 g in 5 mL`, `A = 0.185 → 3.09 mg L⁻¹ → 30.9 µg g⁻¹ fresh weight`],
+[`Relative water content`, `FW = 0.52 g, TW = 0.60 g, DW = 0.10 g`, `(0.52 − 0.10) / (0.60 − 0.10) × 100 = 84%`],
+[`Membrane stability index`, `C₁ = 120 µS cm⁻¹, C₂ = 600 µS cm⁻¹`, `[1 − 120/600] × 100 = 80%`]], [2400, 3800, 3106], `Worked examples of the calculations (dummy data).`, 17));
+K.push(...tab2('cirga', [[`Aspect`, `Leaf gas exchange with a portable infrared gas analyser (LI-6400)`],
+[`Principle (how it works)`, `Air of known CO₂ and water-vapour concentration flows through a leaf chamber; infrared gas analysers measure the concentrations before and after the leaf, and the differences give net photosynthesis, transpiration and stomatal conductance.`],
+[`Problem it solves`, `Measures the physiological activity of the leaf directly, which explains canopy temperature (transpiration) and photosynthesis-related spectral indices.`],
+[`Specification in this study`, `Leaf L3 of a tagged plant; LED light 1200 µmol m⁻² s⁻¹; reference CO₂ 400 µmol mol⁻¹; flow 500 µmol s⁻¹; readings after stabilisation; 09:30–11:30 h.`],
+[`Hyper-parameters and how they are tuned`, `Chamber settings fixed for all dates; readings accepted when CO₂ and water differences are stable; instrument zeroed and matched before each session.`],
+[`Data on which it works well`, `Field leaves under stable mid-morning light; one leaf per plot because each reading takes several minutes.`],
+[`Why it was selected`, `The standard method for leaf photosynthesis, transpiration and stomatal conductance; stomatal conductance explained canopy temperature in airborne disease detection (Calderón et al., 2013).`],
+[`Key references`, `Long and Bernacchi (2003); Riches et al. (2020)`]], [2300, 7006], `Method card – Leaf gas exchange with a portable infrared gas analyser (LI-6400).`, 16));
+K.push(...tab2('clai', [[`Aspect`, `Leaf area index with a plant canopy analyser`],
+[`Principle (how it works)`, `A fish-eye optical sensor compares diffuse light above and below the canopy at several view angles; the gap fraction is inverted to leaf area per ground area.`],
+[`Problem it solves`, `Gives canopy size, which changes with growth stage and with disease and affects every canopy spectral feature.`],
+[`Specification in this study`, `One above and four below readings per subplot, view cap, diffuse light.`],
+[`Hyper-parameters and how they are tuned`, `No tuning; readings only under diffuse light, the same sensor and view cap on all dates.`],
+[`Data on which it works well`, `Row crops with closed or nearly closed canopies.`],
+[`Why it was selected`, `Fast, non-destructive and used for mustard at IARI (Goyal et al., 2021); separates canopy-size effects from disease effects.`],
+[`Key references`, `Bréda (2003); Goyal et al. (2021)`]], [2300, 7006], `Method card – Leaf area index with a plant canopy analyser.`, 16));
 K.push(H2(`Activity B – Image pre-processing`));
 K.push(P(`Activity B turns raw images into calibrated, aligned images on one common grid (${F('preproc')}).`));
 K.push(...fig2('preproc', 'g02_preproc.png', `Flow chart of Activity B (Steps B1–B5).`, 540));
@@ -477,7 +531,7 @@ K.push(...tab2('sd4', [[`Item`, `Description`],
 [`Input`, `Subplot mean reflectance.`],
 [`Output → next step`, `Index group (published indices + red-edge parameters; the searched indices of Activity 1.3 are added later) → Activity 1.4.`]], [2200, 7106], `Step D4 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
-K.push(NL(`Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, MSI, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.`));
+K.push(NL(`Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, moisture stress index, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.`));
 K.push(NL(`Check every formula against the original paper and use the nearest available band.`));
 K.push(NL(`Index definitions are given in Chapter 7 (${T('hsidx')}).`));
 K.push(P(`**Supporting studies.** Index groups for disease detection: Mahlein et al. (2013), Huang et al. (2014), Ma et al. (2026); pigment indices: Gamon et al. (1992), Gitelson et al. (2003), Merzlyak et al. (1999); water and disease indices: Gao (1996), Apan et al. (2004); PSRI and PSSRb for rice bacterial leaf blight: Das et al. (2015).`));
@@ -690,7 +744,8 @@ K.push(...tab2('o1act', [[`Activity`, `Steps`, `Technique (one per feature type)
 [`1.3 Spectral index construction`, `1.3.1–1.3.3`, `exhaustive two-band and three-band search`, `best NDSI, RSI and White Rust Index (WRI)`],
 [`1.4 Vegetation index selection`, `1.4.1–1.4.3`, `redundancy filter → ReliefF / RReliefF`, `5–8 selected indices`],
 [`1.5 Texture selection and TTFI`, `1.5.1–1.5.4`, `principal-component texture → mRMR → TTFI`, `6 texture features + best TTFI`],
-[`1.6 Disease-specific feature sets`, `1.6.1–1.6.4`, `same rules for other cameras → variance inflation factor`, `feature set of each camera; treatment response`]], [2400, 1100, 3000, 2806], `Activities of Objective 1.`, 17));
+[`1.6 Disease-specific feature sets`, `1.6.1–1.6.4`, `same rules for other cameras → variance inflation factor`, `feature set of each camera; treatment response`],
+[`1.7 Biochemical and biophysical basis`, `1.7.1–1.7.6`, `paired comparisons, analysis of variance, within-date correlation`, `disease effect by date and growth stage; parameter–feature links`]], [2400, 1100, 3000, 2806], `Activities of Objective 1.`, 17));
 K.push(H2(`The feature-selection rule: one method for each type of feature`));
 K.push(P(`Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) (${F('selection')}).`));
 K.push(...tab2('stages', [[`Stage`, `What is done`, `Uses labels?`, `Where in this document`],
@@ -1006,6 +1061,92 @@ K.push(NL(`Best NDSI, RSI and the White Rust Index.`));
 K.push(NL(`Selected vegetation indices, selected texture features and the best TTFI.`));
 K.push(NL(`Disease-specific feature set of each camera and the correlation between cameras.`));
 K.push(P(`**Supporting studies.** Ma et al. (2026); Mahlein et al. (2013).`));
+K.push(H2(`Activity 1.7 – Biochemical and biophysical basis of the camera responses`));
+K.push(P(`Activity 1.7 uses the parameters of Step A8 to show what white rust does to the plant and to explain the camera responses. The parameters are not inputs to any model; they are measured on one designated subplot per plot, which is the experimental unit of the field design (Hurlbert, 1984). Statistics are kept to what each question needs (${F('obj1phys')}).`));
+K.push(...fig2('obj1phys', 'g29_physio.png', `Flow chart of Activity 1.7 (Steps 1.7.1–1.7.6).`, 540));
+K.push(H3(`Step 1.7.1 – Data preparation`));
+K.push(...tab2('s171', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Laboratory and field readings must be on one scale and joined to the image data before analysis.`],
+[`Input`, `Parameter table (Step A8); severity grades; covariates; UAV features of the designated subplots.`],
+[`Output → next step`, `One analysis table: plot-date rows with the 11 parameters, plot percent disease index, designated-subplot canopy score and camera features, growth stage, variety and inoculation timing → Steps 1.7.2–1.7.6.`]], [2200, 7106], `Step 1.7.1 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Average technical replicates (duplicate absorbance or conductivity readings).`));
+K.push(NL(`Express pigments, anthocyanin and protein per gram of fresh weight; keep the units of ${T('physio')}.`));
+K.push(NL(`Join by date, plot and designated subplot.`));
+K.push(P(`**Supporting studies.** Gomez and Gomez (1984).`));
+K.push(H3(`Step 1.7.2 – Effect of white rust on the parameters`));
+K.push(...tab2('s172', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Shows whether, and how much, infection changes each parameter on each date.`],
+[`Input`, `Analysis table; the 12 treatments (variety × inoculation timing).`],
+[`Output → next step`, `Mean difference (inoculated − healthy) with 95% confidence interval for each parameter and date → interpretation; 18 January → Step 3.1.2.`]], [2200, 7106], `Step 1.7.2 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`For each treatment and date, pair the mean of its three inoculated plots with its healthy plot (12 pairs per date).`));
+K.push(NL(`Test the paired differences with a paired t-test, or the Wilcoxon signed-rank test when the differences are clearly not normal.`));
+K.push(NL(`Report the mean difference, its 95% confidence interval and the effect size (mean difference divided by the standard deviation of the differences).`));
+K.push(P(`**Supporting studies.** Paired designs and tests: Gomez and Gomez (1984), Wilcoxon (1945); effect sizes instead of p-values alone: Sullivan and Feinn (2012).`));
+K.push(P(`Pairing compares plots of the same variety and sowing date on the same day, which removes crop-age, date and weather effects. The healthy plots lie in a separate, fungicide-protected block, so the differences can also contain small block and fungicide effects; this is stated with the results.`));
+K.push(H3(`Step 1.7.3 – Effect of variety and inoculation timing`));
+K.push(...tab2('s173', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Shows whether varieties or crop ages at inoculation differ in their physiological response, as expected from a factorial field experiment.`],
+[`Input`, `Inoculated plots (36 per date).`],
+[`Output → next step`, `Two-way analysis of variance tables and treatment means → interpretation of variety and timing effects.`]], [2200, 7106], `Step 1.7.3 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`For each parameter and date, fit a two-way analysis of variance for a randomised block design: replication + variety + inoculation timing + variety × inoculation timing.`));
+K.push(NL(`Compare means with the least significant difference at 5% when the F-test is significant.`));
+K.push(P(`**Supporting studies.** Analysis of factorial experiments in randomised block designs: Gomez and Gomez (1984).`));
+K.push(H3(`Step 1.7.4 – Comparison of growth stages`));
+K.push(...tab2('s174', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `White rust may affect the plant more at one growth stage than at another; stage also changes the parameters in healthy plants.`],
+[`Input`, `Analysis table with the BBCH growth stage of every plot and date.`],
+[`Output → next step`, `Parameter means by stage (healthy plots), disease effect by stage, and a test of whether the disease effect differs between stages → interpretation of stage-dependent camera responses.`]], [2200, 7106], `Step 1.7.4 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Healthy reference: mean ± standard error of each parameter for the vegetative, flowering and pod-formation stages, healthy plots only.`));
+K.push(NL(`Disease effect by stage: the paired differences of Step 1.7.2 grouped by stage, each with its mean and 95% confidence interval.`));
+K.push(NL(`Difference between stages: one-way analysis of variance on the paired differences with stage as the factor (Kruskal–Wallis test if the differences are not normal), followed by Tukey comparisons; a linear mixed model with plot as a random effect is the stricter alternative for the repeated dates.`));
+K.push(NL(`Report the number of plots in every stage × date cell.`));
+K.push(P(`**Supporting studies.** Kruskal and Wallis (1952); Tukey (1949); mixed models for repeated measurements: Bates et al. (2015); growth-stage dependence of disease signals: Blasch et al. (2023); flowering and Brassica canopy spectra: Sulik and Long (2016).`));
+K.push(...tab2('stageex', [[`Growth stage (dummy)`, `Healthy`, `Inoculated`, `Difference (95% confidence interval)`],
+[`Vegetative`, `2.10`, `1.95`, `−0.15 (−0.30 to 0.00)`],
+[`Flowering`, `1.85`, `1.45`, `−0.40 (−0.58 to −0.22)`],
+[`Pod formation`, `1.30`, `1.05`, `−0.25 (−0.42 to −0.08)`]], [2200, 1800, 1800, 3506], `Worked example (dummy data): total chlorophyll (mg g⁻¹ fresh weight) by growth stage; the disease effect is largest at flowering.`, 17));
+K.push(H3(`Step 1.7.5 – Relation of the parameters with disease severity`));
+K.push(...tab2('s175', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Shows which parameters change in proportion to severity, not only between healthy and diseased plants.`],
+[`Input`, `Inoculated plots; plot percent disease index; designated-subplot canopy score.`],
+[`Output → next step`, `Correlation coefficients with 95% confidence intervals for each parameter and post-symptomatic date → interpretation.`]], [2200, 7106], `Step 1.7.5 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Compute the Pearson correlation of each parameter with the plot percent disease index and with the canopy score of the designated subplot, separately for each post-symptomatic date (36 plots per date).`));
+K.push(NL(`Do not pool dates directly: if a pooled value is wanted, remove the date means first (within-date correlation), because parameters and severity both change with time.`));
+K.push(P(`**Supporting studies.** Correlation with repeated observations: Bland and Altman (1995), Bakdash and Marusich (2017).`));
+K.push(H3(`Step 1.7.6 – Relation of the parameters with the camera features`));
+K.push(...tab2('s176', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `Links each camera feature to a plant process, which shows why the feature responds to white rust.`],
+[`Input`, `Parameters and the camera features of the designated subplots (selected features of Activities 1.2–1.6 and the indices of ${T('traitlinks')}).`],
+[`Output → next step`, `Parameter × feature correlation heat maps for each date and growth stage; check of the expected links → interpretation of Objectives 1 and 2.`]], [2200, 7106], `Step 1.7.6 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Compute Pearson correlations between each parameter and each selected camera feature within each date (48 designated subplots), and within each growth stage.`));
+K.push(NL(`Control false discoveries over the many pairs with the Benjamini–Hochberg procedure (5%).`));
+K.push(NL(`Compare the strongest links with the expected links of ${T('traitlinks')}.`));
+K.push(P(`**Supporting studies.** Benjamini and Hochberg (1995); physiological traits explaining spectral and thermal disease signals: Calderón et al. (2013), Zarco-Tejada et al. (2018), Poblete et al. (2023).`));
+K.push(...tab2('traitlinks', [[`Parameter`, `Expected camera features`, `Why`, `References`],
+[`Chlorophyll a, b`, `red-edge position, CIrededge, MTCI, NDRE, PSSR, White Rust Index`, `chlorophyll absorbs red light and sets the position of the red edge`, `Gitelson et al. (2003); Filella and Peñuelas (1994)`],
+[`Carotenoids`, `PRI, PSRI`, `carotenoid/chlorophyll ratio changes with stress and senescence`, `Gamon et al. (1992); Merzlyak et al. (1999)`],
+[`Anthocyanin`, `anthocyanin reflectance index (ARI)`, `anthocyanin absorbs green light near 550 nm`, `Gitelson et al. (2001)`],
+[`Relative water content`, `NDWI, NDII, water index, moisture stress index; canopy minus air temperature`, `water absorbs near 970, 1200, 1450 and 1650 nm; water loss warms the canopy`, `Gao (1996); Peñuelas et al. (1997); Jones et al. (2009)`],
+[`Stomatal conductance, transpiration`, `canopy minus air temperature, normalised relative canopy temperature, crop water stress index`, `transpiration cools the leaves`, `Jones et al. (2009); Calderón et al. (2013)`],
+[`Net photosynthesis`, `PRI, chlorophyll indices`, `PRI follows xanthophyll changes linked to light use`, `Gamon et al. (1992)`],
+[`Membrane stability index`, `near-infrared plateau, texture features`, `tissue damage around pustules changes leaf structure and canopy pattern`, `Mahlein (2016)`],
+[`Protein`, `red-edge features`, `leaf protein follows leaf nitrogen and chlorophyll`, `Filella and Peñuelas (1994)`],
+[`Leaf area index`, `NDVI, OSAVI, MSR, texture features`, `canopy size controls near-infrared scattering and canopy cover`, `Haboudane et al. (2004)`]], [1900, 2900, 2700, 1806], `Expected links between the parameters and the camera features, checked in Step 1.7.6.`, 15));
+K.push(...fig2('physdummy', 'g30_dummy_physio.png', `Dummy example: (a) chlorophyll of healthy and inoculated plots by growth stage; (b) correlation heat map between parameters and camera features on one date.`, 560));
+K.push(...tab2('cphysstats', [[`Aspect`, `Statistical analysis of the biochemical and biophysical parameters`],
+[`Principle (how it works)`, `Paired comparisons isolate the disease effect within the same variety, sowing date and day; analysis of variance tests treatment factors in the randomised block design; within-date correlations measure the strength of relations without the time trend.`],
+[`Problem it solves`, `Answers whether white rust changes a parameter, at which growth stage most, and which camera features follow which parameter, without pseudo-replication.`],
+[`Specification in this study`, `Paired t-test or Wilcoxon signed-rank test (12 pairs per date); two-way analysis of variance (36 inoculated plots per date); one-way analysis of variance or Kruskal–Wallis test on paired differences by stage; Pearson correlation within dates; Benjamini–Hochberg control of false discoveries.`],
+[`Hyper-parameters and how they are tuned`, `Significance level 5%; false discovery rate 5%; effect sizes and 95% confidence intervals reported with every test.`],
+[`Data on which it works well`, `Plot-level measurements from designed field experiments with few replications.`],
+[`Why it was selected`, `Simple, standard in agricultural research and matched to the design; the plot is treated as the experimental unit.`],
+[`Key references`, `Gomez and Gomez (1984); Hurlbert (1984); Benjamini and Hochberg (1995); Sullivan and Feinn (2012)`]], [2300, 7006], `Method card – Statistical analysis of the biochemical and biophysical parameters.`, 16));
 K.push(BOX(`Link to satellite monitoring (optional extension, not part of the six-month plan).`, `The subplot hyperspectral spectra can be convolved with the relative spectral response functions of Sentinel-2 and Resourcesat LISS-IV to simulate satellite band reflectance, and the selected wavelengths and indices can then be tested with these simulated bands. This approach was used for yellow rust with Sentinel-2 (Zheng et al., 2018) and for rice bacterial leaf blight with LISS-IV (Das et al., 2015); UAV data have also been used to bridge field and satellite scales (Revill et al., 2020; Blasch et al., 2023; Poblete et al., 2023; Yuan et al., 2025).`, 'EEF3E8', '2C5F2D'));
 K.push(H1(`4. Objective 2 – Detection and severity discrimination through AI-based multimodal data fusion`));
 K.push(P(`Objective 2 builds and compares predictive models on the 1920 post-symptomatic samples of each camera. For every single camera and for every combination of cameras (15 sensor sets), classification models (Task A, healthy vs diseased; Task B, severity classes) and regression models (Task C, severity score) are developed with all model families, so that the performance of every camera and every combination can be compared on the same folds (${T('modelmatrix')}). In combinations, thermal, multispectral and red–green–blue features are added to the hyperspectral features by feature-level fusion for all models, including DT-EDNet and the comparison networks. A second comparison repeats the design of Ma et al. (2026) on the hyperspectral feature groups, with plot-grouped validation.`));
@@ -1424,6 +1565,7 @@ K.push(...tab2('s254', [[`Item`, `Description`],
 [`Output → next step`, `Feature-importance figures; stability table → Objective 1 discussion.`]], [2200, 7106], `Step 2.5.4 at a glance.`, 17));
 K.push(P(`**Procedure.**`));
 K.push(NL(`Compute SHAP values of the best machine-learning model of each task; summarise the mean |SHAP| per feature and per camera.`));
+K.push(NL(`Compare the most important features with the biochemical and biophysical parameters that changed with disease (Activity 1.7), to give the model a physiological explanation.`));
 K.push(NL(`Count how often every feature is selected over the three folds; final feature lists contain features selected in at least two of three folds.`));
 K.push(P(`**Supporting studies.** Lundberg and Lee (2017); Lundberg et al. (2020); Nogueira et al. (2018).`));
 K.push(...tab2('cablation', [[`Aspect`, `Ablation and Shapley interpretation`],
@@ -1544,6 +1686,16 @@ K.push(NL(`Classification: healthy = subplots of the 12 healthy plots; infected 
 K.push(NL(`Regression: target = severity score of the same subplot on the first post-symptomatic date.`));
 K.push(NL(`Record days after inoculation for every sample.`));
 K.push(P(`**Supporting studies.** Zhu et al. (2017); Tian et al. (2021); Mahlein et al. (2019); Yu et al. (2021) for the early stage of pine wilt disease.`));
+K.push(H3(`Step 3.1.2 – Physiological changes before symptoms (18 January 2027)`));
+K.push(...tab2('s312', [[`Item`, `Description`],
+[`Purpose (problem it solves)`, `If pigments, water status or gas exchange already change before pustules appear, there is a physiological reason why pre-symptomatic detection can work.`],
+[`Input`, `Biochemical and biophysical parameters of 18 January (Step A8); later severity of the same plots.`],
+[`Output → next step`, `Inoculated − healthy differences on the pre-symptomatic date and their relation with later severity → interpretation of Objective 3.`]], [2200, 7106], `Step 3.1.2 at a glance.`, 17));
+K.push(P(`**Procedure.**`));
+K.push(NL(`Compare inoculated and healthy plots for every parameter with the paired comparison of Step 1.7.2 (12 pairs).`));
+K.push(NL(`Correlate the pre-symptomatic parameters of the inoculated plots with their percent disease index on 28 January (first post-symptomatic sampling date).`));
+K.push(NL(`Report effect sizes and 95% confidence intervals; note the block and fungicide caveat of Step 1.7.2.`));
+K.push(P(`**Supporting studies.** Pre-visual physiological changes behind early detection: Zarco-Tejada et al. (2018), Calderón et al. (2013); pre-symptomatic hyperspectral detection: Zhu et al. (2017).`));
 K.push(H2(`Activity 3.2 – Normalisation to healthy plots`));
 K.push(H3(`Step 3.2.1 – Healthy-plot normalisation of all features`));
 K.push(...tab2('s321', [[`Item`, `Description`],
@@ -1631,6 +1783,7 @@ K.push(H2(`6.1 Input–output chain of all steps`));
 K.push(...tab2('chain', [[`Step(s)`, `Input`, `Output`, `Used by`],
 [`A1–A3, A5`, `field design, scores`, `labelled subplot list; post- and pre-symptomatic datasets`, `D8, F1, all objectives`],
 [`A4`, `tagged plants, ASD spectroradiometer`, `leaf spectra with leaf grades and metadata`, `separate leaf-level analysis (not part of this document)`],
+[`A8`, `designated subplots, laboratory and field instruments`, `biochemical and biophysical parameters (48 plots × 4 dates)`, `1.7, 3.1.2`],
 [`A7`, `Bharatpur research farms and farmers' fields`, `independent validation dataset (images, grades, covariates)`, `2.7, 3.5.4`],
 [`A6`, `field book, weather records`, `covariate table (days after inoculation, variety, timing, growth stage, weather)`, `D2, 1.1.3, 2.5.5, 3.5.3`],
 [`B1–B2`, `raw images, panels, control points`, `calibrated, georeferenced mosaics`, `B3, B4`],
@@ -1651,6 +1804,7 @@ K.push(...tab2('chain', [[`Step(s)`, `Input`, `Output`, `Used by`],
 [`1.4.1–1.4.3`, `index group`, `selected indices`, `1.6.2, 2.1.5`],
 [`1.5.1–1.5.4`, `principal-component texture`, `selected texture features; best TTFI`, `1.6.2, 2.1.5`],
 [`1.6.1–1.6.4`, `survivors of all groups`, `disease-specific feature set of each camera`, `2.1.2, 3.3.1`],
+[`1.7.1–1.7.6`, `biochemical and biophysical parameters; camera features`, `disease effect by date and stage; parameter–feature links`, `interpretation of Objectives 1–3; 2.5.4`],
 [`2.1.1–2.1.5`, `feature sets, folds`, `task labels; fused sets of 15 sensor sets; six hyperspectral configurations`, `2.2, 2.3`],
 [`2.2.1–2.2.6`, `optimum feature combinations`, `tuned machine-learning predictions`, `2.4`],
 [`2.3.1–2.3.8`, `fused sets; pseudo-images`, `neural-network predictions`, `2.4`],
@@ -1700,6 +1854,7 @@ K.push(...tab2('changes', [[`Item`, `Previous version`, `This version`, `Reason`
 [`Deep learning (post-symptomatic)`, `DNN-F1, DNN-F2`, `DNN-F1, DNN-F2 + DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2`, `user request; comparison of Ma et al. (2026)`],
 [`Normalisation`, `inside other steps`, `separate Activity E (six steps)`, `clarity; user request`],
 [`Endmember extraction`, `one step`, `Activity C with eight steps`, `clarity; user request`],
+[`Biochemical and biophysical parameters`, `not included`, `Step A8 and Activity 1.7: 11 parameters on 4 dates with paired comparisons, analysis of variance, growth-stage comparison and parameter–feature correlations`, `user request; physiological basis`],
 [`Validation`, `IARI field only`, `two stages: IARI field (internal) and Bharatpur research farms and farmers' fields (independent)`, `user request; transferability`],
 [`Leaf spectra`, `not collected`, `ASD leaf spectra of L3, L5 and LL from 3 plants per subplot on every flight date (acquisition only)`, `user request; leaf–canopy link`],
 [`Covariates`, `flower %, canopy cover %, vegetation pixel count`, `days after inoculation, variety, inoculation timing, growth stage, weather`, `user request; covariate baseline`],
@@ -1764,7 +1919,7 @@ K.push(...tab2('hsidx', [[`Group`, `Index`, `Formula`, `Reference`],
 [`SWIR disease–water`, `DWSI-2; DWSI-3`, `R_{1660}/R_{550};  R_{1660}/R_{680}`, `Apan et al. 2004`],
 [``, `DWSI-5`, `(R_{800} + R_{550})/(R_{1660} + R_{680})`, `Apan et al. 2004`],
 [``, `NDWI`, `(R_{860} − R_{1240})/(R_{860} + R_{1240})`, `Gao 1996`],
-[``, `MSI`, `R_{1600}/R_{820}`, `Hunt and Rock 1989`],
+[``, `Moisture stress index`, `R_{1600}/R_{820}`, `Hunt and Rock 1989`],
 [``, `NDII`, `(R_{819} − R_{1649})/(R_{819} + R_{1649})`, `Hardisky et al. 1983`],
 [`Disease-specific`, `WRI`, `NDSI(λ_{1}, λ_{2}) + w R_{λ3} (Step 1.3.2)`, `Mahlein et al. 2013 (method)`]], [1700, 1700, 4106, 1800], `Hyperspectral indices and red-edge parameters.`, 15));
 K.push(...tab2('msidx', [[`Feature`, `Formula (B, G, R, RE, NIR = 475, 560, 668, 717, 840 nm)`, `Reference`],
@@ -1812,7 +1967,7 @@ K.push(...fig2('gantt', 'g24_gantt.png', `Six-month work plan for the analysis.`
 K.push(...tab2('plan', [[`Month`, `Work`, `Deliverable`],
 [`1`, `Common Activities A–C for all dates and cameras; mask accuracy`, `calibrated, masked images; endmember library`],
 [`2`, `Activities D–F: features, covariates, normalisation, folds; Activity 1.1`, `feature and covariate tables; response curves`],
-[`3`, `Activities 1.2–1.6; selection code tested inside folds`, `optimal wavelengths, White Rust Index, selected indices, TTFI; Objective 1 draft`],
+[`3`, `Activities 1.2–1.7; selection code tested inside folds; analysis of the biochemical and biophysical parameters`, `optimal wavelengths, White Rust Index, selected indices, TTFI; Objective 1 draft`],
 [`4`, `Objective 2: machine learning and feature-fusion networks for 15 sensor sets`, `results of 15 sensor sets`],
 [`5`, `Objective 2: DT-EDNet and comparison networks; ablation; Shapley explanation; maps`, `network comparison; ablation; maps`],
 [`6`, `Objective 3; second-stage validation at Bharatpur (Activity 2.7); synthesis and writing`, `earliest detection day; risk maps; independent validation results; thesis chapters`]], [1000, 5000, 3306], `Month-wise plan.`, 17));
@@ -1836,5 +1991,6 @@ K.push(P(`**Q. Why are the folds grouped by replication?** Subplots of a plot an
 K.push(P(`**Q. Why are flowers kept in the subplot spectrum?** The canopy score includes the inflorescence and staghead; the growth stage (vegetative, flowering, pod formation) is recorded with the BBCH scale and results are reported for each stage, so that selected features are not only flowering effects (Sulik and Long, 2016; Meier, 2018).`));
 K.push(P(`**Q. How are weather and other covariates used?** Days after inoculation, variety, inoculation timing, growth stage and weather form a covariate-only baseline; a camera is useful only if it beats this baseline. Weather has one value per date, so models that contain it are labelled within-season (Zhang et al., 2014; Chattopadhyay et al., 2011).`));
 K.push(P(`**Q. How is pre-symptomatic infection known if no symptoms are visible?** From the later status of the same subplot; inoculated subplots that never develop symptoms are excluded (Zhu et al., 2017; Tian et al., 2021).`));
+K.push(P(`**Q. Why are the biochemical and biophysical parameters measured at plot level?** The plot is the experimental unit of the randomised block design (Hurlbert, 1984). One designated subplot per plot keeps the gas-exchange readings inside the mid-morning window and links each sample to the UAV features of that subplot; the parameters explain the camera responses and are not model inputs (Calderón et al., 2013).`));
 K.push(P(`**Q. How do you know the models work outside the IARI field?** Validation has two stages: leave-one-replication-out inside the IARI field to choose and assess the models, then frozen final models tested once on independent research-farm and farmers' field data from Bharatpur with natural infection, as the DT-EDNet study did with an independent naturally infected dataset (Ma et al., 2026; Ploton et al., 2020).`));
 K.push(P(`**Q. How can these results be used with satellite data?** The selected wavelengths and indices can be simulated for Sentinel-2 or LISS-IV bands from the hyperspectral spectra, as done for yellow rust and rice bacterial leaf blight (Zheng et al., 2018; Das et al., 2015).`));
