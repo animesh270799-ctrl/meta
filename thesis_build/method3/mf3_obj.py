@@ -247,7 +247,7 @@ TAB('o2act', [['Activity', 'Steps', 'Main output'], ['2.1 Tasks and inputs', '2.
     ['2.2 Machine-learning models', '2.2.1–2.2.6', 'tuned support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares models'],
     ['2.3 Deep-learning models', '2.3.1–2.3.8', 'feature-fusion networks and pseudo-image networks (DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2)'],
     ['2.4 Evaluation', '2.4.1–2.4.3', 'metric tables'], ['2.5 Comparison, ablation and interpretation', '2.5.1–2.5.5', 'best sensor set and model; contribution of each camera; module ablation; Shapley explanation; gain over the covariate baseline'],
-    ['2.6 Robustness and maps', '2.6.1–2.6.3', 'results by treatment; transfer tests; severity maps']], 'Activities of Objective 2.', [2900, 1300, 5106])
+    ['2.6 Robustness and maps', '2.6.1–2.6.3', 'results by treatment; transfer tests; severity maps'], ['2.7 Second-stage validation at Bharatpur', '2.7.1–2.7.4', 'accuracy of frozen models on independent research-farm and farmers\' field data; farm maps']], 'Activities of Objective 2.', [2900, 1300, 5106])
 
 # ---------------------------------------------------------------- 2.1
 H2('Activity 2.1 – Tasks and inputs')
@@ -532,6 +532,46 @@ STEP('2.6.3', 'Severity maps',
      'Abdulridha et al. (2023); Liu et al. (2024); Deng et al. (2024); Liu et al. (2026).')
 
 # =====================================================================================
+H2('Activity 2.7 – Second-stage validation at Bharatpur')
+P('The first-stage validation (Activity F, leave-one-replication-out inside the IARI field) chooses the models and estimates their accuracy on new plots of the same field. The second stage tests the final models on independent data from research farms and farmers\' fields at Bharatpur (Step A7), with other soils, varieties, management and a natural epidemic ([[F:twostage]]).')
+FIG('twostage', 'g28_twostage.png', 'Two-stage validation: first stage inside the IARI field, second stage on independent Bharatpur data with frozen models.', 560)
+STEP('2.7.1', 'Final models trained on all IARI data and frozen',
+     'Models for an independent test must be fixed before the test data are seen.',
+     'All IARI post-symptomatic samples (1920 per camera); the selection and tuning procedure of Objectives 1 and 2.',
+     'Frozen final models with their selected features, hyper-parameters and standardisation constants → Steps 2.7.2–2.7.3.',
+     ['Repeat feature selection and tuning on all IARI data with grouped inner cross-validation (folds by plot), exactly as in the first stage.',
+      'Train the final models on all IARI data: the best machine-learning model and the best deep-learning model of each task, for the three best sensor sets, the full set (S15) and the best low-cost set without the hyperspectral camera.',
+      'Store the selected features, hyper-parameters, standardisation means and standard deviations, and the trained weights; nothing is changed afterwards.'],
+     'Final model refitted on all development data after nested validation: Cawley and Talbot (2010), Kuhn and Johnson (2013).')
+STEP('2.7.2', 'Processing of the Bharatpur data with the same steps',
+     'The validation data must pass through exactly the same processing, otherwise differences in processing would look like model errors.',
+     'Bharatpur images, quadrat polygons, severity grades and covariates (Step A7).',
+     'Bharatpur feature tables in the same layout as the IARI tables → Step 2.7.3.',
+     ['Apply Activities B–D unchanged: calibration, mosaics, quality control, co-registration, resampling, quadrat means and feature extraction.',
+      'Build the vegetation mask with the same procedure (Activity C) on the Bharatpur images, because soils and weeds differ; this uses no labels.',
+      'Compute only the features selected for the frozen models; standardise them with the IARI constants (frozen).',
+      'Features that need a healthy reference (difference from healthy plots, healthy-normalised features) are used only where a fungicide-protected strip exists; otherwise models without these features are used (canopy minus air temperature and the normalised relative canopy temperature need no healthy reference).'],
+     'Processing fixed on the development data and applied to new data: Kuhn and Johnson (2013); same-sensor protocols across sites: Aasen et al. (2018).')
+STEP('2.7.3', 'Application and evaluation of the frozen models',
+     'Shows how accurate the models are on new fields and how much accuracy is lost compared with the first stage.',
+     'Frozen models; Bharatpur feature tables and severity grades.',
+     'Second-stage accuracy tables and the loss of accuracy from stage 1 to stage 2 → conclusions on transferability.',
+     ['Predict every Bharatpur quadrat-date once with each frozen model; no retraining or re-tuning.',
+      'Compute the same metrics as in Activity 2.4 (overall accuracy, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD).',
+      'Report the results for research farms and farmers\' fields separately, by variety and by growth stage, and the difference from the first-stage accuracy.',
+      'As a second, clearly labelled result, re-standardise the features with the means and standard deviations of the Bharatpur data (no labels used) to show how much of any loss comes from a simple shift between sites.',
+      'Test the covariate models (Step 2.5.5) on Bharatpur weather as well; this is the first test of the weather effect outside the IARI season data.'],
+     'Independent external test after internal validation: Ma et al. (2026); spatial transfer and loss of accuracy at new locations: Ploton et al. (2020), Roberts et al. (2017); cross-scale transfer of UAV disease models: Yuan et al. (2025).')
+TAB('twostaget', [['Item', 'First stage (internal)', 'Second stage (independent)'], ['Data', 'IARI field, 48 plots, 13 dates', 'Bharatpur research farms and farmers\' fields'],
+    ['Infection', 'artificial inoculation (10 January 2027)', 'natural epidemic'], ['Design', 'leave-one-replication-out, nested', 'frozen final models applied once'],
+    ['Used for', 'feature selection, tuning, model choice, accuracy on new plots', 'accuracy on new fields, varieties and management'], ['Varieties', 'PM 26, Pusa Vijay, PM 37', 'local varieties (recorded)']],
+    'The two validation stages.', [2000, 3600, 3706])
+STEP('2.7.4', 'Severity maps of farmers\' fields',
+     'Farm-level maps show whether the models are useful where decisions are made.',
+     'Frozen best models; Bharatpur images.', 'Severity maps of the farmers\' fields with the scored quadrats overlaid → reporting.',
+     ['Apply the best model of each task to the whole vegetated area of each field in quadrat-sized cells.', 'Overlay the scored quadrats and their grades to show agreement and errors.'],
+     'UAV disease maps of smallholder fields: Liu et al. (2026); severity maps from UAV models: Abdulridha et al. (2023), Liu et al. (2024).')
+
 H1('5. Objective 3 – Prediction of white rust at the pre-symptomatic stage')
 P('Objective 3 uses the 576 pre-symptomatic samples of each camera. The question is whether subplots that will develop white rust can be separated from healthy subplots before pustules are visible, and whether their later severity can be predicted. Machine-learning models and the feature-fusion networks (DNN-F1, DNN-F2) are used; the pseudo-image networks are not used here because about 384 training samples per fold are too few for them.')
 FIG('obj3', 'g07_obj3.png', 'Flow chart of Objective 3 (Activities 3.1–3.5).', 540)
@@ -584,3 +624,9 @@ STEP('3.5.3', 'Covariate baseline for the pre-symptomatic stage',
      'Accuracy of the covariate-only model compared with the sensor models → evidence that the early signal comes from the plants.',
      ['Fit the best machine-learning model with days after inoculation, variety, inoculation timing, growth stage and the weather summaries only.', 'Report the sensor models and the best sensor set + covariates next to it, as in Step 2.5.5.'],
      'Zhang et al. (2014); Chattopadhyay et al. (2011); Zhu et al. (2017).')
+STEP('3.5.4', 'Second-stage validation of the pre-symptomatic models',
+     'Early-warning models also need an independent test, but pre-symptomatic labels require a flight before symptoms and a later visit of the same quadrats.',
+     'Bharatpur quadrats flown before symptoms and scored later (Step A7); a fungicide-protected healthy strip for the healthy-plot normalisation.',
+     'Second-stage accuracy of the pre-symptomatic models, where the data allow → conclusions on early warning.',
+     ['Apply the frozen pre-symptomatic models (trained on all IARI pre-symptomatic data) to quadrats flown before symptoms and labelled from their later status.', 'Use the protected strip as the healthy reference; where no early flight or healthy reference exists, the pre-symptomatic models are validated in the first stage only, and this is stated.'],
+     'Ma et al. (2026); Zhu et al. (2017); Zarco-Tejada et al. (2018).')

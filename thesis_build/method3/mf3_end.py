@@ -6,6 +6,7 @@ H2('6.1 Input–output chain of all steps')
 TAB('chain', [['Step(s)', 'Input', 'Output', 'Used by'],
  ['A1–A3, A5', 'field design, scores', 'labelled subplot list; post- and pre-symptomatic datasets', 'D8, F1, all objectives'],
  ['A4', 'tagged plants, ASD spectroradiometer', 'leaf spectra with leaf grades and metadata', 'separate leaf-level analysis (not part of this document)'],
+ ['A7', 'Bharatpur research farms and farmers\' fields', 'independent validation dataset (images, grades, covariates)', '2.7, 3.5.4'],
  ['A6', 'field book, weather records', 'covariate table (days after inoculation, variety, timing, growth stage, weather)', 'D2, 1.1.3, 2.5.5, 3.5.3'],
  ['B1–B2', 'raw images, panels, control points', 'calibrated, georeferenced mosaics', 'B3, B4'],
  ['B3', 'hyperspectral cube', 'clean, smoothed 483-band cube', 'B4, C1, D3'],
@@ -31,6 +32,7 @@ TAB('chain', [['Step(s)', 'Input', 'Output', 'Used by'],
  ['2.4.1–2.4.3', 'predictions', 'metric tables', '2.5'],
  ['2.5.1–2.5.5', 'metric tables, models, covariates', 'best sensor set and model; contributions; ablation; explanation; gain over the covariate baseline', '2.6, conclusions'],
  ['2.6.1–2.6.3', 'best models', 'robustness results; maps', 'conclusions'],
+ ['2.7.1–2.7.4', 'all IARI data; Bharatpur data', 'frozen final models; second-stage accuracy; farm maps', 'conclusions'],
  ['3.1.1–3.5.2', 'pre-symptomatic features, later labels', 'pre-symptomatic models; earliest detection day; risk maps', 'conclusions']],
  'Input and output of every step and the step that uses each output.', [1300, 2700, 3400, 1906], 15)
 P('**Result of the check.** Every output is used by at least one later step, every input is produced by an earlier step, and every label-based step runs inside the training folds ([[T:leak]]). No step is missing between the raw images and the three objectives.')
@@ -76,6 +78,7 @@ TAB('changes', [['Item', 'Previous version', 'This version', 'Reason'],
  ['Deep learning (post-symptomatic)', 'DNN-F1, DNN-F2', 'DNN-F1, DNN-F2 + DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2', 'user request; comparison of Ma et al. (2026)'],
  ['Normalisation', 'inside other steps', 'separate Activity E (six steps)', 'clarity; user request'],
  ['Endmember extraction', 'one step', 'Activity C with eight steps', 'clarity; user request'],
+ ['Validation', 'IARI field only', 'two stages: IARI field (internal) and Bharatpur research farms and farmers\' fields (independent)', 'user request; transferability'],
  ['Leaf spectra', 'not collected', 'ASD leaf spectra of L3, L5 and LL from 3 plants per subplot on every flight date (acquisition only)', 'user request; leaf–canopy link'],
  ['Covariates', 'flower %, canopy cover %, vegetation pixel count', 'days after inoculation, variety, inoculation timing, growth stage, weather', 'user request; covariate baseline'],
  ['Radiometric consistency between dates; sample quality screening', 'Steps E1 and E4', 'not performed', 'user request; panels on every flight (Step B1)'],
@@ -95,7 +98,7 @@ TAB('drawbacks', [['Drawback in the previous version', 'Correction', 'Supporting
  ['Weather has one value per date and cannot be separated from the date in one season.', 'Weather used for interpretation and in covariate models labelled "within-season".', 'Zhang et al. (2014); Chattopadhyay et al. (2011)'],
  ['A variety was assumed to be resistant without field evidence.', 'Variety names from the field record; transfer test run for each variety in turn.', 'Blasch et al. (2023)'],
  ['The healthy plots lie in a separate block, so healthy vs inoculated differences can include a small block (location) effect.', 'Detection labels come from the observed score, so inoculated subplots with no pustules are also healthy samples; detection accuracy is reported separately for healthy-block samples and for symptom-free inoculated subplots; healthy-plot normalisation is done by date.', 'Roberts et al. (2017); Oerke et al. (2006)'],
- ['All results come from one season.', 'Stated as a limitation; leave-one-variety-out and leave-one-timing-out tests used as internal transfer tests.', 'Ma et al. (2026); Roberts et al. (2017)']],
+ ['All results came from one site and one season.', 'Second-stage validation with frozen models on independent research-farm and farmers\' field data at Bharatpur (Activity 2.7); leave-one-variety-out and leave-one-timing-out tests kept as internal transfer tests; transfer to other seasons still to be tested.', 'Ma et al. (2026); Roberts et al. (2017); Ploton et al. (2020)']],
  'Drawbacks of the previous version and how they are corrected.', [3500, 3500, 2306], 15)
 
 H1('7. Definitions of indices and features')
@@ -132,7 +135,7 @@ FIG('gantt', 'g24_gantt.png', 'Six-month work plan for the analysis.', 540)
 TAB('plan', [['Month', 'Work', 'Deliverable'], ['1', 'Common Activities A–C for all dates and cameras; mask accuracy', 'calibrated, masked images; endmember library'],
     ['2', 'Activities D–F: features, covariates, normalisation, folds; Activity 1.1', 'feature and covariate tables; response curves'], ['3', 'Activities 1.2–1.6; selection code tested inside folds', 'optimal wavelengths, White Rust Index, selected indices, TTFI; Objective 1 draft'],
     ['4', 'Objective 2: machine learning and feature-fusion networks for 15 sensor sets', 'results of 15 sensor sets'], ['5', 'Objective 2: DT-EDNet and comparison networks; ablation; Shapley explanation; maps', 'network comparison; ablation; maps'],
-    ['6', 'Objective 3; synthesis and writing', 'earliest detection day; risk maps; thesis chapters']], 'Month-wise plan.', [1000, 5000, 3306])
+    ['6', 'Objective 3; second-stage validation at Bharatpur (Activity 2.7); synthesis and writing', 'earliest detection day; risk maps; independent validation results; thesis chapters']], 'Month-wise plan.', [1000, 5000, 3306])
 NOTE('Computing load: 15 sensor sets × 3 tasks × 3 folds × 5 machine-learning models with floating forward selection; two feature-fusion networks and four pseudo-image networks × 5 seeds. Run the selection of each camera once per fold and reuse it for all combinations, and train the networks on a graphics processing unit.')
 
 # =====================================================================================
@@ -154,5 +157,6 @@ for q, a in [('Why one feature-selection method for each type of feature?', 'Eac
     ('Why are flowers kept in the subplot spectrum?', 'The canopy score includes the inflorescence and staghead; the growth stage (vegetative, flowering, pod formation) is recorded with the BBCH scale and results are reported for each stage, so that selected features are not only flowering effects (Sulik and Long, 2016; Meier, 2018).'),
     ('How are weather and other covariates used?', 'Days after inoculation, variety, inoculation timing, growth stage and weather form a covariate-only baseline; a camera is useful only if it beats this baseline. Weather has one value per date, so models that contain it are labelled within-season (Zhang et al., 2014; Chattopadhyay et al., 2011).'),
     ('How is pre-symptomatic infection known if no symptoms are visible?', 'From the later status of the same subplot; inoculated subplots that never develop symptoms are excluded (Zhu et al., 2017; Tian et al., 2021).'),
+    ('How do you know the models work outside the IARI field?', 'Validation has two stages: leave-one-replication-out inside the IARI field to choose and assess the models, then frozen final models tested once on independent research-farm and farmers\' field data from Bharatpur with natural infection, as the DT-EDNet study did with an independent naturally infected dataset (Ma et al., 2026; Ploton et al., 2020).'),
     ('How can these results be used with satellite data?', 'The selected wavelengths and indices can be simulated for Sentinel-2 or LISS-IV bands from the hyperspectral spectra, as done for yellow rust and rice bacterial leaf blight (Zheng et al., 2018; Das et al., 2015).')]:
     P('**Q. ' + q + '** ' + a)

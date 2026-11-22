@@ -48,7 +48,7 @@ rows = [('Common Activity A – Field experiment, ground truth, covariates and d
         ('Common Activity E – Normalisation and data preparation', 'thermal normalisation → healthy-plot normalisation (healthy plots rotated across folds)\n→ standardisation with training statistics → class weights', 'gold'),
         ('Common Activity F – Validation design and tuning', 'leave-one-replication-out outer folds grouped by plot; inner grouped folds for selection and tuning; leakage checklist', 'gold'),
         ('Objective 1 – Characterisation (Activities 1.1–1.6)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and Tri-band Texture Fusion Index → feature sets', 'o1'),
-        ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.6), 1920 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
+        ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.7), 1920 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
         ('Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5), 576 pre-symptomatic samples', 'labels from the later status of each subplot | normalisation to healthy plots | same feature selection | machine learning and\nfeature-fusion neural networks | earliest detection day and risk maps', 'o3')]
 y = 14.3
 for i, (t, b, k) in enumerate(rows):
@@ -89,13 +89,14 @@ chain('g05_obj1.png', 'Objective 1 – Characterisation of white rust by each ca
     ('Activity 1.5  Texture selection (mRMR) and TTFI', 'principal-component texture → mRMR → ordered triplets → Tri-band Texture Fusion Index', 'selected texture + best TTFI'),
     ('Activity 1.6  Disease-specific feature sets', 'union of selected groups per camera; variance inflation factor below 10; treatment response', 'disease-specific feature set\nof each camera')], 'o1')
 
-chain('g06_obj2.png', 'Objective 2 – Detection and severity discrimination (Activities 2.1–2.6)', [
+chain('g06_obj2.png', 'Objective 2 – Detection and severity discrimination (Activities 2.1–2.7)', [
     ('Activity 2.1  Tasks and inputs', 'detection, severity classes, severity score; hyperspectral feature-group inputs;\n15 sensor sets with feature-level fusion', 'input matrices per fold'),
     ('Activity 2.2  Machine-learning models', 'support vector machine, random forest, extreme gradient boosting, k-nearest\nneighbours, partial least squares', 'predictions'),
     ('Activity 2.3  Deep-learning models', 'feature-fusion networks (DNN-F1, DNN-F2) and pseudo-image networks\n(DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2)', 'predictions'),
     ('Activity 2.4  Evaluation', 'overall accuracy, kappa, macro recall and F1, per-class scores; R², RMSE, RPD', 'metric tables'),
     ('Activity 2.5  Comparison, ablation and interpretation', 'best model per sensor set; fusion gain; drop-one-sensor; DT-EDNet ablation;\nSHAP; gain over the covariate-only baseline', 'best sensor set and model'),
-    ('Activity 2.6  Robustness and maps', 'results by variety and inoculation timing; leave-one-variety-out; subplot maps', 'robustness tables, maps')], 'o2')
+    ('Activity 2.6  Robustness and maps', 'results by variety and inoculation timing; leave-one-variety-out; subplot maps', 'robustness tables, maps'),
+    ('Activity 2.7  Second-stage validation at Bharatpur', 'final models trained on all IARI data and frozen; applied once to research-farm and\nfarmers\' field quadrats (natural infection); same metrics; farm maps', 'independent accuracy;\nfarm maps')], 'o2')
 
 chain('g07_obj3.png', 'Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5)', [
     ('Activity 3.1  Pre-symptomatic samples and labels', 'healthy plots vs inoculated subplots that become diseased later; later severity score', 'labelled 576 samples'),
@@ -317,7 +318,7 @@ save(fig, 'g23_dummy_earliest.png')
 # Gantt
 fig, ax = canvas(11, 5.4)
 tasks = [('Common Activities A–C (all dates, all cameras)', 0, 1.2, 'nav'), ('Common Activity D: features; Activity E: folds', 1.0, 1.8, 'nav'), ('Objective 1: Activities 1.1–1.6', 1.6, 2.7, 'o1'),
-         ('Objective 2: machine learning, feature-fusion networks', 2.5, 3.6, 'o2'), ('Objective 2: DT-EDNet and convolutional networks', 3.0, 4.3, 'o2'), ('Objective 2: comparison, ablation, maps', 4.0, 4.7, 'o2'), ('Objective 3: Activities 3.1–3.5', 4.3, 5.4, 'o3'), ('Interpretation, figures, writing', 5.2, 6.0, 'gold')]
+         ('Objective 2: machine learning, feature-fusion networks', 2.5, 3.6, 'o2'), ('Objective 2: DT-EDNet and convolutional networks', 3.0, 4.3, 'o2'), ('Objective 2: comparison, ablation, maps', 4.0, 4.7, 'o2'), ('Objective 3: Activities 3.1–3.5', 4.3, 5.4, 'o3'), ('Second-stage validation (Bharatpur)', 5.0, 5.8, 'o2'), ('Interpretation, figures, writing', 5.2, 6.0, 'gold')]
 for m in range(7): ax.plot([4.6 + m * 1.03, 4.6 + m * 1.03], [0.4, 4.9], color='#DDD', lw=0.8)
 for m in range(6): ax.text(4.6 + m * 1.03 + 0.51, 5.05, 'Month %d' % (m + 1), ha='center', fontsize=9, fontweight='bold')
 for i, (t, a, b, k) in enumerate(tasks):
@@ -354,4 +355,14 @@ ax.text(x0 + 42.5 * sc, 3.02, 'post-symptomatic: 10 dates, 1920 samples (label =
 ax.text(0.4, 0.55, 'pre-symptomatic label = later status of the same subplot (healthy control vs inoculated subplot that becomes diseased)', ha='left', fontsize=8)
 ax.text(0.4, 0.2, 'all four cameras (red–green–blue, multispectral, thermal, hyperspectral), ASD leaf spectra and visual severity scoring on every date', ha='left', fontsize=8, style='italic')
 save(fig, 'g27_obj3.png')
+
+# two-stage validation
+fig, ax = canvas(12, 3.4)
+box(ax, 0.2, 1.85, 3.6, 1.35, 'Stage 1 – IARI field (internal)', 'leave-one-replication-out, nested\nfeature selection, tuning, model choice\naccuracy on new plots of the same field', 'o1', fs=8.2, tfs=9.4)
+arr(ax, 3.8, 2.52, 4.25, 2.52)
+box(ax, 4.25, 1.85, 3.5, 1.35, 'Final models (frozen)', 'selection and tuning repeated on all IARI data\nfeatures, hyper-parameters and\nstandardisation constants fixed', 'gold', fs=8.2, tfs=9.4)
+arr(ax, 7.75, 2.52, 8.2, 2.52)
+box(ax, 8.2, 1.85, 3.6, 1.35, 'Stage 2 – Bharatpur (independent)', 'research farms and farmers\' fields\nnatural infection, local varieties\nsame cameras, scoring and processing', 'o3', fs=8.2, tfs=9.4)
+box(ax, 0.2, 0.25, 11.6, 1.25, 'Reported for the second stage', 'same metrics as stage 1 (overall accuracy, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD) | loss of accuracy from stage 1 to stage 2\nresults by site type, variety and growth stage | label-free re-standardisation as a second result | covariate models with Bharatpur weather | farm maps', 'grey', fs=8.2, tfs=9.4)
+save(fig, 'g28_twostage.png')
 print('figures ok')
