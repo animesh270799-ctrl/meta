@@ -1,4 +1,4 @@
-"""Final (deployable) models trained on ALL 2339 leaves after the leave-one-replication-out evaluation.
+"""Final (deployable) models trained on ALL leaves (L3, L5, LL) after the leave-one-replication-out evaluation.
 The evaluation numbers come from the outer folds (a3_ml.py, a4_dl.py); these files are the models refitted on the full data set
 with the same procedure, for prediction on new leaves.
   python3 a9_final.py ml   -> per-task feature set (Objective 1 optimal wavelengths + top-5 ReliefF indices -> VIF < 10),
@@ -51,7 +51,7 @@ if part == 'ml':
             fn = '%s_%s.joblib' % ({'A': 'A_detection', 'B': 'B_six_grades', 'C': 'C_severity_score'}[task], name.replace(' ', '_'))
             bundle = dict(model=final, task=task, task_description=TASKN[task], model_name=name, features=[cols[i] for i in idx], candidate_features=cols, idx=idx,
                           scaler_mean=mu, scaler_sd=sd, grades=GRADES, params=gs.best_params_, inner_cv_score=float(gs.best_score_), scoring=scoring,
-                          trained_on='2339 leaves, 4 dates (11 Feb - 13 Mar 2026), IARI 2025-26', versions=dict(sklearn=sklearn.__version__, xgboost=xgboost.__version__, python=platform.python_version()))
+                          trained_on='%d leaves (L3, L5, LL), 4 dates (11 Feb - 13 Mar 2026), IARI 2025-26, natural infection' % len(M), versions=dict(sklearn=sklearn.__version__, xgboost=xgboost.__version__, python=platform.python_version()))
             joblib.dump(bundle, OUT + 'ml/' + fn, compress=3)
             rec.append(dict(file='ml/' + fn, task=task, model=name, n_features=len(idx), features=', '.join(bundle['features']), params=json.dumps(gs.best_params_, default=str), inner_cv_score=round(float(gs.best_score_), 4), scoring=scoring))
             print(task, name, len(idx), gs.best_params_, '%.3f' % gs.best_score_, '%.0fs' % (time.time() - t0), flush=True)

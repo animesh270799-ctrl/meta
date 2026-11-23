@@ -15,6 +15,9 @@ for date, f in FILES.items():
         meta.append(dict(date=date, file_col=name, plot=int(hdr[1][j]), variety=str(hdr[2][j]).strip(), stage=str(hdr[3][j]).strip(), status=str(hdr[4][j]).strip(), leaf=str(hdr[5][j]).strip(), score=hdr[6][j]))
         spec.append([r[j] for r in S])
 M = pd.DataFrame(meta); X = np.array(spec, float)
+# leaf positions sampled are L3, L5 and LL; the 9 spectra labelled L4 (11 Feb 2026) are not a sampled position and are removed (user, 23 Nov 2026)
+drop = (M.leaf == 'L4').values; print('removed L4 spectra:', int(drop.sum()), M.loc[drop, ['date', 'plot', 'score']].values.tolist())
+M = M[~drop].reset_index(drop=True); X = X[~drop]
 print(M.shape, X.shape, wl[0], wl[-1], 'NaN', np.isnan(X).sum())
 np.save(D + 'wl.npy', wl); np.save(D + 'X_leaf.npy', X.astype(np.float32)); M.to_csv(D + 'meta_raw.csv', index=False)
 print(M.groupby('date').size()); print(pd.crosstab(M.date, M.score)); print(M.leaf.value_counts()); print(M.stage.value_counts()); print(M.status.value_counts())

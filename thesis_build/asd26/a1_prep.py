@@ -13,9 +13,10 @@ LAY = {4: 'D3V1', 5: 'D1V2', 12: 'D4V1', 3: 'D1V3', 6: 'D4V3', 11: 'D3V2', 2: 'D
 blk = lambda p: 'C' if p <= 12 else ('R3' if p <= 24 else ('R2' if p <= 36 else 'R1'))
 M['block'] = M['plot'].map(blk); M['timing'] = M['plot'].map(lambda p: LAY[p][:2]); M['lay_var'] = M['plot'].map(lambda p: LAY[p][2:])
 assert (M.lay_var == M.variety).all(), 'variety mismatch with layout'
-M['inoculated'] = (M.block != 'C').astype(int)
+M['unsprayed'] = (M.block != 'C').astype(int)          # natural infection: R1-R3 unsprayed, block C fungicide-sprayed (healthy)
 M['grade'] = M.score.astype(int); M['diseased'] = (M.grade > 0).astype(int)
-M['DAI'] = (pd.to_datetime(M.date) - pd.Timestamp('2026-02-05')).dt.days
+SOW = {'D1': '2025-12-09', 'D2': '2025-12-18', 'D3': '2025-12-27', 'D4': '2026-01-09'}   # D1-D4 = 50, 40, 30, 20 DAS treatments (user)
+M['sowing'] = M.timing.map(SOW); M['DAS'] = (pd.to_datetime(M.date) - pd.to_datetime(M.sowing)).dt.days   # crop age at sampling
 M['stage_code'] = M.stage.map({'Vegetative': 1, 'Flowering': 2, 'Pod formation': 3})
 # ---- outer folds: leave-one-replication-out with rotated healthy plots (methodology Table: healthyrot) ----
 HROT = {7: 0, 2: 0, 10: 0, 12: 0, 5: 1, 8: 1, 4: 1, 1: 1, 3: 2, 9: 2, 11: 2, 6: 2}
@@ -59,4 +60,4 @@ REF = {'NDVI': 'Rouse et al. (1974)', 'NDVI850': 'Raun et al. (2001)', 'SR': 'Jo
 np.savez_compressed(D + 'prep.npz', wl=wl, w5=w5, R1=R1.astype(np.float32), FD1=FD1.astype(np.float32), R5=R5, FD5=FD5)
 M.to_csv(D + 'meta.csv', index=False); F.to_csv(D + 'indices.csv', index=False); json.dump(REF, open(D + 'index_refs.json', 'w'), indent=1)
 print('leaves', len(M), 'bands 1 nm', R1.shape[1], '5 nm', len(w5), 'indices', F.shape[1])
-print(pd.crosstab(M.fold, M.grade)); print(pd.crosstab(M.block, M.status)); print(pd.crosstab(M.inoculated, M.grade)); print(M.DAI.value_counts().sort_index())
+print(pd.crosstab(M.fold, M.grade)); print(pd.crosstab(M.block, M.status)); print(pd.crosstab(M.unsprayed, M.grade)); print(M.DAS.value_counts().sort_index())

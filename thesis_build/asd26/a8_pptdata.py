@@ -8,7 +8,7 @@ def ct(fac):
     c = pd.crosstab(M[fac].astype(str), M.grade); return {'labels': list(c.index), 'series': [{'name': 'grade %d' % g, 'values': [int(v) for v in c[g]]} for g in GR]}
 out['counts'] = {f: ct(f) for f in ['date', 'stage', 'variety', 'leaf', 'timing', 'block']}
 out['grade_n'] = {str(g): int((M.grade == g).sum()) for g in GR}
-out['dates'] = [dict(date=d, DAI=int(g.DAI.iloc[0]), n=len(g), mean_grade=r3(g.grade.mean()), pct=r3(100 * g.diseased.mean()), stages=', '.join(sorted(g.stage.unique()))) for d, g in M.groupby('date')]
+out['dates'] = [dict(date=d, DAS='%d–%d' % (g.DAS.min(), g.DAS.max()), n=len(g), mean_grade=r3(g.grade.mean()), pct=r3(100 * g.diseased.mean()), stages=', '.join(sorted(g.stage.unique()))) for d, g in M.groupby('date')]
 ms = pd.read_csv(D + 'o1_mean_spectra.csv'); sel10 = ms.wl % 10 == 0
 out['mean_spectra'] = {'labels': [int(w) for w in ms.wl[sel10]], 'series': [{'name': 'grade %d' % g, 'values': [r3(v) for v in ms['mean_%d' % g][sel10]]} for g in GR]}
 fs = pd.read_csv(D + 'o1_mean_fd.csv'); s2 = (fs.wl >= 500) & (fs.wl <= 800)
@@ -44,7 +44,8 @@ if os.path.exists(D + 'shap_C.npy'):
 
 out['rep'] = [r3(F.REP[M.grade == g].mean()) for g in GR]; out['dr'] = [r3(F.Dr[M.grade == g].mean()) for g in GR]
 out['bands'] = [[w] + [r3(ms.loc[ms.wl == w, 'mean_%d' % g].iloc[0]) for g in GR] for w in (550, 680, 760, 800, 1450, 1650, 1940, 2200)]
-out['vif'] = O1['VIF_final']; out['das0'] = {'D1': 58, 'D2': 49, 'D3': 40, 'D4': 27}
+out['vif'] = O1['VIF_final']; out['das0'] = {'D1': '28 Jan', 'D2': '27 Jan', 'D3': '26 Jan', 'D4': '29 Jan'}   # date at the treatment crop age (50/40/30/20 DAS)
+out['das_by'] = {t: [int(M[(M.timing == t) & (M.date == d)].DAS.iloc[0]) for d in sorted(M.date.unique())] for t in ('D1', 'D2', 'D3', 'D4')}
 P_ = '../outputs/ASD_2025-26_models/'
 for fn, key in (('ml_models_index.csv', 'ml_files'), ('dl_models_index.csv', 'dl_files')):
     if os.path.exists(B + P_ + fn): out[key] = json.loads(pd.read_csv(B + P_ + fn).to_json(orient='records'))
@@ -55,9 +56,12 @@ for fn, key in (('cov2_metrics.csv', 'cov2_metrics'), ('cov2_gains.csv', 'cov2_g
     if os.path.exists(D + fn): out[key] = json.loads(pd.read_csv(D + fn).round(4).to_json(orient='records'))
 if os.path.exists(D + 'cov2_summary.json'): out['cov2_summary'] = json.load(open(D + 'cov2_summary.json'))
 lp = pd.crosstab(M.date, M.leaf); pp = M.groupby(['date', 'plot']).size(); Xl = np.load(D + 'X_leaf.npy')
-out['leafpos'] = [dict(date=d, **{c: int(lp.loc[d].get(c, 0)) for c in ('L3', 'L4', 'L5', 'LL')}, n=int(lp.loc[d].sum()), plots=int(M[M.date == d]['plot'].nunique()),
+out['leafpos'] = [dict(date=d, **{c: int(lp.loc[d].get(c, 0)) for c in ('L3', 'L5', 'LL')}, n=int(lp.loc[d].sum()), plots=int(M[M.date == d]['plot'].nunique()),
                        med=int(pp.loc[d].median()), mn=int(pp.loc[d].min()), mx=int(pp.loc[d].max())) for d in sorted(M.date.unique())]
-out['qc'] = dict(n_healthy_block=int((M.block == 'C').sum()), healthy_block_diseased=int(((M.block == 'C') & (M.grade > 0)).sum()), n_inoc=int((M.inoculated == 1).sum()),
-                 n_inoc_healthy=int(((M.inoculated == 1) & (M.grade == 0)).sum()), n_inoc_dis=int(((M.inoculated == 1) & (M.grade > 0)).sum()),
+Wf = pd.read_csv(D + 'weather_season.csv', parse_dates=['date']); Wf = Wf[(Wf.date >= '2025-12-09') & (Wf.date < M.date.max())]; FL = Wf[(Wf.Tmax.between(16, 24)) & (Wf.RH1 > 97) & (Wf.RH2 > 40)]
+out['fav'] = dict(n=len(FL), first=FL.date.min().strftime('%d %b %Y'), last=FL.date.max().strftime('%d %b %Y'), by_month={k: int(v) for k, v in FL.groupby(FL.date.dt.strftime('%b')).size().items()})
+out['healthy_unspr'] = [round(float(100 * (1 - g.diseased.mean())), 1) for _, g in M[M.unsprayed == 1].groupby('date')]
+out['qc'] = dict(n_healthy_block=int((M.block == 'C').sum()), healthy_block_diseased=int(((M.block == 'C') & (M.grade > 0)).sum()), n_inoc=int((M.unsprayed == 1).sum()),
+                 n_inoc_healthy=int(((M.unsprayed == 1) & (M.grade == 0)).sum()), n_inoc_dis=int(((M.unsprayed == 1) & (M.grade > 0)).sum()),
                  rmin=round(float(Xl.min()), 3), rmax=round(float(Xl.max()), 3), nan=int(np.isnan(Xl).sum()), bands=int(Xl.shape[1]), med=int(pp.median()), mn=int(pp.min()), mx=int(pp.max()))
 json.dump(out, open(D + 'ppt_data.json', 'w'), indent=0, default=float); print('ppt data ok', len(json.dumps(out)) // 1000, 'kB')

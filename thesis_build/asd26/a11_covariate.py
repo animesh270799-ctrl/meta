@@ -1,7 +1,7 @@
 """Step 2.5.5 for the 2025-26 ASD leaf data: covariate (sensor-free) baseline models.
-Inoculated, unsprayed plots only (healthy plots are fungicide-protected); same leave-one-replication-out folds; no look-ahead
+Unsprayed, naturally infected plots only (the healthy plots were fungicide-sprayed); same leave-one-replication-out folds; no look-ahead
 (weather windows end the day before each sampling date).
-  B1 statistical: logistic regression (A), proportional-odds ordinal logistic regression (B), linear model with DAI and DAI² (C)
+  B1 statistical: logistic regression (A), proportional-odds ordinal logistic regression (B), linear model with DAS and DAS² (C)
   RF: random forest (tuned in inner folds grouped by plot)
   B2: best machine-learning model of Activity 2.2 for each task (A SVM, B XGBoost, C RF), tuned in inner folds
 Inputs: covariates only, leaf spectra (fold-wise DSF), spectra + covariates.
@@ -27,20 +27,21 @@ GR = [0, 1, 3, 5, 7, 9]; enc = {g: i for i, g in enumerate(GR)}
 M = pd.read_csv(D + 'meta.csv'); SEL = json.load(open(D + 'fold_selection.json'))
 P = np.load(D + 'prep.npz'); w5, R5, FD5 = P['w5'], P['R5'], P['FD5']
 BANDS = pd.DataFrame(np.hstack([R5, FD5]), columns=['R%d' % w for w in w5] + ['FD%d' % w for w in w5])
-# ---------------- covariates (no look-ahead: windows end the day before each date) ----------------
+# ---------------- covariates (no look-ahead: windows end the day before each date; natural infection, no inoculation date) ----------------
 W = pd.read_csv(D + 'weather_season.csv', parse_dates=['date']); WC = pd.read_csv(D + 'weather_covariates.csv')
-inoc_day = pd.Timestamp('2026-02-05'); stag = []
-for d in WC.date:
-    t = pd.Timestamp(d); since = W[(W.date >= inoc_day) & (W.date < t)]
-    stag.append(int(((since.Tmax.between(20, 29)) & (since.Tmin > 12) & (since.RH1 > 97)).sum()))
-WC['fav_staghead'] = stag; WC = WC.rename(columns={'fav_days': 'fav_leaf'})
-WC[['date', 'Tmax7', 'Tmin7', 'RH1_7', 'RH2_7', 'rain7', 'fav_leaf', 'fav_staghead']].to_csv(D + 'cov2_covariates_by_date.csv', index=False)
-wx = M[['date']].merge(WC[['date', 'Tmax7', 'Tmin7', 'RH1_7', 'RH2_7', 'rain7', 'fav_leaf', 'fav_staghead']], on='date', how='left').drop(columns='date')
-COV2 = pd.concat([pd.get_dummies(M[['variety', 'timing']].astype(str)).astype(float), M[['DAI', 'stage_code']].astype(float), wx], axis=1)   # B2 / RF covariates
-dai_c = M.DAI - M.DAI.mean()
+SOW = {'D1': '2025-12-09', 'D2': '2025-12-18', 'D3': '2025-12-27', 'D4': '2026-01-09'}
+FAVL = lambda w: int(((w.Tmax.between(16, 24)) & (w.RH1 > 97) & (w.RH2 > 40)).sum()); FAVS = lambda w: int(((w.Tmax.between(20, 29)) & (w.Tmin > 12) & (w.RH1 > 97)).sum())
+fav = {(d, t): (FAVL(W[(W.date >= s_) & (W.date < pd.Timestamp(d))]), FAVS(W[(W.date >= s_) & (W.date < pd.Timestamp(d))])) for d in WC.date for t, s_ in SOW.items()}   # since each sowing
+out_ = WC[['date', 'Tmax7', 'Tmin7', 'RH1_7', 'RH2_7', 'rain7', 'fav7_leaf']].copy()
+for t in SOW: out_['fav_leaf_' + t] = [fav[(d, t)][0] for d in WC.date]
+out_['fav_staghead_max'] = [max(fav[(d, t)][1] for t in SOW) for d in WC.date]; out_.to_csv(D + 'cov2_covariates_by_date.csv', index=False)
+wx = M[['date']].merge(WC[['date', 'Tmax7', 'Tmin7', 'RH1_7', 'RH2_7', 'rain7']], on='date', how='left').drop(columns='date')
+wx['fav_leaf'] = [fav[(d, t)][0] for d, t in zip(M.date, M.timing)]; wx['fav_staghead'] = [fav[(d, t)][1] for d, t in zip(M.date, M.timing)]
+COV2 = pd.concat([pd.get_dummies(M[['variety', 'timing']].astype(str)).astype(float), M[['DAS', 'stage_code']].astype(float), wx], axis=1)   # B2 / RF covariates
+das_c = M.DAS - M.DAS.mean()
 COV1 = pd.concat([pd.get_dummies(M[['variety', 'timing']].astype(str), drop_first=True).astype(float), M[['stage_code']].astype(float)], axis=1)
-COV1['DAI'] = dai_c; COV1['DAI2'] = dai_c ** 2                                       # B1 covariates (date effect via DAI, DAI²)
-inoc = (M.inoculated == 1).values; plots = M['plot'].values
+COV1['DAS'] = das_c; COV1['DAS2'] = das_c ** 2                                       # B1 covariates (crop age via DAS, DAS²)
+inoc = (M.unsprayed == 1).values; plots = M['plot'].values          # unsprayed (naturally infected) plots only
 Y = {'A': M.diseased.values, 'B': M.grade.map(enc).values, 'C': M.grade.values.astype(float)}
 BEST = {'A': 'SVM', 'B': 'XGBoost', 'C': 'RF'}
 def inner(tr): return list(GroupKFold(3).split(np.zeros(tr.sum()), groups=plots[tr]))
@@ -92,7 +93,7 @@ else:
     PR = pd.concat([PR, PR[(PR.task == 'C') & (PR.model == 'RF')].assign(model='B2')], ignore_index=True)
     PR.to_csv(D + 'cov2_predictions.csv', index=False)
 # ---------------- metrics ----------------
-NAME = {'Statistical': {'A': 'Logistic regression', 'B': 'Ordinal logistic regression', 'C': 'Linear regression (DAI, DAI²)'}, 'RF': {t: 'Random forest' for t in 'ABC'}, 'B2': {'A': 'SVM (best ML)', 'B': 'XGBoost (best ML)', 'C': 'Random forest (best ML)'}}
+NAME = {'Statistical': {'A': 'Logistic regression', 'B': 'Ordinal logistic regression', 'C': 'Linear regression (DAS, DAS²)'}, 'RF': {t: 'Random forest' for t in 'ABC'}, 'B2': {'A': 'SVM (best ML)', 'B': 'XGBoost (best ML)', 'C': 'Random forest (best ML)'}}
 def metrics(task, d):
     if task in 'AB':
         m, _ = cls_metrics(d.y.values, d.pred.values, 2 if task == 'A' else 6, d.score.values if task == 'A' and d.score.notna().all() else None)
@@ -156,7 +157,7 @@ for task in 'ABC':
 G = pd.DataFrame(gains); G.to_csv(D + 'cov2_gains.csv', index=False); print(G.round(3).to_string())
 pd.DataFrame(dl).to_csv(D + 'cov2_delong.csv', index=False); print(pd.DataFrame(dl).round(4).to_string())
 json.dump(summary, open(D + 'cov2_summary.json', 'w'), indent=1); print(summary)
-# ---------------- B1 interpretable fit on all inoculated leaves (standardised covariates) ----------------
+# ---------------- B1 interpretable fit on all unsprayed leaves (standardised covariates) ----------------
 Xs = (COV1[inoc] - COV1[inoc].mean()) / COV1[inoc].std(); Xs = Xs.loc[:, COV1[inoc].std() > 0]; coef = []
 try:
     lg = sm.Logit(Y['A'][inoc], sm.add_constant(Xs)).fit(disp=False, maxiter=500)

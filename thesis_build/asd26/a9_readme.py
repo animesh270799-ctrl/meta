@@ -15,7 +15,7 @@ def perf(t, m):
     if not len(r): return '–'
     r = r.iloc[0]; return 'macro-F1 %.3f' % r.macro_F1 + (', AUC %.3f' % r.AUC if t == 'A' else ', QWK %.3f' % r.QWK) if t in 'AB' else 'R² %.3f, RMSE %.2f' % (r.R2, r.RMSE)
 L = ['# White rust leaf models – ASD contact-probe spectra, IARI 2025-26', '',
-     'Models refitted on all 2339 leaf spectra (4 dates, 3 varieties, 4 sowing timings, leaf positions L3/L5/LL) after leave-one-replication-out evaluation.',
+     'Models refitted on all %d leaf spectra (4 dates, 3 varieties, 4 sowing timings, leaf positions L3/L5/LL; natural infection) after leave-one-replication-out evaluation.' % len(pd.read_csv(D + 'meta.csv')),
      'The performance column is the **leave-one-replication-out test performance** of the same procedure (pooled test folds), i.e. the expected accuracy on a new replication of the same experiment.', '',
      '## Tasks', '', '- **A** detection: 0 = healthy (grade 0), 1 = diseased (grade > 0)', '- **B** six grades: 0, 1, 3, 5, 7, 9', '- **C** severity score: 0–9 (regression)', '',
      '## Input and pre-processing (done by the script)', '',
@@ -29,15 +29,15 @@ for r in dli.itertuples(): L.append('| %s | %s | %s | %s (%s) | %s |' % (r.file,
 if os.path.exists(OUT + 'covariate_models_index.csv'):
     ci = pd.read_csv(OUT + 'covariate_models_index.csv')
     L += ['', '## Covariate baseline models (Step 2.5.5) – folder `covariate/`', '',
-          'Models that use NO spectra (M0 candidates) and the best machine-learning model on spectra + covariates (M2), refitted on the inoculated, unsprayed leaves only (n = 1961; the sprayed healthy plots share every covariate with their inoculated plots and are excluded). '
-          'Covariates: days after inoculation (from 5 Feb 2026), inoculation timing D1–D4, variety V1–V3, growth stage (Vegetative / Flowering / Pod formation = 1–3) and, for random forest / best ML, 7-day weather ending the day before the date and favourable days since inoculation (Chattopadhyay et al., 2011). '
-          'B1 statistical models use one-hot variety and timing (V1, D1 = reference), stage code, centred DAI and DAI². `wr_covariates.py` builds the covariates from a leaf table and a daily weather table (`covariate/IARI_daily_weather_2025-26.csv` is the 2025-26 IARI record) and predicts with any bundle.', '',
+          'Models that use NO spectra (M0 candidates) and the best machine-learning model on spectra + covariates (M2), refitted on the unsprayed, naturally infected leaves only (n = %d; the fungicide-sprayed healthy plots share every covariate with the unsprayed plots and are excluded). ' % int(pd.read_csv(D + 'meta.csv').unsprayed.sum()) +
+          'Covariates: crop age (days after sowing, DAS), sowing timing D1–D4 (50, 40, 30, 20 DAS treatments; sown 9 Dec, 18 Dec, 27 Dec 2025, 9 Jan 2026), variety V1–V3, growth stage (Vegetative / Flowering / Pod formation = 1–3) and, for random forest / best ML, 7-day weather ending the day before the date and favourable days from sowing (Chattopadhyay et al., 2011). '
+          'B1 statistical models use one-hot variety and timing (V1, D1 = reference), stage code, centred DAS and DAS². `wr_covariates.py` builds the covariates from a leaf table and a daily weather table (`covariate/IARI_daily_weather_2025-26.csv` is the 2025-26 IARI record) and predicts with any bundle.', '',
           '| File | Task | Input | Model | Role | LORO test performance |', '|---|---|---|---|---|---|']
     for r in ci.itertuples(): L.append('| %s | %s | %s | %s | %s | %s |' % (r.file, r.task, r.input, r.model, r.role, r.loro_test_performance))
     L += ['', '```python', 'import joblib, pandas as pd, wr_covariates as wc', "b = joblib.load('covariate/A_covariates_only_Logistic_regression.joblib')",
           "leaves = pd.DataFrame({'date': ['2026-02-24'], 'variety': ['V1'], 'timing': ['D2'], 'stage': ['Flowering']})",
           "print(wc.predict(b, leaves, pd.read_csv('covariate/IARI_daily_weather_2025-26.csv')))", '```', '',
-          'Spectra + covariates bundles also need the spectral features (`wr_features.all_features`, columns listed in `spectral_columns`). The covariate models describe THIS experiment (inoculation date known); they are a reference for the spectra, not a stand-alone forecaster for other fields or seasons.']
+          'Spectra + covariates bundles also need the spectral features (`wr_features.all_features`, columns listed in `spectral_columns`). The covariate models describe THIS experiment (sowing dates and sampling calendar known); they are a reference for the spectra, not a stand-alone forecaster for other fields or seasons.']
 L += ['', '## Use', '', '```', 'pip install numpy pandas scipy scikit-learn xgboost joblib openpyxl torch', 'python predict_white_rust.py my_spectra.xlsx          # column 1 = wavelength, one column per leaf (ASD export)',
       'python predict_white_rust.py my_spectra.csv --rows   # one row per leaf, headers = wavelengths', 'python predict_white_rust.py my_spectra.xlsx --models ml', '```', '',
       'The functional test of the script was run on training leaves, so its predictions are in-sample (k-NN returns the training grade exactly); use the LORO numbers above for expected accuracy.', '', 'Load one model directly in Python:', '', '```python', 'import joblib, wr_features  # wr_features must be importable (PLS classes)', "b = joblib.load('ml/C_severity_score_RF.joblib')",

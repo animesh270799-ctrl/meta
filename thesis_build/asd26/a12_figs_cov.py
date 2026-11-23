@@ -12,7 +12,7 @@ MT = pd.read_csv(D + 'cov2_metrics.csv'); G = pd.read_csv(D + 'cov2_gains.csv');
 INP = ['covariates only', 'leaf spectra', 'spectra + covariates']; INL = ['Covariates\nonly', 'Leaf\nspectra', 'Spectra +\ncovariates']
 MOD = ['Statistical', 'RF', 'B2']; MC = {'Statistical': '#8C8C8C', 'RF': '#2E7D32', 'B2': '#7030A0'}
 ML = {'A': {'Statistical': 'Logistic regression', 'RF': 'Random forest', 'B2': 'SVM (best ML)'}, 'B': {'Statistical': 'Ordinal logistic', 'RF': 'Random forest', 'B2': 'XGBoost (best ML)'},
-      'C': {'Statistical': 'Linear (DAI, DAI²)', 'RF': 'Random forest = best ML', 'B2': None}}
+      'C': {'Statistical': 'Linear (DAS, DAS²)', 'RF': 'Random forest = best ML', 'B2': None}}
 # ---------------- F32: models x inputs for the three tasks ----------------
 fig, axs = plt.subplots(1, 3, figsize=(15, 5.2))
 for ax, t, k, ttl in zip(axs, 'ABC', ['macro_F1', 'macro_F1', 'R2'], ['(a) Detection: macro-F1', '(b) Six grades: macro-F1', '(c) Severity score: R²']):
@@ -25,7 +25,7 @@ for ax, t, k, ttl in zip(axs, 'ABC', ['macro_F1', 'macro_F1', 'R2'], ['(a) Detec
     ax.annotate('M0', xy=(i0 + (mods.index(m0['model']) - (len(mods) - 1) / 2) * wdt, 0.02), ha='center', fontsize=10, fontweight='bold', color='white')
     ax.set_xticks(range(3)); ax.set_xticklabels(INL); ax.set_title(ttl); ax.grid(axis='x', visible=False)
     ax.set_ylim(0, max(1.0 if t == 'A' else 0.6, MT[MT.task == t][k].max() + 0.08)); ax.legend(loc='upper left', fontsize=9.5)
-fig.text(0.5, -0.02, 'Inoculated (unsprayed) leaves only, n = 1961; leave-one-replication-out; M0 = the stronger covariate-only model', ha='center', fontsize=10.5, color='#444')
+fig.text(0.5, -0.02, 'Unsprayed (naturally infected) leaves only, n = %d; leave-one-replication-out; M0 = the stronger covariate-only model' % int(pd.read_csv(D + 'meta.csv').unsprayed.sum()), ha='center', fontsize=10.5, color='#444')
 plt.tight_layout(); save(fig, 'f32_cov_models.png')
 # ---------------- F33: gains with 95% plot-block bootstrap CI ----------------
 GN = {'ΔS = M1 − M0': ('#2E75B6', 'ΔS: spectra over covariates'), 'ΔC = M2 − M1': ('#E07B00', 'ΔC: covariates added to spectra'), 'ΔT = M2 − M0': ('#7030A0', 'ΔT: spectra + covariates over covariates')}
@@ -47,7 +47,7 @@ fig.legend([Line2D([], [], color=v[0], marker='o', lw=2.2, ms=8) for v in GN.val
            [v[1] for v in GN.values()] + ['filled = real difference (CI excludes 0, |Δ| > fold SD, same sign in all folds); open = not real.  Right of 0 = better (RMSE: left of 0 = better)'], loc='lower center', ncol=2, bbox_to_anchor=(0.5, -0.12))
 plt.tight_layout(rect=(0, 0.06, 1, 1)); save(fig, 'f33_cov_gains.png')
 # ---------------- F34: interpretable B1 model, standardised effects ----------------
-TN = {'variety_V2': 'variety V2 (vs V1)', 'variety_V3': 'variety V3 (vs V1)', 'timing_D2': 'timing D2 (vs D1)', 'timing_D3': 'timing D3 (vs D1)', 'timing_D4': 'timing D4 (vs D1)', 'stage_code': 'growth stage', 'DAI': 'days after inoculation', 'DAI2': '(days after inoculation)²'}
+TN = {'variety_V2': 'variety V2 (vs V1)', 'variety_V3': 'variety V3 (vs V1)', 'timing_D2': 'timing D2 (vs D1)', 'timing_D3': 'timing D3 (vs D1)', 'timing_D4': 'timing D4 (vs D1)', 'stage_code': 'growth stage', 'DAS': 'days after sowing', 'DAS2': '(days after sowing)²'}
 mods = [m for m in ['Logistic (detection)', 'Ordinal logistic (six grades)', 'Linear (score)'] if m in set(CO.model)]
 fig, axs = plt.subplots(1, len(mods), figsize=(5 * len(mods), 5.2), sharey=True)
 axs = np.atleast_1d(axs)

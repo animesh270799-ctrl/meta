@@ -1,6 +1,6 @@
-"""Activity 2.5-2.6 and Step 2.5.5 for the leaf data: metric tables, weather covariates and covariate baseline (inoculated leaves),
+"""Activity 2.5-2.6 and Step 2.5.5 for the leaf data: metric tables, weather covariates and covariate baseline (unsprayed leaves),
 results by stratum, leave-one-variety-out and leave-one-timing-out tests, SHAP of the best tree model, selection stability,
-and the exploratory test of symptomless leaves of inoculated plots vs leaves of healthy plots."""
+and the exploratory test of symptomless leaves of unsprayed plots vs leaves of the sprayed healthy plots."""
 import numpy as np, pandas as pd, os, json, warnings
 warnings.filterwarnings('ignore')
 from a5_metrics import *
@@ -81,19 +81,21 @@ W = pd.read_excel('/root/.claude/uploads/c5704ca0-f1ca-5695-b9e0-a810fbe166a9/96
 W.columns = ['date', 'Tmax', 'Tmin', 'rain', 'wind', 'wd1', 'wd2', 'wc1', 'wc2', 'RH1', 'RH2', 'BSS', 'evap']; W['date'] = pd.to_datetime(W.date)
 for c in ['Tmax', 'Tmin', 'rain', 'wind', 'RH1', 'RH2', 'BSS', 'evap']: W[c] = pd.to_numeric(W[c], errors='coerce')
 season = W[(W.date >= '2025-12-01') & (W.date <= '2026-03-20')].copy(); season.to_csv(D + 'weather_season.csv', index=False)
-inoc = pd.Timestamp('2026-02-05'); wc = []
+# natural infection: favourable days (Chattopadhyay et al., 2011) counted in the 7-day window and from the first sowing (9 Dec 2025)
+FAVL = lambda w: int(((w.Tmax.between(16, 24)) & (w.RH1 > 97) & (w.RH2 > 40)).sum()); FAVS = lambda w: int(((w.Tmax.between(20, 29)) & (w.Tmin > 12) & (w.RH1 > 97)).sum())
+sow1 = pd.Timestamp('2025-12-09'); wc = []
 for dt in sorted(M.date.unique()):
-    t = pd.Timestamp(dt); win = W[(W.date < t) & (W.date >= t - pd.Timedelta(days=7))]; since = W[(W.date >= inoc) & (W.date < t)]
-    fav3 = ((since.Tmax.between(16, 24)) & (since.RH1 > 97) & (since.RH2 > 40)).sum(); fav2 = ((since.Tmax.between(16, 24)) & (since.RH2 > 40)).sum()
-    wc.append(dict(date=dt, Tmax7=win.Tmax.mean(), Tmin7=win.Tmin.mean(), RH1_7=win.RH1.mean(), RH2_7=win.RH2.mean(), rain7=win.rain.sum(), wind7=win.wind.mean(), BSS7=win.BSS.mean(), evap7=win.evap.mean(), fav_days=int(fav3), fav_days_TRH2=int(fav2)))
+    t = pd.Timestamp(dt); win = W[(W.date < t) & (W.date >= t - pd.Timedelta(days=7))]; since = W[(W.date >= sow1) & (W.date < t)]
+    wc.append(dict(date=dt, Tmax7=win.Tmax.mean(), Tmin7=win.Tmin.mean(), RH1_7=win.RH1.mean(), RH2_7=win.RH2.mean(), rain7=win.rain.sum(), wind7=win.wind.mean(), BSS7=win.BSS.mean(), evap7=win.evap.mean(),
+                   fav7_leaf=FAVL(win), fav_leaf_season=FAVL(since), fav_staghead_season=FAVS(since), last_fav_leaf_day=str(since[(since.Tmax.between(16, 24)) & (since.RH1 > 97) & (since.RH2 > 40)].date.max())[:10]))
 WC = pd.DataFrame(wc); WC.to_csv(D + 'weather_covariates.csv', index=False); print(WC.round(2).to_string())
 prog = M.groupby('date').agg(mean_grade=('grade', 'mean'), pct_diseased=('diseased', 'mean'), n=('grade', 'size')).reset_index(); prog['pct_diseased'] *= 100
 prog.merge(WC, on='date').to_csv(D + 'disease_progress.csv', index=False)
 
-# ---------------- covariate baseline (Step 2.5.5): inoculated leaves only ----------------
-inoc_m = (M.inoculated == 1).values
-COV = pd.get_dummies(M[['variety', 'timing']].astype(str)).astype(float); COV['DAI'] = M.DAI; COV['stage'] = M.stage_code
-COV = pd.concat([COV, M[['date']].merge(WC, on='date', how='left').drop(columns='date')], axis=1)
+# ---------------- quick covariate check (random forest; the full Step 2.5.5 analysis is in a11_covariate.py): unsprayed leaves only ----------------
+inoc_m = (M.unsprayed == 1).values
+COV = pd.get_dummies(M[['variety', 'timing']].astype(str)).astype(float); COV['DAS'] = M.DAS; COV['stage'] = M.stage_code
+COV = pd.concat([COV, M[['date']].merge(WC.drop(columns='last_fav_leaf_day'), on='date', how='left').drop(columns='date')], axis=1)
 cb = []
 for t in 'ABC':
     for variant in ('covariates only', 'leaf spectra (DSF)', 'leaf spectra + covariates'):
@@ -157,8 +159,8 @@ for (t, mname), d in mls.groupby(['task', 'model']):
     for feat in sorted(set(allf)): st.append(dict(group='SFFS %s %s' % (t, mname), feature=feat, folds=allf.count(feat)))
 pd.DataFrame(st).to_csv(D + 'selection_stability.csv', index=False)
 
-# ---------------- exploratory: symptomless leaves of inoculated plots vs leaves of healthy plots ----------------
-mask = (M.grade == 0).values; y = M.inoculated.values; ex = []
+# ---------------- exploratory: symptomless leaves of unsprayed (naturally infected) plots vs leaves of the sprayed healthy plots ----------------
+mask = (M.grade == 0).values; y = M.unsprayed.values; ex = []
 preds = []
 for name in ('SVM', 'RF', 'XGBoost', 'k-NN'):
     for f in range(3):

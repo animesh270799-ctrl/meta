@@ -45,7 +45,7 @@ def widths(ws, w=14, first=None):
 ws = sheet('0_Contents', 'White rust of Indian mustard – ASD leaf spectra 2025-26: step-by-step analysis workbook',
            'Leaf level; 4 dates, 3 growth stages, 3 varieties and leaf positions pooled. Blue cells = data; black = formulas; tables marked "static" were computed in Python (scripts in thesis_build/asd26).')
 rows = [('1_Data', 'Common Activity A', 'leaf metadata and smoothed reflectance at 5 nm (400–2400 nm, water bands kept)'),
-        ('2_Counts', 'Step A5', 'leaves by date, stage, variety, leaf position, inoculation timing and block × grade (COUNTIFS formulas, charts)'),
+        ('2_Counts', 'Step A5', 'leaves by date, stage, variety, leaf position, sowing timing and block × grade (COUNTIFS formulas, charts)'),
         ('3_Mean_spectra', 'Step 1.1.1', 'mean reflectance by grade (AVERAGEIFS formulas, line chart)'),
         ('4_First_derivative', 'Step 1.1.1', 'mean first derivative by grade (static, line chart)'),
         ('5_Correlation', 'Step 1.1.2', 'Pearson r of every 5-nm band with leaf grade (CORREL formulas; derivative r static; chart)'),
@@ -67,23 +67,24 @@ rows = [('1_Data', 'Common Activity A', 'leaf metadata and smoothed reflectance 
         ('21_Strata', 'Activity 2.6', 'results by stage, variety, leaf position, date and timing'),
         ('22_Transfer', 'Step 2.6.2', 'leave-one-variety-out and leave-one-timing-out tests'),
         ('23_Weather_covariates', 'Step A6', 'daily weather, 7-day summaries and disease progress'),
-        ('24_Exploratory', 'Objective 3 (proxy)', 'symptomless leaves of inoculated plots vs leaves of healthy plots'),
+        ('24_Exploratory', 'Objective 3 (proxy)', 'symptomless leaves of unsprayed plots vs leaves of the sprayed healthy plots'),
         ('25_Stability', 'Step 2.5.4', 'selection frequency across folds and models'),
         ('26_Covariate_baseline', 'Step 2.5.5', 'covariates by date, models × inputs, M0/M1/M2 gains (formulas) with plot-block bootstrap intervals, DeLong tests, interpretable model; charts'),
         ('27_References', '—', 'references of the methods')]
 table(ws, 4, 1, pd.DataFrame(rows, columns=['Sheet', 'Methodology step', 'Content']))
 ws['A34'] = 'Assumptions and settings'; ws['A34'].font = Font(name=AR, bold=True)
 notes = ['Plot plan from the field layout (healthy block plots 1–12; R3 13–24; R2 25–36; R1 37–48; treatment codes D×V) – confirmed by the user.',
-         'Inoculation 5 February 2026; sowing D1 9 Dec, D2 18 Dec, D3 27 Dec 2025, D4 9 Jan 2026 (user). Days after inoculation of the four dates: 6, 19, 26, 36.',
+         'Natural infection (no artificial inoculation). Sowing D1 9 Dec, D2 18 Dec, D3 27 Dec 2025, D4 9 Jan 2026 = 50, 40, 30, 20 days after sowing (DAS) at the end of January 2026 (user). Column DAS of 1_Data = crop age at sampling.',
+         'Leaf positions L3, L5 and LL only; the nine spectra labelled L4 (11 Feb 2026) were removed (user).',
          'Contact-probe spectra, already splice corrected; water-absorption bands kept; 350–399 and 2401–2500 nm trimmed (detector-edge noise).',
          'Savitzky–Golay smoothing (11 nm window, 2nd order); first derivative from the same filter; 5-nm bands for band-level analysis.',
-         'Validation: leave-one-replication-out with the 12 healthy plots rotated (each fold: one healthy plot of each inoculation timing, all varieties); inner folds grouped by plot.',
+         'Validation: leave-one-replication-out with the 12 healthy plots rotated (each fold: one healthy plot of each sowing timing, all varieties); inner folds grouped by plot.',
          'Deep learning on CPU: Ma et al. (2026) settings (AdamW 6e-4, weight decay 1e-5, cosine annealing, batch 32, label smoothing 0.01, gradient clip 1.2) with maximum 100 epochs, patience 20, seed 42.']
 for i, n in enumerate(notes): ws.cell(35 + i, 1, n).font = NF
 ws['A43'] = 'Workflow from data collection to discussion (where each step is in this workbook and in the Word report)'; ws['A43'].font = Font(name=AR, bold=True)
-WF = [('1', 'Field experiment', '48 plots: healthy (sprayed) block + R1–R3 inoculated; 3 varieties × 4 sowing dates; inoculation 5 Feb 2026', '—', '2.1'),
+WF = [('1', 'Field experiment', '48 plots: healthy (fungicide-sprayed) block + R1–R3 unsprayed; 3 varieties × 4 sowing dates (50, 40, 30, 20 DAS); natural infection', '—', '2.1'),
       ('2', 'Leaf spectra and scoring', 'ASD contact probe on L3, L5, LL leaves of all 48 plots on 11 Feb, 24 Feb, 3 Mar, 13 Mar 2026; 0–9 grade of every leaf', '1_Data, 2_Counts', '2.2'),
-      ('3', 'Weather and covariates', 'IARI observatory daily weather; 7-day windows ending the day before each date; favourable days; DAI, timing, variety, stage', '23_Weather_covariates, 26_Covariate_baseline', '2.3'),
+      ('3', 'Weather and covariates', 'IARI observatory daily weather; 7-day windows ending the day before each date; favourable days since sowing; crop age (DAS), timing, variety, stage', '23_Weather_covariates, 26_Covariate_baseline', '2.3'),
       ('4', 'Data organisation and QC', 'parse four files, join layout, labels, derived fields, range and missing-value checks, fold of each plot', '1_Data, 2_Counts', '2.4'),
       ('5', 'Tasks and validation', 'A detection, B six grades, C score; leave-one-replication-out with rotated healthy plots; inner folds by plot', '13_Fold_selection', '2.5–2.6'),
       ('6', 'Pre-processing and features', 'Savitzky–Golay, first derivative, 5-nm bands, 41 indices + red-edge parameters', '3_Mean_spectra, 4_First_derivative, 9_Indices_formulas, 10_Indices_values', '2.7–2.8'),
@@ -98,8 +99,8 @@ for i, r_ in enumerate(WF):
 widths(ws, 60, 24); ws.column_dimensions['B'].width = 26; ws.column_dimensions['D'].width = 40; ws.column_dimensions['E'].width = 20
 
 # ------------------------------------------------------------------ 1 Data (5 nm)
-ws = sheet('1_Data', 'Leaf metadata and smoothed reflectance (5-nm bands, 400–2400 nm)', 'One row per leaf (n = 2339). Reflectance after Savitzky–Golay smoothing. Values in blue are data.')
-meta_cols = ['leaf_id', 'date', 'DAI', 'plot', 'block', 'fold', 'variety', 'timing', 'stage', 'leaf', 'grade', 'diseased']
+ws = sheet('1_Data', 'Leaf metadata and smoothed reflectance (5-nm bands, 400–2400 nm)', 'One row per leaf (n = %d; L3, L5, LL).' % len(M) + ' Reflectance after Savitzky–Golay smoothing. Values in blue are data.')
+meta_cols = ['leaf_id', 'date', 'DAS', 'plot', 'block', 'fold', 'variety', 'timing', 'stage', 'leaf', 'grade', 'diseased']
 Md = M.copy(); Md['leaf_id'] = np.arange(1, len(M) + 1)
 hdr = meta_cols + ['R%d' % w for w in w5]; header(ws, 4, 1, hdr)
 blue = Font(name=AR, size=9, color='0000FF')
@@ -120,7 +121,7 @@ for fac in ['date', 'stage', 'variety', 'leaf', 'timing', 'block']:
     header(ws, r0, 1, [fac] + ['grade %d' % g for g in GR] + ['total', 'mean grade'])
     for i, lev in enumerate(levels):
         rr = r0 + 1 + i; ws.cell(rr, 1, lev).font = NF
-        for j, g in enumerate(GR): ws.cell(rr, 2 + j, '=COUNTIFS(%s,"%s",%s,%d)' % (FR, lev, GRANGE, g)) if fac not in ('DAI',) else None
+        for j, g in enumerate(GR): ws.cell(rr, 2 + j, '=COUNTIFS(%s,"%s",%s,%d)' % (FR, lev, GRANGE, g))
         ws.cell(rr, 8, '=SUM(B%d:G%d)' % (rr, rr)); ws.cell(rr, 9, '=SUMPRODUCT(B%d:G%d,{0,1,3,5,7,9})/H%d' % (rr, rr, rr)).number_format = '0.00'
     tr = r0 + 1 + len(levels); ws.cell(tr, 1, 'total').font = Font(name=AR, bold=True)
     for j in range(2, 9): ws.cell(tr, j, '=SUM(%s%d:%s%d)' % (CL(j), r0 + 1, CL(j), tr - 1))
@@ -355,7 +356,7 @@ widths(ws, 14)
 # ------------------------------------------------------------------ 21-25 tables with charts
 for name, fn, ttl, key in (('21_Strata', 'strata_metrics.csv', 'Results by stratum (best ML and best DL model; pooled test predictions)', None),
                            ('22_Transfer', 'transfer_tests.csv', 'Leave-one-variety-out and leave-one-timing-out (random forest; selection repeated in each training set)', None),
-                           ('24_Exploratory', 'exploratory_asymptomatic.csv', 'Symptomless leaves of inoculated plots (grade 0) vs leaves of healthy plots (exploratory, leave-one-replication-out)', 'balanced_acc'),
+                           ('24_Exploratory', 'exploratory_asymptomatic.csv', 'Symptomless leaves of unsprayed plots (grade 0) vs leaves of the sprayed healthy plots (exploratory, leave-one-replication-out)', 'balanced_acc'),
                            ('25_Stability', 'selection_stability.csv', 'Selection frequency across the three outer folds and models', None)):
     ws = sheet(name, ttl)
     if os.path.exists(D + fn):
@@ -382,12 +383,12 @@ widths(ws, 11)
 
 # ------------------------------------------------------------------ 26 Covariate baseline
 if os.path.exists(D + 'cov2_metrics.csv'):
-    ws = sheet('26_Covariate_baseline', 'Covariate baseline model without sensor data (Step 2.5.5) – inoculated, unsprayed leaves only',
+    ws = sheet('26_Covariate_baseline', 'Covariate baseline model without sensor data (Step 2.5.5) – unsprayed, naturally infected leaves only',
                'Static values were computed in Python (a11_covariate.py); black cells are Excel formulas. Weather windows end the day before each date (no look-ahead). Favourable days after Chattopadhyay et al. (2011).')
     BF = Font(name=AR, bold=True, size=11, color='1F3864')
     # 1. covariates by date
-    cx = pd.read_csv(D + 'cov2_covariates_by_date.csv'); cx.insert(1, 'DAI', [int(M[M.date == d].DAI.iloc[0]) for d in cx.date])
-    cx.columns = ['date', 'DAI', 'Tmax 7 d (°C)', 'Tmin 7 d (°C)', 'RH I 7 d (%)', 'RH II 7 d (%)', 'rain 7 d (mm)', 'favourable days: leaf', 'favourable days: staghead']
+    cx = pd.read_csv(D + 'cov2_covariates_by_date.csv'); cx.insert(1, 'DAS (range)', ['%d–%d' % (M[M.date == d].DAS.min(), M[M.date == d].DAS.max()) for d in cx.date])
+    cx.columns = ['date', 'DAS (range)', 'Tmax 7 d (°C)', 'Tmin 7 d (°C)', 'RH I 7 d (%)', 'RH II 7 d (%)', 'rain 7 d (mm)', 'favourable leaf days in 7 d', 'fav. leaf days since sowing D1', 'D2', 'D3', 'D4', 'staghead days since sowing']
     ws.cell(4, 1, '1. Weather covariates of the four sampling dates').font = BF; e = table(ws, 5, 1, cx, '0.0')
     # 2. metrics: models x inputs
     mt = pd.read_csv(D + 'cov2_metrics.csv'); KEYS = ['macro_F1', 'AUC', 'balanced_acc', 'QWK', 'R2', 'RMSE', 'fold_sd']
@@ -421,13 +422,13 @@ if os.path.exists(D + 'cov2_metrics.csv'):
         r2 = e + 3
     # 5. interpretable model B1
     if os.path.exists(D + 'cov2_b1_coef.csv'):
-        ws.cell(r2 - 1, 1, '5. Interpretable model B1 on all inoculated leaves (standardised covariates: effect per SD); odds ratio = EXP(estimate) as formula').font = BF
+        ws.cell(r2 - 1, 1, '5. Interpretable model B1 on all unsprayed leaves (standardised covariates: effect per SD); odds ratio = EXP(estimate) as formula').font = BF
         cf = pd.read_csv(D + 'cov2_b1_coef.csv')[['model', 'term', 'estimate', 'ci_low', 'ci_high', 'p']]; e = table(ws, r2, 1, cf, '0.000')
         c_ = ws.cell(r2, 7, 'odds ratio (formula)'); c_.font = HF; c_.fill = HFILL
         for i, r_ in enumerate(cf.itertuples()):
             ws.cell(r2 + 1 + i, 6).number_format = '0.0000'
             if 'ogistic' in r_.model: ws.cell(r2 + 1 + i, 7, '=EXP(C%d)' % (r2 + 1 + i)).number_format = '0.00'
-        ws.cell(e + 1, 1, 'B1 models: logistic regression (A), proportional-odds ordinal logistic regression (B; McCullagh, 1980), linear model with DAI and DAI² (C; Madden et al., 2007).').font = NOTEF
+        ws.cell(e + 1, 1, 'B1 models: logistic regression (A), proportional-odds ordinal logistic regression (B; McCullagh, 1980), linear model with DAS and DAS² (C; Madden et al., 2007).').font = NOTEF
     # 6. chart tables (formulas) + native charts
     cr = 5; cc = 16
     for t, k, ttl in (('A', 'macro_F1', 'Detection: macro-F1'), ('B', 'macro_F1', 'Six grades: macro-F1'), ('C', 'R2', 'Severity score: R²')):

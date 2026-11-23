@@ -1,4 +1,4 @@
-"""Final covariate-baseline models (Step 2.5.5) refitted on ALL inoculated, unsprayed leaves (n = 1961) with the same tuning as in
+"""Final covariate-baseline models (Step 2.5.5) refitted on ALL unsprayed (naturally infected) leaves with the same tuning as in
 a11_covariate.py (inner GroupKFold(3) by plot), saved with joblib in outputs/ASD_2025-26_models/covariate/.
 Per task: B1 statistical, random forest and best ML on covariates only (M0 candidates) and best ML on spectra + covariates (M2).
 Expected accuracy = the leave-one-replication-out numbers in cov2_metrics.csv (stored in each file)."""
@@ -17,12 +17,14 @@ import wr_covariates as wc
 from wr_features import all_features
 B = os.path.dirname(os.path.abspath(__file__)) + '/'; D = B + 'data/'; OUT = B + '../outputs/ASD_2025-26_models/'; CO = OUT + 'covariate/'; os.makedirs(CO, exist_ok=True)
 M = pd.read_csv(D + 'meta.csv'); W = pd.read_csv(D + 'weather_season.csv'); SEL = json.load(open(OUT + 'feature_selection.json')); MT = pd.read_csv(D + 'cov2_metrics.csv')
-INOC = '2026-02-05'; inoc = (M.inoculated == 1).values; plots = M['plot'].values; enc = {g: i for i, g in enumerate(wc.GRADES)}
-DAI_MEAN = float(M.DAI.mean())
-COV2, COV1 = wc.leaf_covariates(M, W, INOC, DAI_MEAN)
+inoc = (M.unsprayed == 1).values; plots = M['plot'].values; enc = {g: i for i, g in enumerate(wc.GRADES)}
+DAS_MEAN = float(M.DAS.mean())
+COV2, COV1 = wc.leaf_covariates(M, W, wc.SOWING_2025_26, DAS_MEAN)
 # check against the covariates used in the evaluation
-chk = pd.read_csv(D + 'cov2_covariates_by_date.csv'); cw = wc.weather_covariates(W, M.date, INOC)
-assert np.allclose(cw[wc.WEATHER_COLS].values, chk[wc.WEATHER_COLS].values), 'weather covariates differ from the evaluation'
+chk = pd.read_csv(D + 'cov2_covariates_by_date.csv'); cw = wc.window7(W, M.date)
+assert np.allclose(cw[['Tmax7', 'Tmin7', 'RH1_7', 'RH2_7', 'rain7']].values, chk[['Tmax7', 'Tmin7', 'RH1_7', 'RH2_7', 'rain7']].values), 'weather covariates differ from the evaluation'
+for t in wc.TIMINGS:
+    for d, v in zip(chk.date, chk['fav_leaf_' + t]): assert COV2.fav_leaf[(M.date == d) & (M.timing == t)].eq(v).all(), 'favourable days differ'
 ALL = all_features(np.load(D + 'X_leaf.npy').astype(float), np.load(D + 'wl.npy'), SEL)
 Y = {'A': M.diseased.values, 'B': M.grade.map(enc).values, 'C': M.grade.values.astype(float)}
 cv = list(GroupKFold(3).split(np.zeros(inoc.sum()), groups=plots[inoc]))
@@ -51,7 +53,7 @@ def fit(task, model, X, y):
     g = GridSearchCV(xgb.XGBClassifier(subsample=0.8, n_jobs=4, random_state=42, verbosity=0), {'n_estimators': [200, 500], 'max_depth': [3, 5], 'learning_rate': [0.05, 0.1]}, scoring='f1_macro', cv=cv).fit(X, y)
     m = xgb.XGBClassifier(subsample=0.8, n_jobs=4, random_state=42, verbosity=0, **g.best_params_).fit(X, y, sample_weight=compute_sample_weight('balanced', y))
     return m, 'sklearn', g.best_params_, {}
-NAME = {'Statistical': {'A': 'Logistic regression', 'B': 'Ordinal logistic regression', 'C': 'Linear regression (DAI, DAI2)'}, 'RF': {t: 'Random forest' for t in 'ABC'}, 'B2': {'A': 'SVM', 'B': 'XGBoost', 'C': 'Random forest'}}
+NAME = {'Statistical': {'A': 'Logistic regression', 'B': 'Ordinal logistic regression', 'C': 'Linear regression (DAS, DAS2)'}, 'RF': {t: 'Random forest' for t in 'ABC'}, 'B2': {'A': 'SVM', 'B': 'XGBoost', 'C': 'Random forest'}}
 SUM = json.load(open(D + 'cov2_summary.json'))
 for task in 'ABC':
     y = Y[task][inoc]
@@ -67,8 +69,8 @@ for task in 'ABC':
         name = NAME[model][task]
         fn = '%s_%s_%s.joblib' % (task, inp.replace(' + ', '_plus_').replace(' ', '_'), name.replace(' ', '_').replace('(', '').replace(')', '').replace(',', ''))
         bundle = dict(model=est, kind=kind, task=task, task_description=TASKN[task], model_name=name, input=inp, role=', '.join(role) if role else 'candidate',
-                      covariate_set=cset, covariate_columns=list(cov.columns), spectral_columns=list(spec), uses_weather=cset == 'COV2', inoculation=INOC, dai_mean=DAI_MEAN,
-                      params={k: (v if isinstance(v, (int, float, str)) else str(v)) for k, v in params.items()}, training='inoculated, unsprayed leaves of IARI 2025-26 (n = %d); tuning GroupKFold(3) by plot' % inoc.sum(),
+                      covariate_set=cset, covariate_columns=list(cov.columns), spectral_columns=list(spec), uses_weather=cset == 'COV2', sowing=wc.SOWING_2025_26, das_mean=DAS_MEAN,
+                      params={k: (v if isinstance(v, (int, float, str)) else str(v)) for k, v in params.items()}, training='unsprayed (naturally infected) leaves of IARI 2025-26 (n = %d); tuning GroupKFold(3) by plot' % inoc.sum(),
                       loro_performance=perf, grades=wc.GRADES, versions=VERS, **extra)
         joblib.dump(bundle, CO + fn, compress=3)
         # functional check on the training leaves (in-sample)

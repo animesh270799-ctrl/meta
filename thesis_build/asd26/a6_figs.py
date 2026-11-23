@@ -53,9 +53,9 @@ def box(ax, x, y, w, h, t, b, c, fc):
     ax.text(x + w / 2, y + h - 0.5, b, ha='center', va='top', fontsize=9.8, linespacing=1.35, color='#1A1A1A')
 PH = {'c': ('#2C5F2D', '#EEF3E8', 'Data collection and quality control'), 'd': ('#1F3864', '#EEF1F6', 'Pre-processing and features'), 'o1': ('#1F6FB2', '#DEEBF7', 'Objective 1: spectral response and feature selection'),
       'v': ('#A87400', '#FFF4D6', 'Validation design'), 'o2': ('#6A2C9A', '#EDE2F6', 'Objective 2: machine and deep learning'), 'i': ('#B71C1C', '#F9E0DE', 'Covariate baseline, interpretation and discussion')}
-steps = [('1. Field experiment', '48 plots: sprayed healthy\nblock + R1–R3 inoculated;\n3 varieties × 4 sowings', 'c'),
-         ('2. Leaf spectra + scores', 'ASD contact probe, 4 dates\n(6–36 DAI), 2339 leaves;\nL3, L5, LL; grade 0–9', 'c'),
-         ('3. Weather + covariates', 'IARI daily weather; 7-day\nwindows (no look-ahead);\nfavourable days; DAI, stage', 'c'),
+steps = [('1. Field experiment', '48 plots: sprayed healthy\nblock + R1–R3 unsprayed\n(natural infection); 3 V × 4 D', 'c'),
+         ('2. Leaf spectra + scores', 'ASD contact probe, 4 dates\n(11 Feb–13 Mar), %d leaves;\nL3, L5, LL; grade 0–9' % len(M), 'c'),
+         ('3. Weather + covariates', 'IARI daily weather; 7-day\nwindows (no look-ahead);\nfavourable days; DAS, stage', 'c'),
          ('4. Organisation + QC', 'parse files, join layout,\nlabels; range, missing-\nvalue and plot checks', 'c'),
          ('5. Pre-processing', '400–2400 nm, water bands\nkept (splice-corrected);\nSavitzky–Golay; derivative', 'd'),
          ('6. Features', 'reflectance + derivative\n(5 nm); 41 indices +\n3 red-edge parameters', 'd'),
@@ -85,12 +85,12 @@ save(fig, 'f00_workflow.png')
 
 # ---------------- F01 dataset ----------------
 fig, axs = plt.subplots(2, 2, figsize=(12, 8.2))
-for ax, fac, ttl in zip(axs.ravel(), ['date', 'stage', 'variety', 'leaf'], ['(a) Sampling date (days after inoculation)', '(b) Growth stage', '(c) Variety', '(d) Leaf position']):
+for ax, fac, ttl in zip(axs.ravel(), ['date', 'stage', 'variety', 'leaf'], ['(a) Sampling date (crop age, days after sowing)', '(b) Growth stage', '(c) Variety', '(d) Leaf position']):
     c = pd.crosstab(M[fac], M.grade); bottom = np.zeros(len(c))
     for g, col in zip(GR, GC): ax.bar(range(len(c)), c[g], bottom=bottom, color=col, width=0.62, edgecolor='white', lw=0.6); bottom += c[g].values
     for i, v in enumerate(bottom): ax.text(i, v + bottom.max() * 0.015, 'n = %d' % v, ha='center', va='bottom', fontsize=10, color='#222')
     lab = list(c.index)
-    if fac == 'date': lab = ['%s\n(%d DAI)' % (pd.Timestamp(d).strftime('%d %b'), M[M.date == d].DAI.iloc[0]) for d in c.index]
+    if fac == 'date': lab = ['%s\n(%d–%d DAS)' % (pd.Timestamp(d).strftime('%d %b'), M[M.date == d].DAS.min(), M[M.date == d].DAS.max()) for d in c.index]
     ax.set_xticks(range(len(c))); ax.set_xticklabels(lab); ax.set_title(ttl); ax.set_ylabel('Number of leaves'); ax.set_ylim(0, bottom.max() * 1.12); ax.grid(axis='x', visible=False)
 grade_legend(fig, bbox=(0.5, -0.035)); plt.tight_layout(rect=(0, 0.03, 1, 1)); save(fig, 'f01_dataset.png')
 
@@ -212,7 +212,7 @@ for ax, stg in zip(axs, ['Vegetative', 'Flowering', 'Pod formation']):
     regions(ax); ax.set_title('%s (n = %d)' % (stg, (M.stage == stg).sum()), pad=22); ax.set_xlabel('Wavelength (nm)'); ax.set_xticks([500, 1000, 1500, 2000])
 axs[0].set_ylabel('Reflectance'); grade_legend(fig, bbox=(0.5, -0.07), counts=False); plt.tight_layout(rect=(0, 0.04, 1, 1)); save(fig, 'f13_spectra_by_stage.png')
 fig, axs = plt.subplots(2, 2, figsize=(12, 8))
-for ax, fac, ttl in zip(axs.ravel(), ['stage', 'variety', 'leaf', 'timing'], ['(a) Growth stage', '(b) Variety', '(c) Leaf position', '(d) Sowing/inoculation timing']):
+for ax, fac, ttl in zip(axs.ravel(), ['stage', 'variety', 'leaf', 'timing'], ['(a) Growth stage', '(b) Variety', '(c) Leaf position', '(d) Sowing timing (D1–D4 = 50, 40, 30, 20 DAS)']):
     g = M.groupby(fac).grade.agg(['mean', 'sem', 'size'])
     ax.bar(range(len(g)), g['mean'], yerr=1.96 * g['sem'], color='#5B8DB8', capsize=5, width=0.6, error_kw=dict(lw=1.3))
     for i, (v, nn) in enumerate(zip(g['mean'], g['size'])): ax.text(i, v / 2, '%.2f\nn = %d' % (v, nn), ha='center', va='center', fontsize=10, color='white', fontweight='bold')
@@ -233,17 +233,18 @@ if os.path.exists(D + 'weather_season.csv'):
     axr2.spines['right'].set_visible(True); axr2.grid(False); axr2.set_ylabel('Relative humidity (%)'); axr2.set_ylim(0, 128); axr2.set_yticks([0, 20, 40, 60, 80, 100]); axr.set_ylim(0, Wd.rain.max() * 1.3); axr.set_ylabel('Rainfall (mm)')
     for a in (ax, axr):
         for dt in SOW: a.axvline(pd.Timestamp(dt), color='#2E7D32', lw=1, ls=':')
-        a.axvline(pd.Timestamp('2026-02-05'), color='k', lw=1.6)
         for d_ in pr.date: a.axvline(d_, color='#7B1FA2', lw=1.2, alpha=.6)
-    ax.text(pd.Timestamp('2026-02-05'), 39, ' inoculation (5 Feb)', fontsize=10, va='top', fontweight='bold')
+    fv = Wd[(Wd.Tmax.between(16, 24)) & (Wd.RH1 > 97) & (Wd.RH2 > 40)]
+    ax.plot(fv.date, np.full(len(fv), 34.5), 'v', color='#2E7D32', ms=8, label='favourable leaf-infection day*')
     for lab, dt in zip(['D1', 'D2', 'D3', 'D4'], SOW): ax.text(pd.Timestamp(dt), 39, ' ' + lab, fontsize=10, color='#2E7D32', va='top', fontweight='bold')
     for _, r in pr.iterrows():
-        ax.text(r.date, -1, '%d DAI\ngrade %.1f\n%d%% dis.' % ((r.date - pd.Timestamp('2026-02-05')).days, r.mean_grade, r.pct_diseased), ha='center', va='bottom', fontsize=8.8,
+        ax.text(r.date, -1, '%s\ngrade %.1f\n%d%% dis.' % (r.date.strftime('%d %b'), r.mean_grade, r.pct_diseased), ha='center', va='bottom', fontsize=8.8,
                 color='#4A148C', fontweight='bold', bbox=dict(fc='white', ec='#CE93D8', boxstyle='round,pad=0.2', alpha=0.92))
     ax.legend(loc='upper left', ncol=3, bbox_to_anchor=(0.0, 0.88), fontsize=9.5)
     h1, l1 = axr.get_legend_handles_labels(); h2, l2 = axr2.get_legend_handles_labels(); axr.legend(h1 + h2, l1 + l2, loc='upper left', ncol=3, fontsize=9.5, bbox_to_anchor=(0, 1.02))
-    ax.set_title('(a) Temperature, sowing dates (D1–D4), inoculation and leaf sampling dates (purple)'); axr.set_title('(b) Rainfall and relative humidity (IARI agro-meteorological observatory)')
+    ax.set_title('(a) Temperature, sowing dates (D1–D4), favourable days and leaf sampling dates (purple); natural infection'); axr.set_title('(b) Rainfall and relative humidity (IARI agro-meteorological observatory)')
     axr.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0, interval=2)); axr.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
+    fig.text(0.01, -0.01, '* T max 16–24 °C, RH I > 97% and RH II > 40% (Chattopadhyay et al., 2011)', fontsize=9.5, color='#444')
     plt.tight_layout(); save(fig, 'f15_weather_progress.png')
 
 # ---------------- F30 disease-specific features by grade (box plots, as in index figures of disease papers) ----------------
@@ -389,13 +390,13 @@ if os.path.exists(D + 'covariate_baseline.csv'):
         d = cb_[cb_.task == t]; bars = ax.bar(range(len(d)), d[k], color=[GREY, ML_C, DL_C], width=0.6); label_bars(ax, bars, '%.3f', fs=10.5)
         ax.set_xticks(range(len(d))); ax.set_xticklabels(['covariates\nonly', 'leaf spectra\n(DSF)', 'spectra +\ncovariates']); ax.grid(axis='x', visible=False)
         ax.set(ylabel=k.replace('_', '-').replace('R2', 'R²'), ylim=(0, max(d[k]) * 1.18)); ax.set_title({'A': '(a) Detection', 'B': '(b) Six grades', 'C': '(c) Severity score'}[t])
-    fig.text(0.5, -0.02, 'Inoculated (unsprayed) plots only; covariates = variety, inoculation timing, days after inoculation, growth stage and 7-day weather', ha='center', fontsize=10.5, color='#444')
+    fig.text(0.5, -0.02, 'Unsprayed (naturally infected) plots only; covariates = variety, sowing timing, days after sowing, growth stage and 7-day weather', ha='center', fontsize=10.5, color='#444')
     plt.tight_layout(); save(fig, 'f27_covariates.png')
 if os.path.exists(D + 'exploratory_asymptomatic.csv'):
     ex = pd.read_csv(D + 'exploratory_asymptomatic.csv'); fig, ax = plt.subplots(figsize=(10, 5)); x = np.arange(len(ex)); KS = ['balanced_acc', 'AUC', 'sensitivity', 'specificity']; KC = ['#7030A0', '#2E75B6', '#E07B00', '#2E7D32']
     for i, k in enumerate(KS): bars = ax.bar(x + (i - 1.5) * 0.2, ex[k], 0.2, label=k.replace('_', ' ').replace('acc', 'accuracy'), color=KC[i]); label_bars(ax, bars, '%.2f', fs=9)
     ax.axhline(0.5, color='#333', ls=':', lw=1); ax.text(len(ex) - 0.5, 0.505, 'chance', fontsize=9.5, ha='right', va='bottom'); ax.set_xticks(x); ax.set_xticklabels(ex.model); ax.set(ylim=(0, 1.05), ylabel='Score'); ax.grid(axis='x', visible=False)
-    ax.set_title('Exploratory: symptomless leaves of inoculated plots vs healthy-plot leaves'); ax.legend(ncol=4, loc='upper center', bbox_to_anchor=(0.5, -0.1)); save(fig, 'f28_asymptomatic.png')
+    ax.set_title('Exploratory: symptomless leaves of unsprayed plots vs sprayed healthy-plot leaves'); ax.legend(ncol=4, loc='upper center', bbox_to_anchor=(0.5, -0.1)); save(fig, 'f28_asymptomatic.png')
 if os.path.exists(D + 'selection_stability.csv'):
     st = pd.read_csv(D + 'selection_stability.csv'); d = st[st.group == 'optimal wavelengths'].sort_values(['folds', 'feature'], ascending=[False, True])
     fig, ax = plt.subplots(figsize=(13, 4.6)); ax.bar(range(len(d)), d.folds, color=[FD_C if f.startswith('FD') else R_C for f in d.feature], width=0.7)
