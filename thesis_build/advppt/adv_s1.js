@@ -75,18 +75,20 @@ box(s, 4.15, 1.45, 1.95, 0.6, null, 'Pre-symptomatic (3)', C.blue, C.lblue); box
 BL(s, ['**All 13 dates:** hyperspectral, multispectral, red–green–blue and thermal flights; canopy severity of every subplot; ASD leaf spectra (L3, L5, LL of 3 tagged plants per subplot).',
   '**Green triangles (7 Jan, 18 Jan, 8 Feb, 1 Mar):** biochemical and biophysical parameters (1 pre- and 3 post-symptomatic dates).', '**Numbers below dates:** days after inoculation (d), counted from 30 December 2026.'], 0.45, 4.6, 12.43, 1.9);
 // 11 ------------------------------------------------------------------ A3 + A5
-s = S('Steps A3 and A5: Subplots, severity score, labels and datasets', 'Data collection', 'The sampling unit is one subplot on one date; labels come from the canopy severity score.');
-T(s, '**Subplots of one plot**', 0.45, 1.15, 3.2, 0.35);
+s = S('Steps A3 and A5: Subplots, disease index, labels and datasets', 'Data collection', 'The sampling unit is one subplot on one date. Disease is surveyed at the centre and four corners of each subplot; the disease index (DI) of the subplot is the label source for all three tasks.');
+T(s, '**Subplots of one plot (● = survey points)**', 0.45, 1.15, 3.5, 0.35);
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 1.55, w: 3.0, h: 2.0, fill: { color: 'FFFFFF' }, line: { color: C.g, width: 2 } });
-[[0.7, 1.7], [2.1, 1.7], [0.7, 2.6], [2.1, 2.6]].forEach((p, i) => box(s, p[0], p[1], 1.3, 0.8, null, 'Subplot ' + (i + 1), C.g2, C.lt));
-T(s, 'Inner buffer excludes border rows; 48 plots × 4 = 192 subplots per image', 0.45, 3.6, 3.3, 0.9, { fontSize: FS });
-tb(s, [['Grade (Conn et al., 1990)', '0', '1', '3', '5', '7', '9'], ['Canopy leaf area with pustules', 'no symptoms', '1–5%', '6–10%', '11–25%', '26–50%', '> 50%']], 0.45, 4.75, 12.43, [3.2, 1.6, 1.5, 1.5, 1.55, 1.55, 1.53]);
-T(s, '**Plot summary:** percent disease index PDI = Σ grade_i / (n × 9) × 100, with n = 4 subplots per plot', 0.45, 5.65, 12.43, 0.4);
-BL(s, ['**Scoring:** one trained scorer grades the canopy of each subplot on the flight day; written grade limits keep scoring consistent (Bock et al., 2010).',
-  '**Task A label (detection):** healthy (grade 0) vs diseased (grade > 0), from the observed score, not the treatment.', '**Task B label (severity classes):** grades 0, 1, 3, 5, 7, 9; a grade with < 5% of samples is merged with its neighbour.',
-  '**Task C label (severity score):** grade treated as a continuous number (regression).', '**Post-symptomatic dataset:** 10 dates × 192 subplots = 1920 samples per camera (Objectives 1 and 2).',
-  '**Pre-symptomatic dataset:** 3 dates × 192 = 576 samples per camera (characterisation in Objective 1, prediction in Objective 3); infected = inoculated subplots that show pustules later.'], 3.95, 1.2, 8.93, 3.45);
-refline(s, 'Conn et al. (1990); Bock et al. (2010); Tian et al. (2021); Feng et al. (2022); Zhu et al. (2017).', 6.3);
+[[0.7, 1.7], [2.1, 1.7], [0.7, 2.6], [2.1, 2.6]].forEach((p, i) => { s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: p[0], y: p[1], w: 1.3, h: 0.8, fill: { color: C.lt }, line: { color: C.g2, width: 1.25 }, rectRadius: 0.06 });
+  [[0.12, 0.1], [1.08, 0.1], [0.6, 0.33], [0.12, 0.56], [1.08, 0.56]].forEach(d => s.addShape(pres.shapes.OVAL, { x: p[0] + d[0], y: p[1] + d[1], w: 0.13, h: 0.13, fill: { color: C.red }, line: { color: C.red } }));
+  T(s, 'S' + (i + 1), p[0] + 0.35, p[1] + 0.5, 0.6, 0.28, { align: 'center', fontSize: 12, color: C.g }); });
+T(s, 'Inner buffer excludes border rows; 48 plots × 4 = 192 subplots per date', 0.45, 3.6, 3.3, 0.7, { fontSize: 13 });
+box(s, 0.45, 4.35, 3.3, 1.25, 'Disease index (Liu et al., 2024)', ['DI = Σ(x × f) / (n × Σf) × 100', 'x = leaf grade 0–9; f = leaves at grade x; n = 9 (highest grade)'], C.red, C.lred, { fs: 13 });
+BL(s, ['**DI survey:** on every flight day one trained scorer grades the leaves at the centre and the four corners of each subplot on the 0–9 key (Conn et al., 1990); written grade limits keep scoring consistent (Bock et al., 2010).',
+  '**Task A (detection):** healthy (DI = 0) vs diseased (DI > 0), from the survey, not the treatment.', '**Task B (severity classes):** DI class 0, 1, 3, 5, 7, 9 (table); a class with < 5% of samples is merged with its neighbour.',
+  '**Task C (severity score):** DI (%) as a continuous variable (regression).', '**Staghead severity (%)** = staghead (infected) racemes / total racemes × 100, recorded from flowering onward.',
+  '**Datasets:** post-symptomatic 10 dates × 192 = 1920 samples per camera (Objectives 1, 2); pre-symptomatic 3 dates × 192 = 576 (Objective 1 characterisation, Objective 3 prediction); infected = inoculated subplots with symptoms later.'], 3.95, 1.15, 8.93, 3.75, { ps: 3 });
+tb(s, [['DI range (%)', '0', '1–5', '6–10', '11–25', '26–50', '> 50'], ['Severity level (field and leaf)', 'healthy', 'very low', 'low', 'moderate', 'high', 'very high'], ['Class', '0', '1', '3', '5', '7', '9']], 3.95, 5.0, 8.93, [2.63, 1.05, 1.05, 1.05, 1.05, 1.05, 1.05], { fs: 13, firstCol: true });
+refline(s, 'Conn et al. (1990); Bock et al. (2010); Liu et al. (2024); Tian et al. (2021); Feng et al. (2022).', 6.45);
 // 12 ------------------------------------------------------------------ A4 ASD
 s = S('Step A4: Leaf spectra with the ASD field spectroradiometer', 'Data collection', 'Leaf-level spectra and grades from the same subplots on the same days as the flights (acquisition only).');
 chain(s, [{ h: 'Tag plants', b: '3 plants per subplot (12 per plot; 576), before inoculation' }, { h: 'White reference', b: 'Spectralon; every 10–15 min or each plot' }, { h: 'Leaves', b: 'L3, L5 (from top) and lowest green leaf (LL)' },
@@ -99,14 +101,14 @@ refline(s, 'field spectroscopy protocols: Milton et al. (2009); leaf and UAV dat
 // 13 ------------------------------------------------------------------ A8 parameters
 s = S('Step A8: Biochemical and biophysical parameters', 'Data collection', 'Eleven parameters on one designated subplot per plot: methods, references, sampling design and formulas.');
 tb(s, [['Parameter (unit)', 'Method', 'Reference'],
-  ['Chlorophyll a, b (mg g⁻¹ FW)', 'DMSO extraction, no grinding (100 mg, 10 mL, 65 °C); A665, A649', 'Hiscox and Israelstam (1979); Wellburn (1994)'],
+  ['Chlorophyll a, b (µg mg⁻¹ FW)', 'DMSO extraction, no grinding (100 mg, 10 mL, 65 °C); A665, A649', 'Hiscox and Israelstam (1979); Wellburn (1994)'],
   ['Total carotenoids (mg g⁻¹ FW)', 'same DMSO extract; A480', 'Lichtenthaler and Wellburn (1983)'],
   ['Anthocyanin (µg g⁻¹ FW)', 'pH-differential: 520 and 700 nm at pH 1.0 and 4.5', 'Lee et al. (2005)'],
-  ['Total soluble protein (mg g⁻¹ FW)', 'Bradford dye binding; 595 nm; BSA standard', 'Bradford (1976)'],
-  ['Relative water content (%)', 'fresh, turgid (4 h) and dry weight (48 h, 70 °C)', 'Barrs and Weatherley (1962)'],
-  ['Membrane stability index (%)', 'conductivity at 40 °C (C₁) and 100 °C (C₂)', 'Premachandra et al. (1990); Sairam (1994)'],
-  ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400: 1200 µmol m⁻² s⁻¹, CO₂ 400 µmol mol⁻¹, flow 500 µmol s⁻¹', 'Long and Bernacchi (2003)'],
-  ['Leaf area index (m² m⁻²)', 'canopy analyser: 1 reading above, 4 below; diffuse light', 'Bréda (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
+  ['Total protein (µg mg⁻¹ FW)', 'Bradford dye binding (colorimetry); 595 nm; BSA standard', 'Bradford (1976); Kuril (2024)'],
+  ['Relative water content (%)', 'dehydration and imbibition: fresh, turgid (4 h) and dry weight (48 h, 70 °C)', 'Barrs and Weatherley (1962)'],
+  ['Membrane stability index (%)', 'electrolyte outflow: conductivity at 40 °C (C₁) and 100 °C (C₂)', 'Sairam (1994); Premachandra et al. (1990)'],
+  ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable gas exchange (LI-COR, USA): 1200 µmol m⁻² s⁻¹, CO₂ 400 µmol mol⁻¹', 'Riches et al. (2020); Long and Bernacchi (2003)'],
+  ['Leaf area index (m² m⁻²)', 'canopy analyser: 1 reading above, 4 below; diffuse light', 'Singh et al. (2021); Bréda (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
 box(s, 9.2, 1.2, 3.68, 3.95, 'Calculations', ['C_a = 12.47 A665 − 3.62 A649', 'C_b = 25.06 A649 − 6.5 A665', 'C_x+c = (1000 A480 − 1.29 C_a − 53.78 C_b) / 220 (Wellburn, 1994)', 'A = (A520 − A700)pH1.0 − (A520 − A700)pH4.5 (Lee et al., 2005)', 'RWC = (FW − DW) / (TW − DW) × 100', 'MSI = [1 − C₁ / C₂] × 100'], C.teal, C.lteal, { valign: 'top', fs: 13 });
 BL(s, ['**Dates (flight days):** 7 Jan 2027 (pre-symptomatic, 8 days after inoculation); 18 Jan, 8 Feb and 1 Mar 2027 (19, 40, 61 days after inoculation).',
   '**Designated subplot:** one per plot, rotated (plot number modulo 4, + 1); gas exchange on leaf L3 of one tagged plant (09:30–11:30 h, before the flight); laboratory samples from L3 leaves of 3 untagged plants (cool box, same day); leaf area index in all four subplots; BBCH stage on every date.',
@@ -145,12 +147,13 @@ chain(s, [{ h: 'D1 Polygons', b: '192 subplot polygons, inner buffer' }, { h: 'D
   { h: 'D5–D7 Texture, MS, RGB, thermal', b: 'GLCM; colour indices; temperature' }, { h: 'D8 Feature table', b: 'one row per subplot-date; group prefixes' }], 0.45, 1.25, 12.43, 1.35, 0.25, C.blue, C.lblue);
 tb(s, [['Camera', 'Feature groups (before selection)', 'Number'],
   ['Hyperspectral', 'reflectance 483; first derivative 483, FD(λi) = [R(λi+1) − R(λi−1)] / (λi+1 − λi−1); 3 red-edge parameters (REP, Dr, SDr); 48 published indices (next two slides); texture of 3 principal components (24)', '≈ 1040'],
-  ['Multispectral', '5 bands; 12 indices (NDVI, GNDVI, NDRE, CIgreen, CIrededge, MTCI, OSAVI, SAVI, TCARI, MCARI, MSR, PSRI); 10 normalised differences; 40 texture', '67'],
-  ['Red–green–blue', 'ExG, ExR, ExG − ExR, VARI, GLI, NGRDI; mean hue, saturation, value; 24 texture', '33'],
+  ['Multispectral', '5 bands; 12 indices (Steps D5–D6 slide); 10 normalised differences; 40 texture', '67'],
+  ['Red–green–blue', 'ExG, ExR, ExG − ExR, VARI, GLI, NGRDI; mean hue, saturation, value; 24 GLCM texture (8 measures × 3 bands)', '33'],
   ['Thermal', 'mean, median, SD, 10th and 90th percentile temperature; CTD, NRCT, CWSI, healthy difference; 8 texture', '17']], 0.45, 2.8, 12.43, [1.8, 9.4, 1.23], { firstCol: true });
 BL(s, ['**GLCM texture:** 32 grey levels, 3 × 3 window, distance 1, four directions; mean, variance, homogeneity, contrast, dissimilarity, entropy, second moment, correlation (Haralick et al., 1973). **No second derivative** (amplifies noise; Rinnan et al., 2009).'], 0.45, 5.75, 12.43, 0.8);
 refline(s, 'Tsai and Philpot (1998); Filella and Peñuelas (1994); Mahlein et al. (2013); Hall-Beyer (2017); Guo et al. (2021); Ma et al. (2026).', 6.55, 0.45);
 require('./adv_idx.js')();
+require('./adv_ms.js')();
 // 19 ------------------------------------------------------------------ Activity E
 s = S('Activity E: Normalisation and data preparation (Steps E1–E4)', 'Data processing', 'Removes effects not caused by disease; E2-E4 use training statistics only.');
 const es = [['E1 Thermal normalisation', ['CTD = Tc − Tair', 'NRCT = (Tc − Tmin) / (Tmax − Tmin)', 'CWSI = (Tc − Twet) / (Tdry − Twet)'], 'Idso et al. (1981); Jones et al. (2009); Calderón et al. (2014)', C.red, C.lred],
