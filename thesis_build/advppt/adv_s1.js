@@ -185,14 +185,6 @@ const es = [['E1 Thermal normalisation', ['CTD = Tc − Tair', 'NRCT = (Tc − T
   ['E4 Class weights', ['w_c = N / (k × n_c)', 'used in the loss; macro-averaged metrics reported'], 'Johnson and Khoshgoftaar (2019); Sokolova and Lapalme (2009)', C.purple, C.lpurple]];
 es.forEach((e, i) => { const x = 0.45 + i * 3.15; box(s, x, 1.3, 2.95, 0.75, null, e[0], e[3], e[4]); box(s, x, 2.2, 2.95, 2.6, null, e[1], e[3], 'FFFFFF'); T(s, e[2], x, 4.9, 2.95, 0.95, { italic: true, align: 'center', color: '3A3A3A' }); if (i < 3) arr(s, x + 2.97, 1.67, x + 3.13, 1.67); });
 T(s, 'E1 uses no labels and is run once on all data; E2–E4 are computed on the training part of every fold and applied to its test part. Date-to-date reflectance consistency relies on the panels flown on every date (B1).', 0.45, 5.95, 12.43, 0.8);
-// 20 ------------------------------------------------------------------ Activity F
-s = S('Activity F: Validation design (LORO and nested tuning)', 'Data processing', 'Outer LORO folds with rotated healthy plots; inner folds grouped by plot; leakage checklist.');
-T(s, '**Outer folds (same for all sensor sets, tasks and models)**', 0.45, 1.15, 6.4, 0.35);
-const fh = [['Fold 1', 'R1 (37–48)', '7, 2, 10, 12'], ['Fold 2', 'R2 (25–36)', '5, 8, 4, 1'], ['Fold 3', 'R3 (13–24)', '3, 9, 11, 6']];
-fh.forEach((f, i) => { const y = 1.6 + i * 0.95; box(s, 0.45, y, 1.1, 0.8, null, f[0], C.grey, C.lgrey); ['R1', 'R2', 'R3'].forEach((r, j) => { const test = j === i; box(s, 1.7 + j * 1.15, y, 1.05, 0.8, null, (test ? 'test ' : 'train ') + r, test ? C.red : C.g, test ? C.lred : C.lt); });
-  box(s, 5.2, y, 1.7, 0.8, null, 'healthy test: ' + f[2], C.gold, C.lgold); });
-T(s, 'Each test fold has one healthy plot of every inoculation timing and every variety at least once; ≈ 1280 training and ≈ 640 test samples (post-symptomatic).', 0.45, 4.5, 6.45, 1.0);
-BL(s, ['**Inner loop:** 3 folds grouped by plot inside the training replications.', '**Inside the inner loop:** index search, SHAP-CARS, ReliefF, mRMR, TTFI search, SFFS, grid search and early stopping.',
-  '**Then:** retrain on the whole training part and predict the test replication once.', '**Leakage checklist:** pre-processing and features once on all data (no labels); statistics in the training part; label-based steps in inner folds; Bharatpur only with frozen models.'], 7.15, 1.2, 5.73, 4.4);
-refline(s, 'Roberts et al. (2017); Varma and Simon (2006); Cawley and Talbot (2010); Ambroise and McLachlan (2002); Ploton et al. (2020); healthy references: Oerke et al. (2006).', 6.0, 0.6);
+// 20 ------------------------------------------------------------------ Activity F: stage-1 validation split
+require('./adv_split.js')();
 module.exports = {};
