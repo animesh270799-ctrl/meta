@@ -1,7 +1,7 @@
 """Assemble the reconstructed methodology Word document (docx JS) with a cross-checked reference list."""
 import re, json, os
 B = os.path.dirname(os.path.abspath(__file__)) + '/'; S = B + '../'
-OUTF = S + 'outputs/White_rust_field_methodology_revised_DT-EDNet.docx'
+OUTF = S + 'outputs/White_rust_field_methodology_revised_DT-EDNet_5_updated.docx'
 T = open(S + 'thesis/t_docx.js').read()
 head = T[:T.index('// ======================= TITLE')]
 head = re.sub(r"const B = '.*?';", "const B = '%s';" % B, head)
@@ -24,7 +24,7 @@ cites = set(m.groups() for m in pat.finditer(body))
 for m in re.finditer(r"([A-Z][A-Za-zÀ-ÿŠš\-]+)(?: et al\.)? \((\d{4})((?:, \d{4})+)\)", body):
     for y in re.findall(r'\d{4}', m.group(3)): cites.add((m.group(1), y))
 def rk(r):
-    a = re.split(r'[ ,]', r.strip())[0]; y = re.search(r'\((\d{4})[a-z]?\)', r); return (a, y.group(1) if y else '')
+    t_ = re.split(r'[ ,]', r.strip()); a = t_[1] if t_[0] in ('De', 'de', 'Van', 'van', 'Le', 'La') and len(t_) > 1 else t_[0]; y = re.search(r'\((\d{4})[a-z]?\)', r); return (a, y.group(1) if y else '')
 used, seen = [], set()
 for r in pool:
     k = rk(r)

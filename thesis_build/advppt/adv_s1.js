@@ -104,11 +104,11 @@ tb(s, [['Parameter (unit)', 'Method', 'Reference'],
   ['Chlorophyll a, b (µg mg⁻¹ FW)', 'DMSO extraction, no grinding (100 mg, 10 mL, 65 °C); A665, A649', 'Hiscox and Israelstam (1979); Wellburn (1994)'],
   ['Total carotenoids (mg g⁻¹ FW)', 'same DMSO extract; A480', 'Lichtenthaler and Wellburn (1983)'],
   ['Anthocyanin (µg g⁻¹ FW)', 'pH-differential: 520 and 700 nm at pH 1.0 and 4.5', 'Lee et al. (2005)'],
-  ['Total protein (µg mg⁻¹ FW)', 'Bradford dye binding (colorimetry); 595 nm; BSA standard', 'Bradford (1976); Kuril (2024)'],
+  ['Total protein (µg mg⁻¹ FW)', 'Bradford dye binding (colorimetry); 595 nm; BSA standard', 'Bradford (1976)'],
   ['Relative water content (%)', 'dehydration and imbibition: fresh, turgid (4 h) and dry weight (48 h, 70 °C)', 'Barrs and Weatherley (1962)'],
   ['Membrane stability index (%)', 'electrolyte outflow: conductivity at 40 °C (C₁) and 100 °C (C₂)', 'Sairam (1994); Premachandra et al. (1990)'],
   ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable gas exchange (LI-COR, USA): 1200 µmol m⁻² s⁻¹, CO₂ 400 µmol mol⁻¹', 'Riches et al. (2020); Long and Bernacchi (2003)'],
-  ['Leaf area index (m² m⁻²)', 'canopy analyser: 1 reading above, 4 below; diffuse light', 'Singh et al. (2021); Bréda (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
+  ['Leaf area index (m² m⁻²)', 'canopy analyser: 1 reading above, 4 below; diffuse light', 'Goyal et al. (2021); Bréda (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
 box(s, 9.2, 1.2, 3.68, 3.95, 'Calculations', ['C_a = 12.47 A665 − 3.62 A649', 'C_b = 25.06 A649 − 6.5 A665', 'C_x+c = (1000 A480 − 1.29 C_a − 53.78 C_b) / 220 (Wellburn, 1994)', 'A = (A520 − A700)pH1.0 − (A520 − A700)pH4.5 (Lee et al., 2005)', 'RWC = (FW − DW) / (TW − DW) × 100', 'MSI = [1 − C₁ / C₂] × 100'], C.teal, C.lteal, { valign: 'top', fs: 13 });
 BL(s, ['**Dates (flight days):** 7 Jan 2027 (pre-symptomatic, 8 days after inoculation); 18 Jan, 8 Feb and 1 Mar 2027 (19, 40, 61 days after inoculation).',
   '**Designated subplot:** one per plot, rotated (plot number modulo 4, + 1); gas exchange on leaf L3 of one tagged plant (09:30–11:30 h, before the flight); laboratory samples from L3 leaves of 3 untagged plants (cool box, same day); leaf area index in all four subplots; BBCH stage on every date.',

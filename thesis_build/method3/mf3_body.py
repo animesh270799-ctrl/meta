@@ -42,11 +42,12 @@ def CARD(key, name, principle, problem, spec, tuning, data, why, refs):
 # TITLE
 # =====================================================================================
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 1100, after: 200 }, children: [new TextRun({ text: 'AI-based multimodal UAV sensing of white rust in mustard', font: FONT, size: 44, bold: true, color: '1E3A1F' })] }));")
-K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: 'Research methodology for the field experiment (revised): objectives → activities → steps', font: FONT, size: 28, color: '2C5F2D' })] }));")
+K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: 'Research methodology for the field experiment, season 2026-27 (revision 5): objectives → activities → steps', font: FONT, size: 28, color: '2C5F2D' })] }));")
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: 'Hyperspectral, multispectral, red–green–blue and thermal unmanned aerial vehicle (UAV) data | 15 sensor sets | feature-level fusion | machine learning, feature-fusion neural networks, DT-EDNet, EfficientNet, ResNet18 and ConvNeXt V2', font: FONT, size: 21, italics: true })] }));")
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [new TextRun({ text: 'Animesh Panda (Roll No. 13098) | Ph.D. Agricultural Physics | ICAR-Indian Agricultural Research Institute, New Delhi', font: FONT, size: 20 })] }));")
 BOX('How to read this document.', 'The work is organised in three levels. (1) Six common activities (A to F) prepare the data once for all objectives. (2) Each objective is divided into activities (for example Activity 1.2). (3) Each activity is divided into numbered steps (for example Step 1.2.3). Every step has a heading and the same layout: purpose, input, output, procedure and supporting studies. Every technique used in a step is described in a method card that gives its principle, the problem it solves, its specification, its hyper-parameters and how they are tuned, the data on which it works well, why it was selected and its references. Flow charts are given for every objective and for the main activities, and small dummy datasets are used to show how each calculation works. Full names are written with their abbreviation in brackets.', 'EEF3E8', '2C5F2D')
 BOX('What is new in this revision.', '(1) The methods of the DT-EDNet study on rice blast (Ma et al., 2026) are included: effective wavelength ranges from normalised difference and ratio spectral index maps, optimal wavelengths by SHAP-CARS, vegetation index selection by ReliefF, texture from principal-component images selected by minimum redundancy maximum relevance (mRMR), the Tri-band Texture Fusion Index (TTFI) and the DT-EDNet network with EfficientNet, ResNet18 and ConvNeXt V2 as comparison networks for the post-symptomatic data. (2) One feature-selection method is used for each type of feature. (3) The second derivative is not used. (4) A separate activity on normalisation and data preparation is added. (5) The endmember extraction is described step by step. (6) Each technique has a method card. (7) Covariates are days after inoculation, variety, inoculation timing, growth stage and weather; they are used for a covariate-only baseline and for sensor + covariate models, not as disease features. (8) Healthy plots are rotated across the folds so that every fold contains healthy plots of all three varieties. (9) SHAP-CARS standardises the bands and always keeps the red-edge first derivative. (10) All models, including DT-EDNet and the comparison networks, are built for every single camera and every camera combination, for classification and regression.')
+BOX('Updates in revision 5.', '(1) Field calendar: sowing on 19 and 26 November and 3 and 10 December 2026 (7-day interval), inoculation on 30 December 2026 (crop age 41, 34, 27 and 20 days), 13 flights from 1 January to 15 March 2027, biochemical and biophysical sampling on 7 and 18 January, 8 February and 1 March. (2) Severity: disease index survey at the centre and four corners of every subplot (DI classes 0, 1, 3, 5, 7, 9; Task C = DI) and staghead severity (Step A3). (3) Objective 1 also characterises the pre-symptomatic stage with 576 samples per camera (Activity 1.8). (4) Bharatpur data are used for independent testing of frozen models, not for validation (Step A7, Activity 2.7). (5) All 48 published hyperspectral indices (39 base + 9 SWIR) and 3 red-edge parameters with formulas and references (Chapter 7). (6) Detailed covariate baseline with interpretable and machine-learning models, plot-block bootstrap and DeLong test (Step 2.5.5). (7) Sensor specifications, two ASD readings per leaf, BBCH vegetative stage 10–49 and a glasshouse pot experiment (Step A9). (8) Expected outcomes (Section 1.5).', 'E8F4F8', '1F6FB2')
 PB()
 K.append("K.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: 'Contents', font: FONT, size: 32, bold: true, color: '1E3A1F' })] }));")
 K.append("K.push(new TableOfContents('Contents', { hyperlink: true, headingStyleRange: '1-3' }));")
@@ -90,12 +91,12 @@ H1('1. Objectives, data and overall design')
 H2('1.1 Background and objectives')
 P('White rust, caused by the obligate oomycete Albugo candida, produces white pustules on the leaves, chlorosis and, after systemic infection, distorted inflorescences (staghead) in Indian mustard, and it can reduce yield by 20–60% (Kumar and Kalha, 2005; Saharan et al., 2014). The disease develops under cool and humid weather (Chattopadhyay et al., 2011). Visual scoring is slow and possible only after symptoms appear. Cameras on an unmanned aerial vehicle (UAV) record the changes in pigments, leaf structure, water and temperature that accompany infection, sometimes before symptoms are visible (Mahlein, 2016; Terentev et al., 2022), and combining several cameras usually improves accuracy (Maimaitijiang et al., 2020; Feng et al., 2022).')
 TAB('objectives', [['Objective', 'Question answered', 'Data used', 'Main output'],
-    ['1. To characterise white rust of mustard through multimodal sensing from a UAV platform', 'Which wavelengths, vegetation indices, texture features and thermal features of each camera respond to white rust severity, and does the response change with variety and inoculation timing?', '1920 post-symptomatic subplot samples per camera', 'Optimal wavelengths, White Rust Index, selected indices, Tri-band Texture Fusion Index and the disease-specific feature set of each camera'],
+    ['1. To characterise white rust of mustard through multimodal sensing from a UAV platform', 'Which wavelengths, vegetation indices, texture features and thermal features of each camera respond to white rust severity, does the response change with variety and inoculation timing, and which features already differ before symptoms appear?', '1920 post-symptomatic and 576 pre-symptomatic subplot samples per camera', 'Optimal wavelengths, White Rust Index, selected indices, Tri-band Texture Fusion Index, the disease-specific feature set of each camera and the pre-symptomatic feature set'],
     ['2. To detect and discriminate disease severity of white rust in mustard through AI-based multimodal data fusion', 'How accurately can (a) healthy vs diseased subplots, (b) severity classes and (c) the severity score be predicted by each of the 15 sensor sets with machine learning and deep learning?', '1920 post-symptomatic subplot samples per camera', 'Best sensor set and model for each task; contribution of each camera; comparison of DT-EDNet with EfficientNet, ResNet18 and ConvNeXt V2; severity maps'],
     ['3. To predict white rust at the pre-symptomatic stage using machine learning', 'Can subplots that will develop white rust be separated from healthy subplots before symptoms, and can their later severity be predicted?', '576 pre-symptomatic subplot samples per camera', 'Pre-symptomatic models; earliest detection day; risk maps']],
     'Objectives, questions, data and outputs.', [2600, 3000, 1600, 2106], 16)
 H2('1.2 Overall design')
-P('All objectives use the same field data and the same preparation. The common activities A to F are carried out once ([[F:overall]]). Objective 1 then describes and selects the features of each camera, Objective 2 builds the detection and severity models on the post-symptomatic data and Objective 3 builds the early-warning models on the pre-symptomatic data.')
+P('All objectives use the same field data and the same preparation. The common activities A to F are carried out once ([[F:overall]]). Objective 1 then describes and selects the features of each camera at the post-symptomatic stage and at the pre-symptomatic stage, Objective 2 builds the detection and severity models on the post-symptomatic data and Objective 3 builds the early-warning models on the pre-symptomatic data. A glasshouse pot experiment (Step A9) gives the same responses under controlled conditions.')
 FIG('overall', 'g01_overall.png', 'Overall workflow. Common activities A–F prepare the data once; each objective is divided into activities and steps.', 560)
 P('**Eight rules apply to every activity.** They come from the methodological literature and from the weaknesses reported in recent disease-sensing studies (Ambroise and McLachlan, 2002; Varma and Simon, 2006; Cawley and Talbot, 2010; Roberts et al., 2017; Ma et al., 2026).')
 NL(['One sample is one subplot on one date. The four subplots of a plot always stay together in the training part or in the test part.',
@@ -105,10 +106,10 @@ NL(['One sample is one subplot on one date. The four subplots of a plot always s
     'All normalisation constants (means, standard deviations, healthy-plot references) are computed on the training part and then applied to the test part.',
     'Severity increases with time, so every sensor model is compared with a covariate-only model (days after inoculation, variety, inoculation timing, growth stage, weather); a sensor model is useful only if it is better than this baseline.',
     'The same folds are used for all sensor sets and all models, so that their accuracies are directly comparable.',
-    'Validation has two stages: first inside the IARI field (leave-one-replication-out, nested), then on independent data from research farms and farmers\' fields at Bharatpur with frozen models.'])
+    'Models are validated inside the IARI field (leave-one-replication-out, nested) and then tested once on independent data from research farms and farmers\' fields at Bharatpur with frozen models (independent testing, not validation).'])
 H2('1.3 Dataset')
-TAB('dataset', [['Item', 'Value'], ['Plots × subplots', '48 × 4 = 192 subplots in each image'], ['Cameras', '4: hyperspectral, multispectral, red–green–blue and thermal'], ['Images', '13 flight dates × 4 cameras = 52 images (3 pre-symptomatic + 10 post-symptomatic dates)'], ['Inoculation and flight dates', 'inoculation 10 Jan 2027; flights 12, 15, 18 Jan (pre-symptomatic) and 21, 28 Jan, 4, 11, 18, 25 Feb, 4, 11, 18, 25 Mar 2027 (post-symptomatic)'],
-    ['Post-symptomatic samples per camera', '1920 (10 dates × 192 subplots)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots)'], ['Label of every sample', 'canopy severity score of the subplot (0–9 grade key) recorded on the flight day'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 27 Nov, D3 = 5 Dec, D4 = 13 Dec'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'], ['ASD leaf spectra', '3 plants per subplot × leaves L3, L5, LL on every flight date (1728 leaf spectra per date)'], ['Biochemical and biophysical parameters', 'chlorophyll a and b, carotenoids, anthocyanin, protein, relative water content, membrane stability index, photosynthesis, transpiration, stomatal conductance, leaf area index; 1 designated subplot per plot on 4 dates (1 pre-, 3 post-symptomatic)'], ['Validation', 'first stage: IARI field (leave-one-replication-out, nested); second stage: Bharatpur research farms and farmers\' fields (independent, natural infection, at least 300 quadrat-dates)'],
+TAB('dataset', [['Item', 'Value'], ['Plots × subplots', '48 × 4 = 192 subplots in each image'], ['Cameras', '4: hyperspectral, multispectral, red–green–blue and thermal'], ['Images', '13 flight dates × 4 cameras = 52 images (3 pre-symptomatic + 10 post-symptomatic dates)'], ['Inoculation and flight dates', 'inoculation 30 Dec 2026; flights 1, 4, 7 Jan (pre-symptomatic; 2, 5, 8 days after inoculation) and 11, 18, 25 Jan, 1, 8, 15, 22 Feb, 1, 8, 15 Mar 2027 (post-symptomatic; 12–75 days after inoculation)'],
+    ['Post-symptomatic samples per camera', '1920 (10 dates × 192 subplots; Objectives 1 and 2)'], ['Pre-symptomatic samples per camera', '576 (3 dates × 192 subplots; Objective 1 characterisation and Objective 3 prediction)'], ['Label of every sample', 'disease index (DI, %) of the subplot from leaves graded 0–9 at the centre and four corners on the flight day; DI class 0, 1, 3, 5, 7, 9'], ['Varieties', 'V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37'], ['Sowing dates (2026)', 'D1 = 19 Nov, D2 = 26 Nov, D3 = 3 Dec, D4 = 10 Dec (7-day interval; crop age at inoculation 41, 34, 27 and 20 days)'], ['Glasshouse pot experiment', '48 pots (36 inoculated + 12 healthy), same varieties, sowing 23 Nov–14 Dec 2026, inoculation 4 Jan 2027 (Step A9)'], ['Field layout', '48 m × 24 m; healthy block (12 plots) + 10 m buffer + inoculated block (R1–R3, 36 plots); plots 5 m × 3 m'], ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)'], ['ASD leaf spectra', '3 plants per subplot × leaves L3, L5, LL on every flight date (1728 leaf spectra per date)'], ['Biochemical and biophysical parameters', 'chlorophyll a and b, carotenoids, anthocyanin, protein, relative water content, membrane stability index, photosynthesis, transpiration, stomatal conductance, leaf area index; 1 designated subplot per plot on 4 dates (1 pre-, 3 post-symptomatic)'], ['Validation and independent testing', 'validation: IARI field (leave-one-replication-out, nested); independent testing: Bharatpur research farms and farmers\' fields with frozen models (natural infection, at least 300 quadrat-dates)'],
     ['Sensor sets analysed', '15 (4 single cameras, 6 pairs, 4 triples, all four)'], ['Tasks', 'detection (healthy vs diseased), severity classes, severity score'], ['Time for the analysis', '6 months']], 'Dataset used in this methodology (numbers as recorded by the researcher).', [3300, 6006])
 FIG('dataset', 'g26_dataset.png', 'Structure of the dataset: flight dates → cameras → plots → scored subplots, and the two datasets used by the objectives.', 520)
 H2('1.4 Main published studies used to build the methodology')
@@ -130,10 +131,17 @@ TAB('literature', [['Study', 'Crop and disease', 'Sensors', 'What it contributes
  ['Mahlein et al. (2019)', 'wheat; Fusarium head blight', 'hyperspectral + thermal + fluorescence', 'sensor comparison and earliest detection day']],
  'Main disease studies and what they contribute.', [2100, 1700, 1800, 3706], 15)
 
+H2('1.5 Expected outcomes')
+TAB('outcomes', [['Objective', 'Expected outcome', 'Main outputs that support it'],
+    ['1', 'Sensitive spectral ranges, signatures and indices for the characterisation of white rust of mustard under laboratory/glasshouse and field conditions, across crop stages and disease severity levels, for large-scale application.', 'optimal wavelengths; White Rust Index; selected indices and TTFI; disease-specific and pre-symptomatic feature sets; physiological basis; glasshouse responses'],
+    ['2', 'The best suitable sensor or fusion of sensors for detection and monitoring of white rust throughout the crop growth stages.', 'accuracy of 15 sensor sets for detection, DI classes and DI; DT-EDNet vs comparison networks; gain over the covariate baseline; maps; independent test at Bharatpur'],
+    ['3', 'Early, pre-symptomatic detection so that appropriate preventive measures can be taken in time.', 'pre-symptomatic models; earliest detection day; risk maps; physiological changes before symptoms']],
+    'Expected outcomes of the research.', [1100, 4300, 3906], 16)
+
 # =====================================================================================
 H1('2. Common activities (carried out once for all objectives)')
 P('The six common activities turn the raw images into clean, normalised feature tables with one row per subplot-date and prepare the validation folds. Each activity is described as a sequence of steps.')
-TAB('commonact', [['Activity', 'Steps', 'Main output'], ['A. Field experiment, ground truth and datasets', 'A1–A8', 'labelled subplot list; ASD leaf spectra; covariates; post- and pre-symptomatic datasets; Bharatpur validation dataset; biochemical and biophysical parameters'], ['B. Image pre-processing', 'B1–B5', 'calibrated, aligned images on the hyperspectral grid'],
+TAB('commonact', [['Activity', 'Steps', 'Main output'], ['A. Field experiment, ground truth and datasets', 'A1–A9', 'labelled subplot list (disease index); ASD leaf spectra; covariates; post- and pre-symptomatic datasets; Bharatpur independent test dataset; biochemical and biophysical parameters; glasshouse pot data'], ['B. Image pre-processing', 'B1–B5', 'calibrated, aligned images on the hyperspectral grid'],
     ['C. Endmember extraction and vegetation mask', 'C1–C8', 'endmember library; vegetation mask applied to all cameras'], ['D. Subplot spectra and feature extraction', 'D1–D8', 'feature table of each camera'],
     ['E. Normalisation and data preparation', 'E1–E4', 'normalised and standardised features; class weights'], ['F. Validation design and tuning', 'F1–F3', 'outer and inner folds; tuning plan; leakage checklist']], 'Common activities and their outputs.', [3500, 1300, 4506])
 
@@ -143,7 +151,7 @@ STEP('A1', 'Experimental design and treatments',
      'Defines the sources of variation (inoculation timing, variety, replication) so that disease effects can be separated from crop-age and variety effects.',
      'IARI research farm, New Delhi, rabi 2026-27; field 48 m × 24 m (9.4 m healthy block + 10 m buffer + 28.6 m inoculated block); plots 5 m × 3 m with 0.2 m bunds and 2 m channels.',
      '48 plots with known treatment, replication and plot number → subplots (Step A3) and validation folds (Activity F).',
-     ['Four sowing dates at 8-day intervals: D1 = 19 November, D2 = 27 November, D3 = 5 December and D4 = 13 December 2026, with one inoculation on 10 January 2027, so the crop is inoculated at four different ages: 52, 44, 36 and 28 days after sowing.',
+     ['Four sowing dates at 7-day intervals: D1 = 19 November, D2 = 26 November, D3 = 3 December and D4 = 10 December 2026, with one inoculation on 30 December 2026, so the crop is inoculated at four different ages: 41, 34, 27 and 20 days after sowing.',
       'Three varieties: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37.',
       'The 12 treatments (4 × 3) are inoculated in three replications (R1: plots 37–48, R2: plots 25–36, R3: plots 13–24) with a zoosporangial suspension of 1.5 × 10^{5} zoosporangia mL^{−1} (Mishra et al., 2009).',
       'One uninoculated healthy plot of every treatment (plots 1–12) is sown in a separate healthy block, 10 m away from the inoculated block, so that inoculum does not spread to the controls: 36 inoculated + 12 healthy = 48 plots.',
@@ -154,70 +162,88 @@ STEP('A2', 'UAV flights and cameras',
      'Flight plan; calibration panels; ground control points.',
      'Raw images of the four cameras on every date → pre-processing (Activity B).',
      ['Fly between 11:00 and 14:00 h under clear sky and low wind, at 30 m above the ground, with about 85% forward and 80% side overlap.',
-      'Hyperspectral camera: Headwall co-aligned visible–near-infrared and short-wave-infrared imager (483 usable bands from 399 to 2398 nm after quality control; ground pixel about 2.2 cm).',
+      'Hyperspectral camera: Headwall co-aligned HP visible–near-infrared and short-wave-infrared imager (400–2500 nm; 483 usable bands from 399 to 2398 nm after quality control, Step B3; ground pixel about 2.2 cm).',
       'Multispectral camera: MicaSense RedEdge-MX (475, 560, 668, 717 and 840 nm; about 2 cm).',
       'Red–green–blue camera: DJI camera (about 0.8 cm). Thermal camera: FLIR Vue Pro R, 7.5–13.5 µm (about 3.9 cm).',
       'Place reflectance panels and ground control points before every flight; record air temperature and relative humidity during the flight.',
-      'Measure ASD leaf spectra on the same dates (Step A4).',
-      'Fly on 13 dates: 12, 15 and 18 January 2027 (pre-symptomatic) and 21 and 28 January, 4, 11, 18 and 25 February, 4, 11, 18 and 25 March 2027 (post-symptomatic); all four cameras on every date.',
-      'Score the subplots on the day of the flight (or within one day).'],
+      'Measure ASD leaf spectra (ASD FieldSpec 4) on the same dates (Step A4). Camera specifications are given in [[T:sensors]].',
+      'Fly on 13 dates: 1, 4 and 7 January 2027 (pre-symptomatic) and 11, 18 and 25 January, 1, 8, 15 and 22 February, 1, 8 and 15 March 2027 (post-symptomatic); all four cameras on every date.',
+      'Survey the disease index of every subplot on the day of the flight (or within one day; Step A3).'],
      'The same four camera types were combined for wheat powdery mildew (Feng et al., 2022) and soybean yield (Maimaitijiang et al., 2020); flight protocols with panels and solar-noon windows are reviewed by Aasen et al. (2018); thermal flight practice: Messina and Modica (2020).')
+TAB('sensors', [['Item', 'RGB camera', 'Multispectral camera', 'Thermal camera', 'Hyperspectral camera', 'Leaf spectroradiometer'], ['Instrument', 'DJI Phantom', 'MicaSense RedEdge-MX', 'FLIR Vue Pro R', 'Headwall co-aligned HP', 'ASD FieldSpec 4'],
+    ['Spectral bands', '3 (red, green, blue)', '5 (blue, green, red, red edge, near infrared)', '1', 'VNIR + SWIR; 483 usable bands after quality control (Step B3)', '2151'],
+    ['Wavelength range', 'R 620–750, G 520–600, B 450–495 nm', '475, 560, 668, 717, 840 nm', '7.5–13.5 µm', 'VNIR 400–1000 nm, SWIR 1000–2500 nm', '350–2500 nm'],
+    ['Image size (pixels)', '5472 × 3648', '1280 × 960', '640 × 480', 'VNIR 640, SWIR 320 (across track)', '—'], ['Focal length', '8.8 mm', '5.4 mm', '13 mm', '17–25 mm', '25° field of view (bare fibre); contact probe used'],
+    ['Radiometric resolution', '14 bit', '12 bit', '14 bit', '14 bit', '16 bit'], ['Ground pixel at 30 m (this study)', '≈ 0.8 cm', '≈ 2 cm', '≈ 3.9 cm', '≈ 2.2 cm after resampling', 'leaf level']],
+    'Sensors used on the UAV and on the ground (specifications from the instrument sheets used by the researcher).', [1700, 1400, 1550, 1300, 1900, 1456], 15)
 TAB('flights', [['Flight', 'Date', 'Days after inoculation', 'Period', 'Cameras and scoring'],
-    ['1', '12 Jan 2027', '2', 'pre-symptomatic', 'RGB (DJI Phantom), multispectral (MicaSense RedEdge), thermal (FLIR), hyperspectral (Headwall co-aligned), ASD leaf spectra, visual severity'],
-    ['2', '15 Jan 2027', '5', 'pre-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'], ['3', '18 Jan 2027', '8', 'pre-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'],
-    ['4', '21 Jan 2027', '11', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'], ['5', '28 Jan 2027', '18', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'],
-    ['6', '4 Feb 2027', '25', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'], ['7', '11 Feb 2027', '32', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'],
-    ['8', '18 Feb 2027', '39', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'], ['9', '25 Feb 2027', '46', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'],
-    ['10', '4 Mar 2027', '53', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'], ['11', '11 Mar 2027', '60', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'],
-    ['12', '18 Mar 2027', '67', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity'], ['13', '25 Mar 2027', '74', 'post-symptomatic', 'all four cameras + ASD leaf spectra + visual severity']],
-    'Timeline of data collection in the field (inoculation on 10 January 2027): 3 pre-symptomatic and 10 post-symptomatic dates.', [900, 1500, 1700, 1700, 3506], 16)
-STEP('A3', 'Subplots and canopy severity score',
+    ['1', '1 Jan 2027', '2', 'pre-symptomatic', 'RGB (DJI Phantom), multispectral (MicaSense RedEdge-MX), thermal (FLIR Vue Pro R), hyperspectral (Headwall co-aligned), ASD leaf spectra, disease index survey'],
+    ['2', '4 Jan 2027', '5', 'pre-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['3', '7 Jan 2027', '8', 'pre-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['4', '11 Jan 2027', '12', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['5', '18 Jan 2027', '19', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['6', '25 Jan 2027', '26', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['7', '1 Feb 2027', '33', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['8', '8 Feb 2027', '40', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['9', '15 Feb 2027', '47', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['10', '22 Feb 2027', '54', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['11', '1 Mar 2027', '61', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['12', '8 Mar 2027', '68', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey'],
+    ['13', '15 Mar 2027', '75', 'post-symptomatic', 'all four cameras + ASD leaf spectra + disease index survey']],
+    'Timeline of data collection in the field (inoculation on 30 December 2026): 3 pre-symptomatic and 10 post-symptomatic dates. Biochemical and biophysical parameters are sampled on flights 3, 5, 8 and 11 (Step A8).', [900, 1500, 1700, 1700, 3506], 16)
+STEP('A3', 'Subplots and disease index survey',
      'Gives every sampling unit its label.',
      'Plot boundaries; field scoring sheets.',
-     'Labelled subplot list (date, plot, subplot, treatment, replication, score) → labels (Step A5) and subplot extraction (Activity D).',
+     'Labelled subplot list (date, plot, subplot, treatment, replication, leaf grades, disease index, DI class) → labels (Step A5) and subplot extraction (Activity D).',
      ['Divide each plot into four equal quadrant subplots; exclude border rows with an inner buffer.',
-      'One trained scorer grades the canopy of each subplot with the 0–9 key of Conn et al. (1990): 0 = no symptoms, 1 = 1–5%, 3 = 6–10%, 5 = 11–25%, 7 = 26–50%, 9 = more than 50% of the canopy leaf area with pustules; staghead is noted after flowering. Grade limits are written on the sheet to keep scoring consistent (Bock et al., 2010).',
-      'For plot summaries, compute the percent disease index of the plot: PDI = Σ(grade of each subplot) / (number of subplots × 9) × 100.'],
-     'Grade keys of this kind were used for canopy severity in UAV studies of wheat stem rust (Abdulridha et al., 2023), powdery mildew (Liu et al., 2024) and rice blast (Ma et al., 2026); disease indices from graded leaves: Guo et al. (2021).')
-EQ('PDI = Σ_{i} grade_{i} / (n × 9) × 100      (n = 4 subplots per plot)')
-TAB('pdiex', [['Subplot', '1', '2', '3', '4', 'Plot PDI'], ['Grade (dummy)', '3', '5', '1', '3', '(3 + 5 + 1 + 3) / (4 × 9) × 100 = 33.3%']], 'Worked example (dummy data): percent disease index of one plot.', [1800, 900, 900, 900, 900, 3906])
+      'Survey points: on every flight day one trained scorer examines the leaves at the centre and the four corners of each subplot (five points per subplot).',
+      'Leaf grade: each examined leaf is graded with the 0–9 key of Conn et al. (1990): 0 = no symptoms, 1 = 1–5%, 3 = 6–10%, 5 = 11–25%, 7 = 26–50%, 9 = more than 50% of the leaf area with pustules. Grade limits are written on the sheet to keep scoring consistent (Bock et al., 2010).',
+      'Disease index of the subplot: DI = Σ(x × f) / (n × Σf) × 100, where x is the grade, f the number of leaves with grade x and n = 9 the highest grade (Liu et al., 2024). The subplot DI is converted to the DI class of [[T:diclass]].',
+      'Staghead severity (%) = number of staghead (infected) racemes / total racemes × 100, recorded per subplot from flowering onward.',
+      'For plot summaries, the plot DI is the mean of its four subplot DIs.'],
+     'Disease index from graded leaves for UAV disease studies: Liu et al. (2024), Guo et al. (2021); grade keys for canopy severity: Abdulridha et al. (2023), Ma et al. (2026); leaf grade key of white rust: Conn et al. (1990).')
+EQ('DI = Σ (x × f) / (n × Σ f) × 100      (x = leaf grade 0–9; f = leaves with grade x; n = 9)')
+TAB('diclass', [['DI range (%)', '0', '1–5', '6–10', '11–25', '26–50', '> 50'], ['Severity level (field and leaf)', 'healthy', 'very low', 'low', 'moderate', 'high', 'very high'], ['DI class', '0', '1', '3', '5', '7', '9']],
+    'Disease index ranges and severity classes (Liu et al., 2024).', [2600, 1100, 1100, 1100, 1100, 1100, 1206])
+TAB('pdiex', [['Grade x', '0', '1', '3', '5', '7', '9', 'Subplot DI'], ['Leaves f (dummy, 5 survey points)', '6', '5', '4', '3', '2', '0', 'Σ(x × f) = 0 + 5 + 12 + 15 + 14 + 0 = 46; Σf = 20; DI = 46 / (9 × 20) × 100 = 25.6% → class 7']],
+    'Worked example (dummy data): disease index of one subplot.', [2200, 600, 600, 600, 600, 600, 600, 3506])
 STEP('A4', 'Leaf spectra with the ASD field spectroradiometer',
      'Gives leaf-level reflectance spectra and leaf severity grades from the same subplots on the same days as the UAV flights, for a separate leaf-level analysis and for linking leaf and canopy data.',
      'Three tagged plants in every subplot (12 per plot, 576 in total); ASD FieldSpec spectroradiometer with plant probe and leaf clip (contact probe with its own light source); white reference panel (Spectralon).',
      'Leaf spectrum table (one row per leaf and date) with leaf grade and metadata → leaf-level dataset (its analysis is not part of this methodology).',
-     ['Dates: all 13 flight dates (12, 15, 18 January; 21, 28 January; 4, 11, 18, 25 February; 4, 11, 18, 25 March 2027), on the day of the flight or within one day. The leaf clip has its own lamp, so measurements do not depend on the time of day or the sky.',
+     ['Dates: all 13 flight dates (1, 4, 7 January; 11, 18, 25 January; 1, 8, 15, 22 February; 1, 8, 15 March 2027), on the day of the flight or within one day. The leaf clip has its own lamp, so measurements do not depend on the time of day or the sky.',
       'Plants: before inoculation, tag 3 plants in every subplot (3 × 4 = 12 plants per plot), inside the inner buffer and spread along the subplot diagonal. Measure the same plants on every date; if a plant dies, replace it with its nearest neighbour and record the change.',
       'Leaves: measure the 3rd (L3) and 5th (L5) fully expanded leaves counted from the top and the lowest green leaf (LL) of every plant. Count the positions again on each date because they shift as the plant grows; record a missing leaf (for example a senesced LL) as missing.',
       'Instrument set-up: optimise the instrument and take a white reference at the start, then a new white reference every 10–15 minutes or at the start of every plot.',
-      'Readings: take 3 readings per leaf (near the tip, the middle and the base of the lamina, avoiding the midrib), each averaging 10–25 scans, over 350–2500 nm.',
+      'Readings: take 2 readings per leaf with the contact probe (on the lamina, avoiding the midrib), over 350–2500 nm.',
       'Leaf grade: score the measured leaf immediately with the 0–9 key (Conn et al., 1990), using the same written grade limits as the canopy scoring.',
       'Metadata for every reading: date, time, plot, subplot, plant ID, leaf position, reading number, leaf grade, time of the last white reference and operator; save the files with names that contain the plot, subplot, plant and leaf codes.'],
      'Field spectroscopy protocols (reference panels, metadata): Milton et al. (2009); leaf measurements collected together with UAV imagery: Calderón et al. (2014), Yu et al. (2021); disease indices developed from leaf measurements and carried to canopy and UAV scale: Huang et al. (2014), Liu et al. (2026); leaf severity grades: Conn et al. (1990), Bock et al. (2010).',
      note='Only the acquisition of the leaf data is described here. The leaf-level analysis and the linking with the UAV data are carried out separately.')
-TAB('asdvol', [['Item', 'Per date', 'All 13 dates'], ['Tagged plants', '576 (48 plots × 12)', 'same 576 plants'], ['Leaves (L3, L5, LL)', '1728', '≈ 22 500'], ['Readings (3 per leaf)', '5184', '≈ 67 000'],
-    ['Working time at about 1 minute per leaf', '≈ 29 operator-hours', '—'], ['Suggested teams', '3 teams, one replication each (healthy block shared)', '—']],
+TAB('asdvol', [['Item', 'Per date', 'All 13 dates'], ['Tagged plants', '576 (48 plots × 12)', 'same 576 plants'], ['Leaves (L3, L5, LL)', '1728', '≈ 22 500'], ['Readings (2 per leaf)', '3456', '≈ 45 000'],
+    ['Working time at about 40 seconds per leaf', '≈ 20 operator-hours', '—'], ['Suggested teams', '3 teams, one replication each (healthy block shared)', '—']],
     'Volume and organisation of the ASD leaf measurements.', [3600, 3000, 2706])
 STEP('A5', 'Labels and the two datasets',
      'Defines exactly what each model predicts and which samples belong to which objective.',
-     'Subplot scores of all 13 flight dates.',
+     'Subplot disease indices and DI classes of all 13 flight dates (Step A3).',
      'Post-symptomatic dataset (1920 samples per camera) and pre-symptomatic dataset (576 samples per camera) with their labels → all objectives.',
-     ['Pre-symptomatic dates: the first three flights (12, 15 and 18 January 2027; 2, 5 and 8 days after inoculation). Post-symptomatic dates: the next ten flights (21 January to 25 March 2027; 11–74 days after inoculation).',
-      'Detection label: healthy (grade 0) or diseased (grade above 0), taken from the observed score, not from the treatment.',
-      'Severity classes: the six grades 0, 1, 3, 5, 7 and 9; a grade with fewer than 5% of the samples is merged with its neighbour (for example 7 + 9).',
-      'Severity score: the grade treated as a continuous number for regression.',
-      'Pre-symptomatic labels (Objective 3): healthy = subplots of the healthy plots; infected = inoculated subplots that show pustules on a later date; inoculated subplots that never show symptoms are kept out of the infected class.'],
+     ['Pre-symptomatic dates: the first three flights (1, 4 and 7 January 2027; 2, 5 and 8 days after inoculation). Post-symptomatic dates: the next ten flights (11 January to 15 March 2027; 12–75 days after inoculation).',
+      'Detection label (Task A): healthy (DI = 0) or diseased (DI above 0), taken from the survey, not from the treatment.',
+      'Severity classes (Task B): the six DI classes 0, 1, 3, 5, 7 and 9 ([[T:diclass]]); a class with fewer than 5% of the samples is merged with its neighbour (for example 7 + 9).',
+      'Severity score (Task C): the disease index DI (%) as a continuous variable for regression.',
+      'Pre-symptomatic labels (Activity 1.8 and Objective 3): healthy = subplots of the healthy plots; infected = inoculated subplots that show pustules on a later date; inoculated subplots that never show symptoms are kept out of the infected class.'],
      'Detection, severity classes and regression were analysed together for rice blast (Tian et al., 2021) and wheat powdery mildew (Feng et al., 2022); labels from the later status for pre-symptomatic samples: Zhu et al. (2017), Tian et al. (2021).')
-TAB('classex', [['Grade', '0', '1', '3', '5', '7', '9'], ['Detection label', 'healthy', 'diseased', 'diseased', 'diseased', 'diseased', 'diseased'], ['Severity class', '0', '1', '3', '5', '7', '9'], ['Dummy count (1920 samples)', '512', '413', '362', '313', '200', '120']],
-    'How one score gives the three labels (dummy class counts).', [2500, 1134, 1134, 1134, 1134, 1134, 1136])
+TAB('classex', [['Disease index (%)', '0', '1–5', '6–10', '11–25', '26–50', '> 50'], ['Detection label (Task A)', 'healthy', 'diseased', 'diseased', 'diseased', 'diseased', 'diseased'], ['DI class (Task B)', '0', '1', '3', '5', '7', '9'], ['Dummy count (1920 samples)', '512', '413', '362', '313', '200', '120']],
+    'How one disease index gives the three labels (Task C uses the DI itself; dummy class counts).', [2500, 1134, 1134, 1134, 1134, 1134, 1136])
 STEP('A6', 'Covariates: days after inoculation, variety, inoculation timing, growth stage and weather',
      'Disease severity changes with time, crop stage, variety and weather. These known factors must be recorded so that their effect can be separated from what the cameras add.',
      'Field book (sowing, inoculation and flight dates; variety; growth stage on each flight date); daily weather from the IARI agrometeorological observatory.',
      'Covariate table with one row per subplot-date → response analysis (Step 1.1.3), covariate baseline and sensor + covariate models (Steps 2.5.5 and 3.5.3), results by stage and treatment.',
-     ['Days after inoculation (DAI): flight date minus inoculation date (numeric).',
+     ['Days after inoculation (DAI): flight date minus inoculation date, 30 December 2026 (numeric).',
       'Variety: V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37 (categorical, one-hot coded in models).',
-      'Inoculation timing: D1–D4, also expressed as crop age at inoculation in days (numeric).',
-      'Growth stage of each plot on each flight date, read with the BBCH scale and coded as 1 = vegetative (BBCH 10–59), 2 = flowering (BBCH 60–69), 3 = pod formation (BBCH 70–79 and later) (ordinal).',
-      'Weather: daily maximum and minimum air temperature (T_{max}, T_{min}), morning and afternoon relative humidity (RH I, RH II) and rainfall, summarised as the mean (rainfall: total) of the 7 days before each flight, plus the number of favourable days since inoculation (T_{max} 16–24 °C, RH I > 97% and RH II > 40%, the conditions reported to favour white rust on leaves).',
+      'Inoculation timing: D1–D4, also expressed as crop age at inoculation: 41, 34, 27 and 20 days (numeric).',
+      'Growth stage of each plot on each flight date, read with the BBCH scale and coded as 1 = vegetative (BBCH 10–49), 2 = flowering (BBCH 60–69), 3 = pod formation (BBCH 70–79 and later) (ordinal).',
+      'Weather: daily maximum and minimum air temperature (T_{max}, T_{min}), morning and afternoon relative humidity (RH I, RH II) and rainfall, summarised as the mean (rainfall: total) of the 7 days ending the day before each flight (no look-ahead), plus the number of favourable days since inoculation for leaf infection (T_{max} 16–24 °C, RH I > 97% and RH II > 40%) and for staghead (T_{max} 20–29 °C, T_{min} > 12 °C and RH I > 97%) (Chattopadhyay et al., 2011).',
       'Covariates are not features of any camera and are not used in feature selection; they enter only the covariate models and the stratified results.'],
      'Weather conditions that favour white rust of Indian mustard and weather-based forecasting: Chattopadhyay et al. (2011), Saharan et al. (2014); BBCH growth stages: Lancashire et al. (1991), Meier (2018); stage-dependent spectral disease signals: Blasch et al. (2023), Liu et al. (2024); combining weather with remote sensing improved disease forecasts over weather alone: Zhang et al. (2014); days after inoculation in early detection: Mahlein et al. (2019), Zhu et al. (2017).')
 TAB('covtab', [['Covariate', 'Type and coding', 'Varies between subplots on one date?', 'Main use'],
@@ -229,25 +255,25 @@ TAB('covtab', [['Covariate', 'Type and coding', 'Varies between subplots on one 
     'Covariates recorded for every subplot-date. Weather is the same for all subplots on a date, so it can explain differences between dates but not between subplots.', [2900, 2200, 1900, 2306])
 NOTE('Weather has only one value per flight date (ten values in the post-symptomatic period), so in a single season it cannot be separated from the date itself. It is therefore used for interpretation and inside the covariate baseline, and results of models that contain weather are labelled "within-season"; their transfer to another season must be tested with data of that season (Zhang et al., 2014; Ma et al., 2026).')
 
-STEP('A7', 'Second-stage validation data at Bharatpur (research farms and farmers\' fields)',
-     'Models tested only inside the IARI field may not work on other soils, varieties, management and natural epidemics. Independent data from another site are needed for a second-stage validation.',
+STEP('A7', 'Independent testing data at Bharatpur (research farms and farmers\' fields)',
+     'Models validated only inside the IARI field may not work on other soils, varieties, management and natural epidemics. Independent data from another site are needed to test the frozen models (independent testing, not validation).',
      'Research farm(s) and farmers\' fields at Bharatpur, Rajasthan, with natural white rust; the same four cameras, calibration panels and ground control points; the same severity key and scorer.',
-     'Bharatpur validation dataset (quadrat-dates with images of all four cameras, severity grade and covariates) → second-stage validation (Activity 2.7).',
+     'Bharatpur independent test dataset (quadrat-dates with images of all four cameras, disease index and covariates) → independent testing (Activity 2.7).',
      ['Sites: research-farm plots and farmers\' fields with natural white rust in the same season (rabi 2026-27), chosen to cover healthy to severely diseased canopies and the common local varieties.',
       'Sampling units: in every field mark validation quadrats of the same size as an IARI subplot (2.5 m × 1.5 m) with corner pegs and image-visible markers, recorded with an RTK GNSS receiver, away from field borders and bunds.',
-      'Size: aim for at least 300 quadrat-dates in total (for example 8–10 farmers\' fields and research-farm plots × 15–20 quadrats × 2–3 post-symptomatic flight dates in February–March), with every severity grade represented, including healthy quadrats.',
+      'Size: aim for at least 300 quadrat-dates in total (for example 8–10 farmers\' fields and research-farm plots × 15–20 quadrats × 2–3 post-symptomatic flight dates in February–March), with every DI class represented, including healthy quadrats.',
       'Flights: the same four cameras and flight settings as at IARI (30 m, 11:00–14:00 h, about 85% forward and 80% side overlap, reflectance panels and ground control points on every flight); if possible add one flight before symptoms with the same quadrats revisited later.',
-      'Ground truth: score the canopy of every quadrat with the same 0–9 key (Conn et al., 1990), by the same scorer, on the day of the flight.',
+      'Ground truth: survey the disease index of every quadrat (centre and four corners, 0–9 leaf grades; Step A3), by the same scorer, on the day of the flight.',
       'Covariates (as in Step A6): variety, sowing date, growth stage (BBCH), days since the first symptoms were seen, fungicide sprays of the farmer, and daily weather from the nearest agrometeorological observatory or automatic weather station.',
       'Healthy reference: where possible, keep a fungicide-protected strip of the main variety at the research farm, so that features that need a healthy reference can also be tested.'],
-     'Independent validation on naturally infected fields from another site and year: Ma et al. (2026); importance of testing on independent locations: Roberts et al. (2017), Ploton et al. (2020); Bharatpur as a white rust site for weather-based forecasting: Chattopadhyay et al. (2011); UAV disease monitoring of smallholder fields: Liu et al. (2026); transfer of UAV disease models to new areas: Yuan et al. (2025).',
-     note='The Bharatpur data are never used for feature selection, tuning or training. They are used only once, for the second-stage validation of the final models.')
+     'Independent testing on naturally infected fields from another site and year: Ma et al. (2026); importance of testing on independent locations: Roberts et al. (2017), Ploton et al. (2020); Bharatpur as a white rust site for weather-based forecasting: Chattopadhyay et al. (2011); UAV disease monitoring of smallholder fields: Liu et al. (2026); transfer of UAV disease models to new areas: Yuan et al. (2025).',
+     note='The Bharatpur data are never used for feature selection, tuning or training. They are used only once, for independent testing of the frozen final models.')
 
 STEP('A8', 'Biochemical and biophysical parameters',
      'Spectral and thermal features are indirect. Measured pigments, water status, membrane damage, gas exchange and leaf area show what white rust does to the plant and give the camera responses a physiological explanation.',
      'One designated subplot per plot; untagged plants of that subplot for destructive samples; leaf L3 (third fully expanded leaf from the top); spectrophotometer, conductivity meter, LI-6400 portable gas exchange system, plant canopy analyser.',
-     'Table of 11 parameters for 48 plots × 4 dates (192 samples per parameter; leaf area index for all 4 subplots) → Activity 1.7 and Step 3.1.2.',
-     ['Dates (all on UAV flight days): 18 January 2027 (pre-symptomatic, 8 days after inoculation) and 28 January, 18 February and 11 March 2027 (post-symptomatic, 18, 39 and 60 days after inoculation), covering early, peak and late disease and the vegetative, flowering and pod-formation stages.',
+     'Table of 11 parameters for 48 plots × 4 dates (192 samples per parameter; leaf area index for all 4 subplots) → Activities 1.7 and 1.8 and Step 3.1.2.',
+     ['Dates (all on UAV flight days): 7 January 2027 (pre-symptomatic, 8 days after inoculation) and 18 January, 8 February and 1 March 2027 (post-symptomatic, 19, 40 and 61 days after inoculation), covering early, peak and late disease and the vegetative, flowering and pod-formation stages.',
       'Designated subplot: one subplot per plot, rotated so that each of the four subplot positions is sampled in 12 plots (position = plot number modulo 4, plus 1); its code is stored with every sample, so the parameters can be joined to the UAV features and canopy score of that subplot.',
       'Gas exchange: on leaf L3 of one tagged plant (non-destructive, Step A4), between 09:30 and 11:30 h, before the flight.',
       'Leaf samples for the laboratory: after the gas-exchange readings, collect L3 leaves from 3 untagged plants of the designated subplot, keep them in a cool box and process them the same day; the tagged plants are not damaged.',
@@ -285,6 +311,18 @@ CARD('lai', 'Leaf area index with a plant canopy analyser', 'A fish-eye optical 
      'Gives canopy size, which changes with growth stage and with disease and affects every canopy spectral feature.', 'One above and four below readings per subplot, view cap, diffuse light.',
      'No tuning; readings only under diffuse light, the same sensor and view cap on all dates.', 'Row crops with closed or nearly closed canopies.',
      'Fast, non-destructive and used for mustard at IARI (Goyal et al., 2021); separates canopy-size effects from disease effects.', 'Bréda (2003); Goyal et al. (2021)')
+
+STEP('A9', 'Glasshouse (pot) experiment',
+     'Field data contain weather, soil and canopy effects. A pot experiment under controlled conditions shows the response of the same varieties and crop ages to white rust in the laboratory/glasshouse situation and links leaf-level and field-level characterisation.',
+     'Glasshouse of the Division of Plant Pathology, IARI; 48 pots; the three varieties of the field (V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37); inoculum of 1.5 × 10^{5} zoosporangia mL^{−1}.',
+     'Pot-level and leaf-level dataset (visual severity and sensor measurements of each pot and date) → response analysis and characterisation under controlled conditions (Objective 1).',
+     ['Treatments: four sowing dates at 7-day intervals (D1 = 23 November, D2 = 30 November, D3 = 7 December, D4 = 14 December 2026) × three varieties = 12 treatments.',
+      'Pots: 36 inoculated pots (12 treatments × 3 replications, R1–R3) in the inoculated compartment and 12 healthy pots (one per treatment) in a separate isolation compartment; total 48 pots, each with a code (sowing date, variety, pot number).',
+      'Inoculation on 4 January 2027: 10 µL droplets of the zoosporangial suspension on the adaxial leaf surface; pots covered with polythene for 3 days; relative humidity 80–90% and about 19 °C.',
+      'Observations at 2, 5, 8 and 11 days after inoculation and then every 7 days: visual severity on the 0–6 scale and handheld sensor measurements of the same leaves (ASD leaf spectra with the contact probe, Step A4 protocol).',
+      'The same data organisation as in the field (identifiers, labels, covariates) is used, so that the pot and field responses can be compared.'],
+     'Controlled-environment inoculation of Brassica juncea with Albugo candida: Mishra et al. (2009); white rust biology and assessment: Saharan et al. (2014); leaf-level disease spectra under controlled conditions linked to field and UAV scale: Mahlein et al. (2013), Huang et al. (2014), Liu et al. (2026).',
+     note='The pot experiment uses its own severity scale (0–6) and is analysed separately from the field datasets; it is not used for training or testing the field models.')
 
 # ---------------------------------------------------------------- B
 H2('Activity B – Image pre-processing')
@@ -346,7 +384,7 @@ CARD('resample', 'Resampling (pixel aggregate, bilinear, nearest neighbour)', 'P
 
 # ---------------------------------------------------------------- C
 H2('Activity C – Endmember extraction and vegetation mask')
-P('Soil, grass, weeds and shadow inside a subplot change reflectance, texture and temperature and must be removed before disease features are extracted. Activity C builds one field-wide library of pure spectra (endmembers) with the hourglass workflow, classifies every pixel with the spectral angle mapper and keeps the canopy pixels ([[F:endmember]]). Flowers are kept because the canopy score includes the inflorescence; no spectral unmixing is done.')
+P('Soil, grass, weeds and shadow inside a subplot change reflectance, texture and temperature and must be removed before disease features are extracted. Activity C builds one field-wide library of pure spectra (endmembers) with the hourglass workflow, classifies every pixel with the spectral angle mapper and keeps the canopy pixels ([[F:endmember]]). Flowers are kept because the disease survey includes the inflorescence (staghead); no spectral unmixing is done.')
 FIG('endmember', 'g03_endmember.png', 'Flow chart of Activity C: endmember extraction (Steps C1–C5) and vegetation mask (Steps C6–C8).', 540)
 STEP('C1', 'Sampling of pixels from all dates',
      'Endmember extraction on every full image would be slow, and endmembers extracted separately for each date or plot would not be comparable.',
@@ -451,7 +489,7 @@ STEP('D2', 'Subplot mean spectra',
      'One mean spectrum (and mean band values) per subplot, date and camera → Steps D3–D7 and Activity E.',
      ['Average the masked vegetation pixels inside each subplot for every band of every camera.', 'Join the covariates of Step A6 by the subplot code and date.'],
      'Plot-mean spectra after masking: Guo et al. (2021), Mustafa et al. (2023), Ma et al. (2026).')
-FIG('dummyspec', 'g11_dummy_spectra.png', 'Dummy example of subplot mean spectra by severity grade (a) and the first derivative in the red-edge region (b). The water-vapour regions are removed.', 560)
+FIG('dummyspec', 'g11_dummy_spectra.png', 'Dummy example of subplot mean spectra by DI class (a) and the first derivative in the red-edge region (b). The water-vapour regions are removed.', 560)
 STEP('D3', 'Hyperspectral spectral features',
      'Reflectance alone does not show red-edge shifts clearly; derivatives and red-edge parameters make them visible.',
      'Subplot mean reflectance (483 bands).',
@@ -470,12 +508,12 @@ STEP('D4', 'Vegetation indices',
      'General physiological changes (pigments, structure, water) are captured best by published indices that have known meaning.',
      'Subplot mean reflectance.',
      'Index group (published indices + red-edge parameters; the searched indices of Activity 1.3 are added later) → Activity 1.4.',
-     ['Compute the published indices in five groups: pigment (for example PRI, ARI, CARI, MCARI, PSRI, PSSRb), structure (NDVI, OSAVI, SR, RVI, MSR), red edge (NDRE, MTCI, CIrededge, CIgreen, RVSI), water (NDWI, moisture stress index, NDII, WBI) and disease (DWSI, RBI); the indices used by Ma et al. (2026) are all included.',
+     ['Compute 48 published hyperspectral indices: the 39 base indices in five groups – greenness and canopy structure (17), pigment ratios (12), photosynthesis and stress (4), water (3) and SWIR disease–water (3) – plus 9 SWIR disease indices (DWSI-2, DWSI-3, DWSI-5, NDWI, moisture stress index, NDII, RBI_{M}, NDBI and RBI_{R}); the indices used by Ma et al. (2026) are all included.',
       'Check every formula against the original paper and use the nearest available band.',
-      'Index definitions are given in Chapter 7 ([[T:hsidx]]).'],
+      'Index definitions, formulas and original references are given in Chapter 7 ([[T:hsidx]] and [[T:hsidx2]]); recent disease-sensing studies that used each index group are listed with the tables.'],
      'Index groups for disease detection: Mahlein et al. (2013), Huang et al. (2014), Ma et al. (2026); pigment indices: Gamon et al. (1992), Gitelson et al. (2003), Merzlyak et al. (1999); water and disease indices: Gao (1996), Apan et al. (2004); PSRI and PSSRb for rice bacterial leaf blight: Das et al. (2015).')
 CARD('vi', 'Vegetation indices', 'Arithmetic combinations (differences, ratios, normalised differences) of reflectance at wavelengths sensitive to a plant property, which cancel part of the illumination and background effect.',
-     'Turns many bands into a few physiologically meaningful variables that can be compared with other studies and sensors.', 'About 48 published hyperspectral indices, 12 multispectral indices and 6 colour indices (Chapter 7).',
+     'Turns many bands into a few physiologically meaningful variables that can be compared with other studies and sensors.', '48 published hyperspectral indices (39 base + 9 SWIR disease indices) and 3 red-edge parameters, 12 multispectral indices and 6 colour indices (Chapter 7).',
      'No hyper-parameters; formulas fixed by the original papers.', 'Canopy reflectance at UAV and satellite scales.',
      'Interpretable, transferable and easy to apply to cheaper sensors.', 'Mahlein et al. (2013); Huang et al. (2014); Ma et al. (2026)')
 STEP('D5', 'Texture features from the grey-level co-occurrence matrix (GLCM)',
@@ -484,7 +522,7 @@ STEP('D5', 'Texture features from the grey-level co-occurrence matrix (GLCM)',
      'Texture groups of each camera → Activity 1.5 (hyperspectral) and Activity 1.6 (other cameras).',
      ['Hyperspectral: reduce the cube with principal component analysis and keep the first three components (cumulative variance above 95%); compute texture on these three component images (Activity 1.5).',
       'For every image used, quantise the grey levels to 32 levels and compute the grey-level co-occurrence matrix (GLCM) in a 3 × 3 moving window at distance 1, averaged over four directions (0°, 45°, 90°, 135°).',
-      'Compute eight texture measures: mean, variance, homogeneity, contrast, dissimilarity, entropy, second moment and correlation; average them over the vegetation pixels of the subplot.',
+      'Compute eight texture measures: mean, variance, homogeneity, contrast, dissimilarity, entropy, second moment and correlation ([[T:rgbfeat]]); average them over the vegetation pixels of the subplot.',
       'Red–green–blue: texture of the R, G and B bands (24 features); multispectral: texture of the five bands (40); thermal: texture of the temperature image (8).'],
      'GLCM: Haralick et al. (1973), Hall-Beyer (2017); texture from principal-component images of UAV hyperspectral data: Guo et al. (2021), Ma et al. (2026); texture as a feature group for Fusarium head blight: Liu et al. (2020).')
 TAB('glcmex', [['Image row', 'Grey levels of the 4 × 4 image', 'GLCM counts (grey levels 0–3)', 'Texture measure', 'Value'],
@@ -522,7 +560,7 @@ STEP('D8', 'Feature table',
      ['Columns: identifiers (date, days after inoculation, plot, subplot, replication, treatment, variety, inoculation timing, fold), labels (score, class, detection label), covariates (days after inoculation, variety, inoculation timing, growth stage, weather summaries) and features with a group prefix (R_, FD_, RE_, VI_, TX_, TH_).',
       'Rows: one per subplot-date.'],
      'Structured multi-sensor feature tables: Maimaitijiang et al. (2020), Feng et al. (2022).')
-TAB('featcount', [['Camera', 'Feature groups', 'Approximate number'], ['Hyperspectral', 'reflectance 483, first derivative 483, red-edge parameters 3, published indices about 48, principal-component texture 24 (+ searched indices and TTFI)', '≈ 1040'],
+TAB('featcount', [['Camera', 'Feature groups', 'Approximate number'], ['Hyperspectral', 'reflectance 483, first derivative 483, red-edge parameters 3, published indices 48 (39 base + 9 SWIR), principal-component texture 24 (+ searched indices and TTFI)', '≈ 1040'],
     ['Multispectral', '5 bands, 12 indices, 10 normalised differences, 40 texture', '67'], ['Red–green–blue', '6 colour indices, 3 colour means, 24 texture', '33'], ['Thermal', '5 temperature statistics, 4 normalised temperatures, 8 texture', '17'],
     ['Covariates', 'days after inoculation, variety, inoculation timing, growth stage, weather (T_{max}, T_{min}, RH, rainfall)', 'not used as disease features']], 'Feature groups before selection.', [1800, 5600, 1906])
 
@@ -608,7 +646,7 @@ STEP('F3', 'Leakage checklist',
 TAB('leak', [['Step', 'Uses labels?', 'Where it is run'], ['Activities B–D (pre-processing, mask, features)', 'no', 'once, on all data'], ['E1 (thermal normalisation)', 'no', 'once, on all data'],
     ['E2 (healthy-plot normalisation)', 'no (uses healthy plots)', 'training healthy plots → applied to test data'], ['E3–E4 (standardisation, class weights)', 'no (statistics)', 'training part of each fold'], ['Covariate coding (Step A6)', 'no', 'once; standardised with training statistics'],
     ['Within-group redundancy (|r| ≥ 0.95), variance inflation factor', 'no', 'training part of each fold'], ['NDSI/RSI and White Rust Index search, SHAP-CARS, ReliefF, mRMR, TTFI search', 'yes', 'inner folds only'],
-    ['Sequential floating forward selection, hyper-parameter tuning, early stopping', 'yes', 'inner folds only'], ['Final evaluation', 'yes', 'test replication, once'], ['Second-stage validation (Bharatpur)', 'yes', 'once, with frozen final models; never used for selection, tuning or training']],
+    ['Sequential floating forward selection, hyper-parameter tuning, early stopping', 'yes', 'inner folds only'], ['Final evaluation', 'yes', 'test replication, once'], ['Independent testing (Bharatpur)', 'yes', 'once, with frozen final models; never used for selection, tuning or training']],
     'Where each step is run so that no information from the test replication enters the model.', [4300, 1900, 3106])
 TAB('foldsize', [['Dataset', 'Training part per outer fold', 'Test part per outer fold', 'Inner folds'], ['Post-symptomatic (1920 per camera)', '≈ 1280 samples', '≈ 640 samples', '3, grouped by plot'], ['Pre-symptomatic (576 per camera)', '≈ 384 samples', '≈ 192 samples', '3, grouped by plot']],
     'Approximate sizes of the training and test parts.', [2800, 2600, 1900, 2006])

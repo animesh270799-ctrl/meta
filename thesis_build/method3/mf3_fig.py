@@ -47,8 +47,8 @@ rows = [('Common Activity A – Field experiment, ground truth, covariates and d
         ('Common Activity D – Subplot spectra and feature extraction', 'mean of vegetation pixels per subplot → reflectance, first derivative, red-edge parameters, vegetation indices,\nprincipal-component texture, multispectral, colour and thermal features', 'nav'),
         ('Common Activity E – Normalisation and data preparation', 'thermal normalisation → healthy-plot normalisation (healthy plots rotated across folds)\n→ standardisation with training statistics → class weights', 'gold'),
         ('Common Activity F – Validation design and tuning', 'leave-one-replication-out outer folds grouped by plot; inner grouped folds for selection and tuning; leakage checklist', 'gold'),
-        ('Objective 1 – Characterisation (Activities 1.1–1.7)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and TTFI → feature sets → biochemical and biophysical basis', 'o1'),
-        ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.7), 1920 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, severity classes, severity score | ablation, maps', 'o2'),
+        ('Objective 1 – Characterisation, post- and pre-symptomatic (Activities 1.1–1.8)', 'response curves → optimal wavelengths (SHAP-CARS) → two-band and three-band indices (NDSI, RSI, White Rust Index)\n→ index selection (ReliefF) → texture (principal components, co-occurrence matrix, mRMR) and TTFI → feature sets → biochemical and biophysical basis', 'o1'),
+        ('Objective 2 – Detection and severity discrimination (Activities 2.1–2.7), 1920 post-symptomatic samples', 'feature-group inputs and 15 sensor sets with feature-level fusion | machine learning, feature-fusion neural networks,\nDT-EDNet, EfficientNet, ResNet18, ConvNeXt V2 | detection, DI classes, disease index | ablation, maps | independent testing at Bharatpur', 'o2'),
         ('Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5), 576 pre-symptomatic samples', 'labels from the later status of each subplot | normalisation to healthy plots | same feature selection | machine learning and\nfeature-fusion neural networks | earliest detection day and risk maps', 'o3')]
 y = 14.3
 for i, (t, b, k) in enumerate(rows):
@@ -81,14 +81,15 @@ chain('g04_features.png', 'Common Activity D – Subplot spectra and feature ext
     ('D5  Multispectral and red–green–blue features', 'band reflectance, indices, colour indices', 'multispectral and colour groups'),
     ('D6  Thermal features', 'canopy temperature statistics; canopy minus air temperature; normalised temperatures', 'thermal group')], 'nav')
 
-chain('g05_obj1.png', 'Objective 1 – Characterisation of white rust by each camera (Activities 1.1–1.7)', [
+chain('g05_obj1.png', 'Objective 1 – Characterisation of white rust by each camera (Activities 1.1–1.8)', [
     ('Activity 1.1  Response curves', 'spectra, indices, texture and temperature by severity class, variety, inoculation timing and date', 'response figures'),
     ('Activity 1.2  Optimal wavelengths (SHAP-CARS)', 'effective ranges from NDSI and RSI maps → Shapley values on a tree ensemble →\ncompetitive adaptive reweighted sampling with partial least squares', 'optimal wavelength set'),
     ('Activity 1.3  Spectral index construction', 'all-pair NDSI and RSI search; three-band White Rust Index', 'best spectral indices'),
     ('Activity 1.4  Vegetation index selection (ReliefF)', 'published indices + red-edge parameters + constructed indices → ReliefF weights', 'selected indices'),
     ('Activity 1.5  Texture selection (mRMR) and TTFI', 'principal-component texture → mRMR → ordered triplets → Tri-band Texture Fusion Index', 'selected texture + best TTFI'),
     ('Activity 1.6  Disease-specific feature sets', 'union of selected groups per camera; variance inflation factor below 10; treatment response', 'disease-specific feature set\nof each camera'),
-    ('Activity 1.7  Biochemical and biophysical basis', 'pigments, anthocyanin, protein, water content, membrane stability, gas exchange, leaf area index:\ndisease effect by date and growth stage; links with camera features', 'physiological explanation')], 'o1')
+    ('Activity 1.7  Biochemical and biophysical basis', 'pigments, anthocyanin, protein, water content, membrane stability, gas exchange, leaf area index:\ndisease effect by date and growth stage; links with camera features', 'physiological explanation'),
+    ('Activity 1.8  Pre-symptomatic stage', '576 pre-symptomatic samples per camera; later-infected vs healthy; response curves, effect sizes,\nwavelengths, indices, texture and thermal features before symptoms', 'pre-symptomatic feature set;\nearliest-responding features')], 'o1')
 
 chain('g06_obj2.png', 'Objective 2 – Detection and severity discrimination (Activities 2.1–2.7)', [
     ('Activity 2.1  Tasks and inputs', 'detection, severity classes, severity score; hyperspectral feature-group inputs;\n15 sensor sets with feature-level fusion', 'input matrices per fold'),
@@ -97,7 +98,7 @@ chain('g06_obj2.png', 'Objective 2 – Detection and severity discrimination (Ac
     ('Activity 2.4  Evaluation', 'overall accuracy, kappa, macro recall and F1, per-class scores; R², RMSE, RPD', 'metric tables'),
     ('Activity 2.5  Comparison, ablation and interpretation', 'best model per sensor set; fusion gain; drop-one-sensor; DT-EDNet ablation;\nSHAP; gain over the covariate-only baseline', 'best sensor set and model'),
     ('Activity 2.6  Robustness and maps', 'results by variety and inoculation timing; leave-one-variety-out; subplot maps', 'robustness tables, maps'),
-    ('Activity 2.7  Second-stage validation at Bharatpur', 'final models trained on all IARI data and frozen; applied once to research-farm and\nfarmers\' field quadrats (natural infection); same metrics; farm maps', 'independent accuracy;\nfarm maps')], 'o2')
+    ('Activity 2.7  Independent testing at Bharatpur', 'final models trained on all IARI data and frozen; applied once to research-farm and\nfarmers\' field quadrats (natural infection); same metrics; farm maps', 'independent accuracy;\nfarm maps')], 'o2')
 
 chain('g07_obj3.png', 'Objective 3 – Pre-symptomatic prediction (Activities 3.1–3.5)', [
     ('Activity 3.1  Pre-symptomatic samples and labels', 'healthy plots vs inoculated subplots that become diseased later; later severity score', 'labelled 576 samples'),
@@ -311,15 +312,15 @@ fig, ax = plt.subplots(figsize=(7, 3.6)); dai = np.array([2, 5, 8])
 for lab, c, vals in (('hyperspectral + thermal', '#7030A0', [0.58, 0.66, 0.74]), ('hyperspectral', '#00838F', [0.56, 0.63, 0.71]), ('thermal', '#C62828', [0.56, 0.62, 0.68]), ('red–green–blue', '#2E7D32', [0.48, 0.52, 0.57])):
     ax.plot(dai, vals, 'o-', color=c, label=lab)
 ax.axhline(0.7, color='k', ls='--', lw=.8); ax.text(5.0, 0.705, 'chosen reliability level (0.70)', fontsize=8, ha='center')
-ax.set_xticks(dai); ax.set_xticklabels(['12 Jan\n(2 DAI)', '15 Jan\n(5 DAI)', '18 Jan\n(8 DAI)'])
+ax.set_xticks(dai); ax.set_xticklabels(['1 Jan\n(2 DAI)', '4 Jan\n(5 DAI)', '7 Jan\n(8 DAI)'])
 ax.set(xlabel='pre-symptomatic flight date (days after inoculation)', ylabel='balanced accuracy', title='Accuracy on the three pre-symptomatic dates', ylim=(0.4, 0.8)); ax.legend(fontsize=7.5, loc='lower right'); ax.grid(alpha=.3)
 fig.text(0.5, -0.03, 'Dummy data for illustration only', ha='center', fontsize=8, style='italic', color='#777'); plt.tight_layout()
 save(fig, 'g23_dummy_earliest.png')
 
 # Gantt
 fig, ax = canvas(11, 5.4)
-tasks = [('Common Activities A–C (all dates, all cameras)', 0, 1.2, 'nav'), ('Common Activity D: features; Activity E: folds', 1.0, 1.8, 'nav'), ('Objective 1: Activities 1.1–1.6', 1.6, 2.7, 'o1'),
-         ('Objective 2: machine learning, feature-fusion networks', 2.5, 3.6, 'o2'), ('Objective 2: DT-EDNet and convolutional networks', 3.0, 4.3, 'o2'), ('Objective 2: comparison, ablation, maps', 4.0, 4.7, 'o2'), ('Objective 3: Activities 3.1–3.5', 4.3, 5.4, 'o3'), ('Second-stage validation (Bharatpur)', 5.0, 5.8, 'o2'), ('Interpretation, figures, writing', 5.2, 6.0, 'gold')]
+tasks = [('Common Activities A–C (all dates, all cameras)', 0, 1.2, 'nav'), ('Common Activity D: features; Activity E: folds', 1.0, 1.8, 'nav'), ('Objective 1: Activities 1.1–1.8', 1.6, 2.7, 'o1'),
+         ('Objective 2: machine learning, feature-fusion networks', 2.5, 3.6, 'o2'), ('Objective 2: DT-EDNet and convolutional networks', 3.0, 4.3, 'o2'), ('Objective 2: comparison, ablation, maps', 4.0, 4.7, 'o2'), ('Objective 3: Activities 3.1–3.5', 4.3, 5.4, 'o3'), ('Independent testing (Bharatpur)', 5.0, 5.8, 'o2'), ('Interpretation, figures, writing', 5.2, 6.0, 'gold')]
 for m in range(7): ax.plot([4.6 + m * 1.03, 4.6 + m * 1.03], [0.4, 4.9], color='#DDD', lw=0.8)
 for m in range(6): ax.text(4.6 + m * 1.03 + 0.51, 5.05, 'Month %d' % (m + 1), ha='center', fontsize=9, fontweight='bold')
 for i, (t, a, b, k) in enumerate(tasks):
@@ -333,16 +334,16 @@ lv = [('13 flight dates\n(3 pre- and 10 post-\nsymptomatic)', 'nav'), ('4 camera
 for i, (t, k) in enumerate(lv):
     box(ax, 0.3 + i * 2.7, 2.7, 2.45, 1.4, t, '', k, tfs=10, filled=True)
     if i < 3: arr(ax, 2.75 + i * 2.7, 3.4, 3.0 + i * 2.7, 3.4)
-box(ax, 0.3, 0.4, 5.1, 1.8, 'Post-symptomatic set (Objectives 1 and 2)', '1920 subplot samples per camera\n(10 dates × 48 plots × 4 subplots; 21 Jan – 25 Mar 2027)\nlabels: severity score, class, healthy / diseased', 'o2', fs=9)
-box(ax, 5.7, 0.4, 5.0, 1.8, 'Pre-symptomatic set (Objective 3)', '576 subplot samples per camera\n(3 dates × 48 plots × 4 subplots; 12, 15, 18 Jan 2027)\nlabels: healthy / infected (later status), later severity', 'o3', fs=9)
+box(ax, 0.3, 0.4, 5.1, 1.8, 'Post-symptomatic set (Objectives 1 and 2)', '1920 subplot samples per camera\n(10 dates × 48 plots × 4 subplots; 11 Jan – 15 Mar 2027)\nlabels: disease index, DI class, healthy / diseased', 'o2', fs=9)
+box(ax, 5.7, 0.4, 5.0, 1.8, 'Pre-symptomatic set (Objectives 1 and 3)', '576 subplot samples per camera\n(3 dates × 48 plots × 4 subplots; 1, 4, 7 Jan 2027)\nlabels: healthy / infected (later status), later disease index', 'o3', fs=9)
 save(fig, 'g26_dataset.png')
 
 # timeline of the 13 flights
 fig, ax = canvas(12, 4.2)
-dates = [('12 Jan', 2), ('15 Jan', 5), ('18 Jan', 8), ('21 Jan', 11), ('28 Jan', 18), ('4 Feb', 25), ('11 Feb', 32), ('18 Feb', 39), ('25 Feb', 46), ('4 Mar', 53), ('11 Mar', 60), ('18 Mar', 67), ('25 Mar', 74)]
+dates = [('1 Jan', 2), ('4 Jan', 5), ('7 Jan', 8), ('11 Jan', 12), ('18 Jan', 19), ('25 Jan', 26), ('1 Feb', 33), ('8 Feb', 40), ('15 Feb', 47), ('22 Feb', 54), ('1 Mar', 61), ('8 Mar', 68), ('15 Mar', 75)]
 x0, sc = 1.6, 0.135
 ax.annotate('', xy=(11.85, 2.3), xytext=(1.45, 2.3), arrowprops=dict(arrowstyle='-|>', color='#333', lw=1.5))
-ax.plot([x0, x0], [2.05, 2.55], color='k', lw=2); ax.text(x0 - 0.12, 2.3, 'inoculation\n10 Jan 2027', ha='right', va='center', fontsize=7.8)
+ax.plot([x0, x0], [2.05, 2.55], color='k', lw=2); ax.text(x0 - 0.12, 2.3, 'inoculation\n30 Dec 2026', ha='right', va='center', fontsize=7.8)
 for i, (d, dai) in enumerate(dates):
     x = x0 + dai * sc; c = C['o3'] if i < 3 else C['o2']
     ax.plot(x, 2.3, 'o', color=c, ms=8)
@@ -351,20 +352,20 @@ for i, (d, dai) in enumerate(dates):
 ax.add_patch(FancyBboxPatch((x0 + 1.0 * sc, 2.75), 8.2 * sc, 0.55, boxstyle='round,pad=0.01,rounding_size=0.05', fc=L['o3'], ec=C['o3']))
 ax.text(x0 + 5.1 * sc, 3.02, 'pre-\nsymptomatic', ha='center', va='center', fontsize=7.0, fontweight='bold', color=C['o3'])
 ax.text(x0 + 5.1 * sc, 3.62, '3 dates\n576 samples', ha='center', va='center', fontsize=7.4, color=C['o3'])
-ax.add_patch(FancyBboxPatch((x0 + 10 * sc, 2.75), 65 * sc, 0.55, boxstyle='round,pad=0.01,rounding_size=0.05', fc=L['o2'], ec=C['o2']))
-ax.text(x0 + 42.5 * sc, 3.02, 'post-symptomatic: 10 dates, 1920 samples (label = severity score observed on the same date)', ha='center', va='center', fontsize=8.2, fontweight='bold', color=C['o2'])
+ax.add_patch(FancyBboxPatch((x0 + 11 * sc, 2.75), 65 * sc, 0.55, boxstyle='round,pad=0.01,rounding_size=0.05', fc=L['o2'], ec=C['o2']))
+ax.text(x0 + 43.5 * sc, 3.02, 'post-symptomatic: 10 dates, 1920 samples (label = disease index surveyed on the same date)', ha='center', va='center', fontsize=8.2, fontweight='bold', color=C['o2'])
 ax.text(0.4, 0.55, 'pre-symptomatic label = later status of the same subplot (healthy control vs inoculated subplot that becomes diseased)', ha='left', fontsize=8)
-ax.text(0.4, 0.2, 'all four cameras (red–green–blue, multispectral, thermal, hyperspectral), ASD leaf spectra and visual severity scoring on every date', ha='left', fontsize=8, style='italic')
+ax.text(0.4, 0.2, 'all four cameras (red–green–blue, multispectral, thermal, hyperspectral), ASD leaf spectra and the disease index survey on every date', ha='left', fontsize=8, style='italic')
 save(fig, 'g27_obj3.png')
 
 # two-stage validation
 fig, ax = canvas(12, 3.4)
-box(ax, 0.2, 1.85, 3.6, 1.35, 'Stage 1 – IARI field (internal)', 'leave-one-replication-out, nested\nfeature selection, tuning, model choice\naccuracy on new plots of the same field', 'o1', fs=8.2, tfs=9.4)
+box(ax, 0.2, 1.85, 3.6, 1.35, 'Validation – IARI field (internal)', 'leave-one-replication-out, nested\nfeature selection, tuning, model choice\naccuracy on new plots of the same field', 'o1', fs=8.2, tfs=9.4)
 arr(ax, 3.8, 2.52, 4.25, 2.52)
 box(ax, 4.25, 1.85, 3.5, 1.35, 'Final models (frozen)', 'selection and tuning repeated on all IARI data\nfeatures, hyper-parameters and\nstandardisation constants fixed', 'gold', fs=8.2, tfs=9.4)
 arr(ax, 7.75, 2.52, 8.2, 2.52)
-box(ax, 8.2, 1.85, 3.6, 1.35, 'Stage 2 – Bharatpur (independent)', 'research farms and farmers\' fields\nnatural infection, local varieties\nsame cameras, scoring and processing', 'o3', fs=8.2, tfs=9.4)
-box(ax, 0.2, 0.25, 11.6, 1.25, 'Reported for the second stage', 'same metrics as stage 1 (overall accuracy, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD) | loss of accuracy from stage 1 to stage 2\nresults by site type, variety and growth stage | label-free re-standardisation as a second result | covariate models with Bharatpur weather | farm maps', 'grey', fs=8.2, tfs=9.4)
+box(ax, 8.2, 1.85, 3.6, 1.35, 'Independent testing – Bharatpur', 'research farms and farmers\' fields\nnatural infection, local varieties\nsame cameras, scoring and processing', 'o3', fs=8.2, tfs=9.4)
+box(ax, 0.2, 0.25, 11.6, 1.25, 'Reported for the independent test (not a validation)', 'same metrics as the internal validation (overall accuracy, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD) | loss of accuracy from validation to test\nresults by site type, variety and growth stage | label-free re-standardisation as a second result | covariate models with Bharatpur weather | farm maps', 'grey', fs=8.2, tfs=9.4)
 save(fig, 'g28_twostage.png')
 
 chain('g29_physio.png', 'Activity 1.7 – Biochemical and biophysical basis of the camera responses (Steps 1.7.1–1.7.6)', [
@@ -372,7 +373,7 @@ chain('g29_physio.png', 'Activity 1.7 – Biochemical and biophysical basis of t
     ('1.7.2  Effect of white rust', 'inoculated − healthy, paired within treatment and date (12 pairs);\npaired t-test or Wilcoxon; mean difference, 95% confidence interval, effect size', 'disease effect per date'),
     ('1.7.3  Variety and inoculation timing', 'two-way analysis of variance (randomised block design), inoculated plots;\nleast significant difference', 'treatment effects'),
     ('1.7.4  Growth stages', 'healthy means by stage; paired differences by stage; one-way analysis of variance\nor Kruskal–Wallis on the differences; Tukey comparisons', 'disease effect by stage'),
-    ('1.7.5  Relation with severity', 'Pearson correlation with plot disease index and subplot score, within each date', 'severity relations'),
+    ('1.7.5  Relation with severity', 'Pearson correlation with plot and subplot disease index, within each date', 'severity relations'),
     ('1.7.6  Relation with camera features', 'within-date and within-stage correlations; Benjamini–Hochberg; expected-link table', 'parameter–feature links')], 'o1')
 
 # dummy physiology figure
@@ -389,4 +390,10 @@ im = axs[1].imshow(R, cmap='RdBu_r', vmin=-1, vmax=1); plt.colorbar(im, ax=axs[1
 axs[1].set_xticks(range(len(feats))); axs[1].set_xticklabels(feats, rotation=45, ha='right', fontsize=8); axs[1].set_yticks(range(len(pars))); axs[1].set_yticklabels(pars, fontsize=8)
 axs[1].set_title('(b) Parameter × camera feature correlations (one date)')
 fig.text(0.5, -0.02, 'Dummy data for illustration only', ha='center', fontsize=8, style='italic', color='#777'); plt.tight_layout(); save(fig, 'g30_dummy_physio.png')
+chain('g31_presym.png', 'Activity 1.8 – Characterisation of the pre-symptomatic stage (576 samples per camera)', [
+    ('1.8.1  Response curves', 'mean spectra, first derivative, indices, texture and temperature of later-infected vs healthy subplots\non 1, 4 and 7 January; percentage difference from healthy', 'pre-symptomatic response'),
+    ('1.8.2  Univariate tests', 'plot means (unit = plot); Welch t-test or Mann–Whitney U; Hedges g with 95% interval;\nBenjamini–Hochberg false discovery rate 5%', 'effect size per feature and date'),
+    ('1.8.3  Effective ranges and optimal wavelengths', 'NDSI/RSI maps and SHAP-CARS with the binary later-status label (inside training folds)', 'pre-symptomatic wavelengths'),
+    ('1.8.4  Indices, texture and thermal features', 'healthy-plot normalisation; ReliefF (two classes); mRMR; canopy minus air temperature, NRCT, CWSI;\nvariance inflation factor below 10', 'pre-symptomatic feature set'),
+    ('1.8.5  Earliest-responding features', 'first date (2, 5 or 8 days after inoculation) with a significant, large effect; by variety and timing;\nlinked with the physiology of 7 January', 'earliest features → Objective 3')], 'o1')
 print('figures ok')

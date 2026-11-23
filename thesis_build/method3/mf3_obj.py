@@ -1,8 +1,8 @@
 # Objectives 1-3 (executed inside mf3_body.py)
 # =====================================================================================
 H1('3. Objective 1 – Characterisation of white rust through multimodal UAV sensing')
-P('Objective 1 describes how each camera sees white rust and selects the features that carry disease information. It uses the 1920 post-symptomatic samples of each camera. For description and interpretation the steps are run on all post-symptomatic samples; for prediction (Objectives 2 and 3) exactly the same steps are repeated inside the training part of every fold (Step F2), so the test replication never chooses a feature.')
-FIG('obj1', 'g05_obj1.png', 'Flow chart of Objective 1 (Activities 1.1–1.6).', 540)
+P('Objective 1 describes how each camera sees white rust and selects the features that carry disease information, at two stages. At the post-symptomatic stage it uses the 1920 post-symptomatic samples of each camera with the disease index as target (Activities 1.1–1.7). At the pre-symptomatic stage it uses the 576 pre-symptomatic samples of each camera with later-infected vs healthy as target (Activity 1.8). For description and interpretation the steps are run on all samples of a stage; for prediction (Objectives 2 and 3) exactly the same steps are repeated inside the training part of every fold (Step F2), so the test replication never influences the selection.')
+FIG('obj1', 'g05_obj1.png', 'Flow chart of Objective 1 (Activities 1.1–1.8).', 540)
 TAB('o1act', [['Activity', 'Steps', 'Technique (one per feature type)', 'Output'],
     ['1.1 Response analysis', '1.1.1–1.1.3', 'mean spectra, first derivative, Pearson correlation', 'response figures; responsive regions'],
     ['1.2 Optimal wavelengths', '1.2.1–1.2.4', 'NDSI/RSI maps → SHAP-CARS', '10–15 optimal wavelengths (OW)'],
@@ -10,7 +10,8 @@ TAB('o1act', [['Activity', 'Steps', 'Technique (one per feature type)', 'Output'
     ['1.4 Vegetation index selection', '1.4.1–1.4.3', 'redundancy filter → ReliefF / RReliefF', '5–8 selected indices'],
     ['1.5 Texture selection and TTFI', '1.5.1–1.5.4', 'principal-component texture → mRMR → TTFI', '6 texture features + best TTFI'],
     ['1.6 Disease-specific feature sets', '1.6.1–1.6.4', 'same rules for other cameras → variance inflation factor', 'feature set of each camera; treatment response'],
-    ['1.7 Biochemical and biophysical basis', '1.7.1–1.7.6', 'paired comparisons, analysis of variance, within-date correlation', 'disease effect by date and growth stage; parameter–feature links']],
+    ['1.7 Biochemical and biophysical basis', '1.7.1–1.7.6', 'paired comparisons, analysis of variance, within-date correlation', 'disease effect by date and growth stage; parameter–feature links'],
+    ['1.8 Pre-symptomatic characterisation', '1.8.1–1.8.5', 'the same steps with the label later-infected vs healthy (576 samples per camera)', 'pre-symptomatic response; earliest-responding features; pre-symptomatic feature set']],
     'Activities of Objective 1.', [2400, 1100, 3000, 2806])
 H2('The feature-selection rule: one method for each type of feature')
 P('Pooling all features (about 1150 for the four cameras) and selecting from one big pool would be unstable, would keep many near-duplicates and would let the hundreds of spectral bands swamp the small thermal and texture groups (Hughes, 1968; Guyon and Elisseeff, 2003; Dormann et al., 2013; Ghamisi et al., 2019). Selection is therefore done in four stages, and in Stage 2 one method is used for each type of feature, the method that best suits the nature of that type and that was used for the same type in the DT-EDNet study (Ma et al., 2026) ([[F:selection]]).')
@@ -244,7 +245,7 @@ FIG('obj1phys', 'g29_physio.png', 'Flow chart of Activity 1.7 (Steps 1.7.1–1.7
 STEP('1.7.1', 'Data preparation',
      'Laboratory and field readings must be on one scale and joined to the image data before analysis.',
      'Parameter table (Step A8); severity grades; covariates; UAV features of the designated subplots.',
-     'One analysis table: plot-date rows with the 11 parameters, plot percent disease index, designated-subplot canopy score and camera features, growth stage, variety and inoculation timing → Steps 1.7.2–1.7.6.',
+     'One analysis table: plot-date rows with the 11 parameters, plot disease index of the plot and of the designated subplot and camera features, growth stage, variety and inoculation timing → Steps 1.7.2–1.7.6.',
      ['Average technical replicates (duplicate absorbance or conductivity readings).', 'Express pigments, anthocyanin and protein per gram of fresh weight; keep the units of [[T:physio]].', 'Join by date, plot and designated subplot.'],
      'Gomez and Gomez (1984).')
 STEP('1.7.2', 'Effect of white rust on the parameters',
@@ -275,7 +276,7 @@ STEP('1.7.5', 'Relation of the parameters with disease severity',
      'Shows which parameters change in proportion to severity, not only between healthy and diseased plants.',
      'Inoculated plots; plot percent disease index; designated-subplot canopy score.',
      'Correlation coefficients with 95% confidence intervals for each parameter and post-symptomatic date → interpretation.',
-     ['Compute the Pearson correlation of each parameter with the plot percent disease index and with the canopy score of the designated subplot, separately for each post-symptomatic date (36 plots per date).', 'Do not pool dates directly: if a pooled value is wanted, remove the date means first (within-date correlation), because parameters and severity both change with time.'],
+     ['Compute the Pearson correlation of each parameter with the plot disease index and with the disease index of the designated subplot, separately for each post-symptomatic date (36 plots per date).', 'Do not pool dates directly: if a pooled value is wanted, remove the date means first (within-date correlation), because parameters and severity both change with time.'],
      'Correlation with repeated observations: Bland and Altman (1995), Bakdash and Marusich (2017).')
 STEP('1.7.6', 'Relation of the parameters with the camera features',
      'Links each camera feature to a plant process, which shows why the feature responds to white rust.',
@@ -300,6 +301,38 @@ CARD('physstats', 'Statistical analysis of the biochemical and biophysical param
      'Significance level 5%; false discovery rate 5%; effect sizes and 95% confidence intervals reported with every test.', 'Plot-level measurements from designed field experiments with few replications.',
      'Simple, standard in agricultural research and matched to the design; the plot is treated as the experimental unit.', 'Gomez and Gomez (1984); Hurlbert (1984); Benjamini and Hochberg (1995); Sullivan and Feinn (2012)')
 
+# ---------------------------------------------------------------- 1.8
+H2('Activity 1.8 – Characterisation of the pre-symptomatic stage')
+P('Activities 1.1–1.7 describe white rust after symptoms appear. Activity 1.8 repeats the characterisation before symptoms, with the 576 pre-symptomatic subplot samples of each camera (3 flights × 192 subplots). No grade exists yet, so the target is later-infected vs healthy: the label of an inoculated subplot is taken from its later status (Step A5). The result is the pre-symptomatic feature set of each camera and a list of the earliest-responding wavelengths, indices, texture and thermal features, which feed the prediction models of Objective 3 ([[F:presym]]).')
+FIG('presym', 'g31_presym.png', 'Activity 1.8 – characterisation of the pre-symptomatic stage (Steps 1.8.1–1.8.5).', 540)
+TAB('presymn', [['Flight', 'Days after inoculation', 'Healthy subplots', 'Inoculated subplots', 'Total'], ['1 Jan 2027', '2', '48', '144', '192'], ['4 Jan 2027', '5', '48', '144', '192'], ['7 Jan 2027', '8', '48', '144', '192'], ['All', '', '144', '432 (later-infected subplots only are used)', '576']],
+    'Pre-symptomatic samples per camera.', [1800, 1800, 1600, 2600, 1506], 16)
+STEP('1.8.1', 'Pre-symptomatic response curves',
+     'Shows whether and where the spectrum, temperature and texture of later-infected subplots already differ from healthy subplots.',
+     'Pre-symptomatic features of all cameras; later-status labels.', 'Mean curves and percentage differences by date → Steps 1.8.2–1.8.5.',
+     ['Mean reflectance, first derivative, indices, texture and thermal features of later-infected and healthy subplots on each pre-symptomatic date (± 1 standard deviation).', 'Percentage difference from healthy: Δ% = (x_{infected} − x_{healthy}) / x_{healthy} × 100, per feature and date.', 'Separate curves for each variety and inoculation timing.'],
+     'Pre-symptomatic spectral and thermal changes: Zarco-Tejada et al. (2018), Calderón et al. (2013), Zhu et al. (2017); early changes in rusts and mildews: Terentev et al. (2023).')
+STEP('1.8.2', 'Univariate tests with plot means and effect sizes',
+     'Gives a simple statistical answer to which features differ before symptoms, without pseudo-replication.',
+     'Plot means of every feature (unit = plot) on each pre-symptomatic date.', 'Effect size and adjusted p-value of every feature and date → interpretation; Step 1.8.4.',
+     ['Average the subplots of each plot so that the plot is the experimental unit (Hurlbert, 1984).', 'Welch t-test (or Mann–Whitney U test for skewed features) between later-infected inoculated plots and healthy plots for every feature and date.', 'Report the effect size (Hedges g) with its 95% confidence interval and control false discoveries with the Benjamini–Hochberg procedure (5%).'],
+     'Hurlbert (1984); Sullivan and Feinn (2012); Benjamini and Hochberg (1995).')
+STEP('1.8.3', 'Pre-symptomatic effective ranges and optimal wavelengths',
+     'The wavelengths that respond earliest may differ from those that respond after symptoms.',
+     'Reflectance and first derivative; binary later-status label (training part).', 'Pre-symptomatic effective ranges and optimal wavelengths → Step 1.8.4 and Objective 3.',
+     ['NDSI and RSI maps with the binary label (area under the curve or point-biserial r^{2} of each band pair).', 'SHAP-CARS with partial least squares discriminant analysis on the binary label (Activity 1.2 settings).', 'Run inside the training part of every fold when used for prediction.'],
+     'Ma et al. (2026); Li et al. (2009); Lundberg and Lee (2017); Zhu et al. (2017).')
+STEP('1.8.4', 'Indices, texture and thermal features before symptoms',
+     'Small early changes are easier to see after removing date, weather and variety effects.',
+     '48 published indices, red-edge parameters, texture and thermal features; healthy plots of the same date and variety.', 'Pre-symptomatic feature set of each camera (variance inflation factor below 10) → Objective 3 (Activity 3.3).',
+     ['Healthy-plot normalisation (Step E2) of every feature.', 'Indices: ReliefF with the two classes; texture: mRMR; thermal: canopy minus air temperature, normalised relative canopy temperature, crop water stress index and difference from healthy plots.', 'Pool the survivors and keep features with a variance inflation factor below 10.'],
+     'Oerke et al. (2006); Calderón et al. (2014); Robnik-Šikonja and Kononenko (2003); Peng et al. (2005); Dormann et al. (2013).')
+STEP('1.8.5', 'Earliest-responding features',
+     'Shows how early and with which feature type white rust can be seen.',
+     'Effect sizes and selected features of the three pre-symptomatic dates.', 'Earliest date on which each feature differs from healthy, by variety and timing; physiological explanation with Step 3.1.2.',
+     ['For every selected feature, find the first date (2, 5 or 8 days after inoculation) on which the effect size is significant and larger than 0.8.', 'Compare the earliest features with the pre-symptomatic biochemical and biophysical parameters of 7 January (Step 3.1.2).'],
+     'Mahlein et al. (2019); Zarco-Tejada et al. (2018); Sullivan and Feinn (2012).')
+
 BOX('Link to satellite monitoring (optional extension, not part of the six-month plan).', 'The subplot hyperspectral spectra can be convolved with the relative spectral response functions of Sentinel-2 and Resourcesat LISS-IV to simulate satellite band reflectance, and the selected wavelengths and indices can then be tested with these simulated bands. This approach was used for yellow rust with Sentinel-2 (Zheng et al., 2018) and for rice bacterial leaf blight with LISS-IV (Das et al., 2015); UAV data have also been used to bridge field and satellite scales (Revill et al., 2020; Blasch et al., 2023; Poblete et al., 2023; Yuan et al., 2025).', 'EEF3E8', '2C5F2D')
 
 # =====================================================================================
@@ -310,7 +343,7 @@ TAB('o2act', [['Activity', 'Steps', 'Main output'], ['2.1 Tasks and inputs', '2.
     ['2.2 Machine-learning models', '2.2.1–2.2.6', 'tuned support vector machine, random forest, extreme gradient boosting, k-nearest neighbours and partial least squares models'],
     ['2.3 Deep-learning models', '2.3.1–2.3.8', 'feature-fusion networks and pseudo-image networks (DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2)'],
     ['2.4 Evaluation', '2.4.1–2.4.3', 'metric tables'], ['2.5 Comparison, ablation and interpretation', '2.5.1–2.5.5', 'best sensor set and model; contribution of each camera; module ablation; Shapley explanation; gain over the covariate baseline'],
-    ['2.6 Robustness and maps', '2.6.1–2.6.3', 'results by treatment; transfer tests; severity maps'], ['2.7 Second-stage validation at Bharatpur', '2.7.1–2.7.4', 'accuracy of frozen models on independent research-farm and farmers\' field data; farm maps']], 'Activities of Objective 2.', [2900, 1300, 5106])
+    ['2.6 Robustness and maps', '2.6.1–2.6.3', 'results by treatment; transfer tests; severity maps'], ['2.7 Independent testing at Bharatpur', '2.7.1–2.7.4', 'accuracy of frozen models on independent research-farm and farmers\' field data; farm maps']], 'Activities of Objective 2.', [2900, 1300, 5106])
 
 # ---------------------------------------------------------------- 2.1
 H2('Activity 2.1 – Tasks and inputs')
@@ -318,7 +351,7 @@ STEP('2.1.1', 'Three tasks and class balance',
      'Defines the three prediction problems and handles unequal class sizes.',
      'Post-symptomatic dataset with labels (Step A5).',
      'Three labelled task datasets → all models.',
-     ['Task A, detection: healthy (grade 0) vs diseased (grade above 0).', 'Task B, severity classes: grades 0, 1, 3, 5, 7, 9 (merged if a class has fewer than 5% of samples).', 'Task C, regression: severity score.', 'Class weights (Step E4) for all classifiers; macro-averaged metrics.'],
+     ['Task A, detection: healthy (DI = 0) vs diseased (DI above 0).', 'Task B, severity classes: DI classes 0, 1, 3, 5, 7, 9 (merged if a class has fewer than 5% of samples).', 'Task C, regression: disease index DI (%).', 'Class weights (Step E4) for all classifiers; macro-averaged metrics.'],
      'Detection, severity classes and regression together: Tian et al. (2021), Feng et al. (2022), Abdulridha et al. (2023); three-class healthy, mild and severe classification: Yuan et al. (2025).')
 STEP('2.1.2', 'Fold-wise feature selection for each camera',
      'Features must be selected without the test replication.',
@@ -570,14 +603,17 @@ STEP('2.5.5', 'Covariate baseline and sensor + covariate models',
      'Severity rises with days after inoculation and differs with variety, inoculation timing, growth stage and weather; a sensor model could look accurate only because it learns time or stage. The cameras must add information beyond these known factors.',
      'Covariates (Step A6); fused feature sets of the sensor sets; same folds.',
      'Accuracy of the covariate-only model, of the sensor models and of the sensor + covariate models → evidence of what the cameras add.',
-     ['Covariate-only model: the best machine-learning model (Activity 2.2) with days after inoculation, variety, inoculation timing, growth stage and the weather summaries as the only inputs, for Tasks A, B and C.',
-      'Sensor models (main results, Activities 2.2–2.3): a sensor set is reported as useful only if it is better than the covariate-only model.',
-      'Sensor + covariate models: the best three sensor sets with the covariates added (one-hot variety and inoculation timing, ordinal growth stage, numeric days after inoculation and weather), to show whether known context improves prediction.',
-      'Report all three side by side for every task; label models that contain weather as "within-season" (Step A6).'],
-     'Combining weather with remote sensing compared with a weather-only model: Zhang et al. (2014); weather-based white rust forecasting: Chattopadhyay et al. (2011); stage-dependent disease signals: Blasch et al. (2023); simple baseline models as a reference for predictive models: Kuhn and Johnson (2013).')
-TAB('covex', [['Model (dummy results, Task B)', 'Inputs', 'Macro-F1', 'Gain over covariate model'], ['Covariate-only', 'days after inoculation, variety, timing, stage, weather', '0.41', '—'], ['Hyperspectral (S1)', 'S1 fused features', '0.66', '+0.25'],
-    ['Hyperspectral + thermal (S7)', 'S7 fused features', '0.69', '+0.28'], ['Hyperspectral + thermal + covariates', 'S7 features + covariates', '0.71', '+0.30 (within-season)']],
-    'Worked example (dummy data): how the covariate baseline is used to show what the cameras add.', [2700, 3200, 1300, 2106])
+     ['Samples: inoculated, unsprayed subplots only; the healthy plots are fungicide-protected and share every covariate with their inoculated plots, so they would teach a false rule. Weather windows end the day before each flight (no look-ahead).',
+      'B1 – interpretable epidemiological model: logistic regression (Task A), proportional-odds ordinal logistic regression (Task B; McCullagh, 1980) and a linear model of the disease index with days after inoculation and its square (Task C; disease-progress shape, Madden et al., 2007), with variety, inoculation timing and growth stage.',
+      'B2 – machine-learning baseline: the best model of Activity 2.2 (for example random forest; Breiman, 2001) with all covariates, including the weather summaries and favourable days, tuned with the same inner grid search as the sensor models.',
+      'M0 = the stronger of B1 and B2 (covariates only); M1 = the sensor models of each sensor set (Activities 2.2–2.3); M2 = the best three sensor sets + covariates (one-hot variety and timing, ordinal growth stage, numeric days after inoculation and weather), labelled "within-season".',
+      'Gains: ΔS = metric(M1) − metric(M0) (what the cameras add); ΔC = metric(M2) − metric(M1) (what known context adds); ΔT = metric(M2) − metric(M0). Metrics: macro-F1 and AUC (Task A), macro-F1 and quadratic-weighted kappa (Task B), R² and RMSE (Task C).',
+      'Is a gain real? 95% confidence interval from 2000 bootstrap resamples of the pooled test predictions that resample whole plots (Efron and Tibshirani, 1993); AUCs of M1 and M0 compared with the DeLong test (DeLong et al., 1988). A gain is real only if the interval excludes zero, it is larger than the fold-to-fold standard deviation and it has the same sign in all three folds.',
+      'The coefficients of B1, fitted on all inoculated subplots with standardised covariates, show the direction and size of each known effect (for example later sowing or variety).'],
+     'Calendar effect in disease prediction: De Wolf and Isard (2007); weather-only machine learning for disease severity: Bijlwan et al. (2025); combining weather with remote sensing compared with a weather-only model: Zhang et al. (2014), Ruan et al. (2022); weather-based white rust forecasting: Chattopadhyay et al. (2011); simple baseline models as a reference for predictive models: Kuhn and Johnson (2013); bootstrap and DeLong test: Efron and Tibshirani (1993), DeLong et al. (1988).')
+TAB('covex', [['Model set (dummy results, Task B)', 'Inputs', 'Macro-F1', 'Gain (95% bootstrap interval)'], ['M0 – covariate baseline (stronger of B1, B2)', 'days after inoculation, variety, timing, stage, weather', '0.41', '—'], ['M1 – hyperspectral (S1)', 'S1 fused features', '0.66', 'ΔS = +0.25 (+0.18 to +0.31): real'],
+    ['M1 – hyperspectral + thermal (S7)', 'S7 fused features', '0.69', 'ΔS = +0.28 (+0.21 to +0.34): real'], ['M2 – hyperspectral + thermal + covariates', 'S7 features + covariates', '0.71', 'ΔC = +0.02 (−0.02 to +0.06): not real; within-season']],
+    'Worked example (dummy data): how the covariate baseline and the bootstrap intervals show what the cameras add.', [2900, 2700, 1100, 2606])
 H2('Activity 2.6 – Robustness and maps')
 STEP('2.6.1', 'Performance by treatment',
      'A model may work for one variety or crop age and fail for another.',
@@ -595,19 +631,19 @@ STEP('2.6.3', 'Severity maps',
      'Abdulridha et al. (2023); Liu et al. (2024); Deng et al. (2024); Liu et al. (2026).')
 
 # =====================================================================================
-H2('Activity 2.7 – Second-stage validation at Bharatpur')
-P('The first-stage validation (Activity F, leave-one-replication-out inside the IARI field) chooses the models and estimates their accuracy on new plots of the same field. The second stage tests the final models on independent data from research farms and farmers\' fields at Bharatpur (Step A7), with other soils, varieties, management and a natural epidemic ([[F:twostage]]).')
-FIG('twostage', 'g28_twostage.png', 'Two-stage validation: first stage inside the IARI field, second stage on independent Bharatpur data with frozen models.', 560)
+H2('Activity 2.7 – Independent testing at Bharatpur')
+P('The validation (Activity F, leave-one-replication-out inside the IARI field) chooses the models and estimates their accuracy on new plots of the same field. Independent testing then applies the frozen final models once to data from research farms and farmers\' fields at Bharatpur (Step A7), with other soils, varieties, management and a natural epidemic ([[F:twostage]]). This is a test, not a validation: nothing is selected, tuned or retrained on the Bharatpur data.')
+FIG('twostage', 'g28_twostage.png', 'Internal validation inside the IARI field and independent testing on Bharatpur data with frozen models.', 560)
 STEP('2.7.1', 'Final models trained on all IARI data and frozen',
      'Models for an independent test must be fixed before the test data are seen.',
      'All IARI post-symptomatic samples (1920 per camera); the selection and tuning procedure of Objectives 1 and 2.',
      'Frozen final models with their selected features, hyper-parameters and standardisation constants → Steps 2.7.2–2.7.3.',
-     ['Repeat feature selection and tuning on all IARI data with grouped inner cross-validation (folds by plot), exactly as in the first stage.',
+     ['Repeat feature selection and tuning on all IARI data with grouped inner cross-validation (folds by plot), exactly as in the internal validation.',
       'Train the final models on all IARI data: the best machine-learning model and the best deep-learning model of each task, for the three best sensor sets, the full set (S15) and the best low-cost set without the hyperspectral camera.',
       'Store the selected features, hyper-parameters, standardisation means and standard deviations, and the trained weights; nothing is changed afterwards.'],
      'Final model refitted on all development data after nested validation: Cawley and Talbot (2010), Kuhn and Johnson (2013).')
 STEP('2.7.2', 'Processing of the Bharatpur data with the same steps',
-     'The validation data must pass through exactly the same processing, otherwise differences in processing would look like model errors.',
+     'The test data must pass through exactly the same processing, otherwise differences in processing would look like model errors.',
      'Bharatpur images, quadrat polygons, severity grades and covariates (Step A7).',
      'Bharatpur feature tables in the same layout as the IARI tables → Step 2.7.3.',
      ['Apply Activities B–D unchanged: calibration, mosaics, quality control, co-registration, resampling, quadrat means and feature extraction.',
@@ -616,19 +652,19 @@ STEP('2.7.2', 'Processing of the Bharatpur data with the same steps',
       'Features that need a healthy reference (difference from healthy plots, healthy-normalised features) are used only where a fungicide-protected strip exists; otherwise models without these features are used (canopy minus air temperature and the normalised relative canopy temperature need no healthy reference).'],
      'Processing fixed on the development data and applied to new data: Kuhn and Johnson (2013); same-sensor protocols across sites: Aasen et al. (2018).')
 STEP('2.7.3', 'Application and evaluation of the frozen models',
-     'Shows how accurate the models are on new fields and how much accuracy is lost compared with the first stage.',
+     'Shows how accurate the models are on new fields and how much accuracy is lost compared with the internal validation.',
      'Frozen models; Bharatpur feature tables and severity grades.',
-     'Second-stage accuracy tables and the loss of accuracy from stage 1 to stage 2 → conclusions on transferability.',
+     'Independent test accuracy tables and the loss of accuracy from the internal validation to the independent test → conclusions on transferability.',
      ['Predict every Bharatpur quadrat-date once with each frozen model; no retraining or re-tuning.',
       'Compute the same metrics as in Activity 2.4 (overall accuracy, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD).',
-      'Report the results for research farms and farmers\' fields separately, by variety and by growth stage, and the difference from the first-stage accuracy.',
+      'Report the results for research farms and farmers\' fields separately, by variety and by growth stage, and the difference from the accuracy of the internal validation.',
       'As a second, clearly labelled result, re-standardise the features with the means and standard deviations of the Bharatpur data (no labels used) to show how much of any loss comes from a simple shift between sites.',
       'Test the covariate models (Step 2.5.5) on Bharatpur weather as well; this is the first test of the weather effect outside the IARI season data.'],
      'Independent external test after internal validation: Ma et al. (2026); spatial transfer and loss of accuracy at new locations: Ploton et al. (2020), Roberts et al. (2017); cross-scale transfer of UAV disease models: Yuan et al. (2025).')
-TAB('twostaget', [['Item', 'First stage (internal)', 'Second stage (independent)'], ['Data', 'IARI field, 48 plots, 13 dates', 'Bharatpur research farms and farmers\' fields'],
-    ['Infection', 'artificial inoculation (10 January 2027)', 'natural epidemic'], ['Design', 'leave-one-replication-out, nested', 'frozen final models applied once'],
+TAB('twostaget', [['Item', 'Validation (internal, IARI field)', 'Independent testing (Bharatpur)'], ['Data', 'IARI field, 48 plots, 13 dates', 'Bharatpur research farms and farmers\' fields'],
+    ['Infection', 'artificial inoculation (30 December 2026)', 'natural epidemic'], ['Design', 'leave-one-replication-out, nested', 'frozen final models applied once'],
     ['Used for', 'feature selection, tuning, model choice, accuracy on new plots', 'accuracy on new fields, varieties and management'], ['Varieties', 'PM 26, Pusa Vijay, PM 37', 'local varieties (recorded)']],
-    'The two validation stages.', [2000, 3600, 3706])
+    'Internal validation and independent testing.', [2000, 3600, 3706])
 STEP('2.7.4', 'Severity maps of farmers\' fields',
      'Farm-level maps show whether the models are useful where decisions are made.',
      'Frozen best models; Bharatpur images.', 'Severity maps of the farmers\' fields with the scored quadrats overlaid → reporting.',
@@ -643,13 +679,13 @@ H2('Activity 3.1 – Pre-symptomatic samples and labels')
 STEP('3.1.1', 'Labels from the later status of each subplot',
      'Before symptoms the visual score is zero everywhere; labels must come from what happens later.',
      'Pre-symptomatic subplot tables; scores of the first post-symptomatic date.', 'Labelled pre-symptomatic dataset → Activity 3.2.',
-     ['Classification: healthy = subplots of the 12 healthy plots; infected = inoculated subplots that show pustules later; inoculated subplots that never show symptoms are excluded from the infected class.', 'Regression: target = severity score of the same subplot on the first post-symptomatic date.', 'Record days after inoculation for every sample.'],
+     ['Classification: healthy = subplots of the 12 healthy plots; infected = inoculated subplots that show pustules later; inoculated subplots that never show symptoms are excluded from the infected class (the same labels as Activity 1.8).', 'Regression: target = disease index of the same subplot on the first post-symptomatic date.', 'Record days after inoculation for every sample.'],
      'Zhu et al. (2017); Tian et al. (2021); Mahlein et al. (2019); Yu et al. (2021) for the early stage of pine wilt disease.')
-STEP('3.1.2', 'Physiological changes before symptoms (18 January 2027)',
+STEP('3.1.2', 'Physiological changes before symptoms (7 January 2027)',
      'If pigments, water status or gas exchange already change before pustules appear, there is a physiological reason why pre-symptomatic detection can work.',
-     'Biochemical and biophysical parameters of 18 January (Step A8); later severity of the same plots.',
+     'Biochemical and biophysical parameters of 7 January (Step A8); later severity of the same plots.',
      'Inoculated − healthy differences on the pre-symptomatic date and their relation with later severity → interpretation of Objective 3.',
-     ['Compare inoculated and healthy plots for every parameter with the paired comparison of Step 1.7.2 (12 pairs).', 'Correlate the pre-symptomatic parameters of the inoculated plots with their percent disease index on 28 January (first post-symptomatic sampling date).', 'Report effect sizes and 95% confidence intervals; note the block and fungicide caveat of Step 1.7.2.'],
+     ['Compare inoculated and healthy plots for every parameter with the paired comparison of Step 1.7.2 (12 pairs).', 'Correlate the pre-symptomatic parameters of the inoculated plots with their disease index on 18 January (first post-symptomatic sampling date of Step A8).', 'Report effect sizes and 95% confidence intervals; note the block and fungicide caveat of Step 1.7.2.'],
      'Pre-visual physiological changes behind early detection: Zarco-Tejada et al. (2018), Calderón et al. (2013); pre-symptomatic hyperspectral detection: Zhu et al. (2017).')
 H2('Activity 3.2 – Normalisation to healthy plots')
 STEP('3.2.1', 'Healthy-plot normalisation of all features',
@@ -661,7 +697,7 @@ H2('Activity 3.3 – Pre-symptomatic feature selection')
 STEP('3.3.1', 'Selection with the pre-symptomatic labels',
      'Features that respond after symptoms are not necessarily the earliest responders.',
      'Healthy-normalised feature groups (training part).', 'Pre-symptomatic feature sets of each camera and sensor set → Activity 3.4.',
-     ['Repeat the one-method-per-type selection with the pre-symptomatic labels: SHAP-CARS for bands, ReliefF for indices (two classes) or RReliefF (later score), mRMR for texture, the TTFI search, the redundancy filter and the variance inflation factor.', 'Fuse the camera sets for the 15 sensor sets and run sequential floating forward selection for the machine-learning models, limited to 10 features because the training part is smaller.'],
+     ['Start from the pre-symptomatic feature sets of Activity 1.8 and repeat the one-method-per-type selection with the pre-symptomatic labels inside every training fold: SHAP-CARS for bands, ReliefF for indices (two classes) or RReliefF (later score), mRMR for texture, the TTFI search, the redundancy filter and the variance inflation factor.', 'Fuse the camera sets for the 15 sensor sets and run sequential floating forward selection for the machine-learning models, limited to 10 features because the training part is smaller.'],
      'Tian et al. (2021); Ma et al. (2026); early spectral changes in rusts and mildews: Terentev et al. (2023), Zhu et al. (2017).')
 H2('Activity 3.4 – Pre-symptomatic models')
 STEP('3.4.1', 'Models for the 15 sensor sets',
@@ -676,8 +712,8 @@ STEP('3.5.1', 'Pre-symptomatic metrics, area under the curve (AUC) and earliest 
      ['Classification: sensitivity, specificity, balanced accuracy and AUC; regression: R² and RMSE of the later score.', 'Compute balanced accuracy separately for each pre-symptomatic date; the earliest detection day is the first date on which it reaches 0.70 ([[F:earliest]]).', 'Report the earliest detection day separately for each variety and inoculation timing.'],
      'Fawcett (2006); Mahlein et al. (2019); Zarco-Tejada et al. (2018).')
 FIG('earliest', 'g23_dummy_earliest.png', 'Dummy example of balanced accuracy by days after inoculation and the earliest detection day of each sensor set.', 460)
-TAB('earlyex', [['Pre-symptomatic flight (days after inoculation)', '12 Jan (2)', '15 Jan (5)', '18 Jan (8)'], ['Hyperspectral + thermal: balanced accuracy (dummy)', '0.58', '0.66', '0.74'], ['Red–green–blue: balanced accuracy (dummy)', '0.48', '0.52', '0.57']],
-    'Worked example (dummy data): the hyperspectral + thermal set reaches 0.70 on 18 January (earliest detection day = 8 days after inoculation), while the red–green–blue set does not reach it before symptoms.', [3700, 1868, 1868, 1870])
+TAB('earlyex', [['Pre-symptomatic flight (days after inoculation)', '1 Jan (2)', '4 Jan (5)', '7 Jan (8)'], ['Hyperspectral + thermal: balanced accuracy (dummy)', '0.58', '0.66', '0.74'], ['Red–green–blue: balanced accuracy (dummy)', '0.48', '0.52', '0.57']],
+    'Worked example (dummy data): the hyperspectral + thermal set reaches 0.70 on 7 January (earliest detection day = 8 days after inoculation), while the red–green–blue set does not reach it before symptoms.', [3700, 1868, 1868, 1870])
 CARD('roc', 'Receiver operating characteristic analysis and earliest detection day', 'The receiver operating characteristic curve plots sensitivity against 1 − specificity for all thresholds; its area (AUC) is the probability that an infected sample scores higher than a healthy one. The earliest detection day is the first date on which balanced accuracy reaches a set level.',
      'Measures early-warning ability independently of the class balance and threshold; gives a simple "how early" answer.', 'AUC and balanced accuracy per date; level 0.70.',
      'Level 0.70 (fixed in advance; 0.65 and 0.75 reported as checks).', 'Binary early-warning problems with unequal classes.',
@@ -691,11 +727,11 @@ STEP('3.5.3', 'Covariate baseline for the pre-symptomatic stage',
      'Before symptoms, infection depends strongly on weather after inoculation and on variety; the cameras must be shown to detect more than these factors.',
      'Covariates (Step A6) of the pre-symptomatic dates; pre-symptomatic models.',
      'Accuracy of the covariate-only model compared with the sensor models → evidence that the early signal comes from the plants.',
-     ['Fit the best machine-learning model with days after inoculation, variety, inoculation timing, growth stage and the weather summaries only.', 'Report the sensor models and the best sensor set + covariates next to it, as in Step 2.5.5.'],
+     ['Fit the best machine-learning model with days after inoculation, variety, inoculation timing, growth stage and the weather summaries only.', 'Report the sensor models and the best sensor set + covariates next to it, with the same B1/B2 baselines, bootstrap intervals and real-gain rule as in Step 2.5.5.'],
      'Zhang et al. (2014); Chattopadhyay et al. (2011); Zhu et al. (2017).')
-STEP('3.5.4', 'Second-stage validation of the pre-symptomatic models',
+STEP('3.5.4', 'Independent testing of the pre-symptomatic models',
      'Early-warning models also need an independent test, but pre-symptomatic labels require a flight before symptoms and a later visit of the same quadrats.',
      'Bharatpur quadrats flown before symptoms and scored later (Step A7); a fungicide-protected healthy strip for the healthy-plot normalisation.',
-     'Second-stage accuracy of the pre-symptomatic models, where the data allow → conclusions on early warning.',
-     ['Apply the frozen pre-symptomatic models (trained on all IARI pre-symptomatic data) to quadrats flown before symptoms and labelled from their later status.', 'Use the protected strip as the healthy reference; where no early flight or healthy reference exists, the pre-symptomatic models are validated in the first stage only, and this is stated.'],
+     'Independent test accuracy of the pre-symptomatic models, where the data allow → conclusions on early warning.',
+     ['Apply the frozen pre-symptomatic models (trained on all IARI pre-symptomatic data) to quadrats flown before symptoms and labelled from their later status.', 'Use the protected strip as the healthy reference; where no early flight or healthy reference exists, the pre-symptomatic models are evaluated with the internal validation only, and this is stated.'],
      'Ma et al. (2026); Zhu et al. (2017); Zarco-Tejada et al. (2018).')
