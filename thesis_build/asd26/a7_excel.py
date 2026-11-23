@@ -67,10 +67,9 @@ rows = [('1_Data', 'Common Activity A', 'leaf metadata and smoothed reflectance 
         ('21_Strata', 'Activity 2.6', 'results by stage, variety, leaf position, date and timing'),
         ('22_Transfer', 'Step 2.6.2', 'leave-one-variety-out and leave-one-timing-out tests'),
         ('23_Weather_covariates', 'Step A6', 'daily weather, 7-day summaries and disease progress'),
-        ('24_Exploratory', 'Objective 3 (proxy)', 'symptomless leaves of unsprayed plots vs leaves of the sprayed healthy plots'),
-        ('25_Stability', 'Step 2.5.4', 'selection frequency across folds and models'),
-        ('26_Covariate_baseline', 'Step 2.5.5', 'covariates by date, models × inputs, M0/M1/M2 gains (formulas) with plot-block bootstrap intervals, DeLong tests, interpretable model; charts'),
-        ('27_References', '—', 'references of the methods')]
+        ('24_Stability', 'Step 2.5.4', 'selection frequency across folds and models'),
+        ('25_Covariate_baseline', 'Step 2.5.5', 'covariates by date, models × inputs, M0/M1/M2 gains (formulas) with plot-block bootstrap intervals, DeLong tests, interpretable model; charts'),
+        ('26_References', '—', 'references of the methods')]
 table(ws, 4, 1, pd.DataFrame(rows, columns=['Sheet', 'Methodology step', 'Content']))
 ws['A34'] = 'Assumptions and settings'; ws['A34'].font = Font(name=AR, bold=True)
 notes = ['Plot plan from the field layout (healthy block plots 1–12; R3 13–24; R2 25–36; R1 37–48; treatment codes D×V) – confirmed by the user.',
@@ -84,14 +83,14 @@ for i, n in enumerate(notes): ws.cell(35 + i, 1, n).font = NF
 ws['A43'] = 'Workflow from data collection to discussion (where each step is in this workbook and in the Word report)'; ws['A43'].font = Font(name=AR, bold=True)
 WF = [('1', 'Field experiment', '48 plots: healthy (fungicide-sprayed) block + R1–R3 unsprayed; 3 varieties × 4 sowing dates (50, 40, 30, 20 DAS); natural infection', '—', '2.1'),
       ('2', 'Leaf spectra and scoring', 'ASD contact probe on L3, L5, LL leaves of all 48 plots on 11 Feb, 24 Feb, 3 Mar, 13 Mar 2026; 0–9 grade of every leaf', '1_Data, 2_Counts', '2.2'),
-      ('3', 'Weather and covariates', 'IARI observatory daily weather; 7-day windows ending the day before each date; favourable days since sowing; crop age (DAS), timing, variety, stage', '23_Weather_covariates, 26_Covariate_baseline', '2.3'),
+      ('3', 'Weather and covariates', 'IARI observatory daily weather; 7-day windows ending the day before each date; favourable days since sowing; crop age (DAS), timing, variety, stage', '23_Weather_covariates, 25_Covariate_baseline', '2.3'),
       ('4', 'Data organisation and QC', 'parse four files, join layout, labels, derived fields, range and missing-value checks, fold of each plot', '1_Data, 2_Counts', '2.4'),
       ('5', 'Tasks and validation', 'A detection, B six grades, C score; leave-one-replication-out with rotated healthy plots; inner folds by plot', '13_Fold_selection', '2.5–2.6'),
       ('6', 'Pre-processing and features', 'Savitzky–Golay, first derivative, 5-nm bands, 41 indices + red-edge parameters', '3_Mean_spectra, 4_First_derivative, 9_Indices_formulas, 10_Indices_values', '2.7–2.8'),
       ('7', 'Objective 1', 'spectral response, NDSI/RSI maps, SHAP-CARS, WRI, ReliefF, VIF → disease-specific features', '5_Correlation to 12_VIF_DSF', '2.9, 3.1–3.7'),
       ('8', 'Objective 2', 'SFFS + tuned machine learning, deep learning (DT-EDNet and others), metrics', '14_ML_SFFS to 19_DL_config_ablation', '2.10, 3.8–3.10'),
-      ('9', 'Covariate baseline', 'models without sensor data vs spectra vs spectra + covariates; gains with bootstrap and DeLong', '26_Covariate_baseline', '2.11, 3.12'),
-      ('10', 'Interpretation and robustness', 'SHAP, strata, transfer tests, selection stability, exploratory symptomless test', '20_SHAP, 21_Strata, 22_Transfer, 24_Exploratory, 25_Stability', '2.12, 3.11, 3.13'),
+      ('9', 'Covariate baseline', 'models without sensor data vs spectra vs spectra + covariates; gains with bootstrap and DeLong', '25_Covariate_baseline', '2.11, 3.12'),
+      ('10', 'Interpretation and robustness', 'SHAP, strata, transfer tests, selection stability', '20_SHAP, 21_Strata, 22_Transfer, 24_Stability', '2.12, 3.11'),
       ('11', 'Discussion and conclusions', 'physical basis, grade overlap, ML vs DL, role of covariates, limitations, UAV implications', '—', '4, 5')]
 header(ws, 44, 1, ['Step', 'Stage', 'What was done', 'Workbook sheets', 'Word report section'])
 for i, r_ in enumerate(WF):
@@ -356,8 +355,7 @@ widths(ws, 14)
 # ------------------------------------------------------------------ 21-25 tables with charts
 for name, fn, ttl, key in (('21_Strata', 'strata_metrics.csv', 'Results by stratum (best ML and best DL model; pooled test predictions)', None),
                            ('22_Transfer', 'transfer_tests.csv', 'Leave-one-variety-out and leave-one-timing-out (random forest; selection repeated in each training set)', None),
-                           ('24_Exploratory', 'exploratory_asymptomatic.csv', 'Symptomless leaves of unsprayed plots (grade 0) vs leaves of the sprayed healthy plots (exploratory, leave-one-replication-out)', 'balanced_acc'),
-                           ('25_Stability', 'selection_stability.csv', 'Selection frequency across the three outer folds and models', None)):
+                           ('24_Stability', 'selection_stability.csv', 'Selection frequency across the three outer folds and models', None)):
     ws = sheet(name, ttl)
     if os.path.exists(D + fn):
         d = pd.read_csv(D + fn); e = table(ws, 4, 1, d, '0.000')
@@ -366,7 +364,7 @@ for name, fn, ttl, key in (('21_Strata', 'strata_metrics.csv', 'Results by strat
 ws = wb['22_Transfer'] if '22_Transfer' in wb.sheetnames else None
 
 # ------------------------------------------------------------------ 23 Weather and covariates
-ws = sheet('23_Weather_covariates', 'Weather (IARI observatory), 7-day summaries and disease progress', 'The covariate baseline model (Step 2.5.5) is in sheet 26_Covariate_baseline.')
+ws = sheet('23_Weather_covariates', 'Weather (IARI observatory), 7-day summaries and disease progress', 'The covariate baseline model (Step 2.5.5) is in sheet 25_Covariate_baseline.')
 if os.path.exists(D + 'weather_season.csv'):
     Wd = pd.read_csv(D + 'weather_season.csv')[['date', 'Tmax', 'Tmin', 'rain', 'RH1', 'RH2', 'wind', 'BSS', 'evap']]; Wd['date'] = Wd.date.str[:10]
     e = table(ws, 4, 1, Wd, '0.0'); ch = LineChart(); ch.add_data(Reference(ws, min_col=2, max_col=3, min_row=4, max_row=e), titles_from_data=True); ch.set_categories(Reference(ws, min_col=1, min_row=5, max_row=e)); ch.x_axis.tickLblSkip = 14
@@ -378,12 +376,12 @@ if os.path.exists(D + 'weather_season.csv'):
     DC = CL(meta_cols.index('date') + 1); DR = "'1_Data'!$%s$5:$%s$%d" % (DC, DC, NROW); DSR = "'1_Data'!$%s$5:$%s$%d" % (CL(meta_cols.index('diseased') + 1), CL(meta_cols.index('diseased') + 1), NROW)
     for i, dt in enumerate(sorted(M.date.unique())):
         rr = e2 + 4 + i; ws.cell(rr, 22, dt); ws.cell(rr, 23, '=COUNTIF(%s,V%d)' % (DR, rr)); ws.cell(rr, 24, '=AVERAGEIFS(%s,%s,V%d)' % (GRANGE, DR, rr)).number_format = '0.00'; ws.cell(rr, 25, '=AVERAGEIFS(%s,%s,V%d)' % (DSR, DR, rr)).number_format = '0.0%'
-    ws.cell(e2 + 10, 22, 'Covariate baseline (Step 2.5.5): see sheet 26_Covariate_baseline').font = Font(name=AR, bold=True)
+    ws.cell(e2 + 10, 22, 'Covariate baseline (Step 2.5.5): see sheet 25_Covariate_baseline').font = Font(name=AR, bold=True)
 widths(ws, 11)
 
 # ------------------------------------------------------------------ 26 Covariate baseline
 if os.path.exists(D + 'cov2_metrics.csv'):
-    ws = sheet('26_Covariate_baseline', 'Covariate baseline model without sensor data (Step 2.5.5) – unsprayed, naturally infected leaves only',
+    ws = sheet('25_Covariate_baseline', 'Covariate baseline model without sensor data (Step 2.5.5) – unsprayed, naturally infected leaves only',
                'Static values were computed in Python (a11_covariate.py); black cells are Excel formulas. Weather windows end the day before each date (no look-ahead). Favourable days after Chattopadhyay et al. (2011).')
     BF = Font(name=AR, bold=True, size=11, color='1F3864')
     # 1. covariates by date
@@ -448,7 +446,7 @@ if os.path.exists(D + 'cov2_metrics.csv'):
     widths(ws, 13); ws.column_dimensions['A'].width = 16; ws.column_dimensions['B'].width = 20; ws.column_dimensions['C'].width = 26; ws.column_dimensions['D'].width = 24; ws.column_dimensions['M'].width = 18; ws.column_dimensions['P'].width = 22
 
 # ------------------------------------------------------------------ 27 References
-ws = sheet('27_References', 'References of the methods used in this workbook')
+ws = sheet('26_References', 'References of the methods used in this workbook')
 refs = json.load(open(D + 'refs_used.json')) if os.path.exists(D + 'refs_used.json') else []
 for i, rf in enumerate(refs): ws.cell(3 + i, 1, rf).font = NF
 ws.column_dimensions['A'].width = 180

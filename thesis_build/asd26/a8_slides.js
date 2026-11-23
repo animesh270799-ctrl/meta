@@ -1,4 +1,4 @@
-// Seminar slides: methodology -> results (Objectives 1, 2, exploratory 3) -> discussion -> conclusions. Native charts where PowerPoint can draw them.
+// Seminar slides: methodology -> results (Objectives 1 and 2; Objective 3 not addressed: no pre-symptomatic dates) -> discussion -> conclusions. Native charts where PowerPoint can draw them.
 const { pres, sec, slide, bullets, card, img, caption, chart, tbl, DATA, FG, GRADE_COLS, OUT, THEME, applyTheme, W } = require('./a8_ppt.js');
 const C = pres.SchemeColor;
 const GR = [0, 1, 3, 5, 7, 9];
@@ -32,7 +32,7 @@ const lineData = obj => obj.series.map(s => ({ name: s.name, labels: obj.labels,
 // =============================== TITLE
 let s = pres.addSlide({ masterName: 'TITLE' });
 s.addText('Leaf-level hyperspectral detection and severity estimation of white rust in Indian mustard', { placeholder: 'title' });
-s.addText([{ text: 'ASD contact-probe spectra, 2025-26 season: four dates pooled, 2339 leaves', options: { breakLine: true } }, { text: 'Animesh Panda | Ph.D. Agricultural Physics | ICAR-IARI, New Delhi', options: { breakLine: true } }, { text: 'Objective 1: spectral response and features | Objective 2: machine and deep learning | exploratory Objective 3' }], { placeholder: 'body' });
+s.addText([{ text: 'ASD contact-probe spectra, 2025-26 season (natural infection): four dates pooled, ' + N + ' leaves (L3, L5, LL)', options: { breakLine: true } }, { text: 'Animesh Panda | Ph.D. Agricultural Physics | ICAR-IARI, New Delhi', options: { breakLine: true } }, { text: 'Objective 1: spectral response and features | Objective 2: machine and deep learning' }], { placeholder: 'body' });
 s.addNotes('Title. This talk presents the complete analysis of the 2025-26 leaf spectra, from methodology to discussion.');
 
 s = slide('Outline', 'Order of the talk.');
@@ -53,7 +53,8 @@ s.addText('Methods of the DT-EDNet rice-blast study (Ma et al., 2026) are applie
 s = slide('Objectives of this analysis');
 card(s, 0.5, 1.3, 3.95, 3.3, 'Objective 1', 'Spectral response of leaves to white rust severity and a compact disease-specific feature set (optimal wavelengths, White Rust Index, ReliefF indices, VIF).', undefined, undefined, 18);
 card(s, 4.68, 1.3, 3.95, 3.3, 'Objective 2', 'Models for (A) detection, (B) six grades and (C) severity score: SVM, RF, XGBoost, k-NN, PLS-DA/PLSR, DNN-F1, DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2-Atto; ablation, SHAP and robustness.', '7030A0', 'EDE2F6', 18);
-card(s, 8.86, 1.3, 3.95, 3.3, 'Objective 3 (exploratory)', 'Do symptomless leaves of unsprayed plots differ from leaves of the sprayed healthy plots? The full pre-symptomatic objective needs the 2026-27 flights.', 'B71C1C', 'F9E0DE', 18);
+card(s, 8.86, 1.3, 3.95, 3.3, 'Reference without sensors', 'Covariate baseline (Step 2.5.5): what do crop age, sowing timing, variety, growth stage and weather explain without spectra, and what do the spectra add?', 'C98A00', 'FFF4D6', 18);
+s.addText('Objective 3 (pre-symptomatic detection) is not addressed: no pre-symptomatic dates were sampled in 2025-26; it is planned for the 2026-27 flights.', { x: 0.5, y: 6.4, w: 12.3, h: 0.45, fontSize: 13, italic: true, color: 'B71C1C', isTextBox: true, fit: 'shrink' });
 stat(s, 0.5, 4.95, 3.95, 'Task A', 'detection: healthy vs diseased leaf'); stat(s, 4.68, 4.95, 3.95, 'Task B', 'six grades 0, 1, 3, 5, 7, 9', '7030A0'); stat(s, 8.86, 4.95, 3.95, 'Task C', 'severity score 0–9 (regression)', 'B71C1C');
 
 // =============================== METHODS
@@ -104,7 +105,7 @@ flow(s, [['Pseudo-image', 'k × k, 1 channel'], ['Embedding', '3 × 3 conv, 128 
 bullets(s, ['Ablation: without SE, without the dual transformer group (DTG), without both.', 'Comparison networks from the same paper: EfficientNet-B0 (Tan and Le, 2019), ResNet18 (He et al., 2016), ConvNeXt V2 (Woo et al., 2023).', 'Feature configurations compared: optimal wavelengths (OW), selected indices (VI), disease-specific set (DSF).'], 0.5, 3.9, 12.3, 2.6, 15);
 s = slide('Evaluation and interpretation', 'Metrics and additional analyses.');
 tbl(s, [['Metric', 'Meaning'], ['OA, kappa', 'accuracy; agreement beyond chance (Cohen, 1960)'], ['Macro-F1', 'mean F1 of classes; small classes count equally'], ['AUC', 'area under the ROC curve (Fawcett, 2006)'], ['QWK', 'weighted kappa, ordinal grades (Cohen, 1968)'], ['R², RMSE, RPD', 'regression; RPD = SD/RMSE (Williams, 2001)']], 0.5, 1.3, 6.2, [1.8, 4.4], 15);
-bullets(s, ['SHAP of XGBoost on the disease-specific set', 'Strata: stage, variety, leaf position, date', 'Leave-one-variety-out and leave-one-timing-out', 'Selection stability across folds', 'Covariate baseline without sensor data (next three slides)', 'Exploratory: symptomless unsprayed vs sprayed healthy-plot leaves', 'Final models refitted on all leaves and saved'], 7.0, 1.3, 5.8, 5.2, 17);
+bullets(s, ['SHAP of XGBoost on the disease-specific set', 'Strata: stage, variety, leaf position, date', 'Leave-one-variety-out and leave-one-timing-out', 'Selection stability across folds', 'Covariate baseline without sensor data (next three slides)', 'Final models refitted on all leaves and saved'], 7.0, 1.3, 5.8, 5.2, 17);
 
 s = slide('Covariate baseline: purpose and inputs', 'Step 2.5.5. A model built WITHOUT spectra, from what is known about the leaf, plot and season. The spectra are credited only with what they add to it.');
 card(s, 0.5, 1.25, 6.0, 4.3, 'Why a model without sensor data?', '• Calendar effect: severity rises with crop age and sampling date and differs with variety, sowing timing, stage and weather; a spectral model can look good only by learning the calendar (De Wolf and Isard, 2007).\n• Weather alone predicted disease severity (Bijlwan et al., 2025).\n• Sensors add to weather: reflectance + meteorological data raised accuracy from 69% to 78% for wheat powdery mildew (Zhang et al., 2014; Ruan et al., 2022).\n• Rule: spectra are useful only if they beat the covariate-only model (Kuhn and Johnson, 2013).', '1565C0', 'E3F2FD', 14);
@@ -120,7 +121,7 @@ s = slide('Covariate baseline: gain of the spectra and decision rule', 'Three ou
 card(s, 0.5, 1.25, 6.0, 2.1, 'Gains', 'ΔS (spectra) = metric(M1) − metric(M0)\nΔC (covariates added) = metric(M2) − metric(M1)\nΔT (both) = metric(M2) − metric(M0)\nA: macro-F1, AUC, balanced accuracy;  B: macro-F1, QWK;  C: R², RMSE', '1565C0', 'E3F2FD', 15);
 card(s, 0.5, 3.55, 6.0, 2.95, 'Is the gain real?', '• Plot-block bootstrap: 2000 resamples of whole plots → 95% CI of Δ (Efron and Tibshirani, 1993).\n• Detection AUC: DeLong test of correlated ROC curves (DeLong et al., 1988).\n• Real gain = CI excludes 0 AND |Δ| > fold-to-fold SD AND same sign in all three folds.', undefined, undefined, 15);
 tbl(s, [['Outcome', 'Meaning'], ['M1 > M0 (CI above 0)', 'spectra see disease beyond calendar and stage'], ['M1 ≈ M0', 'spectra mainly track time or stage'], ['M2 > M1', 'known context adds information (within-season use)'], ['M0 high only for detection', 'epidemic level follows time; spectral value lies in grading']], 6.8, 1.25, 6.0, [2.4, 3.6], 14);
-s.addText('Healthy vs later-infected (pre-symptomatic) leaves cannot be separated by covariates; the baseline therefore applies to detection, grades and score.', { x: 6.8, y: 4.6, w: 6.0, h: 1.2, fontSize: 14, italic: true, color: '2C5F2D', isTextBox: true, fit: 'shrink' });
+s.addText('The baseline is applied to all three tasks (detection, six grades, severity score) on the same folds as the spectral models.', { x: 6.8, y: 4.6, w: 6.0, h: 1.2, fontSize: 14, italic: true, color: '2C5F2D', isTextBox: true, fit: 'shrink' });
 
 // =============================== RESULTS OBJECTIVE 1
 sec('Results – Objective 1', 'Spectral response and disease-specific features');
@@ -263,13 +264,6 @@ if (DATA.cov2_coef && DATA.cov2_coef.length) {
   const oc = k => (DATA.cov2_coef.find(r => r.model.startsWith('Ordinal') && r.term === k) || {}).estimate;
   s.addText('Crop age (DAS) ' + (oc('DAS') > 0 ? 'raises' : 'lowers') + ' the grade' + (oc('DAS2') < 0 ? ' at a slowing rate' : '') + '; at the same crop age the latest sowing D4 ' + (oc('timing_D4') > 0 ? 'raises' : 'lowers') + ' it and V3 ' + (oc('variety_V3') > 0 ? 'raises' : 'lowers') + ' it. Weather is not in B1: with four dates it is collinear with date and timing.', { x: 0.5, y: 6.6, w: 12.3, h: 0.4, fontSize: 12, italic: true, color: '2C5F2D', isTextBox: true, fit: 'shrink' });
 }
-if (DATA.exploratory) {
-  s = slide('Exploratory: symptomless leaves (Objective 3 proxy)', 'Grade-0 leaves of unsprayed plots vs leaves of the sprayed healthy plots.');
-  img(s, FG + 'f28_asymptomatic.png', 0.5, 1.3, 8.0, 4.0);
-  const eb = DATA.exploratory.reduce((a, b) => (b.balanced_acc > a.balanced_acc ? b : a));
-  stat(s, 8.9, 1.4, 3.9, f2(eb.balanced_acc), 'best balanced accuracy (' + eb.model + ')', 'B71C1C');
-  bullets(s, ['Groups also differ in fungicide treatment → only a hint of a pre-visual signal.', 'Proper test: the three pre-symptomatic flights of 2026-27.'], 8.9, 3.0, 3.9, 3.2, 14);
-}
 
 // =============================== DISCUSSION
 sec('Discussion', 'What the results mean');
@@ -285,7 +279,7 @@ s = slide('Machine learning vs deep learning; role of covariates');
 card(s, 0.5, 1.3, 6.0, 4.2, 'Models', (HASDL ? 'All models within about one fold SD: best network ' + BEST.B.DL + ' ' + f3(row('B', BEST.B.DL).macro_F1) + ' vs ' + BEST.B.ML + ' ' + f3(row('B', BEST.B.ML).macro_F1) + ' (six grades); DT-EDNet ' + f3(dte.B.macro_F1) + '. ' : '') + 'With 10–16 features the 4 × 4 pseudo-images carry little spatial pattern (Sharma et al., 2019). The DT-EDNet advantage reported for rice canopies (Ma et al., 2026) is expected on UAV hyperspectral images.', '7030A0', 'EDE2F6', 17);
 card(s, 6.8, 1.3, 6.0, 4.2, 'Covariates and weather', '• Without spectra the covariates reached detection macro-F1 ' + f2(m0v('A', 'macro_F1')) + ' (AUC ' + f2(m0v('A', 'AUC')) + '): inside unsprayed plots healthy leaves occur mainly on the first date, so the calendar detects disease (spectra alone ΔS ' + cg('A', 'macro_F1', 'ΔS').delta.toFixed(3) + ').\n• For severity the spectra add what the calendar cannot: ΔS ' + (cg('B', 'macro_F1', 'ΔS').delta >= 0 ? '+' : '') + cg('B', 'macro_F1', 'ΔS').delta.toFixed(3) + ' macro-F1 (grades), ' + (cg('C', 'R2', 'ΔS').delta >= 0 ? '+' : '') + cg('C', 'R2', 'ΔS').delta.toFixed(3) + ' R² (score); with covariates ΔT +' + cg('B', 'macro_F1', 'ΔT').delta.toFixed(3) + ' and +' + cg('C', 'R2', 'ΔT').delta.toFixed(3) + ' R².\n• Weather soon left the favourable range (Chattopadhyay et al., 2011); four dates are too few to test it independently.', undefined, undefined, 15);
 s = slide('Limitations and implications for the UAV phase');
-card(s, 0.5, 1.3, 6.0, 3.9, 'Limitations', '• One season, one location (Bharatpur validation next).\n• Subjective leaf grades; grade 9 small (' + DATA.grade_n['9'] + ' leaves).\n• Stage and date confounded.\n• Networks on CPU with paper settings, no tuning.\n• No pre-symptomatic dates in 2025-26.', 'B71C1C', 'F9E0DE', 18);
+card(s, 0.5, 1.3, 6.0, 3.9, 'Limitations', '• One season, one location (Bharatpur validation next).\n• Subjective leaf grades; grade 9 small (' + DATA.grade_n['9'] + ' leaves).\n• Stage and date confounded.\n• Networks on CPU with paper settings, no tuning.\n• No pre-symptomatic dates in 2025-26 → Objective 3 not addressed.', 'B71C1C', 'F9E0DE', 18);
 card(s, 6.8, 1.3, 6.0, 3.9, 'Implications', '• Key regions: red edge 690–760 nm, NIR shoulder 780–870 nm, SWIR water-band edges.\n• Keep hyperspectral derivatives in the UAV features.\n• Detection is realistic at canopy level; report severity as a score or few classes.\n• Final leaf models can check UAV predictions on the sampled leaves.', undefined, undefined, 18);
 
 // =============================== CONCLUSIONS
@@ -300,9 +294,9 @@ s = slide('Cross-check with the methodology', 'All steps that apply to non-imagi
 tbl(s, [['Done', 'Adapted', 'Not applicable to leaf spectra'], ['Design A1, A4–A6; B3, D3, D4; E3, E4; F1–F3', 'Effective ranges: top 5% (no pair R² ≥ 0.5)', 'B1, B2, B4, B5 (image processing); C1–C8 (crop mask)'],
   ['1.1–1.4, 1.6.2; 2.1.1, 2.1.2, 2.1.4, 2.1.5', 'DL: paper settings on CPU, ≤ 100 epochs, no extra tuning', 'D5–D7, 1.5 (texture, TTFI, thermal); 1.3.3 (multispectral)'],
   ['2.2.1–2.2.6; 2.3.1, 2.3.3–2.3.8; 2.4', 'Covariate baseline (B1, RF, best ML; bootstrap, DeLong) on unsprayed plots only', '2.1.3, 2.3.2 (fusion of 15 sensor sets, DNN-F2)'],
-  ['2.5.3–2.5.5; 2.6.1–2.6.2; 2.7.1', 'Objective 3 only as exploratory proxy', '2.6.3 maps; 2.7.2–2.7.4 Bharatpur (next season); 1.7 not measured']], 0.5, 1.3, 12.3, [4.1, 4.1, 4.1], 15);
+  ['2.5.3–2.5.5; 2.6.1–2.6.2; 2.7.1', 'Crop age (DAS) as time variable (natural infection)', '2.6.3 maps; 2.7.2–2.7.4 Bharatpur; 1.7; Objective 3 (no pre-symptomatic dates)']], 0.5, 1.3, 12.3, [4.1, 4.1, 4.1], 15);
 s = slide('Outputs delivered', 'Everything is editable and reproducible.');
-card(s, 0.5, 1.3, 3.95, 3.6, 'Excel workbook', '27 sheets: data, live formulas (counts, mean spectra, correlation, WRI with editable wavelengths, indices, confusion and regression metrics), native charts, the covariate baseline with formula gains and all result tables.', undefined, undefined, 17);
+card(s, 0.5, 1.3, 3.95, 3.6, 'Excel workbook', '26 numbered sheets: data, live formulas (counts, mean spectra, correlation, WRI with editable wavelengths, indices, confusion and regression metrics), native charts, the covariate baseline with formula gains and all result tables.', undefined, undefined, 17);
 card(s, 4.68, 1.3, 3.95, 3.6, 'Word report + PDF', 'Thesis-seminar style: introduction, methods (step cards), results with ' + require('fs').readdirSync(FG).filter(f => f.endsWith('.png')).length + ' figures and editable tables, discussion, conclusions, cross-check, questions and references.', '1565C0', 'E3F2FD', 18);
 card(s, 8.86, 1.3, 3.95, 3.6, 'Model files', (DATA.ml_files ? DATA.ml_files.length : 15) + ' machine-learning models (joblib) and ' + (DATA.dl_files ? DATA.dl_files.length : 15) + ' networks (PyTorch) trained on all leaves, plus 11 covariate-baseline models, with feature definitions and prediction scripts.', '7030A0', 'EDE2F6', 18);
 s.addText('Files: ASD_2025-26_leaf_analysis_white_rust.xlsx | ASD_2025-26_leaf_analysis_white_rust_report.docx / .pdf | ASD_2025-26_leaf_analysis_seminar.pptx | ASD_2025-26_models.zip', { x: 0.5, y: 5.2, w: 12.3, h: 0.8, fontSize: 14, italic: true, color: '2C5F2D', isTextBox: true });

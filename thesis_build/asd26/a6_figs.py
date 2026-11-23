@@ -392,11 +392,6 @@ if os.path.exists(D + 'covariate_baseline.csv'):
         ax.set(ylabel=k.replace('_', '-').replace('R2', 'R²'), ylim=(0, max(d[k]) * 1.18)); ax.set_title({'A': '(a) Detection', 'B': '(b) Six grades', 'C': '(c) Severity score'}[t])
     fig.text(0.5, -0.02, 'Unsprayed (naturally infected) plots only; covariates = variety, sowing timing, days after sowing, growth stage and 7-day weather', ha='center', fontsize=10.5, color='#444')
     plt.tight_layout(); save(fig, 'f27_covariates.png')
-if os.path.exists(D + 'exploratory_asymptomatic.csv'):
-    ex = pd.read_csv(D + 'exploratory_asymptomatic.csv'); fig, ax = plt.subplots(figsize=(10, 5)); x = np.arange(len(ex)); KS = ['balanced_acc', 'AUC', 'sensitivity', 'specificity']; KC = ['#7030A0', '#2E75B6', '#E07B00', '#2E7D32']
-    for i, k in enumerate(KS): bars = ax.bar(x + (i - 1.5) * 0.2, ex[k], 0.2, label=k.replace('_', ' ').replace('acc', 'accuracy'), color=KC[i]); label_bars(ax, bars, '%.2f', fs=9)
-    ax.axhline(0.5, color='#333', ls=':', lw=1); ax.text(len(ex) - 0.5, 0.505, 'chance', fontsize=9.5, ha='right', va='bottom'); ax.set_xticks(x); ax.set_xticklabels(ex.model); ax.set(ylim=(0, 1.05), ylabel='Score'); ax.grid(axis='x', visible=False)
-    ax.set_title('Exploratory: symptomless leaves of unsprayed plots vs sprayed healthy-plot leaves'); ax.legend(ncol=4, loc='upper center', bbox_to_anchor=(0.5, -0.1)); save(fig, 'f28_asymptomatic.png')
 if os.path.exists(D + 'selection_stability.csv'):
     st = pd.read_csv(D + 'selection_stability.csv'); d = st[st.group == 'optimal wavelengths'].sort_values(['folds', 'feature'], ascending=[False, True])
     fig, ax = plt.subplots(figsize=(13, 4.6)); ax.bar(range(len(d)), d.folds, color=[FD_C if f.startswith('FD') else R_C for f in d.feature], width=0.7)

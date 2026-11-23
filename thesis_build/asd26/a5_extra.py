@@ -1,6 +1,5 @@
 """Activity 2.5-2.6 and Step 2.5.5 for the leaf data: metric tables, weather covariates and covariate baseline (unsprayed leaves),
-results by stratum, leave-one-variety-out and leave-one-timing-out tests, SHAP of the best tree model, selection stability,
-and the exploratory test of symptomless leaves of unsprayed plots vs leaves of the sprayed healthy plots."""
+results by stratum, leave-one-variety-out and leave-one-timing-out tests, SHAP of the best tree model, selection stability."""
 import numpy as np, pandas as pd, os, json, warnings
 warnings.filterwarnings('ignore')
 from a5_metrics import *
@@ -159,18 +158,4 @@ for (t, mname), d in mls.groupby(['task', 'model']):
     for feat in sorted(set(allf)): st.append(dict(group='SFFS %s %s' % (t, mname), feature=feat, folds=allf.count(feat)))
 pd.DataFrame(st).to_csv(D + 'selection_stability.csv', index=False)
 
-# ---------------- exploratory: symptomless leaves of unsprayed (naturally infected) plots vs leaves of the sprayed healthy plots ----------------
-mask = (M.grade == 0).values; y = M.unsprayed.values; ex = []
-preds = []
-for name in ('SVM', 'RF', 'XGBoost', 'k-NN'):
-    for f in range(3):
-        Ff = pd.read_csv(D + 'fold%d_indices.csv' % f); ALL = pd.concat([BANDS, Ff], axis=1); cols = SEL[str(f)]['DSF']['A']
-        X = ALL[cols].values; tr = (M.fold != f).values & mask; te = (M.fold == f).values & mask
-        mu, sd = X[tr].mean(0), X[tr].std(0) + 1e-12; Xs = (X - mu) / sd
-        mdl = {'SVM': SVC(C=10, gamma='scale', class_weight='balanced'), 'RF': RandomForestClassifier(500, class_weight='balanced', random_state=42, n_jobs=4),
-               'XGBoost': xgb.XGBClassifier(n_estimators=300, max_depth=3, learning_rate=0.05, random_state=42, n_jobs=4), 'k-NN': KNeighborsClassifier(7)}[name]
-        mdl.fit(Xs[tr], y[tr]); yp = mdl.predict(Xs[te])
-        sc = mdl.predict_proba(Xs[te])[:, 1] if hasattr(mdl, 'predict_proba') and name != 'SVM' else mdl.decision_function(Xs[te])
-        for i, ii in enumerate(np.where(te)[0]): preds.append(dict(task='X', model=name, fold=f, leaf=int(ii), y=int(y[ii]), pred=int(yp[i]), score=float(sc[i])))
-EX, _ = summarise(pd.DataFrame(preds)); EX.to_csv(D + 'exploratory_asymptomatic.csv', index=False); print(EX[['model', 'balanced_acc', 'AUC', 'sensitivity', 'specificity']].round(3))
 print('extra done')
