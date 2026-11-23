@@ -4,23 +4,18 @@ const fs = require('fs');
 let s;
 // 21 ------------------------------------------------------------------ Obj1 overview
 sec('Objective 1');
-s = S('Objective 1: Characterisation of white rust (overview)', 'Objective 1', 'Seven activities; uses the 1920 post-symptomatic samples of each camera. For prediction, the same steps are repeated inside each training fold.');
-const o1 = [['1.1 Response analysis', 'mean spectra, first derivative, correlation'], ['1.2 Optimal wavelengths', 'NDSI/RSI maps → SHAP-CARS'], ['1.3 Index construction', 'best NDSI, RSI; White Rust Index'], ['1.4 Index selection', 'redundancy filter → ReliefF'],
-  ['1.5 Texture and TTFI', 'PCA texture → mRMR → TTFI'], ['1.6 Disease-specific sets', 'other cameras; VIF < 10'], ['1.7 Physiological basis', 'biochemical and biophysical parameters']];
-o1.slice(0, 4).forEach((o, i) => { const x = 0.45 + i * 3.15; box(s, x, 1.3, 2.9, 1.2, o[0], o[1], C.g, C.lt); if (i < 3) arr(s, x + 2.92, 1.9, x + 3.13, 1.9); });
-arr(s, 11.9, 2.52, 11.9, 2.83);
-o1.slice(4).forEach((o, i) => { const x = 9.9 - i * 3.15 + 0.6; box(s, x - 0.6, 2.85, 2.9, 1.2, o[0], o[1], i === 2 ? C.teal : C.g, i === 2 ? C.lteal : C.lt); if (i < 2) arr(s, x - 0.62, 3.45, x - 0.83, 3.45); });
-tb(s, [['Output of Objective 1', 'Used in'], ['Response curves by grade, variety, timing and growth stage', 'interpretation; robustness (2.6)'], ['10–15 optimal wavelengths (reflectance and first derivative) with stability', 'fused inputs; network configurations (2.1.5)'],
-  ['Best NDSI, RSI and White Rust Index; selected indices; selected texture and best TTFI', 'Objectives 2 and 3'], ['Disease-specific feature set of each camera; correlation between cameras', 'Objective 2 (2.1.2–2.1.3)']], 0.45, 4.3, 12.43, [8.0, 4.43]);
-// 22 ------------------------------------------------------------------ selection rule
-s = S('Feature-selection rule: one method for each type of feature', 'Objective 1', 'Four stages; stage 2 uses one method per feature type, as in the DT-EDNet study.');
-const st = [['Stage 0', 'Build groups with physical meaning (no second derivative)', 'no labels', C.grey, C.lgrey], ['Stage 1', 'Redundancy within groups: remove near-constant features; keep one per cluster with |r| ≥ 0.95', 'no labels', C.blue, C.lblue],
-  ['Stage 2', 'Selection within groups (one method per type)', 'labels, inner folds', C.g, C.lt], ['Stage 3', 'Redundancy across groups: pool survivors; variance inflation factor < 10', 'no labels', C.blue, C.lblue], ['Stage 4', 'Final compact set: SFFS with each machine-learning model (≤ 15 features)', 'labels, inner folds', C.purple, C.lpurple]];
-st.forEach((x, i) => { const y = 1.25 + i * 1.05; box(s, 0.45, y, 1.3, 0.85, null, x[0], x[3], x[4]); box(s, 1.85, y, 4.6, 0.85, null, x[1], x[3], 'FFFFFF', { align: 'left' }); T(s, x[2], 6.5, y + 0.2, 1.3, 0.5, { italic: true, color: '555555' }); if (i < 4) arr(s, 1.1, y + 0.87, 1.1, y + 1.03); });
-const m2 = [['Spectral bands (R, FD)', 'SHAP-CARS'], ['Vegetation indices', 'ReliefF (RReliefF for score)'], ['Texture features', 'mRMR'], ['Constructed indices', 'exhaustive search (NDSI, RSI, WRI, TTFI)'], ['Thermal and multispectral bands', 'kept (small groups)']];
-T(s, '**Stage 2 – method for each feature type**', 8.0, 1.2, 4.9, 0.35);
-m2.forEach((m, i) => { const y = 1.65 + i * 0.95; box(s, 8.0, y, 2.15, 0.78, null, m[0], C.g, C.lt); arr(s, 10.17, y + 0.39, 10.45, y + 0.39); box(s, 10.47, y, 2.41, 0.78, null, m[1], C.g, 'FFFFFF'); });
-refline(s, 'Hughes (1968); Guyon and Elisseeff (2003); Dormann et al. (2013); Ghamisi et al. (2019); Ma et al. (2026).', 6.45);
+s = S('Objective 1: Characterisation of white rust (overview)', 'Objective 1', 'Eight activities at two stages. Post-symptomatic stage: 1920 subplot samples per camera with the severity grade and score as target (Activities 1.1–1.7). Pre-symptomatic stage: 576 subplot samples per camera with later-infected vs healthy as target (Activity 1.8). For prediction, the same steps are repeated inside each training fold. Feature selection follows four stages with one method per feature type, as in the DT-EDNet study.');
+box(s, 0.45, 1.2, 6.1, 0.85, 'Post-symptomatic stage (Activities 1.1–1.7)', '1920 subplot samples per camera; 10 flights, 12–75 days after inoculation; target = grade, score', C.g, C.lt, { fs: 13 });
+box(s, 6.78, 1.2, 6.1, 0.85, 'Pre-symptomatic stage (Activity 1.8)', '576 subplot samples per camera; 3 flights, 2–8 days after inoculation; target = later-infected vs healthy', C.red, C.lred, { fs: 13 });
+const o1 = [['1.1 Response analysis', 'mean spectra, derivative, correlation'], ['1.2 Optimal wavelengths', 'NDSI/RSI maps → SHAP-CARS'], ['1.3 Index construction', 'best NDSI, RSI; White Rust Index'], ['1.4 Index selection', 'redundancy filter → ReliefF'],
+  ['1.5 Texture and TTFI', 'PCA texture → mRMR → TTFI'], ['1.6 Disease-specific sets', 'all cameras; VIF < 10'], ['1.7 Physiological basis', '11 parameters vs features'], ['1.8 Pre-symptomatic stage', 'same steps, binary target']];
+o1.slice(0, 4).forEach((o, i) => { const x = 0.45 + i * 3.15; box(s, x, 2.25, 2.9, 0.85, o[0], o[1], C.g, C.lt, { fs: 13 }); if (i < 3) arr(s, x + 2.92, 2.67, x + 3.13, 2.67); });
+arr(s, 11.9, 3.12, 11.9, 3.3);
+o1.slice(4).forEach((o, i) => { const x = 9.9 - i * 3.15; const red = i === 3, teal = i === 2; box(s, x, 3.32, 2.9, 0.85, o[0], o[1], red ? C.red : (teal ? C.teal : C.g), red ? C.lred : (teal ? C.lteal : C.lt), { fs: 13 }); if (i < 3) arr(s, x - 0.02, 3.74, x - 0.23, 3.74); });
+tb(s, [['Selection stage', 'What is done', 'Labels'], ['0 Groups', 'physically meaningful groups (no second derivative)', 'no'], ['1 Redundancy', 'drop near-constant; one per cluster with |r| ≥ 0.95', 'no'],
+  ['2 Selection', 'one method per feature type (right)', 'inner folds'], ['3 Across groups', 'pool survivors; VIF < 10', 'no'], ['4 Final set', 'SFFS with each machine-learning model (Objective 2)', 'inner folds']], 0.45, 4.35, 7.6, [1.75, 4.6, 1.25], { fs: 12, firstCol: true });
+tb(s, [['Feature type', 'Selection method'], ['Spectral bands (R, FD)', 'SHAP-CARS'], ['Vegetation indices', 'ReliefF (RReliefF for score)'], ['Texture features', 'mRMR'], ['Constructed indices', 'exhaustive search'], ['Thermal, MS bands', 'kept (small groups)']], 8.3, 4.35, 4.58, [2.2, 2.38], { fs: 12, firstCol: true });
+refline(s, 'Guyon and Elisseeff (2003); Dormann et al. (2013); Ghamisi et al. (2019); Ma et al. (2026).', 6.62, 0.35);
 // 23 ------------------------------------------------------------------ 1.1
 s = S('Activity 1.1: Response analysis (Steps 1.1.1–1.1.3)', 'Objective 1', 'Model-free description of how each camera responds to severity, treatment, stage and weather.');
 const a11 = [['Step 1.1.1', 'Mean spectra and first-derivative curves by grade', ['Mean subplot spectra of grades 0–9 with ± 1 SD', 'First derivative of the red edge (680–760 nm)', 'Expected: visible rise (chlorophyll loss), red-edge blue shift, NIR fall (leaf damage), SWIR rise (water loss)']],
@@ -75,26 +70,22 @@ BL(s, ['**Output:** disease-specific feature set of each camera (≈ 10–25 fea
 BL(s, ['**Why VIF:** survivors of different groups can still be collinear (e.g., a red-edge wavelength and a red-edge index); collinearity makes models and importance values unstable (Dormann et al., 2013; O\'Brien, 2007).'], 0.45, 4.35, 7.4, 1.4);
 refline(s, 'Ma et al. (2026); Feng et al. (2022); Liu et al. (2024); Tian et al. (2021); Mustafa et al. (2023); Mahlein et al. (2019); Maimaitijiang et al. (2020); Sulik and Long (2016).', 6.15, 0.65);
 // 30 ------------------------------------------------------------------ 1.7 stats
-s = S('Activity 1.7: Physiological basis of camera responses', 'Objective 1', 'Parameters are not model inputs; the plot (designated subplot) is the experimental unit.');
-const a17 = [['1.7.1 Data preparation', 'average technical replicates; per g fresh weight; join by date, plot, subplot'], ['1.7.2 Effect of white rust', '12 pairs per date (inoculated mean vs healthy plot): paired t-test or Wilcoxon; mean difference, 95% CI, effect size'],
-  ['1.7.3 Variety and timing', 'two-way ANOVA (RBD): replication + variety + timing + interaction; LSD at 5%'], ['1.7.4 Growth stages', 'healthy means by stage; disease effect by stage; one-way ANOVA or Kruskal–Wallis on paired differences; Tukey'],
-  ['1.7.5 Relation with severity', 'Pearson r with plot PDI and subplot score, per date (36 plots); within-date pooling only'], ['1.7.6 Relation with camera features', 'within-date and within-stage correlations; Benjamini–Hochberg false discovery rate 5%']];
-a17.forEach((a, i) => { const col = i % 3, row = Math.floor(i / 3), x = 0.45 + col * 4.2, y = 1.3 + row * 2.25; box(s, x, y, 4.0, 2.0, a[0], a[1], C.teal, row ? 'FFFFFF' : C.lteal); if (col < 2) arr(s, x + 4.02, y + 1.0, x + 4.18, y + 1.0); });
-arr(s, 10.65, 3.32, 10.65, 3.53);
-refline(s, 'Gomez and Gomez (1984); Hurlbert (1984); Wilcoxon (1945); Sullivan and Feinn (2012); Kruskal and Wallis (1952); Tukey (1949); Bates et al. (2015); Bakdash and Marusich (2017); Benjamini and Hochberg (1995).', 5.95, 0.75);
-// 31 ------------------------------------------------------------------ 1.7 links
-s = S('Step 1.7.6: Expected parameter–feature links', 'Objective 1', 'Physiological explanation of the camera responses; checked with within-date correlations.');
-tb(s, [['Parameter', 'Expected camera features', 'Why', 'Reference'],
-  ['Chlorophyll a, b', 'red-edge position, CIrededge, MTCI, NDRE, PSSR, WRI', 'chlorophyll absorbs red light and sets the red edge', 'Gitelson et al. (2003); Filella and Peñuelas (1994)'],
-  ['Carotenoids', 'PRI, PSRI', 'carotenoid/chlorophyll ratio changes with stress', 'Gamon et al. (1992); Merzlyak et al. (1999)'], ['Anthocyanin', 'ARI', 'absorbs green light near 550 nm', 'Gitelson et al. (2001)'],
-  ['Relative water content', 'NDWI, NDII, water index; canopy − air temperature', 'water absorbs at 970, 1200, 1450, 1650 nm; water loss warms canopy', 'Gao (1996); Peñuelas et al. (1997); Jones et al. (2009)'],
-  ['Stomatal conductance, transpiration', 'CTD, NRCT, CWSI', 'transpiration cools the leaves', 'Jones et al. (2009); Calderón et al. (2013)'], ['Net photosynthesis', 'PRI, chlorophyll indices', 'PRI follows xanthophyll changes', 'Gamon et al. (1992)'],
-  ['Membrane stability index', 'NIR plateau, texture', 'tissue damage around pustules', 'Mahlein (2016)'], ['Leaf area index', 'NDVI, OSAVI, MSR, texture', 'canopy size controls NIR scattering', 'Haboudane et al. (2004)']], 0.45, 1.25, 12.43, [2.4, 3.4, 3.5, 3.13], { firstCol: true });
+s = S('Activity 1.7: Physiological basis of camera responses', 'Objective 1', 'Parameters are not model inputs; the plot (designated subplot) is the experimental unit. Steps 1.7.1–1.7.6 and the expected links between parameters and camera features.');
+BL(s, ['**1.7.1 Preparation:** average technical replicates; per g fresh weight; join by date, plot, subplot.', '**1.7.2 Effect of white rust:** 12 inoculated–healthy pairs per date; paired t-test or Wilcoxon; mean difference, 95% CI, effect size.',
+  '**1.7.3 Variety and timing:** two-way ANOVA (RBD), LSD at 5%.', '**1.7.4 Growth stages:** disease effect by stage; ANOVA or Kruskal–Wallis; Tukey.',
+  '**1.7.5 Severity:** Pearson r with plot PDI and subplot score, per date.', '**1.7.6 Camera features:** within-date and within-stage correlations; Benjamini–Hochberg FDR 5%.'], 0.45, 1.2, 5.2, 5.2, { lead: C.teal, ps: 5 });
+tb(s, [['Parameter', 'Expected camera features', 'Why'],
+  ['Chlorophyll a, b', 'REP, CIrededge, MTCI, NDRE, PSSR, WRI', 'chlorophyll sets the red edge'], ['Carotenoids', 'PRI, PSRI', 'carotenoid/chlorophyll ratio changes'], ['Anthocyanin', 'ARI', 'absorbs green light near 550 nm'],
+  ['Relative water content', 'NDWI, NDII, WI; canopy − air temperature', 'water absorption; water loss warms canopy'], ['Stomatal conductance, transpiration', 'CTD, NRCT, CWSI', 'transpiration cools the leaves'],
+  ['Net photosynthesis', 'PRI, chlorophyll indices', 'PRI follows xanthophyll changes'], ['Membrane stability index', 'NIR plateau, texture', 'tissue damage around pustules'], ['Leaf area index', 'NDVI, OSAVI, MSR, texture', 'canopy size controls NIR scattering']],
+  5.85, 1.2, 7.03, [2.05, 2.6, 2.38], { fs: 12, firstCol: true, head: C.teal });
+refline(s, 'Gomez and Gomez (1984); Sullivan and Feinn (2012); Benjamini and Hochberg (1995); Gitelson et al. (2003); Gamon et al. (1992); Gao (1996); Jones et al. (2009); Calderón et al. (2013); Haboudane et al. (2004).', 6.3, 0.65);
+require('./adv_pre.js')();
 // 32 ------------------------------------------------------------------ Obj2 overview
 sec('Objective 2');
 s = S('Objective 2: Detection and severity discrimination (overview)', 'Objective 2', 'Seven activities on the 1920 post-symptomatic samples; every model for every sensor set and task on the same folds.');
 const o2 = [['2.1 Tasks and inputs', 'three tasks; fold-wise selection; 15 sensor sets; SFFS'], ['2.2 Machine learning', 'SVM/SVR, RF, XGBoost, k-NN, PLS-DA/PLSR'], ['2.3 Deep learning', 'DNN-F1, DNN-F2; DT-EDNet, EfficientNet, ResNet18, ConvNeXt V2'], ['2.4 Evaluation', 'OA, kappa, weighted kappa, macro-F1, AUC; R², RMSE, RPD'],
-  ['2.5 Comparison', 'ranking; fusion gain; ablation; SHAP; covariate baseline'], ['2.6 Robustness, maps', 'by treatment; LOVO/LOTO; severity maps'], ['2.7 Stage-2 validation', 'frozen models at Bharatpur; farm maps']];
+  ['2.5 Comparison', 'ranking; fusion gain; ablation; SHAP; covariate baseline'], ['2.6 Robustness, maps', 'by treatment; LOVO/LOTO; severity maps'], ['2.7 Independent testing', 'frozen models at Bharatpur; farm maps']];
 o2.slice(0, 4).forEach((o, i) => { const x = 0.45 + i * 3.15; box(s, x, 1.3, 2.9, 1.3, o[0], o[1], C.purple, C.lpurple); if (i < 3) arr(s, x + 2.92, 1.95, x + 3.13, 1.95); });
 arr(s, 11.9, 2.62, 11.9, 2.93);
 o2.slice(4).forEach((o, i) => { const x = 9.9 - i * 3.15; box(s, x, 2.95, 2.9, 1.3, o[0], o[1], i === 2 ? C.gold : C.purple, i === 2 ? C.lgold : C.lpurple); if (i < 2) arr(s, x - 0.02, 3.6, x - 0.23, 3.6); });
@@ -137,23 +128,17 @@ BL(s, ['**Training:** Adam (learning rate 0.001, weight decay 10⁻⁴), batch 3
   '**Why:** compact enough for ≈ 1000 samples; intermediate fusion was better than input fusion for multi-sensor UAV data, and DNN-F2 shows which camera the model relies on (Maimaitijiang et al., 2020).'], 0.45, 4.25, 12.43, 1.8);
 refline(s, 'Maimaitijiang et al. (2020); Kingma and Ba (2015); Srivastava et al. (2014); Ioffe and Szegedy (2015); Hu et al. (2018).', 6.2);
 // 37 ------------------------------------------------------------------ pseudo-image
-s = S('Step 2.3.3: Pseudo-image construction', 'Objective 2', 'Feature vector reshaped into a small one-channel image so that convolution and attention can be applied.');
-T(s, '**Example: sensor set S7 (HS + TIR), 6 × 6**', 0.45, 1.15, 4.6, 0.35);
-for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) { const idx = r * 6 + c; let col = 'FFFFFF', lc = 'B0B0B0'; if (r < 3 && idx < 16) { col = C.lt; lc = C.g; } else if (r === 3) { col = C.lred; lc = C.red; } s.addShape(pres.shapes.RECTANGLE, { x: 0.8 + c * 0.62, y: 1.65 + r * 0.62, w: 0.58, h: 0.58, fill: { color: col }, line: { color: lc, width: 1 } }); }
-T(s, 'green = 16 hyperspectral features (3 rows of 6); red = 6 thermal features (own row); white = zero padding', 0.45, 5.45, 4.8, 0.9);
-BL(s, ['**Ordering:** by camera (HS, MS, RGB, TIR), and within hyperspectral by group and wavelength (OW, indices, texture, TTFI), so that neighbouring pixels hold related features.', '**Grid size:** k × k with k = ⌈√p⌉ (minimum 3); each camera starts on a new row so that small groups (e.g., thermal) are not split.',
-  '**Padding:** remaining pixels = 0, which is the training mean after standardisation (adds no information).', '**Example (hyperspectral only):** 22 features → 5 × 5 image with 3 padded pixels.',
-  '**Note:** Ma et al. (2026) used hyperspectral features only; adding thermal, multispectral and RGB features is an extension of this study, tested against S1 and DNN-F2.'], 5.2, 1.15, 7.68, 4.9);
-refline(s, 'Ma et al. (2026); Sharma et al. (2019); Vaswani et al. (2017).', 6.35);
-// 38 ------------------------------------------------------------------ DT-EDNet
-s = S('Step 2.3.4: DT-EDNet architecture', 'Objective 2', 'Convolution embedding, squeeze-and-excitation, kernel transformer block with CBAM and four token transformer blocks.');
-chain(s, [{ h: 'Pseudo-image', b: 'k × k, 1 channel' }, { h: 'Embedding', b: '3 × 3 conv, stride 1, 128 channels' }, { h: 'SE block', b: 'channel re-weighting', c: C.red, f: C.lred }, { h: 'Tokens', b: 'k² tokens + class token + position' },
-  { h: 'Kernel Transformer Block', b: 'conv + CBAM (channel → spatial attention)', c: C.blue, f: C.lblue }, { h: '4 Token Transformer Blocks', b: 'LN → MHSA (4 heads) → LN → FFN; residual', c: C.blue, f: C.lblue }, { h: 'Head', b: 'LN(class token) → linear' }], 0.45, 1.3, 12.43, 1.75, 0.18, C.purple, C.lpurple);
-T(s, 'Dual Transformer Group (DTG)', 7.6, 3.1, 3.6, 0.35, { align: 'center', italic: true, color: C.blue });
-box(s, 0.45, 3.55, 6.1, 1.25, 'Self-attention (Vaswani et al., 2017)', ['Attention(Q, K, V) = softmax(Q Kᵀ / √d) V', 'd = 128 / 4 heads = 32'], C.blue, 'FFFFFF');
-BL(s, ['**Why:** relates local neighbours (convolution, CBAM) and distant features (self-attention), e.g., a red-edge wavelength with a texture feature far away on the grid.', '**Settings:** embedding 128; dropout 0.03; trained from scratch; input = fused features of all cameras in the set.',
-  '**Published result:** highest accuracy for rice blast (OA 95.25% with OW + VI + TTFI) against EfficientNet, ResNet18 and ConvNeXt V2 (Ma et al., 2026); tested here with plot-grouped validation.'], 6.78, 3.5, 6.1, 2.6);
-refline(s, 'Ma et al. (2026); Hu et al. (2018); Woo et al. (2018); Vaswani et al. (2017); Dosovitskiy et al. (2021).', 6.2);
+s = S('Steps 2.3.3–2.3.4: Pseudo-image and DT-EDNet architecture', 'Objective 2', 'The feature vector is reshaped into a small one-channel image; DT-EDNet = convolution embedding, squeeze-and-excitation, kernel transformer block with CBAM and four token transformer blocks.');
+chain(s, [{ h: 'Pseudo-image', b: 'k × k, 1 channel' }, { h: 'Embedding', b: '3 × 3 conv, stride 1, 128 ch.' }, { h: 'SE block', b: 'channel re-weighting', c: C.red, f: C.lred }, { h: 'Tokens', b: 'k² + class token + position' },
+  { h: 'Kernel TB', b: 'conv + CBAM attention', c: C.blue, f: C.lblue }, { h: '4 Token TBs', b: 'LN → MHSA (4 heads) → FFN', c: C.blue, f: C.lblue }, { h: 'Head', b: 'LN(class token) → linear' }], 0.45, 1.2, 12.43, 1.3, 0.2, C.purple, C.lpurple, { fs: 13 });
+T(s, 'Dual Transformer Group (DTG)', 7.1, 2.52, 3.6, 0.32, { align: 'center', italic: true, color: C.blue });
+T(s, '**Pseudo-image, e.g. S7 (HS + TIR), 6 × 6**', 0.45, 2.85, 4.2, 0.32, { fontSize: 13 });
+for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) { const idx = r * 6 + c; let col = 'FFFFFF', lc = 'B0B0B0'; if (r < 3 && idx < 16) { col = C.lt; lc = C.g; } else if (r === 3) { col = C.lred; lc = C.red; } s.addShape(pres.shapes.RECTANGLE, { x: 0.7 + c * 0.42, y: 3.25 + r * 0.42, w: 0.4, h: 0.4, fill: { color: col }, line: { color: lc, width: 1 } }); }
+T(s, 'green = 16 HS features; red = 6 thermal features; white = zero padding', 0.45, 5.85, 3.5, 0.6, { fontSize: 12 });
+BL(s, ['**Ordering:** by camera, then by group and wavelength, so neighbouring pixels hold related features.', '**Grid:** k = ⌈√p⌉ (≥ 3); padding = 0 (training mean after standardisation).', '**Extension:** Ma et al. (2026) used hyperspectral features only; thermal, MS and RGB features are added here and tested against S1 and DNN-F2.'], 3.85, 2.85, 4.1, 3.6, { box: { fontSize: 13 } });
+box(s, 8.15, 2.95, 4.73, 1.1, 'Self-attention (Vaswani et al., 2017)', ['softmax(Q Kᵀ / √d) V; d = 128 / 4 heads = 32'], C.blue, 'FFFFFF', { fs: 13 });
+BL(s, ['**Why:** relates local neighbours (convolution, CBAM) and distant features (attention).', '**Settings:** embedding 128; dropout 0.03; trained from scratch; output softmax (A, B) or linear (C).', '**Published:** best for rice blast (OA 95.25%, OW + VI + TTFI) (Ma et al., 2026).'], 8.15, 4.15, 4.73, 2.3, { box: { fontSize: 13 } });
+refline(s, 'Ma et al. (2026); Sharma et al. (2019); Hu et al. (2018); Woo et al. (2018); Vaswani et al. (2017); Dosovitskiy et al. (2021).', 6.55, 0.35);
 // 39 ------------------------------------------------------------------ comparison networks + protocol
 s = S('Steps 2.3.5–2.3.8: Comparison networks and training', 'Objective 2', 'Same comparison set and training settings as Ma et al. (2026), adapted to small pseudo-images.');
 tb(s, [['Network', 'Main design', 'Change for small pseudo-images', 'Reference'], ['EfficientNet-B0', 'mobile inverted bottleneck blocks; depthwise convolution; squeeze-and-excitation', '3 × 3 stem, stride 1, one input channel', 'Tan and Le (2019)'],
@@ -172,31 +157,32 @@ refline(s, 'Cohen (1960, 1968); Sokolova and Lapalme (2009); Fawcett (2006); Cha
 s = S('Activity 2.5: Comparison, ablation and interpretation', 'Objective 2', 'Which sensor set, model, camera and module contribute, and do cameras add beyond known factors?');
 const a25 = [['2.5.1 Ranking', 'rank 15 sets by AUC (A), macro-F1 (B), RMSE (C); a difference is real only if larger than the fold SD and seen in all folds'], ['2.5.2 Fusion gain', 'combination minus best single camera; drop-one-camera from S15; DNN-F2 camera weights'],
   ['2.5.3 Networks and ablation', 'four networks + best ML on six configurations; DT-EDNet without SE, without DTG, without both'], ['2.5.4 SHAP and stability', 'mean |SHAP| per feature and camera; links to Activity 1.7; features kept if selected in ≥ 2 of 3 folds'],
-  ['2.5.5 Covariate baseline', 'covariates-only model vs sensor models vs best 3 sets + covariates; a sensor set is useful only if it beats the baseline']];
+  ['2.5.5 Covariate baseline', 'covariate-only models (B1 statistical, B2 best ML) vs sensor models vs sensor + covariate models; a sensor set is useful only if it beats the baseline (next two slides)']];
 a25.forEach((a, i) => { const y = 1.25 + i * 0.98; box(s, 0.45, y, 2.9, 0.85, null, a[0], C.purple, C.lpurple); box(s, 3.45, y, 9.43, 0.85, null, a[1], C.purple, 'FFFFFF', { align: 'left' }); });
 refline(s, 'Feng et al. (2022); Maimaitijiang et al. (2020); Ma et al. (2026); Lundberg and Lee (2017); Nogueira et al. (2018); Zhang et al. (2014); Chattopadhyay et al. (2011); Kuhn and Johnson (2013).', 6.2, 0.65);
+require('./adv_cov2.js')();
 // 42 ------------------------------------------------------------------ 2.6 + 2.7
-s = S('Activities 2.6–2.7: Robustness, maps, stage-2 validation', 'Objective 2', 'Transfer tests and maps; frozen final models applied once to independent Bharatpur data.');
+s = S('Activities 2.6–2.7: Robustness, maps and independent testing', 'Objective 2', 'Transfer tests and maps; frozen final models applied once to independent Bharatpur data (independent testing, not validation).');
 BL(s, ['**2.6.1 By treatment:** metrics for each variety, inoculation timing and date.', '**2.6.2 Transfer:** leave-one-variety-out (train on two varieties, test the third) and leave-one-timing-out (train on three timings, test the fourth) (Roberts et al., 2017).', '**2.6.3 Maps:** detection, class and score of every subplot and date with the best model of each task.'], 0.45, 1.2, 5.9, 3.1);
 chain(s, [{ h: '2.7.1 Freeze', b: 'selection + tuning on all IARI data; best models stored' }, { h: '2.7.2 Same processing', b: 'Activities B, D unchanged; IARI scaling constants' }], 6.6, 1.3, 6.28, 1.45, 0.3, C.gold, C.lgold);
 chain(s, [{ h: '2.7.3 Apply once', b: 'no retraining; same metrics; farms and fields separately' }, { h: '2.7.4 Farm maps', b: 'quadrat-sized cells; scored quadrats overlaid' }], 6.6, 3.0, 6.28, 1.45, 0.3, C.gold, C.lgold);
 arr(s, 12.0, 2.77, 12.0, 2.98);
-tb(s, [['Item', 'Stage 1 (internal)', 'Stage 2 (independent)'], ['Data', 'IARI field, 48 plots, 13 dates', 'Bharatpur research farms and farmers\' fields'], ['Infection', 'artificial (10 Jan 2027)', 'natural epidemic'], ['Design', 'leave-one-replication-out, nested', 'frozen models applied once']], 0.45, 4.6, 12.43, [2.4, 4.8, 5.23]);
+tb(s, [['Item', 'Validation (internal, IARI)', 'Independent testing (Bharatpur)'], ['Data', 'IARI field, 48 plots, 13 dates', 'Bharatpur research farms and farmers\' fields'], ['Infection', 'artificial (30 Dec 2026)', 'natural epidemic'], ['Design', 'leave-one-replication-out, nested', 'frozen models applied once']], 0.45, 4.6, 12.43, [2.4, 4.8, 5.23]);
 // 43 ------------------------------------------------------------------ Obj3 overview
 sec('Objective 3');
 s = S('Objective 3: Pre-symptomatic prediction (overview)', 'Objective 3', 'Uses the 576 pre-symptomatic samples per camera; machine learning and feature-fusion networks only.');
-chain(s, [{ h: '3.1 Samples and labels', b: 'labels from later status; physiology on 18 Jan' }, { h: '3.2 Normalisation', b: 'healthy plots of same date and variety' }, { h: '3.3 Selection', b: 'one method per type with pre-symptomatic labels' },
+chain(s, [{ h: '3.1 Samples and labels', b: 'labels from later status; physiology on 7 Jan' }, { h: '3.2 Normalisation', b: 'healthy plots of same date and variety' }, { h: '3.3 Selection', b: 'one method per type with pre-symptomatic labels' },
   { h: '3.4 Models', b: 'ML + DNN-F1, DNN-F2 for 15 sets' }, { h: '3.5 Evaluation', b: 'AUC; earliest detection day; risk maps' }], 0.45, 1.3, 12.43, 1.5, 0.25, C.red, C.lred);
 T(s, '**How pre-symptomatic samples are labelled**', 0.45, 3.0, 8, 0.35);
 line(s, 0.8, 4.25, 12.6, 4.25, '555555', 2);
-[['12 Jan (2 d)', 1.6], ['15 Jan (5 d)', 3.2], ['18 Jan (8 d)', 4.8]].forEach(f => { s.addShape(pres.shapes.OVAL, { x: f[1], y: 4.13, w: 0.24, h: 0.24, fill: { color: C.blue }, line: { color: C.blue } }); T(s, f[0], f[1] - 0.6, 3.65, 1.45, 0.4, { align: 'center', color: C.blue }); });
-s.addShape(pres.shapes.OVAL, { x: 7.2, y: 4.13, w: 0.24, h: 0.24, fill: { color: C.purple }, line: { color: C.purple } }); T(s, '21 Jan → 25 Mar: symptoms scored', 6.2, 3.65, 3.6, 0.4, { align: 'center', color: C.purple });
+[['1 Jan (2 d)', 1.6], ['4 Jan (5 d)', 3.2], ['7 Jan (8 d)', 4.8]].forEach(f => { s.addShape(pres.shapes.OVAL, { x: f[1], y: 4.13, w: 0.24, h: 0.24, fill: { color: C.blue }, line: { color: C.blue } }); T(s, f[0], f[1] - 0.6, 3.65, 1.45, 0.4, { align: 'center', color: C.blue }); });
+s.addShape(pres.shapes.OVAL, { x: 7.2, y: 4.13, w: 0.24, h: 0.24, fill: { color: C.purple }, line: { color: C.purple } }); T(s, '11 Jan → 15 Mar: symptoms scored', 6.2, 3.65, 3.6, 0.4, { align: 'center', color: C.purple });
 arr(s, 7.2, 4.55, 3.4, 4.55, C.red, 2); T(s, 'label taken back from the later status of the same subplot', 7.45, 4.38, 5.4, 0.35, { color: C.red, italic: true });
 BL(s, ['**Healthy** = subplots of the 12 healthy plots; **infected** = inoculated subplots that show pustules later; inoculated subplots that never show symptoms are excluded.', '**Regression target:** score of the same subplot on the first post-symptomatic date. Pseudo-image networks are not used (≈ 384 training samples per fold).'], 0.45, 5.1, 12.43, 1.1);
 refline(s, 'Zhu et al. (2017); Tian et al. (2021); Mahlein et al. (2019); Yu et al. (2021).', 6.3);
 // 44 ------------------------------------------------------------------ 3.1-3.4
 s = S('Activities 3.1–3.4: Labels, normalisation, selection, models', 'Objective 3', 'Early signals are small; healthy-plot normalisation and stricter limits are needed.');
-const a3 = [['3.1.2 Physiology before symptoms (18 Jan)', 'paired comparison of 12 inoculated–healthy pairs for every parameter; correlation of pre-symptomatic parameters with plot PDI on 28 Jan; effect sizes and 95% CI'],
+const a3 = [['3.1.2 Physiology before symptoms (7 Jan)', 'paired comparison of 12 inoculated–healthy pairs for every parameter; correlation of pre-symptomatic parameters with plot PDI on 18 Jan; effect sizes and 95% CI'],
   ['3.2.1 Healthy-plot normalisation', 'z_h = (x − mean_healthy) / SD_healthy for every feature; healthy plots of the same date and variety in the training part; same reference for the test samples'],
   ['3.3.1 Pre-symptomatic selection', 'SHAP-CARS (bands), ReliefF/RReliefF (indices), mRMR (texture), TTFI search, redundancy filter, VIF; SFFS limited to 10 features'],
   ['3.4.1 Models for 15 sensor sets', 'SVM, RF, XGBoost, k-NN, PLS-DA/PLSR; DNN-F1 and DNN-F2 with smaller layers (32, 16 units) and dropout 0.4; same folds as Objective 2']];
@@ -205,42 +191,40 @@ refline(s, 'Zarco-Tejada et al. (2018); Calderón et al. (2013); Oerke et al. (2
 // 45 ------------------------------------------------------------------ 3.5
 s = S('Activity 3.5: Earliest detection day and risk maps', 'Objective 3', 'How early, with which sensor set and with what reliability can white rust be predicted?');
 chain(s, [{ h: '3.5.1 Metrics', b: 'sensitivity, specificity, balanced accuracy, AUC; R², RMSE of later score' }, { h: 'Earliest detection day', b: 'first date with balanced accuracy ≥ 0.70 (0.65, 0.75 checked); per variety and timing' },
-  { h: '3.5.2 Risk maps', b: 'predicted infection probability of every subplot; compared with later severity' }, { h: '3.5.3 Covariate baseline', b: 'DAI, variety, timing, stage, weather only vs sensor models' }, { h: '3.5.4 Stage-2 validation', b: 'Bharatpur quadrats flown before symptoms, labelled later; protected healthy strip' }], 0.45, 1.3, 12.43, 2.1, 0.22, C.red, C.lred);
+  { h: '3.5.2 Risk maps', b: 'predicted infection probability of every subplot; compared with later severity' }, { h: '3.5.3 Covariate baseline', b: 'DAI, variety, timing, stage, weather only vs sensor models' }, { h: '3.5.4 Independent testing', b: 'Bharatpur quadrats flown before symptoms, labelled later; protected healthy strip' }], 0.45, 1.3, 12.43, 2.1, 0.22, C.red, C.lred);
 box(s, 0.45, 3.7, 6.1, 1.5, 'Receiver operating characteristic (Fawcett, 2006)', ['AUC = probability that an infected subplot scores higher than a healthy one; independent of class balance and threshold'], C.red, 'FFFFFF');
-BL(s, ['**Why a covariate baseline:** before symptoms, infection depends strongly on weather after inoculation and on variety; the cameras must detect more than these factors (Zhang et al., 2014).', '**Where data do not allow** an early Bharatpur flight or a healthy reference, the pre-symptomatic models are validated in the first stage only, and this is stated.'], 6.78, 3.65, 6.1, 2.4);
+BL(s, ['**Why a covariate baseline:** before symptoms, infection depends strongly on weather after inoculation and on variety; the cameras must detect more than these factors (Zhang et al., 2014).', '**Where data do not allow** an early Bharatpur flight or a healthy reference, the pre-symptomatic models are evaluated with the internal validation only, and this is stated.'], 6.78, 3.65, 6.1, 2.4);
 refline(s, 'Fawcett (2006); Mahlein et al. (2019); Zarco-Tejada et al. (2018); Chattopadhyay et al. (2011); Zhu et al. (2017); Ma et al. (2026).', 6.2);
 // 46 ------------------------------------------------------------------ outputs
 sec('Conclusion');
-s = S('Expected outputs of the research', 'Outputs', 'What each objective delivers.');
-box(s, 0.45, 1.3, 4.0, 3.6, 'Objective 1', ['• Response of each camera to severity, variety, timing and growth stage', '• Optimal wavelengths (SHAP-CARS) with stability', '• White Rust Index; best NDSI/RSI', '• Selected indices, texture features and TTFI', '• Disease-specific feature set of each camera', '• Physiological basis from 11 parameters'], C.g, C.lt, { valign: 'top', align: 'left' });
-box(s, 4.65, 1.3, 4.0, 3.6, 'Objective 2', ['• Accuracy of 15 sensor sets for detection, severity classes and score', '• Best model family; DT-EDNet vs EfficientNet, ResNet18, ConvNeXt V2', '• Contribution of each camera (fusion gain, ablation, SHAP)', '• Gain over covariate baseline', '• Severity maps; independent accuracy at Bharatpur'], C.purple, C.lpurple, { valign: 'top', align: 'left' });
-box(s, 8.85, 1.3, 4.03, 3.6, 'Objective 3', ['• Pre-symptomatic models for 15 sensor sets', '• Earliest detection day by sensor set, variety and timing', '• Physiological changes before symptoms (18 Jan)', '• Risk maps of later infection', '• Recommendation of the most cost-effective camera(s) for early warning'], C.red, C.lred, { valign: 'top', align: 'left' });
-T(s, 'All results are produced with leakage-free, plot-grouped validation and tested on independent farm data.', 0.45, 5.15, 12.43, 0.5, { bold: true, color: C.g, align: 'center' });
-// 47 ------------------------------------------------------------------ work plan
-s = S('Six-month work plan for the analysis and software', 'Outputs', 'Month-wise plan and software for reproducibility.');
-const wp = [['Activities A–B: calibration, mosaics, co-registration, vegetation pixels (all dates, cameras)', 0, 1, C.blue], ['Activities D–F: features, covariates, normalisation, folds; Activity 1.1', 1, 1, C.blue], ['Activities 1.2–1.7: selection inside folds; physiological statistics', 2, 1, C.g],
-  ['Objective 2: machine learning and feature-fusion networks (15 sets)', 3, 1, C.purple], ['Objective 2: DT-EDNet and comparison networks; ablation; SHAP; maps', 4, 1, C.purple], ['Objective 3; stage-2 validation (Bharatpur); synthesis and writing', 5, 1, C.red]];
-const gx = 6.6, gw = 1.03;
-['M1', 'M2', 'M3', 'M4', 'M5', 'M6'].forEach((m, i) => T(s, '**' + m + '**', gx + i * gw, 1.2, gw, 0.35, { align: 'center' }));
-wp.forEach((w, i) => { const y = 1.6 + i * 0.62; T(s, w[0], 0.45, y, 6.05, 0.58, { valign: 'middle' }); for (let k = 0; k < 6; k++) s.addShape(pres.shapes.RECTANGLE, { x: gx + k * gw, y: y + 0.05, w: gw, h: 0.48, fill: { color: 'FAFAFA' }, line: { color: 'DDDDDD', width: 0.5 } });
-  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: gx + w[1] * gw + 0.05, y: y + 0.1, w: w[2] * gw - 0.1, h: 0.38, fill: { color: w[3] }, line: { color: w[3] }, rectRadius: 0.05 }); });
-tb(s, [['Task', 'Software'], ['Image processing, registration, resampling', 'ENVI or Python (GDAL, rasterio)'], ['Features, selection, machine learning', 'Python: NumPy, pandas, scikit-learn (Pedregosa et al., 2011), XGBoost (Chen and Guestrin, 2016), SHAP (Lundberg and Lee, 2017), mlxtend (Raschka, 2018)'],
-  ['Deep learning', 'PyTorch (Paszke et al., 2019); graphics processing unit']], 0.45, 5.45, 12.43, [3.6, 8.83]);
-// 48-49 ------------------------------------------------------------------ references
-const R = JSON.parse(fs.readFileSync(__dirname + '/../method3/mf3_refs_used.json', 'utf8'));
+s = S('Expected outputs and six-month work plan', 'Outputs', 'What each objective delivers, the month-wise plan of the analysis and the software used.');
+box(s, 0.45, 1.2, 4.0, 2.25, 'Objective 1', ['• Response of each camera to severity, variety, timing, stage', '• Optimal wavelengths, White Rust Index, selected indices, TTFI', '• Disease-specific and pre-symptomatic feature sets', '• Physiological basis (11 parameters)'], C.g, C.lt, { valign: 'top', align: 'left', fs: 13 });
+box(s, 4.65, 1.2, 4.0, 2.25, 'Objective 2', ['• Accuracy of 15 sensor sets for three tasks', '• DT-EDNet vs comparison networks; best model', '• Camera contribution; gain over covariate baseline', '• Severity maps; accuracy at Bharatpur (independent test)'], C.purple, C.lpurple, { valign: 'top', align: 'left', fs: 13 });
+box(s, 8.85, 1.2, 4.03, 2.25, 'Objective 3', ['• Pre-symptomatic models for 15 sensor sets', '• Earliest detection day by set, variety, timing', '• Physiological changes before symptoms (7 Jan)', '• Risk maps; most cost-effective camera(s)'], C.red, C.lred, { valign: 'top', align: 'left', fs: 13 });
+const wp = [['A–B: calibration, mosaics, co-registration, vegetation pixels', 0, 1, C.blue], ['D–F: features, indices, covariates, normalisation, folds; 1.1', 1, 1, C.blue], ['1.2–1.8: selection inside folds; pre-symptomatic stage; physiology', 2, 1, C.g],
+  ['Objective 2: machine learning and feature-fusion networks (15 sets)', 3, 1, C.purple], ['Objective 2: DT-EDNet, comparison networks, ablation, SHAP, maps', 4, 1, C.purple], ['Objective 3; independent testing (Bharatpur); synthesis, writing', 5, 1, C.red]];
+const gx = 6.85, gw = 1.0;
+['M1', 'M2', 'M3', 'M4', 'M5', 'M6'].forEach((m, i) => T(s, '**' + m + '**', gx + i * gw, 3.55, gw, 0.3, { align: 'center', fontSize: 13 }));
+wp.forEach((w, i) => { const y = 3.88 + i * 0.42; T(s, w[0], 0.45, y, 6.3, 0.4, { valign: 'middle', fontSize: 13 }); for (let k = 0; k < 6; k++) s.addShape(pres.shapes.RECTANGLE, { x: gx + k * gw, y: y + 0.03, w: gw, h: 0.36, fill: { color: 'FAFAFA' }, line: { color: 'DDDDDD', width: 0.5 } });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: gx + w[1] * gw + 0.05, y: y + 0.07, w: w[2] * gw - 0.1, h: 0.28, fill: { color: w[3] }, line: { color: w[3] }, rectRadius: 0.05 }); });
+T(s, [{ text: 'Software: ', options: { bold: true, color: C.g } }, { text: 'ENVI or Python (GDAL, rasterio) for images; NumPy, pandas, scikit-learn (Pedregosa et al., 2011), XGBoost (Chen and Guestrin, 2016), SHAP (Lundberg and Lee, 2017), mlxtend (Raschka, 2018); PyTorch (Paszke et al., 2019) on a GPU.' }], 0.45, 6.45, 12.43, 0.55, { fontSize: 13 });
+// 48-49  ------------------------------------------------------------------ references
+const R = JSON.parse(fs.readFileSync(__dirname + '/../method3/mf3_refs_used.json', 'utf8')).concat(JSON.parse(fs.readFileSync(__dirname + '/pool.json', 'utf8')));
 const keys = [['Ma, J', '2026'], ['Saharan', '2014'], ['Chattopadhyay', '2011'], ['Kumar, S., Kalha', '2005'], ['Mishra', '2009'], ['Conn', '1990'], ['Bock, C.H., Poole', '2010'], ['Mahlein, A.-K. (2016)', '2016'], ['Maimaitijiang', '2020'],
   ['Feng, Z', '2022'], ['Guo, A', '2021'], ['Mahlein, A.-K., Rumpf', '2013'], ['Roberts', '2017'], ['Varma', '2006'], ['Li, H', '2009'], ['Lundberg, S.M., Lee', '2017'], ['Robnik', '2003'],
   ['Peng, H', '2005'], ['Haralick', '1973'], ['Dormann', '2013'], ['Pudil', '1994'], ['Cortes', '1995'], ['Breiman', '2001'], ['Chen, T', '2016'], ['He, K', '2016'], ['Tan, M', '2019'], ['Woo, S., Debnath', '2023'],
-  ['Woo, S., Park', '2018'], ['Hu, J', '2018'], ['Vaswani', '2017'], ['Zhu, H', '2017'], ['Zarco', '2018'], ['Wellburn', '1994'], ['Gomez', '1984']];
+  ['Woo, S., Park', '2018'], ['Hu, J', '2018'], ['Vaswani', '2017'], ['Zhu, H', '2017'], ['Zarco', '2018'], ['Wellburn', '1994'], ['Gomez', '1984'],
+  ['Bijlwan', '2025'], ['De Wolf', '2007'], ['DeLong', '1988'], ['Efron', '1993'], ['Madden', '2007'], ['McCullagh', '1980'], ['Zhang, J., Pu, R., Yuan', '2014'], ['Kuhn, M', '2013'], ['Ruan', '2022'], ['Benjamini', '1995'], ['Terentev', '2023']];
 const refs = keys.map(([k, y]) => R.find(r => r.startsWith(k) && r.includes('(' + y))).filter(Boolean).map(r => r.replace(/ https?:\/\/\S+$/, ''));
-const half = Math.ceil(refs.length / 2);
+refs.sort((a, b) => a.localeCompare(b)); const half = Math.ceil(refs.length / 2);
 [refs.slice(0, half), refs.slice(half)].forEach((part, i) => {
-  s = S('Key references (' + (i + 1) + '/2)', 'References', 'Key references; the full list is in the methodology document.');
+  s = S('Key references (' + (i + 1) + '/2)', 'References', 'Key references; full references of the 48 published indices are on the two index slides (Step D4); the complete list is in the methodology document.');
   const runs = part.map((r, j) => ({ text: r, options: { breakLine: j < part.length - 1, paraSpaceAfter: 2 } }));
-  s.addText(runs, { x: 0.45, y: 1.15, w: 12.43, h: 5.85, fontFace: F, fontSize: 12, color: C.dk, valign: 'top', isTextBox: true, margin: 0.05 });
+  s.addText(runs, { x: 0.45, y: 1.15, w: 12.43, h: 5.85, fontFace: F, fontSize: 10, color: C.dk, valign: 'top', isTextBox: true, margin: 0.05 });
 });
 // 50 ------------------------------------------------------------------ thank you
 s = pres.addSlide({ masterName: 'TITLE', sectionTitle: 'Conclusion' });
 s.addText('Thank you', { placeholder: 'title' });
 s.addText([{ text: 'Suggestions of the Advisory Committee are welcome', options: { breakLine: true } }, { text: ' ', options: { breakLine: true } }, { text: 'Animesh Panda | Ph.D. (Agricultural Physics) | ICAR-IARI, New Delhi' }], { placeholder: 'body' });
+if (refs.length !== keys.length) console.log('WARNING: references not found:', keys.filter(([k, y]) => !R.find(r => r.startsWith(k) && r.includes('(' + y))).map(k => k.join(' ')).join('; '));
 module.exports = { nrefs: refs.length };

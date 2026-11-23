@@ -1,8 +1,8 @@
-// Slide: stage-1 validation split (used in the full deck and as a one-slide file)
+// Slide: Activity F validation design – nested leave-one-replication-out split (used in the full deck and as a one-slide file)
 module.exports = function () {
 const { pres, F, FS, C, S, T, BL, box, arr, refline } = require('./adv_lib.js');
 let s;
-s = S('Stage-1 validation: nested leave-one-replication-out', 'Data processing',
+s = S('Activity F: Validation design (LORO and nested tuning)', 'Data processing',
   'How the data are split. The unit that moves between training and test is the plot with its four subplots and all dates. Outer loop: each fold tests one replication (12 inoculated plots) plus four rotated healthy plots and trains on the other 32 plots. Inner loop: inside the 32 training plots, three folds grouped by plot run every label-based step and choose features and hyper-parameters; the model is retrained on all 32 plots and predicts the test replication once. After three folds every sample is predicted once.');
 // ---- outer loop grid
 T(s, '**1. Outer loop – leave one replication out (3 folds)**', 0.45, 1.1, 7.5, 0.35, { color: C.blue });
@@ -32,11 +32,10 @@ box(s, 6.26, 5.08, 1.69, 1.68, 'Then', 'best mean inner score → retrain on all
 box(s, 8.15, 1.1, 4.73, 5.66, null, null, C.g, 'FBFCF9');
 T(s, '**Rules of the split**', 8.3, 1.18, 4.45, 0.35, { color: C.g });
 BL(s, ['**Unit = plot:** its 4 subplots and all dates stay in the same fold (no plot is seen in both training and test).',
-  '**Healthy plots rotated:** each test fold has every sowing timing once and every variety; each training part keeps 2–3 healthy plots per variety for healthy-plot normalisation (E2).',
-  '**Training statistics only:** z-score means and SDs, healthy references and class weights.',
+  '**Healthy plots rotated:** each test fold has every sowing timing once and every variety; each training part keeps 2–3 healthy plots per variety (E2).',
   '**Inner folds:** the 32 training plots form 3 groups (A, B, C ≈ 10–11 plots); each group is the validation part once.',
-  '**Same 3 folds** for all 15 sensor sets, all models and all 3 tasks.',
-  '**Result:** after 3 folds every sample is predicted once → pooled metrics and mean ± SD over folds.',
+  '**Same 3 folds** for all 15 sensor sets, models and tasks; every sample is predicted once → pooled metrics, mean ± SD over folds.',
+  '**Leakage checklist:** features once on all data (no labels); means, SDs, healthy references and class weights from the training part; label-based steps in inner folds; Bharatpur only with frozen models.',
   '**Why not a random split:** subplots and dates of one plot are correlated; random splits inflate accuracy.'], 8.25, 1.55, 4.55, 5.15, { ps: 5 });
 refline(s, 'Roberts et al. (2017); Varma and Simon (2006); Cawley and Talbot (2010); Ambroise and McLachlan (2002); Oerke et al. (2006).', 6.82, 0.3);
 };

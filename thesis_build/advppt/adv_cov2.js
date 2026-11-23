@@ -1,0 +1,25 @@
+// Step 2.5.5: covariate (sensor-free) baseline – two slides for the 2026-27 deck (no 2025-26 results)
+module.exports = function () {
+const { C, S, T, BL, box, chain, tb, refline } = require('./adv_lib.js');
+let s = S('Step 2.5.5: Covariate baseline model – purpose and design', 'Objective 2',
+  'A covariate baseline is a model built WITHOUT any sensor data, from what is known about the plot and the season (Step A6). Two baselines are fitted: an interpretable epidemiological model (B1) and the best machine-learning model (B2); the stronger is the reference M0. Sensor models (M1) and sensor + covariate models (M2) use the same folds and metrics.');
+box(s, 0.45, 1.2, 6.05, 3.2, 'Why a model without sensor data?', ['• **Calendar effect:** severity rises with days after inoculation and differs with variety, crop age, stage and weather; a camera model can look accurate only by learning the calendar (De Wolf and Isard, 2007).',
+  '• **Weather alone can be strong:** machine learning on weather predicted crop disease severity (Bijlwan et al., 2025).',
+  '• **Sensors add to weather:** reflectance + meteorological data raised accuracy from 69% to 78% for wheat powdery mildew (Zhang et al., 2014; Ruan et al., 2022).',
+  '• **Rule:** a sensor set is useful only if it beats the covariate-only model (Kuhn and Johnson, 2013).'], C.blue, C.lblue, { valign: 'top', align: 'left', fs: 13 });
+box(s, 6.78, 1.2, 6.1, 1.5, 'B1 – interpretable epidemiological model', ['A: logistic regression;  B: proportional-odds ordinal logistic regression (McCullagh, 1980)', 'C: linear model of the score with DAI and DAI² (Madden et al., 2007)'], C.purple, 'FFFFFF', { valign: 'top', align: 'left', fs: 13 });
+box(s, 6.78, 2.85, 6.1, 1.55, 'B2 – machine-learning baseline', ['best model of Activity 2.2 (e.g., random forest; Breiman, 2001) with the same inner grid search as the sensor models; covariates incl. weather and favourable days'], C.purple, 'FFFFFF', { valign: 'top', align: 'left', fs: 13 });
+tb(s, [['Model set', 'Inputs', 'Question answered'], ['M0 – covariate baseline', 'covariates only (stronger of B1 and B2)', 'how much do time, crop age, variety, stage and weather explain?'],
+  ['M1 – sensor model', 'each of the 15 sensor sets (fused features)', 'what do the cameras achieve alone?'], ['M2 – sensor + covariates', 'best 3 sensor sets + covariates', 'does known context add to the cameras? (labelled "within-season")']],
+  0.45, 4.6, 12.43, [2.8, 4.1, 5.53], { firstCol: true, fs: 13 });
+T(s, '**Samples:** inoculated, unsprayed plots only (healthy plots are fungicide-protected and share every covariate with their inoculated plots). **Inputs (Step A6):** DAI from 30 Dec 2026, crop age at inoculation (41, 34, 27, 20 days), variety, BBCH stage, 7-day weather ending the day before each flight (no look-ahead), favourable days (Chattopadhyay et al., 2011).', 0.45, 6.05, 12.43, 0.95, { fontSize: 13 });
+s = S('Step 2.5.5: Gain of the sensors and decision rule', 'Objective 2',
+  'The gain of the sensors is the metric of the sensor model minus the metric of the covariate baseline. With only three outer folds the gain is tested by a block bootstrap of the pooled test predictions that resamples whole plots; AUCs are compared with the DeLong test. A gain is reported as real only when all three criteria hold.');
+box(s, 0.45, 1.2, 6.1, 1.6, 'Gains', ['ΔS (sensor gain) = metric(M1) − metric(M0)', 'ΔC (context gain) = metric(M2) − metric(M1)', 'ΔT (total gain) = metric(M2) − metric(M0)', 'A: macro-F1, AUC;  B: macro-F1, QWK;  C: R², RMSE'], C.blue, C.lblue, { fs: 13 });
+box(s, 0.45, 2.95, 6.1, 2.0, 'Is the gain real?', ['• block bootstrap of pooled test predictions resampling whole plots (2000 times) → 95% CI of Δ (Efron and Tibshirani, 1993)', '• AUC of M1 vs M0: DeLong test (DeLong et al., 1988)', '• **real gain:** CI excludes 0, |Δ| > fold SD and the same sign in all 3 folds'], C.blue, 'FFFFFF', { align: 'left', fs: 13 });
+tb(s, [['Outcome', 'Meaning'], ['M1 > M0 (CI above 0)', 'cameras detect disease beyond the calendar and growth stage'], ['M1 ≈ M0', 'sensor features mainly track time or stage; check results within each stage'],
+  ['M2 > M1', 'known context adds information; reported as within-season only'], ['M0 high for detection only', 'epidemic level follows time; sensor value lies in severity grading']], 6.78, 1.2, 6.1, [2.3, 3.8], { firstCol: true, fs: 13 });
+BL(s, ['**Pre-symptomatic stage (Step 3.5.3):** the same baseline (DAI, variety, timing, stage, weather) is compared with the pre-symptomatic sensor models.', '**Independent testing at Bharatpur (Step 2.7.3):** covariate models are re-tested with local variety, sowing date and weather, together with the frozen sensor models.',
+  '**Interpretation:** B1 coefficients show the direction and size of each known effect (e.g., later sowing, susceptible variety).'], 0.45, 5.15, 12.43, 1.3);
+refline(s, 'Efron and Tibshirani (1993); DeLong et al. (1988); Zhang et al. (2014); Chattopadhyay et al. (2011); Roberts et al. (2017); Kuhn and Johnson (2013).', 6.55, 0.4);
+};
