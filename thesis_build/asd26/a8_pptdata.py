@@ -51,4 +51,13 @@ for fn, key in (('ml_models_index.csv', 'ml_files'), ('dl_models_index.csv', 'dl
 out['refs'] = json.load(open(D + 'refs_used.json')) if os.path.exists(D + 'refs_used.json') else []
 st_ = pd.read_csv(D + 'selection_stability.csv'); out['sffs_top'] = list(st_[st_.group.str.startswith('SFFS')].groupby('feature').folds.sum().sort_values(ascending=False).index[:5])
 out['prog'] = json.loads(pd.read_csv(D + 'disease_progress.csv').round(3).to_json(orient='records'))
+for fn, key in (('cov2_metrics.csv', 'cov2_metrics'), ('cov2_gains.csv', 'cov2_gains'), ('cov2_delong.csv', 'cov2_delong'), ('cov2_b1_coef.csv', 'cov2_coef'), ('cov2_covariates_by_date.csv', 'cov2_dates')):
+    if os.path.exists(D + fn): out[key] = json.loads(pd.read_csv(D + fn).round(4).to_json(orient='records'))
+if os.path.exists(D + 'cov2_summary.json'): out['cov2_summary'] = json.load(open(D + 'cov2_summary.json'))
+lp = pd.crosstab(M.date, M.leaf); pp = M.groupby(['date', 'plot']).size(); Xl = np.load(D + 'X_leaf.npy')
+out['leafpos'] = [dict(date=d, **{c: int(lp.loc[d].get(c, 0)) for c in ('L3', 'L4', 'L5', 'LL')}, n=int(lp.loc[d].sum()), plots=int(M[M.date == d]['plot'].nunique()),
+                       med=int(pp.loc[d].median()), mn=int(pp.loc[d].min()), mx=int(pp.loc[d].max())) for d in sorted(M.date.unique())]
+out['qc'] = dict(n_healthy_block=int((M.block == 'C').sum()), healthy_block_diseased=int(((M.block == 'C') & (M.grade > 0)).sum()), n_inoc=int((M.inoculated == 1).sum()),
+                 n_inoc_healthy=int(((M.inoculated == 1) & (M.grade == 0)).sum()), n_inoc_dis=int(((M.inoculated == 1) & (M.grade > 0)).sum()),
+                 rmin=round(float(Xl.min()), 3), rmax=round(float(Xl.max()), 3), nan=int(np.isnan(Xl).sum()), bands=int(Xl.shape[1]), med=int(pp.median()), mn=int(pp.min()), mx=int(pp.max()))
 json.dump(out, open(D + 'ppt_data.json', 'w'), indent=0, default=float); print('ppt data ok', len(json.dumps(out)) // 1000, 'kB')

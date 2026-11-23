@@ -41,6 +41,8 @@ ms = pd.read_csv(D + 'o1_mean_spectra.csv'); cc = pd.read_csv(D + 'o1_corr_curve
 mls = pd.read_csv(D + 'ml_selection.csv'); strata = pd.read_csv(D + 'strata_metrics.csv'); cov = pd.read_csv(D + 'covariate_baseline.csv')
 wc = pd.read_csv(D + 'weather_covariates.csv'); prog = pd.read_csv(D + 'disease_progress.csv')
 opt = lambda fn: pd.read_csv(D + fn) if os.path.exists(D + fn) else None
+cv2m, cv2g, cv2d, cv2c, cv2x = opt('cov2_metrics.csv'), opt('cov2_gains.csv'), opt('cov2_delong.csv'), opt('cov2_b1_coef.csv'), opt('cov2_covariates_by_date.csv')
+cv2s = json.load(open(D + 'cov2_summary.json')) if os.path.exists(D + 'cov2_summary.json') else None
 tt, ex, stab, cfg, abl = opt('transfer_tests.csv'), opt('exploratory_asymptomatic.csv'), opt('selection_stability.csv'), opt('dl_summary_config.csv'), opt('dl_summary_ablation.csv')
 MLM = ['SVM', 'RF', 'XGBoost', 'k-NN', 'PLS-DA', 'PLS']; DLM = ['DNN-F1', 'DT-EDNet', 'EfficientNet-B0', 'ResNet18', 'ConvNeXt V2-Atto']
 GR = [0, 1, 3, 5, 7, 9]; N = len(M)
@@ -95,7 +97,7 @@ TAB('objectives', [['Objective (thesis)', 'Question answered with the 2025-26 le
 
 # ------------------------------------------------------------------ 2 materials and methods
 H1('2. Materials and methods')
-FIG('workflow', 'f00_workflow.png', 'Workflow of the analysis: data and pre-processing, Objective 1 (spectral response and feature selection), validation design, Objective 2 (models and evaluation) and interpretation.', 620)
+FIG('workflow', 'f00_workflow.png', 'Workflow of the analysis from data collection to discussion: data collection and quality control, pre-processing and features, Objective 1 (spectral response and feature selection), validation design, Objective 2 (models and evaluation), covariate baseline, interpretation and discussion.', 620)
 H2('2.1 Experiment and field layout')
 P('The 2025-26 experiment had 48 plots (5 m × 3.5 m, 0.5-m bunds, 2-m channels; field 48 m × 24 m). Plots 1–12 formed the healthy block, kept free of disease by fungicide sprays; plots 13–24, 25–36 and 37–48 were the three inoculated replications (R3, R2, R1). Each block contained the 12 combinations of three varieties (V1, V2, V3) and four sowing dates (D1–D4). All inoculated plots were inoculated on 5 February 2026.')
 das0 = {t: (pd.Timestamp('2026-02-05') - pd.Timestamp(s)).days for t, s in (('D1', '2025-12-09'), ('D2', '2025-12-18'), ('D3', '2025-12-27'), ('D4', '2026-01-09'))}
@@ -103,8 +105,13 @@ TAB('design', [['Sowing timing', 'Sowing date', 'Planned crop age at inoculation
     *[[t, s, p, str(das0[t]), ', '.join(str(int(M[(M.timing == t) & (M.date == d)].DAS.iloc[0])) for d in dates)] for t, s, p in (('D1', '9 Dec 2025', '50'), ('D2', '18 Dec 2025', '40'), ('D3', '27 Dec 2025', '30'), ('D4', '9 Jan 2026', '20'))]],
     'Sowing timings, crop age at inoculation (5 February 2026) and at the sampling dates.', [1500, 1700, 2100, 1900, 2106])
 NOTE('Check: with inoculation on 5 February 2026 the sowing dates give a crop age of %d, %d, %d and %d days, not the planned 50, 40, 30 and 20 days after sowing (DAS). The analysis uses the actual dates; the planned values are kept only as labels of the timing treatments.' % tuple(das0[t] for t in ('D1', 'D2', 'D3', 'D4')))
-H2('2.2 Leaf spectra and disease scores')
-P('Leaf reflectance was measured with the ASD contact probe (internal halogen source, leaf clip) over 350–2500 nm. The files were already splice-corrected at the detector joins. Three leaf positions were sampled on each plant: the third (L3) and fifth (L5) fully expanded leaf from the top and the lowest green leaf (LL). Each spectrum was scored on the 0–9 white rust scale (grades 0, 1, 3, 5, 7, 9). Plot-average columns present in the files were not used: the analysis is at leaf level, as agreed. Nine spectra of 11 February are labelled L4 in the files; they were kept as recorded.')
+H2('2.2 Leaf spectra acquisition and disease scoring (Step A4)')
+P('On each of the four sampling dates (11 and 24 February, 3 and 13 March 2026; 6, 19, 26 and 36 days after inoculation) leaves were measured in all 48 plots with the ASD FieldSpec spectroradiometer fitted with the contact probe and leaf clip. The probe has its own halogen light source, so readings do not depend on the sky (Milton et al., 2009). Reflectance was recorded from 350 to 2500 nm at 1-nm intervals, and the files were already splice-corrected at the detector joins. Three leaf positions were sampled: the third (L3) and fifth (L5) fully expanded leaf from the top and the lowest green leaf (LL); nine spectra of 11 February are labelled L4 in the files and were kept as recorded. Each measured leaf was scored on the 0–9 white rust scale (grades 0, 1, 3, 5, 7, 9).')
+P('Each date was delivered as one Excel file in which every leaf spectrum is a column with seven header rows (wavelength, plot number, variety, growth stage, plot status, leaf position, score). Columns with plot averages were also present but were not used, because the analysis is at leaf level.')
+lp = pd.crosstab(M.date, M.leaf)
+TAB('leafpos', [['Date', 'L3', 'L4', 'L5', 'LL', 'Leaves', 'Plots', 'Leaves per plot (median, range)']] + [[pd.Timestamp(d).strftime('%d %b %Y'), *[str(int(lp.loc[d].get(c, 0))) for c in ('L3', 'L4', 'L5', 'LL')], str(int(lp.loc[d].sum())), str(int(M[M.date == d]['plot'].nunique())),
+    '%d (%d–%d)' % (M[M.date == d].groupby('plot').size().median(), M[M.date == d].groupby('plot').size().min(), M[M.date == d].groupby('plot').size().max())] for d in dates],
+    'Leaf spectra by sampling date and leaf position.', [1500, 800, 800, 800, 800, 1000, 900, 2706])
 dt_rows = [['Date', 'Days after inoculation', 'Growth stages', 'Leaves', 'Mean grade', 'Diseased leaves (%)']]
 for d in dates:
     g = M[M.date == d]; dt_rows.append([pd.Timestamp(d).strftime('%d %b %Y'), str(DAI[d]), ', '.join(sorted(g.stage.unique())), str(len(g)), f2(g.grade.mean()), '%.1f' % (100 * g.diseased.mean())])
@@ -113,28 +120,41 @@ TAB('dates', dt_rows, 'Sampling dates, growth stages and disease level of the le
 TAB('grades', [['Grade', *[str(g) for g in GR], 'Total'], ['Leaves', *[str(gN[g]) for g in GR], str(N)], ['Share (%)', *['%.1f' % (100 * gN[g] / N) for g in GR], '100']],
     'Number of leaves in each severity grade (pooled data).', [1500] + [1000] * 6 + [1806])
 FIG('dataset', 'f01_dataset.png', 'Leaves by (a) sampling date, (b) growth stage, (c) variety and (d) leaf position, coloured by severity grade.', 560)
-H2('2.3 Three prediction tasks')
+H2('2.3 Weather data and covariates (Step A6)')
+P('Daily weather of the season (1 December 2025 to 20 March 2026) came from the IARI agro-meteorological observatory: maximum and minimum air temperature (T_{max}, T_{min}), rainfall, morning (RH I) and afternoon (RH II) relative humidity, wind speed, bright sunshine and evaporation. For every sampling date the 7 days before the date were summarised (mean T_{max}, T_{min}, RH I, RH II; total rainfall). The window ends the day before the date, so no later weather enters any model. Favourable days since inoculation were counted for leaf infection (T_{max} 16–24 °C, RH I > 97% and RH II > 40%) and for staghead (T_{max} 20–29 °C, T_{min} > 12 °C and RH I > 97%) (Chattopadhyay et al., 2011). Leaf-level covariates were days after inoculation, inoculation timing (D1–D4; crop age 58, 49, 40 and 27 days at inoculation), variety and growth stage (vegetative, flowering, pod formation, coded 1–3 following the BBCH ranges; Lancashire et al., 1991).')
+if cv2x is not None:
+    TAB('covdate', [['Date', 'DAI', 'Tmax 7 d (°C)', 'Tmin 7 d (°C)', 'RH I 7 d (%)', 'RH II 7 d (%)', 'Rain 7 d (mm)', 'Favourable days: leaf', 'Favourable days: staghead']] +
+        [[pd.Timestamp(r.date).strftime('%d %b'), str(DAI[r.date]), '%.1f' % r.Tmax7, '%.1f' % r.Tmin7, '%.0f' % r.RH1_7, '%.0f' % r.RH2_7, '%.1f' % r.rain7, str(int(r.fav_leaf)), str(int(r.fav_staghead))] for r in cv2x.itertuples()],
+        'Weather covariates of the four sampling dates (7-day windows ending the day before each date).', [1000, 700, 1050, 1050, 950, 950, 1000, 1300, 1306], 15)
+H2('2.4 Data organisation and quality control')
+NL(['**Parsing:** the four files were read; the %d leaf columns (headers ending in .sco) were kept and the plot-average columns were skipped.' % N,
+    '**Treatments:** plot numbers were joined to the field layout (block, sowing timing, variety); the variety written in the files agreed with the layout for all 48 plots.',
+    '**Labels:** grade from the score; detection label diseased = grade > 0. The %d leaves of the healthy block were all grade 0; %d leaves came from inoculated plots.' % (int((M.block == 'C').sum()), int((M.inoculated == 1).sum())),
+    '**Derived fields:** days after inoculation (from 5 February 2026), crop age from the sowing dates and the growth-stage code.',
+    '**Checks:** grades only 0, 1, 3, 5, 7 or 9; wavelength grid 350–2500 nm at 1 nm; no missing values; reflectance between %.3f and %.3f; all 48 plots on every date; %d–%d leaves per plot and date (median %d).' % (float(np.load(D + 'X_leaf.npy').min()), float(np.load(D + 'X_leaf.npy').max()), M.groupby(['date', 'plot']).size().min(), M.groupby(['date', 'plot']).size().max(), M.groupby(['date', 'plot']).size().median()),
+    '**Folds:** every leaf was assigned to the outer fold of its plot (Step F1, section 2.6).'])
+H2('2.5 Three prediction tasks')
 TAB('tasks', [['Task', 'Target', 'Type', 'Main metric'], ['A – detection', 'grade 0 (healthy) vs grade > 0 (diseased); %d vs %d leaves' % (gN[0], N - gN[0]), 'binary classification', 'macro-F1, AUC'],
     ['B – six grades', 'grade 0, 1, 3, 5, 7, 9', 'multi-class (ordinal) classification', 'macro-F1, quadratic weighted kappa'], ['C – severity score', 'grade as a number 0–9', 'regression', 'R², RMSE, RPD']],
     'Prediction tasks.', [1700, 3500, 2300, 1806])
-H2('2.4 Pooling and validation design')
+H2('2.6 Pooling and validation design')
 CARD('cvcard', 'Leave-one-replication-out validation (Steps F1–F3)',
      'The model is trained on two replications and tested on the third, which it has never seen; repeated three times so that every leaf is tested once.',
      'Leaves of one plot share soil, microclimate and inoculum, so random leaf splits would put near-copies in training and test and inflate accuracy. Blocking by replication avoids this (Roberts et al., 2017). The fungicide-protected healthy plots are rotated so that every test fold has four healthy plots.',
      'Spatially blocked cross-validation (Roberts et al., 2017); nested selection and tuning inside the training part to avoid selection bias (Ambroise and McLachlan, 2002; Varma and Simon, 2006; Cawley and Talbot, 2010).',
      'Fold 1 tests R1 (plots 37–48) + healthy plots 7, 2, 10, 12; fold 2 tests R2 + 5, 8, 4, 1; fold 3 tests R3 + 3, 9, 11, 6. Feature selection, SFFS and grid search use only the training part, with inner GroupKFold(3) by plot.',
-     'Pooled test predictions of all %d leaves for every model.' % N, 'Leave-one-date-out was not used because the dates differ in growth stage and disease level (see 2.9 for the transfer tests).')
+     'Pooled test predictions of all %d leaves for every model.' % N, 'Leave-one-date-out was not used because the dates differ in growth stage and disease level (see 2.12 for the transfer tests).')
 TAB('folds', [['Outer fold', 'Test replication', 'Healthy plots in test', 'Test leaves', 'Training leaves'],
     *[[str(f + 1), {0: 'R1 (37–48)', 1: 'R2 (25–36)', 2: 'R3 (13–24)'}[f], {0: '7, 2, 10, 12', 1: '5, 8, 4, 1', 2: '3, 9, 11, 6'}[f], str(int((M.fold == f).sum())), str(int((M.fold != f).sum()))] for f in range(3)]],
     'Outer folds of the leave-one-replication-out design.', [1500, 2000, 2300, 1700, 1806])
-H2('2.5 Pre-processing (Steps B3 and D2 for leaf spectra)')
+H2('2.7 Pre-processing (Steps B3 and D2 for leaf spectra)')
 CARD('prepcard', 'Spectral range, smoothing and first derivative',
      'Savitzky–Golay smoothing fits a local polynomial in a moving window; the same fit gives the first derivative, which removes additive offsets and sharpens the red edge (Savitzky and Golay, 1964; Tsai and Philpot, 1998).',
      'Contact-probe spectra are clean, but the detector ends (350–399 nm and 2401–2500 nm) are noisy. Water-absorption regions (1350–1460 and 1790–1960 nm) were kept: the probe uses its own light source, so atmospheric water does not affect them, and they carry leaf-water information.',
      'Savitzky–Golay with the first derivative in rice blast (Ma et al., 2026) and wheat diseases (Huang et al., 2020; Meng et al., 2020); derivative analysis of leaf spectra (Tsai and Philpot, 1998).',
      'Savitzky–Golay window 11 nm, order 2, applied on 350–2500 nm; spectra trimmed to 400–2400 nm; first derivative from the same filter; bands taken every 5 nm (401 reflectance + 401 derivative features).',
      'Smoothed reflectance R_{λ} and first derivative FD_{λ} (×10^{-3} nm^{-1}) at 5 nm.', 'The second derivative was not used (agreed rule: it amplifies noise). Standard normal variate and continuum removal were not needed for contact-probe data.')
-H2('2.6 Spectral features')
+H2('2.8 Spectral features')
 IDXF = {'NDVI': '(R_{800}−R_{670})/(R_{800}+R_{670})', 'NDVI850': '(R_{850}−R_{650})/(R_{850}+R_{650})', 'SR': 'R_{800}/R_{680}', 'RVI': 'R_{800}/R_{670}', 'GNDVI': '(R_{850}−R_{550})/(R_{850}+R_{550})',
         'RDVI': '(R_{800}−R_{670})/√(R_{800}+R_{670})', 'MSR': '(R_{800}/R_{670}−1)/√(R_{800}/R_{670}+1)', 'OSAVI': '1.16(R_{800}−R_{670})/(R_{800}+R_{670}+0.16)', 'TVI': '0.5[120(R_{750}−R_{550})−200(R_{670}−R_{550})]',
         'MTVI2': '1.5[1.2(R_{800}−R_{550})−2.5(R_{670}−R_{550})]/√[(2R_{800}+1)^{2}−(6R_{800}−5√R_{670})−0.5]', 'MCARI': '[(R_{700}−R_{670})−0.2(R_{700}−R_{550})](R_{700}/R_{670})',
@@ -148,7 +168,7 @@ IREF = json.load(open(D + 'index_refs.json')); rcorr = F.corrwith(M.grade)
 idx_rows = [['Index', 'Formula', 'Reference', 'r with grade']] + [[k, v, IREF.get(k, ''), f2(rcorr.get(k, np.nan))] for k, v in IDXF.items()]
 P('Forty-one published vegetation indices (pigment, structure, red edge, water and disease indices) and three red-edge parameters (44 features) were computed from the 1-nm smoothed reflectance ([[T:indices]]). Three data-driven indices were added in Objective 1: the best normalised difference spectral index (NDSI_best), the best ratio spectral index (RSI_best) and the White Rust Index (WRI).')
 TAB('indices', idx_rows, 'Vegetation indices and red-edge parameters computed for every leaf, with Pearson r against the leaf grade (n = %d).' % N, [1300, 4300, 2600, 1106], 15)
-H2('2.7 Objective 1 – spectral response and disease-specific features')
+H2('2.9 Objective 1 – spectral response and disease-specific features')
 CARD('o11card', 'Activity 1.1 – Response analysis', 'Mean reflectance and first-derivative curves of each grade show where and how the spectrum changes with disease; Pearson correlation of each band with the grade measures the strength of the change.',
      'It is the first, model-free evidence of the disease signal and shows whether the response is consistent across varieties, stages and dates.', 'Mean spectra and correlation curves are the standard first step in disease spectroscopy (Mahlein et al., 2013; Meng et al., 2020; Mandal et al., 2023; Ma et al., 2026).',
      'Means ± SD by grade for 400–2400 nm; first derivative; r of each 5-nm band and derivative with the grade; spectra by growth stage; mean grade by stage, variety, leaf position and timing.', 'Disease-sensitive regions; evidence for the band selection that follows.')
@@ -164,7 +184,7 @@ CARD('o13card', 'Activities 1.3–1.4 – Index construction and ReliefF selecti
 CARD('o16card', 'Activity 1.6 – Variance inflation factor and the disease-specific feature set', 'VIF = 1/(1 − R²_{j}) measures how well feature j is explained by the others; the feature with the largest VIF is removed until all are below 10.',
      'Optimal wavelengths and indices overlap; strong collinearity makes models unstable and explanations unreliable (Dormann et al., 2013; O\'Brien, 2007).', 'VIF screening before modelling (Dormann et al., 2013; Mandal et al., 2023).',
      'Pool = optimal wavelengths + selected indices; iterative removal until all VIF < 10.', 'Disease-specific feature set (DSF): the input of Objective 2.')
-H2('2.8 Objective 2 – models')
+H2('2.10 Objective 2 – models')
 P('The selection of Objective 1 was repeated inside the training part of every outer fold (Step 2.1.2), so the test replication never influenced which features were used. Each machine-learning model then chose its own compact subset by sequential floating forward selection (SFFS; Pudil et al., 1994) and its hyper-parameters by grid search, both with inner GroupKFold(3) by plot. Features were standardised with training statistics only.')
 TAB('mlmodels', [['Model', 'Principle (one line)', 'Grid searched', 'Reference'],
     ['SVM / SVR', 'maximum-margin boundary with radial basis kernel', 'C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5} (SVR)', 'Cortes and Vapnik (1995)'],
@@ -184,21 +204,34 @@ TAB('metrics', [['Metric', 'Formula / meaning', 'Use'], ['Overall accuracy (OA)'
     ['Quadratic weighted kappa (QWK)', 'kappa with penalty growing with the squared grade distance (Cohen, 1968)', 'B (ordinal)'], ['Within one grade', 'share of leaves predicted at most one class away', 'B'],
     ['R², RMSE, MAE', 'explained variance, root mean square and mean absolute error (grade units)', 'C'], ['RPD', 'SD of observed / RMSE; > 2 good, 1.4–2 fair, < 1.4 poor (Williams, 2001)', 'C'], ['Bias', 'mean (predicted − observed)', 'C']],
     'Evaluation metrics.', [2400, 5400, 1506], 16)
-H2('2.9 Interpretation, robustness, covariates and the exploratory test')
+H2('2.11 Covariate baseline model without sensor data (Step 2.5.5)')
+P('Severity rose with days after inoculation and differed with variety, crop age, growth stage and weather, so a spectral model could look accurate only by learning the calendar (De Wolf and Isard, 2007). Weather alone can predict disease severity well (Bijlwan et al., 2025), and adding sensor data to meteorological data improved forecasts of wheat powdery mildew from 69% to 78% overall accuracy (Zhang et al., 2014; see also Ruan et al., 2022). A covariate baseline was therefore built without any spectral data, and the spectra are credited only with what they add to it (Kuhn and Johnson, 2013).')
+TAB('covmodels', [['Model', 'Detection (A)', 'Six grades (B)', 'Severity score (C)', 'Covariates used'],
+    ['B1 – statistical (interpretable)', 'logistic regression (C tuned)', 'proportional-odds ordinal logistic regression (McCullagh, 1980)', 'linear model with DAI and DAI² (Madden et al., 2007)', 'variety, timing, growth stage, DAI, DAI²'],
+    ['Random forest', 'tuned in inner folds', 'tuned in inner folds', 'tuned in inner folds (= best ML for C)', 'all covariates incl. weather and favourable days'],
+    ['B2 – best machine-learning model of Activity 2.2', 'SVM', 'XGBoost', 'random forest', 'all covariates incl. weather and favourable days']],
+    'Covariate-only models. With four sampling dates the date-level weather variables are collinear with DAI; in B1 the date effect is therefore represented by DAI and DAI².', [2300, 1600, 2100, 1700, 1606], 15)
+BL(['**Samples:** inoculated, unsprayed leaves only (n = %d); the healthy plots were fungicide-protected and share every covariate with their inoculated plots, so they would teach a false rule.' % int((M.inoculated == 1).sum()),
+    '**Inputs:** covariates only, leaf spectra (the fold-wise disease-specific feature set) and spectra + covariates, each with the three models; same outer folds, inner tuning grouped by plot, standardisation with training statistics.',
+    '**Model sets:** M0 = the stronger covariate-only model; M1 = the best machine-learning model on leaf spectra; M2 = the same model on spectra + covariates.',
+    '**Gains:** ΔS = metric(M1) − metric(M0) (what the spectra add); ΔC = metric(M2) − metric(M1) (what the covariates add to the spectra); ΔT = metric(M2) − metric(M0).',
+    '**Is a gain real?** 95% confidence interval from 2000 bootstrap resamples of the pooled test predictions that resample whole plots (Efron and Tibshirani, 1993); AUCs compared with the DeLong test (DeLong et al., 1988). A gain is called real when the interval excludes zero, it is larger than the fold-to-fold SD and it has the same sign in all three folds.',
+    '**Interpretable model:** B1 was also fitted on all inoculated leaves with standardised covariates to show the direction and size of each effect.'])
+H2('2.12 Interpretation, robustness and the exploratory test')
 BL(['**SHAP** of an XGBoost model on the Objective 1 feature set: direction and size of each feature\'s effect (Lundberg and Lee, 2017).',
     '**Strata:** test metrics of the best models by growth stage, variety, leaf position and date.',
     '**Transfer tests:** leave-one-variety-out and leave-one-timing-out with random forest, feature selection repeated inside each training set.',
     '**Selection stability:** how often each optimal wavelength and index was chosen across the three outer folds.',
-    '**Covariate baseline (Step 2.5.5):** random forest on (i) covariates only (variety, timing, days after inoculation, growth stage and 7-day weather), (ii) leaf spectra (DSF) and (iii) both, on inoculated, unsprayed plots only, because the healthy plots were sprayed with fungicide (agreed decision; Chattopadhyay et al., 2011).',
     '**Exploratory pre-symptomatic test:** grade-0 leaves of inoculated plots vs leaves of the healthy plots, same folds. This is only a proxy: the true Objective 3 needs the pre-symptomatic dates of 2026-27.'])
-H2('2.10 Software and final models')
+H2('2.13 Software and final models')
 P('Python 3 with NumPy, pandas, SciPy, scikit-learn (Pedregosa et al., 2011), mlxtend (Raschka, 2018), XGBoost (Chen and Guestrin, 2016), SHAP (Lundberg et al., 2020) and PyTorch (Paszke et al., 2019). After evaluation, every model was refitted on all %d leaves with the same procedure and saved (Step 2.7.1): machine-learning models as joblib files, networks as PyTorch state dictionaries, with the feature definitions and a prediction script for new spectra.' % N)
 
 # ------------------------------------------------------------------ 3 results
 H1('3. Results')
 H2('3.1 Disease progress and weather')
-P('The mean grade rose from %.2f at %d days after inoculation to %.2f at %d days; the share of diseased leaves rose from %.0f%% to %.0f%%. Weather after inoculation became warmer and drier: the 7-day mean maximum temperature increased from %.1f to %.1f °C and afternoon relative humidity fell from %.0f%% to %.0f%%. Days with a maximum temperature of 16–24 °C and afternoon humidity above 40%% (favourable for white rust; Chattopadhyay et al., 2011) occurred mainly in the first week after inoculation ([[F:weather]], [[T:weather]]).' % (
-    prog.mean_grade.iloc[0], DAI[dates[0]], prog.mean_grade.iloc[-1], DAI[dates[-1]], prog.pct_diseased.iloc[0], prog.pct_diseased.iloc[-1], wc.Tmax7.iloc[0], wc.Tmax7.iloc[-1], wc.RH2_7.iloc[0], wc.RH2_7.iloc[-1]))
+WS_ = pd.read_csv(D + 'weather_season.csv', parse_dates=['date']); WS_ = WS_[(WS_.date >= '2026-02-05') & (WS_.date < pd.Timestamp(dates[-1]))]; H97 = WS_[WS_.RH1 > 97]
+P('The mean grade rose from %.2f at %d days after inoculation to %.2f at %d days; the share of diseased leaves rose from %.0f%% to %.0f%%. Weather after inoculation became warmer and drier: the 7-day mean maximum temperature increased from %.1f to %.1f °C and afternoon relative humidity fell from %.0f%% to %.0f%%. Days with a maximum temperature of 16–24 °C and afternoon humidity above 40%% (favourable for white rust; Chattopadhyay et al., 2011) occurred mainly in the first week after inoculation, but on those days morning humidity was at most 97%%, while the %d days with morning humidity above 97%% were too warm (T_{max} %.0f–%.0f °C) and had cool nights (T_{min} ≤ %.1f °C). The complete leaf-infection and staghead criteria of Chattopadhyay et al. (2011), which also need RH I > 97%%, were therefore not met on any day ([[F:weather]], [[T:weather]]).' % (
+    prog.mean_grade.iloc[0], DAI[dates[0]], prog.mean_grade.iloc[-1], DAI[dates[-1]], prog.pct_diseased.iloc[0], prog.pct_diseased.iloc[-1], wc.Tmax7.iloc[0], wc.Tmax7.iloc[-1], wc.RH2_7.iloc[0], wc.RH2_7.iloc[-1], len(H97), H97.Tmax.min(), H97.Tmax.max(), H97.Tmin.max()))
 FIG('weather', 'f15_weather_progress.png', 'Weather of the season (IARI observatory) with sowing dates, inoculation and the four leaf sampling dates (boxes: days after inoculation, mean grade and % diseased leaves).', 620)
 TAB('weather', [['Date', 'Days after inoculation', 'Mean grade', 'Diseased (%)', 'T max 7 d (°C)', 'T min 7 d (°C)', 'RH I 7 d (%)', 'RH II 7 d (%)', 'Rain 7 d (mm)', 'Favourable days*'],
     *[[pd.Timestamp(r.date).strftime('%d %b'), str(DAI[r.date]), f2(r.mean_grade), '%.0f' % r.pct_diseased, '%.1f' % r.Tmax7, '%.1f' % r.Tmin7, '%.0f' % r.RH1_7, '%.0f' % r.RH2_7, '%.1f' % r.rain7, str(int(r.fav_days_TRH2))] for r in prog.itertuples()]],
@@ -314,14 +347,39 @@ if tt is not None:
     P('In the transfer tests, macro-F1 on a held-out variety was %s and on a held-out timing %s; RMSE on held-out groups was %.2f–%.2f grades, close to the cross-validated value, so the models did not depend on one variety or timing ([[F:transfer]]).' % (
         ', '.join('%s %.2f' % (r.level, r.macro_F1) for r in tb[tb.test == 'variety'].itertuples()), ', '.join('%s %.2f' % (r.level, r.macro_F1) for r in tb[tb.test == 'timing'].itertuples()), tc.RMSE.min(), tc.RMSE.max()))
     FIG('transfer', 'f26_transfer.png', 'Leave-one-variety-out and leave-one-timing-out tests (random forest).', 600)
-H2('3.12 Covariates and weather (Step 2.5.5)')
-cv = lambda t, v, k: cov[(cov.task == t) & (cov.variant == v)][k].iloc[0]
-P('On inoculated plots, covariates alone (variety, timing, days after inoculation, growth stage, 7-day weather) gave macro-F1 %.3f for detection, %.3f for six grades and R² %.3f for the score. Leaf spectra gave %.3f, %.3f and %.3f, and spectra plus covariates %.3f, %.3f and %.3f ([[F:cov]], [[T:cov]]). Covariates capture the epidemic stage; spectra add the leaf-to-leaf differences within a stage.' % (
-    cv('A', 'covariates only', 'macro_F1'), cv('B', 'covariates only', 'macro_F1'), cv('C', 'covariates only', 'R2'), cv('A', 'leaf spectra (DSF)', 'macro_F1'), cv('B', 'leaf spectra (DSF)', 'macro_F1'), cv('C', 'leaf spectra (DSF)', 'R2'),
-    cv('A', 'leaf spectra + covariates', 'macro_F1'), cv('B', 'leaf spectra + covariates', 'macro_F1'), cv('C', 'leaf spectra + covariates', 'R2')))
-TAB('cov', [['Input (random forest, inoculated plots)', 'Detection macro-F1', 'Six grades macro-F1', 'Score R²', 'Score RMSE']] + [[v, f3(cv('A', v, 'macro_F1')), f3(cv('B', v, 'macro_F1')), f3(cv('C', v, 'R2')), f3(cv('C', v, 'RMSE'))] for v in ('covariates only', 'leaf spectra (DSF)', 'leaf spectra + covariates')],
-    'Covariate baseline and spectra + covariate models (inoculated, unsprayed plots only).', [3306, 1500, 1500, 1500, 1500], 16)
-FIG('cov', 'f27_covariates.png', 'Covariates only, leaf spectra and both (inoculated plots).', 600)
+H2('3.12 Covariate baseline (Step 2.5.5)')
+if cv2m is not None and cv2s is not None:
+    gm = lambda t, i_, m, k: cv2m[(cv2m.task == t) & (cv2m.input == i_) & (cv2m.model == m)][k].iloc[0]
+    m0n = {t: (lambda n: n if n.startswith(('XGB', 'SVM')) else n[0].lower() + n[1:])(cv2s[t]['M0']['model_name']) for t in 'ABC'}; m0m = {t: cv2s[t]['M0']['model'] for t in 'ABC'}
+    P('Without any spectral data, the stronger covariate-only model (M0) was the %s for detection (macro-F1 %.3f, AUC %s), the %s for six grades (macro-F1 %.3f, QWK %.3f) and the %s for the severity score (R² %.3f, RMSE %.2f) ([[T:covres]], [[F:covmod]]).' % (
+        m0n['A'], gm('A', 'covariates only', m0m['A'], 'macro_F1'), f3(gm('A', 'covariates only', m0m['A'], 'AUC')), m0n['B'], gm('B', 'covariates only', m0m['B'], 'macro_F1'), gm('B', 'covariates only', m0m['B'], 'QWK'),
+        m0n['C'], gm('C', 'covariates only', m0m['C'], 'R2'), gm('C', 'covariates only', m0m['C'], 'RMSE')))
+    INP = ['covariates only', 'leaf spectra', 'spectra + covariates']; MO = [('Statistical', 'B1 statistical'), ('RF', 'Random forest'), ('B2', 'Best ML (B2)')]
+    rows_ = [['Input', 'Model', 'A macro-F1', 'A AUC', 'A balanced acc.', 'B macro-F1', 'B QWK', 'C R²', 'C RMSE']]
+    for i_ in INP:
+        for m, ml in MO:
+            rows_.append([i_, ml, f3(gm('A', i_, m, 'macro_F1')), f3(gm('A', i_, m, 'AUC')), f3(gm('A', i_, m, 'balanced_acc')), f3(gm('B', i_, m, 'macro_F1')), f3(gm('B', i_, m, 'QWK')), f3(gm('C', i_, m, 'R2')), f3(gm('C', i_, m, 'RMSE'))])
+    TAB('covres', rows_, 'Covariate-only, spectra and spectra + covariate models on inoculated leaves (pooled leave-one-replication-out test predictions; B1 = logistic / ordinal logistic / linear model; B2 = SVM, XGBoost, random forest for tasks A, B, C).', [1700, 1400, 900, 850, 950, 900, 850, 850, 906], 14)
+    FIG('covmod', 'f32_cov_models.png', 'Primary metric of the three models on covariates only, leaf spectra and spectra + covariates (inoculated leaves; M0 marked).', 620)
+    gg = lambda t, k, gname: cv2g[(cv2g.task == t) & (cv2g.metric == k) & (cv2g.gain == gname)].iloc[0]
+    real_imp = lambda r: bool(r.real_gain) and r.direction == 'improves'
+    fmtg = lambda r: '%+.3f (%+.3f to %+.3f)%s' % (r.delta, r.ci_low, r.ci_high, ' ✓' if real_imp(r) else (' ✗' if r.real_gain else ''))
+    P('Leaf spectra compared with the covariate baseline (ΔS) changed macro-F1 by %s for detection and by %s for six grades, and R² by %s for the score. Adding the covariates to the spectra (ΔC) changed them by %s, %s and %s; spectra + covariates against the baseline (ΔT) by %s, %s and %s ([[T:covgain]], [[F:covgain]]). Values marked ✓ meet all three criteria of a real gain (✗ = a real loss).' % (
+        fmtg(gg('A', 'macro_F1', 'ΔS = M1 − M0')), fmtg(gg('B', 'macro_F1', 'ΔS = M1 − M0')), fmtg(gg('C', 'R2', 'ΔS = M1 − M0')), fmtg(gg('A', 'macro_F1', 'ΔC = M2 − M1')), fmtg(gg('B', 'macro_F1', 'ΔC = M2 − M1')), fmtg(gg('C', 'R2', 'ΔC = M2 − M1')),
+        fmtg(gg('A', 'macro_F1', 'ΔT = M2 − M0')), fmtg(gg('B', 'macro_F1', 'ΔT = M2 − M0')), fmtg(gg('C', 'R2', 'ΔT = M2 − M0'))))
+    lab_ = {'macro_F1': 'macro-F1', 'AUC': 'AUC', 'balanced_acc': 'balanced accuracy', 'QWK': 'QWK', 'R2': 'R²', 'RMSE': 'RMSE'}
+    TAB('covgain', [['Task', 'Metric', 'ΔS = M1 − M0 (95% CI)', 'ΔC = M2 − M1 (95% CI)', 'ΔT = M2 − M0 (95% CI)']] + [[{'A': 'Detection', 'B': 'Six grades', 'C': 'Score'}[t], lab_[k], fmtg(gg(t, k, 'ΔS = M1 − M0')), fmtg(gg(t, k, 'ΔC = M2 − M1')), fmtg(gg(t, k, 'ΔT = M2 − M0'))]
+        for t in 'ABC' for k in dict.fromkeys(cv2g[cv2g.task == t].metric)], 'Gains with 95% plot-block bootstrap confidence intervals (2000 resamples). ✓ = real gain: interval excludes zero, larger than the fold-to-fold SD and the same sign in all three folds; ✗ = a real loss by the same rule. For RMSE a negative value is an improvement.', [1300, 1500, 2150, 2150, 2206], 14)
+    FIG('covgain', 'f33_cov_gains.png', 'Gains of the spectra (ΔS), of the covariates added to the spectra (ΔC) and of both (ΔT) with 95% plot-block bootstrap intervals (filled = real difference; right of zero = better, except RMSE).', 620)
+    if cv2d is not None and len(cv2d):
+        P('DeLong tests of the detection AUC: %s.' % '; '.join('%s %.3f vs %.3f (z = %.2f, p = %s)' % (r.comparison, r.AUC_a, r.AUC_b, r.z, ('%.3f' % r.p) if r.p >= 0.001 else '< 0.001') for r in cv2d.itertuples()))
+    if cv2c is not None and len(cv2c):
+        TN = {'variety_V2': 'variety V2', 'variety_V3': 'variety V3', 'timing_D2': 'timing D2', 'timing_D3': 'timing D3', 'timing_D4': 'timing D4', 'stage_code': 'growth stage', 'DAI': 'days after inoculation', 'DAI2': '(days after inoculation)²'}
+        oo = cv2c[cv2c.model.str.startswith('Ordinal')]
+        if not len(oo): oo = cv2c[cv2c.model.str.startswith('Linear')]
+        sig = oo[oo.p < 0.05].reindex(oo[oo.p < 0.05].estimate.abs().sort_values(ascending=False).index)
+        P('In the interpretable model (B1, all inoculated leaves, standardised covariates), the strongest effects on the severity grade were %s ([[F:covb1]]). Positive values raise and negative values lower the expected grade.' % ('; '.join('%s (%+.2f per SD, 95%% CI %+.2f to %+.2f)' % (TN.get(r.term, r.term), r.estimate, r.ci_low, r.ci_high) for r in sig.head(4).itertuples()) if len(sig) else 'none significant at 5%'))
+        FIG('covb1', 'f34_cov_b1.png', 'Standardised effects of the covariates in the interpretable models: logistic (detection), ordinal logistic (six grades) and linear (score) (95% CI).', 620)
 H2('3.13 Exploratory test of symptomless leaves (Objective 3 proxy)')
 if ex is not None:
     eb = ex.loc[ex.balanced_acc.idxmax()]
@@ -350,7 +408,16 @@ if HAS_DL:
             ab_['DT-EDNet'] - ab_['DT-EDNet-DTG'], ab_['DT-EDNet-DTG'], ab_['DT-EDNet-SE'], cf_.get('OW', np.nan), cf_.get('DSF', np.nan)))
 else: P('Deep-learning results are pending.')
 H2('4.5 Role of covariates and weather')
-P('Growth stage, sowing timing and days after inoculation are strongly linked with the disease level because the epidemic advanced with time. A model on covariates alone therefore performs well for detection, but spectra improved six-grade and score prediction and the combination was best. Weather after inoculation moved quickly out of the favourable range (cool and humid; Chattopadhyay et al., 2011), which explains why disease progressed mainly in the first three weeks. With only four sampling dates, weather can describe the epidemic but cannot be tested as an independent predictor; the 13 flights of 2026-27 will give enough time points.')
+if cv2g is not None and cv2s is not None:
+    dS = {t: gg(t, k, 'ΔS = M1 − M0') for t, k in (('A', 'macro_F1'), ('B', 'macro_F1'), ('C', 'R2'))}; dT = {t: gg(t, k, 'ΔT = M2 − M0') for t, k in (('A', 'macro_F1'), ('B', 'macro_F1'), ('C', 'R2'))}
+    P('Growth stage, sowing timing and days after inoculation follow the epidemic, so a model without any sensor data already explained much of the disease level (detection macro-F1 %.2f and AUC %.2f; six-grade macro-F1 %.2f; score R² %.2f), as expected from weather- and calendar-based disease models (De Wolf and Isard, 2007; Bijlwan et al., 2025).' % (
+        gm('A', 'covariates only', m0m['A'], 'macro_F1'), gm('A', 'covariates only', m0m['A'], 'AUC'), gm('B', 'covariates only', m0m['B'], 'macro_F1'), gm('C', 'covariates only', m0m['C'], 'R2')))
+    P('Detection inside inoculated plots is mainly a question of time: at 6 days after inoculation almost every leaf was still grade 0, and later almost every leaf was diseased, so the date alone separates the classes. Here the leaf spectra alone were weaker than the covariates (ΔS %+.3f macro-F1; DeLong p %s), and spectra + covariates were only slightly better than the covariates (ΔT %+.3f, interval including zero). This does not mean the spectra are useless for detection: the covariates only know when the field was inoculated, which a sensor survey of an unknown field does not, and the spectra detected disease with macro-F1 %.2f when the healthy plots were included (%s; section 3.8).' % (
+        dS['A'].delta, ('%.3f' % cv2d.p.iloc[0]) if cv2d.p.iloc[0] >= 0.001 else '< 0.001', dT['A'].delta, MT[(MT.task == 'A') & (MT.model == BEST['A']['ML'])].macro_F1.iloc[0], BEST['A']['ML']))
+    P('For severity the spectra added information that the calendar cannot give: six-grade macro-F1 rose by %+.3f (%s) and score R² by %+.3f (%s), because leaves of the same date, timing and stage differ in their actual infection. Spectra and covariates together gave real gains over the baseline for six grades (ΔT %+.3f) and score (ΔT %+.3f R²), in line with the benefit of combining sensor and meteorological data for wheat diseases (Zhang et al., 2014; Ruan et al., 2022). In the interpretable model, disease rose with days after inoculation at a slowing rate (negative DAI² term), was lower in later sowings (crop younger at inoculation) and lower in variety V3, effects that agree with the epidemiology of white rust (Chattopadhyay et al., 2011).' % (
+        dS['B'].delta, 'a real gain' if real_imp(dS['B']) else 'not a consistent gain', dS['C'].delta, 'a real gain' if real_imp(dS['C']) else 'interval above zero but smaller than the fold-to-fold SD', dT['B'].delta, dT['C'].delta))
+    P('Weather after inoculation soon left the favourable range. A few days in the first week met the temperature and afternoon-humidity part of the rule, but their morning humidity was at most 97%%, and the few more humid mornings came on warm days; the full leaf-infection and staghead criteria of Chattopadhyay et al. (2011) were therefore not met on any day, and the favourable-day covariates were zero on all four dates ([[T:covdate]]). The disease therefore came from the artificial inoculation, and the warmer, drier weather (7-day mean T_{max} rising from %.1f to %.1f °C) explains why it progressed mainly in the first three weeks. With four sampling dates the weather variables are collinear with the date, so they describe the epidemic but cannot be tested as an independent predictor; the 13 flights of 2026-27 and the Bharatpur data will allow that.' % (cv2x.Tmax7.iloc[0], cv2x.Tmax7.iloc[-1]))
+else: P('Covariate results pending.')
 H2('4.6 Limitations')
 BL(['One season and one location; the Bharatpur data of the next season are needed for external validation.',
     'Leaf-level visual grades are subjective; image-based pustule area or a second rater would reduce label noise (Bock et al., 2010).',
@@ -366,26 +433,26 @@ H1('5. Conclusions')
 NL(['White rust lowers near-infrared reflectance, raises red and shortwave-infrared reflectance and shifts the red-edge position by about %.0f nm towards shorter wavelengths between grades 0 and 9.' % (REPg[0] - REPg[9]),
     'The first derivative carries the strongest signal; SHAP-CARS selected %d derivative bands, and the disease-specific feature set has %d features (%s).' % (len(O1['OW']), len(O1['DSF']), ', '.join(O1['DSF'])),
     'Detection of diseased leaves is reliable (best macro-F1 %.2f, AUC %s); six-grade classification is limited by the overlap of neighbouring grades (macro-F1 %.2f, QWK %.2f); the severity score is predicted with R² %.2f and RMSE %.2f grades.' % (rA.macro_F1, f2(rA.AUC), rB.macro_F1, rB.QWK, rC.R2, rC.RMSE),
-    'Leaf spectra add information beyond crop stage, timing and weather; the models transfer across varieties and timings.',
+    ('A covariate-only model (no sensor data) explained much of the epidemic level and, inside inoculated plots, detected disease as well as the spectra; leaf spectra added %+.3f macro-F1 for six grades and %+.3f R² for the score beyond it, and spectra + covariates gave real gains for grades and score; the models transfer across varieties and timings.' % (gg('B', 'macro_F1', 'ΔS = M1 − M0').delta, gg('C', 'R2', 'ΔS = M1 − M0').delta)) if cv2g is not None else 'Leaf spectra add information beyond crop stage, timing and weather; the models transfer across varieties and timings.',
     'Final models trained on all leaves are saved for the UAV phase and for the Bharatpur validation.'])
 
 # ------------------------------------------------------------------ 6 cross-check
 H1('6. Cross-check against the methodology')
 P('Every step of the revised methodology that applies to leaf spectra was performed. Steps for UAV images (radiometric calibration, orthomosaics, crop mask, texture, thermal and the 15 sensor sets) do not apply to non-imaging contact-probe data.')
 CK = [['Methodology step', 'Status in this analysis', 'Where'],
-      ['A1 Design and treatments', 'Done: 48 plots, healthy block + R1–R3, D × V layout checked for all plots', '2.1, Table design'], ['A4 Leaf spectra (ASD)', 'Done: %d leaf spectra, L3/L5/LL, 4 dates' % N, '2.2'],
-      ['A5 Labels', 'Done: tasks A, B (six grades) and C', '2.3'], ['A6 Covariates', 'Done: variety, timing, days after inoculation, growth stage, 7-day weather', '2.9, 3.12'],
-      ['B3 Smoothing; D3 spectral features; D4 indices', 'Done: Savitzky–Golay 11/2, first derivative, 5-nm bands, 41 indices + REP, Dr, REarea; water bands kept (contact probe)', '2.5–2.6'],
-      ['E3 Standardisation; E4 class weights', 'Done with training statistics; balanced class weights', '2.8'], ['E2 Healthy-plot normalisation', 'Not used (healthy plots are fungicide-sprayed; Objective 3 step)', '–'],
-      ['F1–F3 LORO, nested inner folds, leakage checks', 'Done: rotated healthy plots, inner GroupKFold by plot, selection inside folds', '2.4'],
+      ['A1 Design and treatments', 'Done: 48 plots, healthy block + R1–R3, D × V layout checked for all plots', '2.1, Table design'], ['A4 Leaf spectra (ASD)', 'Done: %d leaf spectra, L3/L5/LL, 4 dates; files parsed and checked' % N, '2.2, 2.4'],
+      ['A5 Labels', 'Done: tasks A, B (six grades) and C', '2.5'], ['A6 Covariates', 'Done: variety, timing, days after inoculation, growth stage, 7-day weather (no look-ahead), favourable days', '2.3, 3.12'],
+      ['B3 Smoothing; D3 spectral features; D4 indices', 'Done: Savitzky–Golay 11/2, first derivative, 5-nm bands, 41 indices + REP, Dr, REarea; water bands kept (contact probe)', '2.7–2.8'],
+      ['E3 Standardisation; E4 class weights', 'Done with training statistics; balanced class weights', '2.10'], ['E2 Healthy-plot normalisation', 'Not used (healthy plots are fungicide-sprayed; Objective 3 step)', '–'],
+      ['F1–F3 LORO, nested inner folds, leakage checks', 'Done: rotated healthy plots, inner GroupKFold by plot, selection inside folds', '2.6'],
       ['1.1.1–1.1.3 Response analysis', 'Done: mean and derivative spectra, correlation, strata, weather', '3.1–3.2'], ['1.2.1–1.2.4 Effective ranges, SHAP-CARS, OW', 'Done (top-5% rule because no pair reached R² 0.5)', '3.3'],
       ['1.3.1–1.3.2 NDSI, RSI, WRI', 'Done', '3.4'], ['1.3.3 Multispectral two-band indices', 'Not applicable (no camera)', '–'], ['1.4.1–1.4.3 Index group, redundancy, ReliefF', 'Done', '3.4'],
       ['1.5 Texture and TTFI', 'Not applicable (non-imaging data)', '–'], ['1.6.2 VIF across groups', 'Done → DSF', '3.4'], ['1.7 Biochemical parameters', 'Not measured in 2025-26', '–'],
       ['2.1.1–2.1.2 Tasks, fold-wise selection', 'Done', '3.5'], ['2.1.3 Fusion of 15 sensor sets', 'Not applicable (one sensor)', '–'], ['2.1.4 SFFS', 'Done', '3.6'], ['2.1.5 Feature configurations', 'Done: OW, VI, DSF', '3.9'],
       ['2.2.1–2.2.6 SVM/SVR, RF, XGBoost, k-NN, PLS-DA/PLSR, grids', 'Done', '3.6, 3.8'], ['2.3.1 DNN-F1; 2.3.3–2.3.8 pseudo-images, DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2', 'Done (paper settings, CPU, no extra tuning)', '3.7–3.9'],
       ['2.3.2 DNN-F2', 'Not applicable (one sensor)', '–'], ['2.4.1–2.4.3 Metrics', 'Done', '3.8'], ['2.5.3 Network comparison and ablation', 'Done', '3.9'], ['2.5.4 SHAP and stability', 'Done', '3.5, 3.10'],
-      ['2.5.5 Covariate baseline', 'Done (inoculated plots only)', '3.12'], ['2.6.1–2.6.2 Strata, LOVO, LOTO', 'Done', '3.11'], ['2.6.3 Severity maps', 'Not applicable (no images)', '–'],
-      ['2.7.1 Final models on all data', 'Done: models saved with prediction script', '2.10, Appendix'], ['2.7.2–2.7.4 Bharatpur validation', 'Next season', '–'], ['3.1–3.5 Pre-symptomatic objective', 'Exploratory proxy only', '3.13']]
+      ['2.5.5 Covariate baseline', 'Done: B1 statistical, random forest and best ML on covariates only; M0/M1/M2; gains with plot-block bootstrap and DeLong (inoculated plots only)', '2.11, 3.12'], ['2.6.1–2.6.2 Strata, LOVO, LOTO', 'Done', '3.11'], ['2.6.3 Severity maps', 'Not applicable (no images)', '–'],
+      ['2.7.1 Final models on all data', 'Done: models saved with prediction script', '2.13, Appendix'], ['2.7.2–2.7.4 Bharatpur validation', 'Next season', '–'], ['3.1–3.5 Pre-symptomatic objective', 'Exploratory proxy only', '3.13']]
 TAB('check', CK, 'Methodology steps and their status for the 2025-26 leaf spectra.', [3300, 4400, 1606], 15)
 
 # ------------------------------------------------------------------ 7 questions
@@ -397,7 +464,7 @@ QA = [('Why leaf level and not plot means?', 'The grade is scored on each leaf, 
       ('Why only derivative bands in the optimal wavelengths?', 'The derivative removes offsets and emphasises the red-edge shape, which changes with chlorophyll loss; SHAP and CARS both preferred them.'),
       ('Did DT-EDNet beat the other models?', ('No. At leaf level DT-EDNet reached macro-F1 %.3f for six grades, against %.3f for %s and %.3f for %s; all models were within about one fold-to-fold SD. With 10–16 features the pseudo-images have little spatial pattern; its strength is expected on UAV hyperspectral images. The ablation still showed a gain from the dual transformer group.' % (dte['B'].macro_F1, dlB.macro_F1, bB['DL'], row('B', bB['ML']).macro_F1, bB['ML'])) if HAS_DL else 'Results pending.'),
       ('How were feature selection and tuning kept free of leakage?', 'All selection (maps, SHAP-CARS, ReliefF, VIF, SFFS) and tuning were repeated inside each training part; the test replication was used once, for the final metrics.'),
-      ('What does the covariate baseline show?', 'Stage, timing and weather explain much of the epidemic level, but spectra add leaf-to-leaf information; spectra + covariates gave the best results.'),
+      ('What does the covariate baseline show?', ('A model without sensor data (days after inoculation, timing, variety, stage, weather) already explains much of the epidemic level (six-grade macro-F1 %.2f). The spectra are credited only with the gain over it (ΔS %+.3f for six grades, %+.3f R² for the score), tested with a plot-level bootstrap; for detection inside inoculated plots the calendar alone was as good as the spectra, because healthy leaves occurred mainly on the first date.' % (gm('B', 'covariates only', m0m['B'], 'macro_F1'), gg('B', 'macro_F1', 'ΔS = M1 − M0').delta, gg('C', 'R2', 'ΔS = M1 − M0').delta)) if cv2g is not None else 'Results pending.'),
       ('Why is the crop age different from 50/40/30/20 days?', 'With inoculation on 5 February 2026 the sowing dates give %d, %d, %d and %d days. The analysis uses the actual dates.' % tuple(das0[t] for t in ('D1', 'D2', 'D3', 'D4'))),
       ('What will change in 2026-27?', 'UAV images with 13 flights (3 pre-symptomatic), plot and subplot features, multi-sensor fusion, the full Objective 3 and external validation at Bharatpur.')]
 for q, a in QA:
@@ -407,7 +474,7 @@ for q, a in QA:
 H1('Appendix A. Excel workbook and model files')
 TAB('sheets', [['Sheet', 'Content'], ['1_Data', 'leaf metadata and 5-nm reflectance (input of the formula sheets)'], ['2_Counts', 'COUNTIFS tables by factor and grade, with charts'], ['3_Mean_spectra', 'AVERAGEIFS mean spectra by grade, line chart'],
     ['4–7', 'first derivative, correlation (CORREL), NDSI/RSI R² grid, SHAP-CARS'], ['8_WRI', 'White Rust Index with editable wavelengths and weight (INDEX/MATCH)'], ['9–12', 'indices as formulas and values, ReliefF, VIF and the disease-specific feature set'],
-    ['13–14', 'fold-wise selection, SFFS and grid search'], ['15–17', 'metrics, confusion matrices with formula metrics, observed vs predicted with formula metrics'], ['18–23', 'deep learning, SHAP, strata, transfer, weather and covariates'], ['26_References', 'references']],
+    ['13–14', 'fold-wise selection, SFFS and grid search'], ['15–17', 'metrics, confusion matrices with formula metrics, observed vs predicted with formula metrics'], ['18–23', 'deep learning, SHAP, strata, transfer, weather and covariates'], ['26_Covariate_baseline', 'covariates by date, models × inputs, gains with bootstrap intervals (Δ as formulas), DeLong tests, interpretable model; charts'], ['27_References', 'references']],
     'Main sheets of the Excel workbook.', [2200, 7106], 16)
 for fn, lab in (('ml_models_index.csv', 'Machine-learning model files'), ('dl_models_index.csv', 'Deep-learning model files')):
     p = S + 'outputs/ASD_2025-26_models/' + fn

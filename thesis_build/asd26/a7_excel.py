@@ -66,20 +66,36 @@ rows = [('1_Data', 'Common Activity A', 'leaf metadata and smoothed reflectance 
         ('20_SHAP', 'Step 2.5.4', 'Shapley importance of the best tree model'),
         ('21_Strata', 'Activity 2.6', 'results by stage, variety, leaf position, date and timing'),
         ('22_Transfer', 'Step 2.6.2', 'leave-one-variety-out and leave-one-timing-out tests'),
-        ('23_Weather_covariates', 'Steps A6, 2.5.5', 'daily weather, 7-day summaries, disease progress and covariate baseline'),
+        ('23_Weather_covariates', 'Step A6', 'daily weather, 7-day summaries and disease progress'),
         ('24_Exploratory', 'Objective 3 (proxy)', 'symptomless leaves of inoculated plots vs leaves of healthy plots'),
         ('25_Stability', 'Step 2.5.4', 'selection frequency across folds and models'),
-        ('26_References', '—', 'references of the methods')]
+        ('26_Covariate_baseline', 'Step 2.5.5', 'covariates by date, models × inputs, M0/M1/M2 gains (formulas) with plot-block bootstrap intervals, DeLong tests, interpretable model; charts'),
+        ('27_References', '—', 'references of the methods')]
 table(ws, 4, 1, pd.DataFrame(rows, columns=['Sheet', 'Methodology step', 'Content']))
-ws['A33'] = 'Assumptions and settings'; ws['A33'].font = Font(name=AR, bold=True)
+ws['A34'] = 'Assumptions and settings'; ws['A34'].font = Font(name=AR, bold=True)
 notes = ['Plot plan from the field layout (healthy block plots 1–12; R3 13–24; R2 25–36; R1 37–48; treatment codes D×V) – confirmed by the user.',
          'Inoculation 5 February 2026; sowing D1 9 Dec, D2 18 Dec, D3 27 Dec 2025, D4 9 Jan 2026 (user). Days after inoculation of the four dates: 6, 19, 26, 36.',
          'Contact-probe spectra, already splice corrected; water-absorption bands kept; 350–399 and 2401–2500 nm trimmed (detector-edge noise).',
          'Savitzky–Golay smoothing (11 nm window, 2nd order); first derivative from the same filter; 5-nm bands for band-level analysis.',
          'Validation: leave-one-replication-out with the 12 healthy plots rotated (each fold: one healthy plot of each inoculation timing, all varieties); inner folds grouped by plot.',
          'Deep learning on CPU: Ma et al. (2026) settings (AdamW 6e-4, weight decay 1e-5, cosine annealing, batch 32, label smoothing 0.01, gradient clip 1.2) with maximum 100 epochs, patience 20, seed 42.']
-for i, n in enumerate(notes): ws.cell(34 + i, 1, n).font = NF
-widths(ws, 60, 24); ws.column_dimensions['B'].width = 22
+for i, n in enumerate(notes): ws.cell(35 + i, 1, n).font = NF
+ws['A43'] = 'Workflow from data collection to discussion (where each step is in this workbook and in the Word report)'; ws['A43'].font = Font(name=AR, bold=True)
+WF = [('1', 'Field experiment', '48 plots: healthy (sprayed) block + R1–R3 inoculated; 3 varieties × 4 sowing dates; inoculation 5 Feb 2026', '—', '2.1'),
+      ('2', 'Leaf spectra and scoring', 'ASD contact probe on L3, L5, LL leaves of all 48 plots on 11 Feb, 24 Feb, 3 Mar, 13 Mar 2026; 0–9 grade of every leaf', '1_Data, 2_Counts', '2.2'),
+      ('3', 'Weather and covariates', 'IARI observatory daily weather; 7-day windows ending the day before each date; favourable days; DAI, timing, variety, stage', '23_Weather_covariates, 26_Covariate_baseline', '2.3'),
+      ('4', 'Data organisation and QC', 'parse four files, join layout, labels, derived fields, range and missing-value checks, fold of each plot', '1_Data, 2_Counts', '2.4'),
+      ('5', 'Tasks and validation', 'A detection, B six grades, C score; leave-one-replication-out with rotated healthy plots; inner folds by plot', '13_Fold_selection', '2.5–2.6'),
+      ('6', 'Pre-processing and features', 'Savitzky–Golay, first derivative, 5-nm bands, 41 indices + red-edge parameters', '3_Mean_spectra, 4_First_derivative, 9_Indices_formulas, 10_Indices_values', '2.7–2.8'),
+      ('7', 'Objective 1', 'spectral response, NDSI/RSI maps, SHAP-CARS, WRI, ReliefF, VIF → disease-specific features', '5_Correlation to 12_VIF_DSF', '2.9, 3.1–3.7'),
+      ('8', 'Objective 2', 'SFFS + tuned machine learning, deep learning (DT-EDNet and others), metrics', '14_ML_SFFS to 19_DL_config_ablation', '2.10, 3.8–3.10'),
+      ('9', 'Covariate baseline', 'models without sensor data vs spectra vs spectra + covariates; gains with bootstrap and DeLong', '26_Covariate_baseline', '2.11, 3.12'),
+      ('10', 'Interpretation and robustness', 'SHAP, strata, transfer tests, selection stability, exploratory symptomless test', '20_SHAP, 21_Strata, 22_Transfer, 24_Exploratory, 25_Stability', '2.12, 3.11, 3.13'),
+      ('11', 'Discussion and conclusions', 'physical basis, grade overlap, ML vs DL, role of covariates, limitations, UAV implications', '—', '4, 5')]
+header(ws, 44, 1, ['Step', 'Stage', 'What was done', 'Workbook sheets', 'Word report section'])
+for i, r_ in enumerate(WF):
+    for j, v in enumerate(r_): c_ = ws.cell(45 + i, 1 + j, v); c_.font = NF; c_.alignment = Alignment(wrap_text=True, vertical='top')
+widths(ws, 60, 24); ws.column_dimensions['B'].width = 26; ws.column_dimensions['D'].width = 40; ws.column_dimensions['E'].width = 20
 
 # ------------------------------------------------------------------ 1 Data (5 nm)
 ws = sheet('1_Data', 'Leaf metadata and smoothed reflectance (5-nm bands, 400–2400 nm)', 'One row per leaf (n = 2339). Reflectance after Savitzky–Golay smoothing. Values in blue are data.')
@@ -349,7 +365,7 @@ for name, fn, ttl, key in (('21_Strata', 'strata_metrics.csv', 'Results by strat
 ws = wb['22_Transfer'] if '22_Transfer' in wb.sheetnames else None
 
 # ------------------------------------------------------------------ 23 Weather and covariates
-ws = sheet('23_Weather_covariates', 'Weather (IARI observatory), 7-day summaries, disease progress and covariate baseline', 'Covariate baseline on inoculated leaves only (fungicide-protected healthy plots excluded); random forest; same folds.')
+ws = sheet('23_Weather_covariates', 'Weather (IARI observatory), 7-day summaries and disease progress', 'The covariate baseline model (Step 2.5.5) is in sheet 26_Covariate_baseline.')
 if os.path.exists(D + 'weather_season.csv'):
     Wd = pd.read_csv(D + 'weather_season.csv')[['date', 'Tmax', 'Tmin', 'rain', 'RH1', 'RH2', 'wind', 'BSS', 'evap']]; Wd['date'] = Wd.date.str[:10]
     e = table(ws, 4, 1, Wd, '0.0'); ch = LineChart(); ch.add_data(Reference(ws, min_col=2, max_col=3, min_row=4, max_row=e), titles_from_data=True); ch.set_categories(Reference(ws, min_col=1, min_row=5, max_row=e)); ch.x_axis.tickLblSkip = 14
@@ -361,11 +377,77 @@ if os.path.exists(D + 'weather_season.csv'):
     DC = CL(meta_cols.index('date') + 1); DR = "'1_Data'!$%s$5:$%s$%d" % (DC, DC, NROW); DSR = "'1_Data'!$%s$5:$%s$%d" % (CL(meta_cols.index('diseased') + 1), CL(meta_cols.index('diseased') + 1), NROW)
     for i, dt in enumerate(sorted(M.date.unique())):
         rr = e2 + 4 + i; ws.cell(rr, 22, dt); ws.cell(rr, 23, '=COUNTIF(%s,V%d)' % (DR, rr)); ws.cell(rr, 24, '=AVERAGEIFS(%s,%s,V%d)' % (GRANGE, DR, rr)).number_format = '0.00'; ws.cell(rr, 25, '=AVERAGEIFS(%s,%s,V%d)' % (DSR, DR, rr)).number_format = '0.0%'
-    cb = pd.read_csv(D + 'covariate_baseline.csv'); ws.cell(e2 + 10, 22, 'Covariate baseline (Step 2.5.5)').font = Font(name=AR, bold=True); table(ws, e2 + 11, 22, cb, '0.000')
+    ws.cell(e2 + 10, 22, 'Covariate baseline (Step 2.5.5): see sheet 26_Covariate_baseline').font = Font(name=AR, bold=True)
 widths(ws, 11)
 
-# ------------------------------------------------------------------ 26 References
-ws = sheet('26_References', 'References of the methods used in this workbook')
+# ------------------------------------------------------------------ 26 Covariate baseline
+if os.path.exists(D + 'cov2_metrics.csv'):
+    ws = sheet('26_Covariate_baseline', 'Covariate baseline model without sensor data (Step 2.5.5) – inoculated, unsprayed leaves only',
+               'Static values were computed in Python (a11_covariate.py); black cells are Excel formulas. Weather windows end the day before each date (no look-ahead). Favourable days after Chattopadhyay et al. (2011).')
+    BF = Font(name=AR, bold=True, size=11, color='1F3864')
+    # 1. covariates by date
+    cx = pd.read_csv(D + 'cov2_covariates_by_date.csv'); cx.insert(1, 'DAI', [int(M[M.date == d].DAI.iloc[0]) for d in cx.date])
+    cx.columns = ['date', 'DAI', 'Tmax 7 d (°C)', 'Tmin 7 d (°C)', 'RH I 7 d (%)', 'RH II 7 d (%)', 'rain 7 d (mm)', 'favourable days: leaf', 'favourable days: staghead']
+    ws.cell(4, 1, '1. Weather covariates of the four sampling dates').font = BF; e = table(ws, 5, 1, cx, '0.0')
+    # 2. metrics: models x inputs
+    mt = pd.read_csv(D + 'cov2_metrics.csv'); KEYS = ['macro_F1', 'AUC', 'balanced_acc', 'QWK', 'R2', 'RMSE', 'fold_sd']
+    r0 = e + 3; ws.cell(r0 - 1, 1, '2. Pooled test metrics (leave-one-replication-out): three models on three inputs').font = BF
+    mtab = mt[['task', 'input', 'model', 'model_name'] + KEYS].copy(); e = table(ws, r0, 1, mtab, '0.000'); ROWOF = {(r.task, r.input, r.model): r0 + 1 + i for i, r in enumerate(mtab.itertuples())}
+    COLOF = {k: CL(5 + j) for j, k in enumerate(KEYS)}
+    ws.cell(e + 1, 1, 'fold_sd = SD of the three fold values of macro-F1 (tasks A, B) or RMSE (task C). B2 = best ML model of Activity 2.2 (A SVM, B XGBoost, C random forest; for C, B2 = random forest).').font = NOTEF
+    # 3. M0 / M1 / M2 with formula gains and bootstrap CIs
+    SU = json.load(open(D + 'cov2_summary.json')); G = pd.read_csv(D + 'cov2_gains.csv')
+    r1 = e + 4; ws.cell(r1 - 1, 1, '3. Gains: ΔS = M1 − M0 (spectra), ΔC = M2 − M1 (covariates added), ΔT = M2 − M0; values linked to table 2, Δ and flag are formulas').font = BF
+    header(ws, r1, 1, ['task', 'metric', 'M0 model', 'M0', 'M1', 'M2', 'gain', 'Δ (formula)', 'CI low', 'CI high', 'fold SD', 'same sign in 3 folds', 'real? (formula)'])
+    rr = r1 + 1; GROWS = {}
+    for t in 'ABC':
+        for k in dict.fromkeys(G[G.task == t].metric):
+            cells = {mk: "=%s%d" % (COLOF[k], ROWOF[(t, SU[t][mk]['input'], SU[t][mk]['model'])]) for mk in ('M0', 'M1', 'M2')}
+            for gname, a, b_ in (('ΔS = M1 − M0', 'E', 'D'), ('ΔC = M2 − M1', 'F', 'E'), ('ΔT = M2 − M0', 'F', 'D')):
+                g_ = G[(G.task == t) & (G.metric == k) & (G.gain == gname)].iloc[0]
+                vals = [t, k, SU[t]['M0']['model_name'], cells['M0'], cells['M1'], cells['M2'], gname, '=%s%d-%s%d' % (a, rr, b_, rr), float(g_.ci_low), float(g_.ci_high), float(g_.fold_sd), 'yes' if g_.same_sign_all_folds else 'no',
+                        '=IF(AND(OR(I{0}>0,J{0}<0),ABS(H{0})>K{0},L{0}="yes"),IF((H{0}>0)=(B{0}<>"RMSE"),"real gain","real loss"),"not real")'.format(rr)]
+                for j, v in enumerate(vals):
+                    c_ = ws.cell(rr, 1 + j, v); c_.font = NF
+                    if j in (3, 4, 5, 7, 8, 9, 10): c_.number_format = '0.000'
+                GROWS[(t, k, gname)] = rr; rr += 1
+    ws.cell(rr, 1, 'Real gain = 95% plot-block bootstrap interval (2000 resamples of whole plots; Efron and Tibshirani, 1993) excludes 0 AND |Δ| > fold SD AND same sign in all three folds. For RMSE a negative Δ is an improvement.').font = NOTEF
+    # 4. DeLong
+    r2 = rr + 3
+    if os.path.exists(D + 'cov2_delong.csv'):
+        ws.cell(r2 - 1, 1, '4. DeLong test of the detection AUC (DeLong et al., 1988)').font = BF; dl = pd.read_csv(D + 'cov2_delong.csv'); e = table(ws, r2, 1, dl, '0.0000')
+        c_ = ws.cell(r2, 6, 'ΔAUC (formula)'); c_.font = HF; c_.fill = HFILL
+        for i in range(len(dl)): ws.cell(r2 + 1 + i, 6, '=B%d-C%d' % (r2 + 1 + i, r2 + 1 + i)).number_format = '0.000'
+        r2 = e + 3
+    # 5. interpretable model B1
+    if os.path.exists(D + 'cov2_b1_coef.csv'):
+        ws.cell(r2 - 1, 1, '5. Interpretable model B1 on all inoculated leaves (standardised covariates: effect per SD); odds ratio = EXP(estimate) as formula').font = BF
+        cf = pd.read_csv(D + 'cov2_b1_coef.csv')[['model', 'term', 'estimate', 'ci_low', 'ci_high', 'p']]; e = table(ws, r2, 1, cf, '0.000')
+        c_ = ws.cell(r2, 7, 'odds ratio (formula)'); c_.font = HF; c_.fill = HFILL
+        for i, r_ in enumerate(cf.itertuples()):
+            ws.cell(r2 + 1 + i, 6).number_format = '0.0000'
+            if 'ogistic' in r_.model: ws.cell(r2 + 1 + i, 7, '=EXP(C%d)' % (r2 + 1 + i)).number_format = '0.00'
+        ws.cell(e + 1, 1, 'B1 models: logistic regression (A), proportional-odds ordinal logistic regression (B; McCullagh, 1980), linear model with DAI and DAI² (C; Madden et al., 2007).').font = NOTEF
+    # 6. chart tables (formulas) + native charts
+    cr = 5; cc = 16
+    for t, k, ttl in (('A', 'macro_F1', 'Detection: macro-F1'), ('B', 'macro_F1', 'Six grades: macro-F1'), ('C', 'R2', 'Severity score: R²')):
+        mods = ['Statistical', 'RF'] + ([] if t == 'C' else ['B2'])
+        header(ws, cr, cc, ['input'] + [mt[(mt.task == t) & (mt.model == m_)].model_name.iloc[0] for m_ in mods])
+        for i, inp in enumerate(['covariates only', 'leaf spectra', 'spectra + covariates']):
+            ws.cell(cr + 1 + i, cc, inp).font = NF
+            for j, m_ in enumerate(mods): ws.cell(cr + 1 + i, cc + 1 + j, '=%s%d' % (COLOF[k], ROWOF[(t, inp, m_)])).number_format = '0.000'
+        ch = BarChart(); ch.type = 'col'; ch.add_data(Reference(ws, min_col=cc + 1, max_col=cc + len(mods), min_row=cr, max_row=cr + 3), titles_from_data=True); ch.set_categories(Reference(ws, min_col=cc, min_row=cr + 1, max_row=cr + 3))
+        ch.y_axis.scaling.min = 0; ws.add_chart(style_chart(ch, ttl, None, k.replace('_', '-'), 16, 7.5), '%s%d' % (CL(cc + 5), cr)); cr += 16
+    header(ws, cr, cc, ['gain (primary metric)', 'A macro-F1', 'B macro-F1', 'C R²'])
+    for i, gname in enumerate(['ΔS = M1 − M0', 'ΔC = M2 − M1', 'ΔT = M2 − M0']):
+        ws.cell(cr + 1 + i, cc, gname).font = NF
+        for j, (t, k) in enumerate((('A', 'macro_F1'), ('B', 'macro_F1'), ('C', 'R2'))): ws.cell(cr + 1 + i, cc + 1 + j, '=H%d' % GROWS[(t, k, gname)]).number_format = '0.000'
+    ch = BarChart(); ch.type = 'col'; ch.add_data(Reference(ws, min_col=cc + 1, max_col=cc + 3, min_row=cr, max_row=cr + 3), titles_from_data=True); ch.set_categories(Reference(ws, min_col=cc, min_row=cr + 1, max_row=cr + 3))
+    ws.add_chart(style_chart(ch, 'Gains in the primary metric', None, 'Δ', 16, 7.5), '%s%d' % (CL(cc + 5), cr))
+    widths(ws, 13); ws.column_dimensions['A'].width = 16; ws.column_dimensions['B'].width = 20; ws.column_dimensions['C'].width = 26; ws.column_dimensions['D'].width = 24; ws.column_dimensions['M'].width = 18; ws.column_dimensions['P'].width = 22
+
+# ------------------------------------------------------------------ 27 References
+ws = sheet('27_References', 'References of the methods used in this workbook')
 refs = json.load(open(D + 'refs_used.json')) if os.path.exists(D + 'refs_used.json') else []
 for i, rf in enumerate(refs): ws.cell(3 + i, 1, rf).font = NF
 ws.column_dimensions['A'].width = 180

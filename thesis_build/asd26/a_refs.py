@@ -17,8 +17,9 @@ def cites(text):
         for y in re.findall(r'\d{4}', m.group(3)): c.add((m.group(1), y))
     return c
 def rk(r):
-    a = re.split(r'[ ,]', r.strip())[0]; y = re.search(r'\((\d{4})[a-z]?\)', r); return (a, y.group(1) if y else '')
-SKIP = {'November', 'December', 'Feb', 'Mar', 'March', 'February', 'January', 'Jan', 'IARI', 'ICAR', 'Table', 'Figure', 'Step', 'Stage', 'Objective', 'PM', 'Pusa', 'ASD', 'Sheet', 'Excel', 'Python', 'Task', 'Grade', 'Fold', 'Date', 'Activity', 'Section', 'Slide', 'Sowing', 'V1', 'Inoculation', 'Season'}
+    t = re.split(r'[ ,]', r.strip()); a = t[1] if t[0] in ('De', 'de', 'Van', 'van', 'Le', 'La') and len(t) > 1 else t[0]
+    y = re.search(r'\((\d{4})[a-z]?\)', r); return (a, y.group(1) if y else '')
+SKIP = {'November', 'December', 'Dec', 'The', 'Feb', 'Mar', 'March', 'February', 'January', 'Jan', 'IARI', 'ICAR', 'Table', 'Figure', 'Step', 'Stage', 'Objective', 'PM', 'Pusa', 'ASD', 'Sheet', 'Excel', 'Python', 'Task', 'Grade', 'Fold', 'Date', 'Activity', 'Section', 'Slide', 'Sowing', 'V1', 'Inoculation', 'Season'}
 def select(text, fp=()):
     c = cites(text); used, seen = [], set()
     for r in pool():

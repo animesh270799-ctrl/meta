@@ -51,27 +51,31 @@ def box(ax, x, y, w, h, t, b, c, fc):
     ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle='round,pad=0.012,rounding_size=0.08', fc=fc, ec=c, lw=1.6))
     ax.text(x + w / 2, y + h - 0.13, t, ha='center', va='top', fontsize=11.5, fontweight='bold', color=c)
     ax.text(x + w / 2, y + h - 0.5, b, ha='center', va='top', fontsize=9.8, linespacing=1.35, color='#1A1A1A')
-PH = {'d': ('#1F3864', '#EEF1F6', 'Data and pre-processing'), 'o1': ('#1F6FB2', '#DEEBF7', 'Objective 1: spectral response and feature selection'),
-      'v': ('#A87400', '#FFF4D6', 'Validation design'), 'o2': ('#6A2C9A', '#EDE2F6', 'Objective 2: machine and deep learning'), 'i': ('#B71C1C', '#F9E0DE', 'Interpretation and robustness')}
-steps = [('1. Data', '4 dates (6–36 days after\ninoculation), 2339 leaves;\nL3, L5, LL; grades 0–9', 'd'),
-         ('2. Pre-processing', '400–2400 nm, water bands\nkept (splice-corrected);\nSavitzky–Golay; derivative', 'd'),
-         ('3. Features', 'reflectance + derivative\n(5 nm); 41 indices +\n3 red-edge parameters', 'd'),
-         ('4. Response analysis', 'mean spectra, derivative\nand correlation curves\nby severity grade', 'o1'),
-         ('5. Optimal wavelengths', 'NDSI/RSI R² maps →\neffective ranges →\nSHAP-CARS', 'o1'),
-         ('6. Index selection', 'best NDSI, RSI, WRI;\n|r| ≥ 0.95 filter →\nReliefF / RReliefF', 'o1'),
-         ('7. Feature set', 'variance inflation\nfactor < 10 → disease-\nspecific feature set', 'o1'),
-         ('8. Validation', 'leave-one-replication-\nout (healthy plots\nrotated); inner by plot', 'v'),
-         ('9. Machine learning', 'SVM, RF, XGBoost, k-NN,\nPLS; floating forward\nselection; grid search', 'o2'),
-         ('10. Deep learning', 'DNN-F1, DT-EDNet,\nEfficientNet-B0, ResNet18,\nConvNeXt V2-Atto', 'o2'),
-         ('11. Evaluation', 'OA, kappa, macro-F1,\nweighted kappa, AUC;\nR², RMSE, RPD', 'o2'),
-         ('12. Interpretation', 'SHAP, ablation, strata,\ntransfer, covariates,\nweather', 'i')]
-fig, ax = plt.subplots(figsize=(13, 6.3)); ax.set_xlim(0, 13); ax.set_ylim(0, 6.3); ax.axis('off')
+PH = {'c': ('#2C5F2D', '#EEF3E8', 'Data collection and quality control'), 'd': ('#1F3864', '#EEF1F6', 'Pre-processing and features'), 'o1': ('#1F6FB2', '#DEEBF7', 'Objective 1: spectral response and feature selection'),
+      'v': ('#A87400', '#FFF4D6', 'Validation design'), 'o2': ('#6A2C9A', '#EDE2F6', 'Objective 2: machine and deep learning'), 'i': ('#B71C1C', '#F9E0DE', 'Covariate baseline, interpretation and discussion')}
+steps = [('1. Field experiment', '48 plots: sprayed healthy\nblock + R1–R3 inoculated;\n3 varieties × 4 sowings', 'c'),
+         ('2. Leaf spectra + scores', 'ASD contact probe, 4 dates\n(6–36 DAI), 2339 leaves;\nL3, L5, LL; grade 0–9', 'c'),
+         ('3. Weather + covariates', 'IARI daily weather; 7-day\nwindows (no look-ahead);\nfavourable days; DAI, stage', 'c'),
+         ('4. Organisation + QC', 'parse files, join layout,\nlabels; range, missing-\nvalue and plot checks', 'c'),
+         ('5. Pre-processing', '400–2400 nm, water bands\nkept (splice-corrected);\nSavitzky–Golay; derivative', 'd'),
+         ('6. Features', 'reflectance + derivative\n(5 nm); 41 indices +\n3 red-edge parameters', 'd'),
+         ('7. Response analysis', 'mean spectra, derivative\nand correlation curves\nby severity grade', 'o1'),
+         ('8. Optimal wavelengths', 'NDSI/RSI R² maps →\neffective ranges →\nSHAP-CARS', 'o1'),
+         ('9. Index selection', 'best NDSI, RSI, WRI;\n|r| ≥ 0.95 filter →\nReliefF / RReliefF', 'o1'),
+         ('10. Feature set', 'variance inflation\nfactor < 10 → disease-\nspecific feature set', 'o1'),
+         ('11. Validation', 'leave-one-replication-\nout (healthy plots\nrotated); inner by plot', 'v'),
+         ('12. Machine learning', 'SVM, RF, XGBoost, k-NN,\nPLS; floating forward\nselection; grid search', 'o2'),
+         ('13. Deep learning', 'DNN-F1, DT-EDNet,\nEfficientNet-B0, ResNet18,\nConvNeXt V2-Atto', 'o2'),
+         ('14. Evaluation', 'OA, kappa, macro-F1,\nweighted kappa, AUC;\nR², RMSE, RPD', 'o2'),
+         ('15. Covariate baseline', 'no-sensor models vs\nspectra vs both; plot\nbootstrap, DeLong; SHAP', 'i'),
+         ('16. Discussion', 'physical basis, grade\noverlap, ML vs DL,\nlimitations, UAV phase', 'i')]
+fig, ax = plt.subplots(figsize=(13, 8.4)); ax.set_xlim(0, 13); ax.set_ylim(0, 8.4); ax.axis('off')
 bw, bh, gx, X0 = 2.75, 1.45, 3.25, 0.25; pos = []
-for i in range(12):
-    r, k = divmod(i, 4); k = k if r % 2 == 0 else 3 - k; pos.append((X0 + k * gx, 4.65 - r * 2.05))
+for i in range(16):
+    r, k = divmod(i, 4); k = k if r % 2 == 0 else 3 - k; pos.append((X0 + k * gx, 6.75 - r * 2.05))
 for i, (t, b, ph) in enumerate(steps):
     x, y = pos[i]; c, fc, _ = PH[ph]; box(ax, x, y, bw, bh, t, b, c, fc)
-    if i < 11:
+    if i < 15:
         x2, y2 = pos[i + 1]; ap = dict(arrowstyle='-|>', color='#555', lw=1.6, mutation_scale=16)
         if y2 == y:
             xa, xb = (x + bw, x2) if x2 > x else (x, x2 + bw); ax.annotate('', xy=(xb, y + bh / 2), xytext=(xa, y + bh / 2), arrowprops=ap)

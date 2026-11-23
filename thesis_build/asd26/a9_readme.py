@@ -1,7 +1,7 @@
 """Write README.md for the model folder, copy the support files, test the prediction script on raw leaf spectra and zip the folder."""
 import os, json, shutil, subprocess, numpy as np, pandas as pd
 B = os.path.dirname(os.path.abspath(__file__)) + '/'; D = B + 'data/'; OUT = B + '../outputs/ASD_2025-26_models/'
-for f in ('wr_features.py', 'wr_networks.py', 'predict_white_rust.py'): shutil.copy(B + f, OUT + f)
+for f in ('wr_features.py', 'wr_networks.py', 'predict_white_rust.py', 'wr_covariates.py'): shutil.copy(B + f, OUT + f)
 MT = pd.read_csv(D + 'metrics_all.csv'); SEL = json.load(open(OUT + 'feature_selection.json'))
 mli = pd.read_csv(OUT + 'ml_models_index.csv') if os.path.exists(OUT + 'ml_models_index.csv') else pd.DataFrame()
 import glob
@@ -26,13 +26,25 @@ for t, n in (('A', 'detection'), ('B', 'six grades'), ('C', 'score')): L.append(
 L += ['', 'Each machine-learning model then uses its own SFFS subset (listed below).', '', '## Files', '', '| File | Task | Model | Features used | LORO test performance |', '|---|---|---|---|---|']
 for r in mli.itertuples(): L.append('| %s | %s | %s | %s | %s |' % (r.file, r.task, {'SVM': 'SVR', 'PLS': 'PLSR'}.get(r.model, r.model) if r.task == 'C' else r.model, r.features, perf(r.task, r.model)))
 for r in dli.itertuples(): L.append('| %s | %s | %s | %s (%s) | %s |' % (r.file, r.task, r.model, r.features, 'feature vector' if r.model == 'DNN-F1' else '%d×%d pseudo-image' % (r.pseudo_image_k, r.pseudo_image_k), perf(r.task, r.model)))
+if os.path.exists(OUT + 'covariate_models_index.csv'):
+    ci = pd.read_csv(OUT + 'covariate_models_index.csv')
+    L += ['', '## Covariate baseline models (Step 2.5.5) – folder `covariate/`', '',
+          'Models that use NO spectra (M0 candidates) and the best machine-learning model on spectra + covariates (M2), refitted on the inoculated, unsprayed leaves only (n = 1961; the sprayed healthy plots share every covariate with their inoculated plots and are excluded). '
+          'Covariates: days after inoculation (from 5 Feb 2026), inoculation timing D1–D4, variety V1–V3, growth stage (Vegetative / Flowering / Pod formation = 1–3) and, for random forest / best ML, 7-day weather ending the day before the date and favourable days since inoculation (Chattopadhyay et al., 2011). '
+          'B1 statistical models use one-hot variety and timing (V1, D1 = reference), stage code, centred DAI and DAI². `wr_covariates.py` builds the covariates from a leaf table and a daily weather table (`covariate/IARI_daily_weather_2025-26.csv` is the 2025-26 IARI record) and predicts with any bundle.', '',
+          '| File | Task | Input | Model | Role | LORO test performance |', '|---|---|---|---|---|---|']
+    for r in ci.itertuples(): L.append('| %s | %s | %s | %s | %s | %s |' % (r.file, r.task, r.input, r.model, r.role, r.loro_test_performance))
+    L += ['', '```python', 'import joblib, pandas as pd, wr_covariates as wc', "b = joblib.load('covariate/A_covariates_only_Logistic_regression.joblib')",
+          "leaves = pd.DataFrame({'date': ['2026-02-24'], 'variety': ['V1'], 'timing': ['D2'], 'stage': ['Flowering']})",
+          "print(wc.predict(b, leaves, pd.read_csv('covariate/IARI_daily_weather_2025-26.csv')))", '```', '',
+          'Spectra + covariates bundles also need the spectral features (`wr_features.all_features`, columns listed in `spectral_columns`). The covariate models describe THIS experiment (inoculation date known); they are a reference for the spectra, not a stand-alone forecaster for other fields or seasons.']
 L += ['', '## Use', '', '```', 'pip install numpy pandas scipy scikit-learn xgboost joblib openpyxl torch', 'python predict_white_rust.py my_spectra.xlsx          # column 1 = wavelength, one column per leaf (ASD export)',
       'python predict_white_rust.py my_spectra.csv --rows   # one row per leaf, headers = wavelengths', 'python predict_white_rust.py my_spectra.xlsx --models ml', '```', '',
       'The functional test of the script was run on training leaves, so its predictions are in-sample (k-NN returns the training grade exactly); use the LORO numbers above for expected accuracy.', '', 'Load one model directly in Python:', '', '```python', 'import joblib, wr_features  # wr_features must be importable (PLS classes)', "b = joblib.load('ml/C_severity_score_RF.joblib')",
       "print(b['features'], b['params'])", '```', '',
       '## Limits', '', '- Trained on one season (2025-26) and one site (IARI, New Delhi) with the ASD contact probe; check on new data (e.g. Bharatpur) before use.',
       '- Six-grade predictions are uncertain between neighbouring grades; use detection and the severity score for decisions.',
-      '- Software versions are stored in each model file (key `versions` / `torch`). Load with the same major versions of scikit-learn, XGBoost and PyTorch.', '- Files `wr_features.py` and `wr_networks.py` hold the pre-processing and network definitions; keep them with the models.', '', '## Packaging', '', '- `ASD_2025-26_models.zip`: README, scripts, feature definitions, all 15 machine-learning models and the DNN-F1 and DT-EDNet networks.', '- `ASD_2025-26_models_CNN_weights.zip`: EfficientNet-B0, ResNet18 and ConvNeXt V2-Atto weights (large files). Unzip both into the same place; the folder inside both archives is `ASD_2025-26_models/`.']
+      '- Software versions are stored in each model file (key `versions` / `torch`). Load with the same major versions of scikit-learn, XGBoost and PyTorch.', '- Files `wr_features.py` and `wr_networks.py` hold the pre-processing and network definitions; keep them with the models.', '', '## Packaging', '', '- `ASD_2025-26_models.zip`: README, scripts, feature definitions, all 15 machine-learning models, the DNN-F1 and DT-EDNet networks and the 11 covariate-baseline models.', '- `ASD_2025-26_models_CNN_weights.zip`: EfficientNet-B0, ResNet18 and ConvNeXt V2-Atto weights (large files). Unzip both into the same place; the folder inside both archives is `ASD_2025-26_models/`.']
 open(OUT + 'README.md', 'w').write('\n'.join(L)); print('README written')
 # test the prediction script on 20 raw spectra in ASD layout
 X0 = np.load(D + 'X_leaf.npy')[:20]; wl = np.load(D + 'wl.npy'); M = pd.read_csv(D + 'meta.csv')[:20]
