@@ -7,7 +7,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.colors import ListedColormap, BoundaryNorm, Normalize
 HERE = os.path.dirname(os.path.abspath(__file__)) + '/'; TB = HERE + '../'; T = TB + 'uavt/out/'; O = HERE + 'out/'; FG = HERE + 'fig/'
 os.makedirs(O, exist_ok=True); os.makedirs(FG, exist_ok=True)
-plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 8, 'savefig.dpi': 300, 'savefig.bbox': 'tight', 'axes.titleweight': 'bold', 'axes.titlesize': 9})
+plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 8, 'savefig.dpi': 300, 'savefig.bbox': 'tight', 'axes.titleweight': 'bold', 'axes.titlesize': 7.5})
 GR = [0, 1, 3, 5, 7, 9]; VAR = ['Direct', 'Healthy-reference corrected', 'Corrected + brightness-normalised']; VSH = {'Direct': 'direct', 'Healthy-reference corrected': 'corrected', 'Corrected + brightness-normalised': 'normalised'}
 GT = pd.read_csv(T + 'ground_truth.csv'); PF = pd.read_csv(T + 'predictions_frozen.csv'); PU = pd.read_csv(T + 'predictions_uav_trained.csv')
 SU = json.load(open(T + 'summary.json')); RN = json.load(open(T + 'report_numbers.json')); best = SU['best']; bv = RN['best_variant']
@@ -42,8 +42,11 @@ for t, key in (('A', 'A'), ('B', 'B'), ('C', 'C')):
         if t == 'A': tab['A_%s_score' % VSH[v]] = d.score.values
     u = PU[PU.task == t].sort_values('plot'); tab['%s_uav' % key] = u.pred.values
     if t == 'A': tab['A_uav_score'] = u.score.values
+MX = pd.read_csv(T + 'maxstat.csv').set_index('task'); top = MX.loc['A']
+dtop = pred('A', top.model, top.variant); tab['A_top'] = dtop.pred.values; tab['A_top_score'] = dtop.score.values
 cat = lambda y, p: np.where((y == 1) & (p == 1), 'TP', np.where((y == 0) & (p == 0), 'TN', np.where((y == 0) & (p == 1), 'FP', 'FN')))
 gi = {g: i for i, g in enumerate(GR)}
+tab['A_top_cat'] = cat(tab.A.values, tab['A_top'].values.astype(int))
 for tag in [VSH[v] for v in VAR] + ['uav']:
     tab['A_%s_cat' % tag] = cat(tab.A.values, tab['A_%s' % tag].values.astype(int))
     tab['B_%s_steps' % tag] = [gi[int(p)] - gi[int(y)] for p, y in zip(tab['B_%s' % tag], tab.grade)]
@@ -63,6 +66,13 @@ for tag, lab in [(VSH[v], 'Best ASD model, %s input' % VSH[v]) for v in VAR] + [
     for kind, x in (('C residual (pred - true score)', tab['C_%s_res' % tag].values.astype(float)), ('A error (1 = wrong)', (tab['A_%s_cat' % tag].isin(['FP', 'FN'])).astype(float).values),
                     ('B grade steps (pred - true)', tab['B_%s_steps' % tag].values.astype(float))):
         I, EI, p = moran_test(x); mrows.append(dict(model=lab, tag=tag, variable=kind, moran_I=I, expected_I=EI, p_value=p))
+dmask = (tab.status == 'Diseased').values; Wd = Wm[np.ix_(dmask, dmask)]
+def moran_test_d(x, n=999):
+    I = moran(x, Wd); null = np.array([moran(rng.permutation(x), Wd) for _ in range(n)]); return I, -1 / (len(x) - 1), float((1 + np.sum(null >= I)) / (n + 1))
+for tag, lab in [(VSH[v], 'Best ASD model, %s input' % VSH[v]) for v in VAR] + [('uav', 'UAV-trained model')]:
+    I, EI, p = moran_test_d(tab['C_%s_res' % tag].values[dmask].astype(float)); mrows.append(dict(model=lab, tag=tag, variable='C residual, diseased plots only', moran_I=I, expected_I=EI, p_value=p))
+I, EI, p = moran_test_d(tab.score.values[dmask]); mrows.append(dict(model='Ground truth', tag='truth', variable='True score, diseased plots only', moran_I=I, expected_I=EI, p_value=p))
+I, EI, p = moran_test((tab['A_top_cat'].isin(['FP', 'FN'])).astype(float).values); mrows.append(dict(model='Best-transferring frozen model (%s, %s input)' % (top.model, VSH[top.variant]), tag='top', variable='A error (1 = wrong)', moran_I=I, expected_I=EI, p_value=p))
 for kind, x in (('True plot mean score', tab.score.values), ('True PDI', tab.PDI.values)):
     I, EI, p = moran_test(x); mrows.append(dict(model='Ground truth', tag='truth', variable=kind, moran_I=I, expected_I=EI, p_value=p))
 MO = pd.DataFrame(mrows); MO.to_csv(O + 'moran.csv', index=False)
@@ -102,15 +112,16 @@ def cbar(fig, ax, cmap, norm, label):
 SCM = plt.get_cmap('YlOrRd'); SNORM = Normalize(0, 9); RCM = plt.get_cmap('RdBu_r'); RNORM = Normalize(-4, 4)
 GCM = ListedColormap(['#1A9850', '#FEE08B', '#FDAE61', '#F46D43', '#D73027', '#7F0000']); GNORM = BoundaryNorm([-0.5, 0.5, 2, 4, 6, 8, 9.5], 6)
 STC = {0: '#1A9850', 1: '#D73027'}; CATC = {'TP': '#D73027', 'TN': '#1A9850', 'FP': '#FDAE61', 'FN': '#4575B4'}
-def save(f, n): f.savefig(FG + n); plt.close(f)
+def save(f, n):
+    f.subplots_adjust(wspace=0.35, hspace=0.25); f.savefig(FG + n); plt.close(f)
 def gmap(values):           # grade values on the 0..9 scale for the grade colour map
     return np.array(values, float)
 
 # m01 ground truth
 f, axs = plt.subplots(1, 3, figsize=(15, 3.6))
-draw(axs[0], [int(a) for a in tab.A], 'cat', 'a  Status (sprayed = healthy, unsprayed = diseased)', {0: STC[0], 1: STC[1]})
-draw(axs[1], tab.score.values, 'num', 'b  True plot mean leaf score (0–9), 24 Feb 2026', SCM, SNORM); cbar(f, axs[1], SCM, SNORM, 'score')
-draw(axs[2], gmap(tab.grade), 'num', 'c  True grade (nearest grade of the mean score)', GCM, GNORM, fmt='%.0f'); cbar(f, axs[2], GCM, GNORM, 'grade')
+draw(axs[0], [int(a) for a in tab.A], 'cat', 'a  True status (0 healthy, 1 diseased)', {0: STC[0], 1: STC[1]})
+draw(axs[1], tab.score.values, 'num', 'b  True mean leaf score (0–9)', SCM, SNORM); cbar(f, axs[1], SCM, SNORM, 'score')
+draw(axs[2], gmap(tab.grade), 'num', 'c  True grade', GCM, GNORM, fmt='%.0f'); cbar(f, axs[2], GCM, GNORM, 'grade')
 save(f, 'm01_truth.png')
 # m02 best ASD model (best input per task): predictions
 f, axs = plt.subplots(1, 3, figsize=(15, 3.6))
@@ -120,9 +131,9 @@ draw(axs[2], tab['C_%s' % VSH[bv['C']]].values, 'num', 'c  Predicted score: %s (
 save(f, 'm02_pred_best.png')
 # m03 best ASD model: error maps
 f, axs = plt.subplots(1, 3, figsize=(15, 3.6))
-draw(axs[0], list(tab['A_%s_cat' % VSH[bv['A']]]), 'cat', 'a  Detection outcome (TP, TN, FP, FN)', CATC)
-draw(axs[1], tab['B_%s_steps' % VSH[bv['B']]].values.astype(float), 'num', 'b  Grade error (predicted − true, grade steps)', RCM, Normalize(-5, 5), fmt='%+.0f'); cbar(f, axs[1], RCM, Normalize(-5, 5), 'steps')
-draw(axs[2], tab['C_%s_res' % VSH[bv['C']]].values, 'num', 'c  Score error (predicted − true)', RCM, RNORM, fmt='%+.1f'); cbar(f, axs[2], RCM, RNORM, 'score units')
+draw(axs[0], list(tab['A_%s_cat' % VSH[bv['A']]]), 'cat', 'a  Detection outcome', CATC)
+draw(axs[1], tab['B_%s_steps' % VSH[bv['B']]].values.astype(float), 'num', 'b  Grade error (steps)', RCM, Normalize(-5, 5), fmt='%+.0f'); cbar(f, axs[1], RCM, Normalize(-5, 5), 'steps')
+draw(axs[2], tab['C_%s_res' % VSH[bv['C']]].values, 'num', 'c  Score error (pred − true)', RCM, RNORM, fmt='%+.1f'); cbar(f, axs[2], RCM, RNORM, 'score units')
 save(f, 'm03_err_best.png')
 # m04 predicted score for the three inputs + UAV-trained
 f, axs = plt.subplots(2, 2, figsize=(11, 6.6))
@@ -145,6 +156,11 @@ sA = tab['A_%s_score' % VSH[bv['A']]].values.astype(float); sU = tab.A_uav_score
 PN = Normalize(np.nanmin(sA), np.nanmax(sA)); draw(axs[0], sA, 'num', 'a  Disease score of %s (%s input)' % (best['A']['overall'], VSH[bv['A']]), plt.get_cmap('RdYlGn_r'), PN, fmt='%.2f'); cbar(f, axs[0], plt.get_cmap('RdYlGn_r'), PN, 'decision value / probability')
 PN2 = Normalize(np.nanmin(sU), np.nanmax(sU)); draw(axs[1], sU, 'num', 'b  Disease score of the UAV-trained model', plt.get_cmap('RdYlGn_r'), PN2, fmt='%.2f'); cbar(f, axs[1], plt.get_cmap('RdYlGn_r'), PN2, 'decision value / probability')
 save(f, 'm06_disease_score.png')
+f, axs = plt.subplots(1, 3, figsize=(15, 3.6))
+draw(axs[0], [int(a) for a in tab.A_top], 'cat', 'a  Predicted status: %s (%s input)' % (top.model, VSH[top.variant]), {0: STC[0], 1: STC[1]})
+draw(axs[1], list(tab.A_top_cat), 'cat', 'b  Detection outcome', CATC)
+sT = tab.A_top_score.values.astype(float); PN3 = Normalize(np.nanmin(sT), np.nanmax(sT)); draw(axs[2], sT, 'num', 'c  Probability of disease', plt.get_cmap('RdYlGn_r'), PN3, fmt='%.2f'); cbar(f, axs[2], plt.get_cmap('RdYlGn_r'), PN3, 'probability')
+save(f, 'm08_best_transfer_detection.png')
 # m07 block / sowing summaries
 f, axs = plt.subplots(1, 3, figsize=(13, 3.4))
 for ax, k, ttl in zip(axs, ('block', 'sowing', 'variety'), ('a  By block', 'b  By sowing date', 'c  By variety')):
@@ -154,6 +170,6 @@ for ax, k, ttl in zip(axs, ('block', 'sowing', 'variety'), ('a  By block', 'b  B
     ax.axhline(0, color='k', lw=0.6); ax.set_xticks(x); ax.set_xticklabels(gs); ax.set_title(ttl, loc='left'); ax.set_ylabel('mean score error (pred − true)')
 axs[0].legend(fontsize=6.5, frameon=False)
 save(f, 'm07_group_errors.png')
-json.dump(dict(best=best, best_variant=bv, n_plots=NP, n_neighbour_pairs=int(Wm.sum() / 2), uav_models={t: PU[PU.task == t].model.iloc[0] for t in 'ABC'}), open(O + 'map_summary.json', 'w'), indent=1)
+json.dump(dict(top_model=top.model, top_variant=top.variant, top_macro_F1=float(top.observed), top_p=float(top.p_value), top_ci=[float(top.ci_lo), float(top.ci_hi)], top_AUC=float(top.AUC), best=best, best_variant=bv, n_plots=NP, n_neighbour_pairs=int(Wm.sum() / 2), uav_models={t: PU[PU.task == t].model.iloc[0] for t in 'ABC'}), open(O + 'map_summary.json', 'w'), indent=1)
 pd.DataFrame(Wm.astype(int), index=range(1, NP + 1), columns=range(1, NP + 1)).to_csv(O + 'neighbours.csv')
 print('maps saved', sorted(os.listdir(FG))); print(MO.round(3).to_string(index=False))

@@ -43,7 +43,10 @@ mu = {t: MU[MU.task == t].iloc[0] for t in 'ABC'}; asd = lambda t: float(BM[(BM.
 tg = {t: VSH[bv[t]] for t in 'ABC'}
 dis = TB[TB.status == 'Diseased']
 nb = MS['n_neighbour_pairs']
-def mo(tag, var): r = MO[(MO.tag == tag) & (MO.variable.str.startswith(var))]; return r.iloc[0] if len(r) else None
+def mo(tag, var):
+    exact = {'C residual': 'C residual (pred - true score)', 'A error': 'A error (1 = wrong)', 'True plot mean score': 'True plot mean score', 'Cd': 'C residual, diseased plots only', 'Td': 'True score, diseased plots only'}
+    r = MO[(MO.tag == tag) & (MO.variable == exact.get(var, var))]; return r.iloc[0] if len(r) else None
+TOPM, TOPV = MS['top_model'], VSH[MS['top_variant']]; nTopOK = int(TB.A_top_cat.isin(['TP', 'TN']).sum())
 cnt = lambda col: TB[col].value_counts().to_dict()
 nPredD = int((TB['A_%s' % tg['A']] == 1).sum()); nPredDu = int((TB.A_uav == 1).sum())
 
@@ -53,8 +56,10 @@ def findings_list():
             'True map: the 12 sprayed plots were healthy and the 36 unsprayed plots diseased (mean score %.1f–%.1f); true severity was spatially clustered (Moran\'s I %.2f, p = %.3f).' % (dis.score.min(), dis.score.max(), I_t.moran_I, I_t.p_value),
             'Best ASD detection map (%s input): %d of 48 plots mapped diseased (true 36); %d correct (sensitivity %.2f, specificity %.2f).' % (tg['A'], nPredD, int(TB['A_%s_cat' % tg['A']].isin(['TP', 'TN']).sum()), a.sensitivity, a.specificity),
             'Best ASD score map (%s input): R² %.2f, RMSE %.2f; predicted scores %.1f–%.1f vs true %.1f–%.1f; residuals %s (Moran\'s I %.2f, p = %.3f).' % (tg['C'], c.R2, c.RMSE, TB['C_%s' % tg['C']].min(), TB['C_%s' % tg['C']].max(), TB.score.min(), TB.score.max(), 'spatially clustered' if I_b.p_value < 0.05 else 'not spatially clustered', I_b.moran_I, I_b.p_value),
+            'Within the 36 diseased plots the score errors of the best ASD map were %s (Moran\'s I %.2f, p = %.3f): the all-plot clustering reflects flat predictions over the clustered healthy block, not a local spatial artefact.' % ('not clustered' if mo(tg['C'], 'Cd').p_value >= 0.05 else 'clustered', mo(tg['C'], 'Cd').moran_I, mo(tg['C'], 'Cd').p_value),
+            'Best-transferring frozen detection model (%s, %s input): %d of 48 plots correct (macro-F1 %.2f, 95 %% CI %.2f to %.2f; maximum-statistic p = %.3f) - the best detection map of this date, to be confirmed on the next flight.' % (TOPM, TOPV, nTopOK, MS['top_macro_F1'], MS['top_ci'][0], MS['top_ci'][1], MS['top_p']),
             'UAV-trained maps: detection %d of 48 correct (macro-F1 %.2f); score R² %.2f (residual Moran\'s I %.2f, p = %.3f).' % (int(TB.A_uav_cat.isin(['TP', 'TN']).sum()), mu['A'].macro_F1, mu['C'].R2, I_u.moran_I, I_u.p_value),
-            'The frozen leaf models do not give usable disease maps of the canopy; the UAV-trained detection map is the most reliable map; severity maps need more UAV training data. A pixel-level map needs the image cube (ENVI .dat/.hdr).']
+            'The models selected as best on the leaves do not give usable disease maps of the canopy; usable detection maps came from the best-transferring frozen network and the UAV-trained model; severity maps need more UAV training data. A pixel-level map needs the image cube (ENVI .dat/.hdr).']
 
 # ================================================================== title and summary
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 900, after: 200 }, children: [new TextRun({ text: 'Disease maps of white rust from the UAV hyperspectral image of 24 February 2026', font: FONT, size: 42, bold: true, color: '1E3A1F' })] }));")
@@ -158,28 +163,35 @@ INT('pred', [('What is shown.', '[[F:pred]] maps the predictions of the best ASD
     ('Interpretation.', 'The maps do not reproduce the true pattern: the healthy block is not separated from the diseased blocks and the predicted severity is compressed into a narrow range. This is the spatial expression of the failed leaf-to-canopy transfer (transfer report: inputs outside the leaf range; Feudale et al., 2002).')])
 H2('3.3 Error maps of the best ASD models')
 FIG('err', 'm03_err_best.png', 'Error maps of the best ASD models: (a) detection outcome (TP, TN, FP, FN), (b) grade error in grade steps, (c) score error (predicted − true).')
-Ib = mo(tg['C'], 'C residual'); Iab = mo(tg['A'], 'A error')
+Ib = mo(tg['C'], 'C residual'); Iab = mo(tg['A'], 'A error'); IDd = mo(tg['C'], 'Cd')
 INT('err', [('What is shown.', '[[F:err]] shows where the maps are right or wrong.'),
     ('How to read it.', 'Detection: green and red = correct (TN, TP), orange = false alarm (FP), blue = missed disease (FN). Errors: red = over-prediction, blue = under-prediction.'),
     ('Result.', 'Detection outcomes: %s. Mean score error %+.2f; Moran\'s I of the score error %.2f (p = %.3f) and of the detection error %.2f (p = %.3f).' % (', '.join('%s %d' % (k, v) for k, v in sorted(cnt('A_%s_cat' % tg['A']).items())), TB['C_%s_res' % tg['C']].mean(), Ib.moran_I, Ib.p_value, Iab.moran_I, Iab.p_value)),
-    ('Interpretation.', ('The score errors are spatially clustered: whole groups of neighbouring plots are over- or under-predicted, which points to a spatial cause such as plot brightness by sowing strip or illumination across the image (Aasen et al., 2018) rather than random model error (Dormann et al., 2007).' if Ib.p_value < 0.05 else
-                         'The score errors are not significantly clustered: the model is wrong in a similar way across the field, consistent with a general leaf–canopy mismatch rather than a local spatial artefact (Legendre, 1993).'))])
-H2('3.4 Score maps of the three inputs')
+    ('Interpretation.', 'Across all 48 plots the score errors are clustered (Moran\'s I %.2f) because the true pattern is clustered (healthy block) while the predictions are nearly flat: the healthy block is over-predicted and the diseased blocks under-predicted, so the error map copies the true map with the opposite sign. '
+     'The fairer test is within the 36 diseased plots, where the errors were %s (I = %.2f, p = %.3f; true severity itself I = %.2f, p = %.3f). %s (Legendre, 1993; Dormann et al., 2007).' % (Ib.moran_I, 'not clustered' if IDd.p_value >= 0.05 else 'clustered', IDd.moran_I, IDd.p_value, mo('truth', 'Td').moran_I, mo('truth', 'Td').p_value,
+     'No local spatial artefact is therefore evident for this map; its failure is a general leaf–canopy mismatch' if IDd.p_value >= 0.05 else 'Neighbouring diseased plots share errors, which points to a spatial cause such as sowing strips or illumination (Aasen et al., 2018)'))])
+H2('3.4 Detection map of the best-transferring frozen model')
+FIG('top', 'm08_best_transfer_detection.png', 'Detection map of the frozen model that transferred best to the UAV plots (%s, %s input): (a) predicted status, (b) outcome, (c) probability of disease.' % (TOPM, TOPV))
+It_ = mo('top', 'A error')
+INT('top', [('What is shown.', '[[F:top]] maps the detection of the one frozen ASD model that transferred beyond chance (transfer report: maximum-statistic test over 30 model–input combinations).'),
+    ('Result.', '%d of 48 plots were mapped correctly (%s); macro-F1 %.3f (95 %% CI %.2f to %.2f), AUC %.2f, maximum-statistic p = %.3f; Moran\'s I of the detection errors %.2f (p = %.3f).' % (nTopOK, ', '.join('%s %d' % (k, v) for k, v in sorted(cnt('A_top_cat').items())), MS['top_macro_F1'], MS['top_ci'][0], MS['top_ci'][1], MS['top_AUC'], MS['top_p'], It_.moran_I, It_.p_value)),
+    ('Interpretation.', 'This network separates most of the healthy block from the diseased blocks once brightness is normalised, so it gives the best detection map of this date. It was chosen after testing many combinations and its AUC interval reaches 0.5, so the map is a lead to confirm on the next flight rather than a validated product (Westfall and Young, 1993; Olofsson et al., 2014).')])
+H2('3.5 Score maps of the three inputs')
 FIG('var', 'm04_score_variants.png', 'Predicted score maps of the best ASD score model with the three inputs and of the UAV-trained model.')
 INT('var', [('What is shown.', '[[F:var]] compares the score maps of the three inputs with the UAV-trained map.'),
     ('Result.', 'Predicted score ranges: %s; UAV-trained %.1f–%.1f.' % ('; '.join('%s %.1f–%.1f' % (VSH[v], TB['C_%s' % VSH[v]].min(), TB['C_%s' % VSH[v]].max()) for v in VAR), TB.C_uav.min(), TB.C_uav.max())),
     ('Interpretation.', 'The corrections change the level of the map but not its pattern; none separates the healthy block clearly. Correcting the spectra cannot replace training on canopy data (Pan and Yang, 2010).')])
-H2('3.5 Maps of the UAV-trained models')
+H2('3.6 Maps of the UAV-trained models')
 FIG('uav', 'm05_uav_trained.png', 'Maps of the UAV-trained models (out-of-fold, leave-one-replication-out): predictions (a–c) and errors (d–f).')
 Iu = mo('uav', 'C residual')
 INT('uav', [('What is shown.', '[[F:uav]] shows the maps of the best ML model types trained on the UAV plots, each plot predicted by a model that did not see it.'),
     ('Result.', 'Detection: %d of 48 plots correct (%s); %d plots mapped diseased. Score map R² %.2f, RMSE %.2f; Moran\'s I of the score error %.2f (p = %.3f).' % (int(TB.A_uav_cat.isin(['TP', 'TN']).sum()), ', '.join('%s %d' % (k, v) for k, v in sorted(cnt('A_uav_cat').items())), nPredDu, mu['C'].R2, mu['C'].RMSE, Iu.moran_I, Iu.p_value)),
-    ('Interpretation.', 'The UAV-trained detection map separates the healthy block from most diseased plots and is the most useful map of this date; the severity map still flattens the differences between diseased plots because 48 plots of one date are too few to learn severity (Zhang et al., 2019).')])
-H2('3.6 Disease score maps (probability of disease)')
+    ('Interpretation.', 'The UAV-trained detection map (%d of 48 correct) and the best-transferring frozen map (%d of 48) are the usable detection maps of this date; the UAV-trained severity map still flattens the differences between diseased plots because 48 plots of one date are too few to learn severity (Zhang et al., 2019).' % (int(TB.A_uav_cat.isin(['TP', 'TN']).sum()), nTopOK))])
+H2('3.7 Disease score maps (probability of disease)')
 FIG('prob', 'm06_disease_score.png', 'Continuous disease score of the detection models: (a) best ASD model, (b) UAV-trained model (decision value or probability; red = more likely diseased).')
 INT('prob', [('What is shown.', '[[F:prob]] maps the continuous output behind the detection maps, which can be thresholded to trade false alarms against missed disease (Fawcett, 2006).'),
     ('Interpretation.', 'A useful score map shows the healthy block in green and the diseased blocks in red; the best ASD model\'s score map does not, the UAV-trained map largely does (AUC %s vs %s).' % (f2(mu['A'].AUC), f2(a.AUC)))])
-H2('3.7 Errors by block, sowing date and variety')
+H2('3.8 Errors by block, sowing date and variety')
 FIG('grp', 'm07_group_errors.png', 'Mean score error (predicted − true) by block, sowing date and variety for the best ASD map and the UAV-trained map.')
 INT('group', [('What is shown.', '[[F:grp]] and the group tables show whether some blocks, sowing dates or varieties are mapped worse than others.'),
     ('Interpretation.', 'For the best ASD map the healthy block is over-predicted (positive error) and the severely diseased plots under-predicted (negative error): the map regresses towards a middle value. Differences between sowing dates follow the plot-brightness pattern of the image (Olofsson et al., 2014).')])
@@ -187,6 +199,7 @@ rows = [['Map', 'Detection accuracy', 'Sensitivity', 'Specificity', 'Within one 
 for lab, tag, mA, mB, mC in [('Best ASD models (best input)', None, a, b_, c), ('UAV-trained models', 'uav', mu['A'], mu['B'], mu['C'])]:
     I_ = mo(tg['C'] if tag is None else 'uav', 'C residual')
     rows.append([lab, f3((mA.sensitivity * 36 + mA.specificity * 12) / 48), f3(mA.sensitivity), f3(mA.specificity), f3(mB.within1), f3(mC.R2), f2(mC.RMSE), '%.2f (%.3f)' % (I_.moran_I, I_.p_value)])
+tp_ = TB.A_top_cat.value_counts(); rows.append(['Best-transferring frozen detection model (%s, %s)' % (TOPM, TOPV), f3(nTopOK / 48), f3(tp_.get('TP', 0) / 36), f3(tp_.get('TN', 0) / 12), '–', '–', '–', '–'])
 TAB('acc', rows, 'Map accuracy against the ASD ground truth of 24 Feb 2026 (48 plots).', [2400, 1000, 900, 900, 1000, 800, 900, 1406], 15)
 TAB('moran', [['Map', 'Variable', 'Moran\'s I', 'E(I)', 'p (999 permutations)']] + [[r.model, r.variable, '%.3f' % r.moran_I, '%.3f' % r.expected_I, '%.3f' % r.p_value] for r in MO.itertuples()],
     'Spatial autocorrelation (Moran\'s I, rook neighbours) of the true values and of the map errors.', [3000, 2900, 1100, 1000, 1306], 15)
@@ -198,8 +211,8 @@ for k, ttl in (('block', 'block'), ('sowing', 'sowing date'), ('variety', 'varie
 
 # ================================================================== 4 discussion, 5 conclusions
 H1('4. Discussion')
-BL(['**What the maps show.** The best ASD maps do not reproduce the true pattern; the UAV-trained detection map does for most plots. This mirrors the accuracy of the transfer test and confirms that mapping must use models trained on canopy data (Mahlein, 2016; Bohnenkamp et al., 2019).',
-    '**Spatial errors.** %s (Legendre, 1993; Dormann et al., 2007).' % ('Clustered errors indicate a spatial cause (brightness by strip or illumination) that radiometric correction should address before mapping (Aasen et al., 2018)' if Ib.p_value < 0.05 else 'Errors without spatial clustering indicate a general model mismatch rather than a local artefact'),
+BL(['**What the maps show.** The maps of the models selected on the leaves do not reproduce the true pattern; the best-transferring frozen network and the UAV-trained detection model do for most plots. This mirrors the accuracy of the transfer test and confirms that mapping must use models trained on canopy data (Mahlein, 2016; Bohnenkamp et al., 2019).',
+    '**Spatial errors.** Errors over all plots copy the clustered true pattern (healthy block) when predictions are flat; within the diseased plots the best ASD map showed %s (I = %.2f, p = %.3f), so its failure is %s (Legendre, 1993; Dormann et al., 2007).' % ('no clustering' if IDd.p_value >= 0.05 else 'clustering', IDd.moran_I, IDd.p_value, 'a general leaf–canopy mismatch rather than a local artefact' if IDd.p_value >= 0.05 else 'partly spatial (sowing strips or illumination; Aasen et al., 2018)'),
     '**Accuracy statements.** Each map is given with its confusion matrix and error measures, as required for map products (Congalton, 1991; Olofsson et al., 2014).',
     '**Next step.** With the image cube, pixel maps can be made with UAV-trained models; with the 2026-27 subplot data (1536 samples per camera), severity maps can be trained and validated.'])
 H1('5. Conclusions')
@@ -237,7 +250,7 @@ for r in POOL:
     k = a_refs.rk(r)
     if k in c_ and k not in seen: seen.add(k); used.append(r)
 used.sort(key=lambda r: r.lower())
-FP = {('Ord', '1981'), ('Brewer', '2003'), ('Yang', '2010')}
+FP = {('Ord', '1981'), ('Brewer', '2003'), ('Yang', '2010'), ('Young', '1993')}
 print('missing refs:', sorted(x for x in c_ if x not in seen and x[0] not in a_refs.SKIP and 1900 < int(x[1]) < 2028 and x not in FP))
 q = lambda s: "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
 body += "\nconst refPara = r => new Paragraph({ spacing: { after: 70, line: 255 }, indent: { left: 400, hanging: 400 }, children: [new TextRun({ text: r, font: FONT, size: 19 })] });\n[" + ',\n'.join(q(r) for r in used) + "].forEach(r => K.push(refPara(r)));"

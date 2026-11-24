@@ -93,6 +93,7 @@ sec('2  Maps, accuracy and interpretation');
 figSlide('truth', 'True disease map of 24 Feb 2026', 'truth');
 figSlide('pred', 'Maps of the best ASD models', 'pred');
 figSlide('err', 'Error maps of the best ASD models', 'err');
+figSlide('top', 'Detection map of the best-transferring frozen model', 'top');
 figSlide('var', 'Score maps: three inputs and UAV-trained', 'var');
 figSlide('uav', 'Maps of the UAV-trained models', 'uav');
 figSlide('prob', 'Disease score maps', 'prob');

@@ -20,7 +20,7 @@ step a6_figs python3 a6_figs.py
 step a11_cov python3 a11_covariate.py
 step a12_figs python3 a12_figs_cov.py
 step a9_ml python3 a9_final.py ml
-final_dl() { i=0; for n in "DNN-F1" "DT-EDNet" "EfficientNet-B0" "ResNet18" "ConvNeXt V2-Atto"; do TT=1 python3 a9_final.py dl "$n" "n$i" > data/final_dl_$i.log 2>&1 & i=$((i+1)); done; wait; grep -L "saved" data/final_dl_*.log | grep -q . && return 1 || return 0; }
+final_dl() { i=0; for net in "DNN-F1" "DT-EDNet" "EfficientNet-B0" "ResNet18" "ConvNeXt V2-Atto"; do TT=1 python3 a9_final.py dl "$net" "n$i" > data/final_dl_$i.log 2>&1 & i=$((i+1)); done; wait; grep -L "saved" data/final_dl_*.log | grep -q . && return 1 || return 0; }
 step a9_dl final_dl
 step a13_cov_models python3 a13_cov_models.py
 step a9_readme python3 a9_readme.py

@@ -45,12 +45,14 @@ title(ws, 'Plot table: ground truth, predictions and errors (24 Feb 2026)', 'Yel
       'Each row is one plot. Outcome = TP/TN/FP/FN; grade steps = position(predicted grade) - position(true grade) on 0, 1, 3, 5, 7, 9; error = predicted - true score. Paste the predictions of another model into the yellow columns and every map, accuracy and Moran\'s I updates.', 20, 48)
 cols = [('Plot', 'plot', None), ('Block', 'block', None), ('Status', 'status', None), ('Sowing', 'sowing', None), ('Variety', 'variety', None), ('True A (0/1)', 'A', '0'), ('True grade', 'grade', '0'), ('True score', 'score', '0.00'),
         ('ASD status (%s)' % tg['A'], 'A_%s' % tg['A'], '0'), ('ASD disease score', 'A_%s_score' % tg['A'], '0.000'), ('ASD grade (%s)' % tg['B'], 'B_%s' % tg['B'], '0'), ('ASD score (%s)' % tg['C'], 'C_%s' % tg['C'], '0.00'),
-        ('UAV status', 'A_uav', '0'), ('UAV disease score', 'A_uav_score', '0.000'), ('UAV grade', 'B_uav', '0'), ('UAV score', 'C_uav', '0.00')]
+        ('UAV status', 'A_uav', '0'), ('UAV disease score', 'A_uav_score', '0.000'), ('UAV grade', 'B_uav', '0'), ('UAV score', 'C_uav', '0.00'),
+        ('Top status (%s, %s)' % (MS['top_model'], VSH[MS['top_variant']]), 'A_top', '0'), ('Top disease probability', 'A_top_score', '0.000')]
 FORM = [('ASD outcome', lambda r: '=IF(AND(F{0}=1,I{0}=1),"TP",IF(AND(F{0}=0,I{0}=0),"TN",IF(AND(F{0}=0,I{0}=1),"FP","FN")))'.format(r)),
         ('ASD grade steps', lambda r: '=MATCH(K{0},{{0,1,3,5,7,9}},0)-MATCH(G{0},{{0,1,3,5,7,9}},0)'.format(r)), ('ASD score error', lambda r: '=L{0}-H{0}'.format(r)),
         ('UAV outcome', lambda r: '=IF(AND(F{0}=1,M{0}=1),"TP",IF(AND(F{0}=0,M{0}=0),"TN",IF(AND(F{0}=0,M{0}=1),"FP","FN")))'.format(r)),
-        ('UAV grade steps', lambda r: '=MATCH(O{0},{{0,1,3,5,7,9}},0)-MATCH(G{0},{{0,1,3,5,7,9}},0)'.format(r)), ('UAV score error', lambda r: '=P{0}-H{0}'.format(r))]
-header(ws, 4, 1, [c[0] for c in cols] + [f[0] for f in FORM], [6, 8, 9, 7, 7, 8, 8, 8, 11, 11, 11, 11, 9, 11, 9, 9, 10, 10, 10, 10, 10, 10], 42)
+        ('UAV grade steps', lambda r: '=MATCH(O{0},{{0,1,3,5,7,9}},0)-MATCH(G{0},{{0,1,3,5,7,9}},0)'.format(r)), ('UAV score error', lambda r: '=P{0}-H{0}'.format(r)),
+        ('Top outcome', lambda r: '=IF(AND(F{0}=1,Q{0}=1),"TP",IF(AND(F{0}=0,Q{0}=0),"TN",IF(AND(F{0}=0,Q{0}=1),"FP","FN")))'.format(r))]
+header(ws, 4, 1, [c[0] for c in cols] + [f[0] for f in FORM], [6, 8, 9, 7, 7, 8, 8, 8, 11, 11, 11, 11, 9, 11, 9, 9, 12, 11, 10, 10, 10, 10, 10, 10, 10], 42)
 YF = PatternFill('solid', fgColor='FFF2CC')
 for i, r in TB.iterrows():
     rr = 5 + i
@@ -99,7 +101,9 @@ for ttl, lab, kind, fmt in [('Plot numbers', 'plot', None, None), ('True status 
                             ('Best ASD model: disease score', 'ASD disease score', 'prob', '0.00'), ('Best ASD model: predicted grade (%s, %s input)' % (best['B']['overall'], tg['B']), 'ASD grade (%s)' % tg['B'], 'grade', '0'),
                             ('Best ASD model: predicted score (%s, %s input)' % (best['C']['overall'], tg['C']), 'ASD score (%s)' % tg['C'], 'score', '0.0'), ('Best ASD model: score error (predicted - true)', 'ASD score error', 'err', '+0.0;-0.0;0.0'),
                             ('UAV-trained: predicted status', 'UAV status', 'status', '0'), ('UAV-trained: detection outcome', 'UAV outcome', 'cat', None), ('UAV-trained: disease score', 'UAV disease score', 'prob', '0.00'),
-                            ('UAV-trained: predicted grade', 'UAV grade', 'grade', '0'), ('UAV-trained: predicted score', 'UAV score', 'score', '0.0'), ('UAV-trained: score error', 'UAV score error', 'err', '+0.0;-0.0;0.0')]:
+                            ('UAV-trained: predicted grade', 'UAV grade', 'grade', '0'), ('UAV-trained: predicted score', 'UAV score', 'score', '0.0'), ('UAV-trained: score error', 'UAV score error', 'err', '+0.0;-0.0;0.0'),
+                            ('Best-transferring frozen model (%s, %s input): predicted status' % (MS['top_model'], VSH[MS['top_variant']]), 'Top status (%s, %s)' % (MS['top_model'], VSH[MS['top_variant']]), 'status', '0'),
+                            ('Best-transferring frozen model: detection outcome', 'Top outcome', 'cat', None), ('Best-transferring frozen model: probability of disease', 'Top disease probability', 'prob', '0.00')]:
     r = mapblock(r, ttl, lab, kind, fmt)
 for c_ in range(2, 2 + 4 * (ncol_h + 1)): ws.column_dimensions[CL(c_)].width = 7
 ws.column_dimensions['A'].width = 3
@@ -120,6 +124,12 @@ def acc(lab_out, lab_steps, lab_pred, lab_err):
 A1_ = acc('ASD outcome', 'ASD grade steps', 'ASD score (%s)' % tg['C'], 'ASD score error'); A2_ = acc('UAV outcome', 'UAV grade steps', 'UAV score', 'UAV score error')
 for i, ((lab, f1, fmt), (_, f2_, _)) in enumerate(zip(A1_, A2_)):
     cell(ws, 5 + i, 2, lab, BF, LFILL, border=True); cell(ws, 5 + i, 3, f1, fmt=fmt, border=True); cell(ws, 5 + i, 4, f2_, fmt=fmt, border=True)
+cell(ws, 4, 5, 'Best-transferring frozen model (detection only)', HF, HFILL, border=True, al=Alignment(wrap_text=True)); ws.column_dimensions['E'].width = 18
+o_ = rng('Top outcome')
+for i, (f_, fmt) in enumerate([('=COUNTIF(%s,"TP")' % o_, '0'), ('=COUNTIF(%s,"TN")' % o_, '0'), ('=COUNTIF(%s,"FP")' % o_, '0'), ('=COUNTIF(%s,"FN")' % o_, '0'),
+                               ('=(COUNTIF(%s,"TP")+COUNTIF(%s,"TN"))/COUNTA(%s)' % (o_, o_, o_), '0.000'), ('=COUNTIF(%s,"TP")/(COUNTIF(%s,"TP")+COUNTIF(%s,"FN"))' % (o_, o_, o_), '0.000'),
+                               ('=COUNTIF(%s,"TN")/(COUNTIF(%s,"TN")+COUNTIF(%s,"FP"))' % (o_, o_, o_), '0.000'), ('=COUNTIF(%s,"TP")/(COUNTIF(%s,"TP")+COUNTIF(%s,"FP"))' % (o_, o_, o_), '0.000')]):
+    cell(ws, 5 + i, 5, f_, fmt=fmt, border=True)
 
 # ---------------- 4 neighbours and Moran's I (formulas)
 ws = wb['4_Neighbours_Moran']
