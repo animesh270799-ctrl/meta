@@ -58,7 +58,7 @@ K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { bef
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: 'Comparison of three validation designs – leave-one-replication-out (LORO), grouped 70:30 and grouped 80:20 hold-out – for leaf-level white rust models (ASD spectra, IARI 2025-26)', font: FONT, size: 26, color: '2C5F2D' })] }));")
 K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 500 }, children: [new TextRun({ text: 'Animesh Panda | Ph.D. Agricultural Physics | ICAR-Indian Agricultural Research Institute, New Delhi', font: FONT, size: 22, bold: true })] }));")
 ans = ' '.join(SUMM[lab]['verdict'] for lab in SUMM)
-BOX('Answer in short.', ans + ' ' + ' '.join(SUMM[lab]['summary_sentence'].split(' ' + SUMM[lab]['verdict'])[0] for lab in SUMM) + ' LORO, which tests all %d leaves once and follows the replication structure of the experiment, remains the main accuracy estimate; the hold-out models are deployable models whose single-split accuracy must be read with the split-to-split range.' % N, 'E8F5E9', '2E7D32')
+BOX('Answer in short.', ' '.join('**%s.** %s' % (lab, SUMM[lab]['summary_sentence']) for lab in SUMM) + ' LORO, which tests all %d leaves once and follows the replication structure of the experiment, remains the main accuracy estimate; the hold-out models are deployable models whose single-split accuracy must be read with the split-to-split range.' % N, 'E8F5E9', '2E7D32')
 BOX('How the files fit together.', 'This report compares the designs. The full analyses are in the three reports ASD_2025-26_leaf_analysis_white_rust_report (LORO), ASD_2025-26_70-30_… and ASD_2025-26_80-20_… with their Excel workbooks, slides and model folders. '
     'Every table of this report is in the Excel workbook ASD_2025-26_validation_comparison_LORO_70-30_80-20.xlsx with live formulas, and in the slides of the same name. The folder ASD_2025-26_validation_comparison_step_by_step holds all outputs in numbered step folders.')
 PB(); K.append("K.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: 'Contents', font: FONT, size: 32, bold: true, color: '1E3A1F' })] }));")
@@ -113,18 +113,18 @@ P('The networks therefore already work as a train : validation : test design (70
 
 # ---------------- 3 methods of comparison
 H1('3. How the designs were compared')
-CARD('c_side', 'Step 1 – all models side by side', 'Every metric of every model and task under each design, from the full analyses.', 'The first, raw look at the question.', 'Standard reporting of model metrics (Sokolova and Lapalme, 2009).',
+CARD('cside', 'Step 1 – all models side by side', 'Every metric of every model and task under each design, from the full analyses.', 'The first, raw look at the question.', 'Standard reporting of model metrics (Sokolova and Lapalme, 2009).',
      'Ten models (five ML, five DL) × three tasks; macro-F1, AUC, QWK, R², RMSE and the other metrics of each analysis.', 'Differences design − LORO; best model of each design.', 'The designs test different leaves, so these differences mix the design with the test set.')
-CARD('c_pair', 'Step 2 – same test leaves (paired comparison)', 'In LORO every leaf was tested once, so the LORO predictions of exactly the hold-out test leaves can be compared with the hold-out predictions of the same leaves.',
+CARD('cpair', 'Step 2 – same test leaves (paired comparison)', 'In LORO every leaf was tested once, so the LORO predictions of exactly the hold-out test leaves can be compared with the hold-out predictions of the same leaves.',
      'Removes the effect of testing different leaves; what remains is the effect of the training set and the design.', 'Paired comparison of classifiers on the same test set (Dietterich, 1998); cluster bootstrap for dependent samples (Field and Welsh, 2007; Efron and Tibshirani, 1993).',
      'For each split, model and metric: difference split − LORO on the split test leaves; 2000 bootstrap resamples of whole test plots (healthy and unsprayed separately) → 95% interval. Verdict "higher" or "lower" only when the interval excludes zero.', 'Counts of real gains and losses.')
-CARD('c_rep', 'Step 3 – split-to-split variability (repeated splits)', 'The same light pipeline is run on LORO, on the main split and on 20 other rule-conforming grouped splits of each ratio.',
+CARD('crep', 'Step 3 – split-to-split variability (repeated splits)', 'The same light pipeline is run on LORO, on the main split and on 20 other rule-conforming grouped splits of each ratio.',
      'One split is one draw; the range over many draws shows whether the main split is typical and whether a hold-out is systematically higher than LORO (Kohavi, 1995; Vabalas et al., 2019).', 'Repeated hold-out (Cross et al., 2024; Xu and Goodacre, 2018).',
      'Light pipeline, identical everywhere: selection on the training part (effective ranges, SHAP-CARS 10 runs, NDSI/RSI, WRI, ReliefF, VIF < 10), A SVM, B random forest, C XGBoost with grid search in three inner folds (no SFFS, to keep 49 runs affordable).', 'Mean, SD, range and number of splits above LORO.')
-CARD('c_leak', 'Step 4 – leakage check', 'Five random 70:30 and 80:20 splits of LEAVES, stratified by grade, with inner folds also by leaf – the usual practice in many papers.',
+CARD('cleak', 'Step 4 – leakage check', 'Five random 70:30 and 80:20 splits of LEAVES, stratified by grade, with inner folds also by leaf – the usual practice in many papers.',
      'Shows how much accuracy is gained only because leaves of the same plot are in training and test (Roberts et al., 2017; Kattenborn et al., 2022; Kapoor and Narayanan, 2023).', 'Spatial vs random cross-validation (Roberts et al., 2017; Kattenborn et al., 2022).',
      'Same light pipeline as Step 3.', 'Inflation = leaf-level − grouped accuracy.')
-CARD('c_ov', 'Step 5 – selection overlap', 'Jaccard similarity |A ∩ B| / |A ∪ B| of the optimal wavelengths and of the disease-specific feature set chosen in each training set.', 'Shows whether the design changes which spectral features are chosen.', 'Stability of feature selection (Kalousis et al., 2007).',
+CARD('cov', 'Step 5 – selection overlap', 'Jaccard similarity |A ∩ B| / |A ∪ B| of the optimal wavelengths and of the disease-specific feature set chosen in each training set.', 'Shows whether the design changes which spectral features are chosen.', 'Stability of feature selection (Kalousis et al., 2007).',
      'All leaves (Objective 1), three LORO training parts, 70:30 and 80:20 training plots.', 'Similarity matrix.')
 
 # ---------------- 4 results
@@ -151,6 +151,12 @@ if CP is not None:
         rows_ = [['Task', 'Model', 'LORO (same leaves)', lab, 'Difference', '95% interval', 'Verdict']] + [[r.task, mn(r.model, r.task), f3(r.LORO_same), f3(r.split), sg(r.delta), '%s to %s' % (sg(r.ci_low), sg(r.ci_high)), r.verdict] for r in P_.itertuples()]
         TAB('pair' + lab.replace(':', ''), rows_, 'Paired comparison on the %d %s test leaves (%d plots): LORO predictions of the same leaves vs %s predictions.' % (int(P_.n_leaves.iloc[0]), lab, int(P_.n_plots.iloc[0]), lab), [600, 1700, 1500, 1100, 1100, 1900, 1406], 14)
         P(SUMM[lab]['summary_sentence'])
+    for lab, _, d in DES:
+        bt = opt(d + 'data/cmp_blocktype_summary.csv')
+        if bt is None: continue
+        TAB('block' + lab.replace(':', ''), [['Task', 'Test leaves from', 'Metric', 'Leaves', 'LORO (same leaves)', lab, 'Difference']] + [[r.task, r.plots, r.metric, str(int(r.n)), f3(r.LORO_same), f3(r.split), sg(r.delta)] for r in bt.itertuples()],
+            'Paired difference by type of test plot, %s (overall accuracy for A and B, RMSE for C; mean of the ten models).' % lab, [700, 1700, 900, 900, 1700, 1500, 1906], 15)
+        if SUMM[lab].get('diag_sentence'): P(SUMM[lab]['diag_sentence'])
     FIG('pair', 'c03_paired.png', 'Difference split − LORO on the same test leaves with 95% plot-bootstrap intervals (green: really higher, red: really lower, grey: no real difference).', 620)
 if CR is not None:
     H2('4.3 Split-to-split variability')

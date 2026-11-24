@@ -84,7 +84,7 @@ tableSlides('balance', 'Grade balance of the 70:30 and 80:20 splits');
 tableSlides('valroles', 'Which models need train : validation : test');
 tableSlides('dlparts', 'Train : validation : test parts of the networks');
 sec('2  How the designs were compared', 'Five steps');
-['c_side', 'c_pair', 'c_rep', 'c_leak', 'c_ov'].forEach(k => {
+['cside', 'cpair', 'crep', 'cleak', 'cov'].forEach(k => {
   const t = TABS[k]; SHOWN_T.add(k); const r = Object.fromEntries(t.rows.slice(1).map(x => [x[0], x[1]]));
   const s = slide(t.rows[0][1], t.caption);
   card(s, 0.5, 1.15, 6.05, 2.5, 'Concept', r['Concept'], '2C5F2D', 'EEF3E8', 13); card(s, 6.75, 1.15, 6.05, 2.5, 'Why', r['Why (justification)'], '1565C0', 'E3F2FD', 13);

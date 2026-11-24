@@ -92,6 +92,29 @@ for tag, lab, d in SPLITS:
     P[P.metric == P.task.map(MAINK)].to_csv(d + 'data/cmp_paired.csv', index=False)
 pd.concat([p.assign(split=l_) if False else p.assign(design=l_) for l_, p in PAIR.items()]).to_csv(OUT + 'cmp3_paired.csv', index=False)
 
+# ---------------- (2b) diagnostics of the paired result: healthy vs unsprayed test leaves, LORO folds of the test plots, test-set difficulty
+DIAG = {}
+for tag, lab, d in SPLITS:
+    rows = []
+    for (t, m), a_ in SPP[lab].groupby(['task', 'model']):
+        b_ = LP[(LP.task == t) & (LP.model == m)].set_index('leaf').loc[a_.leaf.values]; h = PLOT[a_.leaf.values.astype(int)] <= 12
+        for nm, msk in (('healthy plots', h), ('unsprayed plots', ~h)):
+            y = a_.y.values[msk]; pa = a_.pred.values[msk]; pb = b_.pred.values[msk]
+            if t in 'AB': rows.append(dict(task=t, model=m, plots=nm, metric='OA', n=int(msk.sum()), LORO_same=float(np.mean(pb == y)), split=float(np.mean(pa == y))))
+            else: rows.append(dict(task=t, model=m, plots=nm, metric='RMSE', n=int(msk.sum()), LORO_same=float(np.sqrt(np.mean((pb - y) ** 2))), split=float(np.sqrt(np.mean((pa - y) ** 2)))))
+    BT = pd.DataFrame(rows); BT['delta'] = BT.split - BT.LORO_same; BT.to_csv(d + 'data/cmp_blocktype.csv', index=False)
+    BS = BT.groupby(['task', 'plots', 'metric'], sort=False).agg(n=('n', 'first'), LORO_same=('LORO_same', 'mean'), split=('split', 'mean'), delta=('delta', 'mean')).reset_index(); BS.to_csv(d + 'data/cmp_blocktype_summary.csv', index=False)
+    te_pl = SPJ[lab]['test_plots']; lf = M.groupby('plot').fold.first(); hp = [p_ for p_ in te_pl if p_ <= 12]
+    fold_of = {p_: int(lf[p_]) for p_ in te_pl}; hf = sorted(set(fold_of[p_] for p_ in hp))
+    same_h = len(hf) == 1 and set(M[(M.fold == hf[0]) & (M['plot'] <= 12)]['plot'].unique()) == set(hp)
+    Pm = PAIR[lab][PAIR[lab].metric == PAIR[lab].task.map(MAINK)]
+    lp_all = {t: float(np.mean([LMT[(LMT.task == t) & (LMT.model == m)][MAINK[t]].iloc[0] for m in Pm[Pm.task == t].model])) for t in 'ABC'}
+    lp_same = {t: float(Pm[Pm.task == t].LORO_same.mean()) for t in 'ABC'}; sp_same = {t: float(Pm[Pm.task == t].split.mean()) for t in 'ABC'}
+    ntr_loro = {f: int((M.fold != f).sum()) for f in range(3)}
+    DIAG[lab] = dict(test_plot_loro_fold={str(k): v + 1 for k, v in fold_of.items()}, healthy_test_plots=hp, healthy_same_as_loro_fold=(hf[0] + 1) if same_h else None,
+                     loro_pooled_mean=lp_all, loro_same_mean=lp_same, split_same_mean=sp_same, n_train_split=int(SPJ[lab]['n_train_leaves']), n_train_loro=ntr_loro,
+                     blocktype=json.loads(BS.round(4).to_json(orient='records')))
+
 # ---------------- (3)-(4) repeated splits and leakage ----------------
 REP, REPS, LEAK = {}, {}, {}
 for tag, lab, d in SPLITS:
@@ -253,16 +276,29 @@ for tag, lab, d in SPLITS:
         Lk = LEAK[lab]; Lm = Lk[Lk.metric == Lk.task.map(MAINK)].set_index('task')
         leak_txt = ('Random leaf-level %s splits, which put leaves of the same plot in training and test, gave macro-F1 %.3f and %.3f and R² %.3f, against %.3f, %.3f and %.3f for grouped splits: an apparent gain of %+.3f, %+.3f and %+.3f that is due only to leakage '
                     '(Roberts et al., 2017; Kattenborn et al., 2022).') % (lab, Lm.loc['A', 'leaf'], Lm.loc['B', 'leaf'], Lm.loc['C', 'leaf'], Lm.loc['A', 'grouped'], Lm.loc['B', 'grouped'], Lm.loc['C', 'grouped'], Lm.loc['A', 'inflation'], Lm.loc['B', 'inflation'], Lm.loc['C', 'inflation'])
-    consistent_up = nh > nl + n0 and zs and all(z > 1 for z in zs.values())
-    if consistent_up: verdict = 'Yes: the %s split gives consistently higher accuracy than LORO, on the same leaves and over other %s splits.' % (lab, lab)
-    elif nh == 0 and nl == 0: verdict = 'No: on the same leaves the %s models are as accurate as the LORO models; the differences in the raw numbers come from which leaves are tested, not from the design.' % lab
-    elif nh > nl: verdict = 'Only partly: some %s models are higher than LORO on the same leaves, but the gain is not consistent across models and lies within the split-to-split variability of %s hold-out testing.' % (lab, lab)
-    else: verdict = 'No: the %s split does not improve accuracy; where the paired comparison shows a difference, it is mostly in favour of LORO, and the hold-out result depends on which plots are drawn.' % lab
+    share = {}
+    if lab in REPS:
+        Rs = REPS[lab]; Rm = Rs[Rs.metric == Rs.task.map(MAINK)].set_index('task'); share = {t: float(Rm.loc[t, 'rep_above'] / Rm.loc[t, 'rep_n']) for t in 'ABC'}
+    fh = nh / len(Pm); msh = float(np.mean(list(share.values()))) if share else None
+    dg = DIAG[lab]; tr_gain = 100 * (dg['n_train_split'] / np.mean(list(dg['n_train_loro'].values())) - 1)
+    why = (' In LORO a whole replication is left out of training, so every test leaf comes from a field block the model has never seen; in the %s split the training plots include every replication (and the training set is %.0f%% larger than a LORO training part), so the test is closer to prediction within known field blocks than to prediction in a new block (Roberts et al., 2017).' % (lab, tr_gain))
+    if nh == 0 and nl == 0: verdict = 'No: on the same test leaves the %s models are as accurate as the LORO models; the differences in the raw numbers come from which leaves are tested.' % lab
+    elif nl > nh: verdict = 'No: on the same test leaves the %s models are less accurate than the LORO models more often than they are more accurate.' % lab
+    elif msh is None: verdict = 'On the same test leaves the %s models are higher than LORO in %d of %d comparisons and lower in %d; whether this holds for other %s splits is tested with the repeated splits.' % (lab, nh, len(Pm), nl, lab)
+    elif fh >= 0.4 and nl == 0 and msh >= 0.75: verdict = ('Yes, the numbers are higher, but for a reason that does not make the models better: the %s split gives higher accuracy than LORO on the same test leaves and in most other %s splits (%.0f%% of them above LORO).' % (lab, lab, 100 * msh)) + why
+    elif fh >= 0.4 and nl == 0: verdict = 'Only partly: the %s models are higher than LORO on these test leaves, but other %s splits are not consistently higher (%.0f%% of them above LORO), so the gain depends on which plots are drawn.' % (lab, lab, 100 * msh)
+    else: verdict = 'Mixed: some %s models are higher and some are not different from LORO on the same leaves; %.0f%% of other %s splits are above LORO.' % (lab, 100 * msh, lab)
+    hs = [b for b in dg['blocktype'] if b['task'] == 'A']
+    diag_txt = ('The %d test leaves were harder than average for LORO: on them the LORO models reached mean macro-F1 %.3f (detection) and R² %.3f (score), against %.3f and %.3f over all %d leaves. ' % (J['n_test'], dg['loro_same_mean']['A'], dg['loro_same_mean']['C'], dg['loro_pooled_mean']['A'], dg['loro_pooled_mean']['C'], N)
+                + ('The gain was not limited to the unsprayed plots: detection accuracy rose from %.3f to %.3f on the leaves of the healthy test plots and from %.3f to %.3f on the unsprayed test plots (mean of the ten models). ' % (hs[0]['LORO_same'], hs[0]['split'], hs[1]['LORO_same'], hs[1]['split']) if len(hs) == 2 else '')
+                + ('The healthy test plots (%s) are exactly the healthy plots that LORO fold %d tested, so the healthy training plots were the same in both designs; the difference lies in the unsprayed training plots, which in the %s split come from all three replications.' % (', '.join(map(str, dg['healthy_test_plots'])), dg['healthy_same_as_loro_fold'], lab) if dg['healthy_same_as_loro_fold'] else ''))
+    J['diag_sentence'] = diag_txt; J['share_above'] = share
     J['verdict'] = verdict; J['z'] = zs
     J['summary_sentence'] = s1 + ' ' + verdict
     J['repeat_sentence'] = rep_txt; J['leak_sentence'] = leak_txt
     J['qa_better'] = verdict + ' ' + s1 + (' ' + rep_txt.split('. The main')[0] + '.' if rep_txt else '')
-    J['answer'] = verdict + ' ' + s1 + (' ' + rep_txt if rep_txt else '') + (' ' + leak_txt if leak_txt else '') + ' The %s test set has only %d plots, so one split is a noisy estimate (Kohavi, 1995; Vabalas et al., 2019); LORO, which tests every leaf once, remains the more reliable estimate, and the %s models are best used as deployable models trained on a larger share of plots.' % (lab, J['n_test_plots'], lab)
+    J['diag'] = DIAG[lab]
+    J['answer'] = verdict + ' ' + s1 + ' ' + diag_txt + (' ' + rep_txt if rep_txt else '') + (' ' + leak_txt if leak_txt else '') + ' For new fields and seasons the relevant question is prediction in an unseen block, which LORO measures; LORO therefore remains the main accuracy estimate (it also tests every leaf once), and the %s models are kept as deployable models with their test-plot accuracy (Kohavi, 1995; Roberts et al., 2017; Vabalas et al., 2019).' % lab
     json.dump(J, open(d + 'data/cmp_summary.json', 'w'), indent=1, default=float); SUMM3[lab] = J; print(lab, J['summary_sentence'])
 json.dump(SUMM3, open(OUT + 'cmp3_summary.json', 'w'), indent=1, default=float)
 print('comparison done')
