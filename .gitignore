@@ -13,3 +13,14 @@ thesis_build/uavt/u4_build.js
 thesis_build/uavm/out/
 thesis_build/uavm/m2_build.js
 thesis_build/uavp/kit/models/
+thesis_build/asd7030/data/
+thesis_build/asd7030/fig/
+thesis_build/asd7030/a10_build.js
+thesis_build/asd8020/data/
+thesis_build/asd8020/fig/
+thesis_build/asd8020/a10_build.js
+thesis_build/splitcmp/out/
+thesis_build/splitcmp/fig/
+thesis_build/splitcmp/c3_build.js
+thesis_build/splitcmp/*.log
+thesis_build/splitcmp/master.done

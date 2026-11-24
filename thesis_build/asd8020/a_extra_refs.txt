@@ -1,0 +1,28 @@
+Kira, K., Rendell, L.A. (1992). A practical approach to feature selection. In: Sleeman, D., Edwards, P. (eds) Machine Learning: Proceedings of the Ninth International Workshop (ML92). Morgan Kaufmann, San Francisco, 249–256.
+Hand, D.J., Till, R.J. (2001). A simple generalisation of the area under the ROC curve for multiple class classification problems. Machine Learning 45, 171–186. https://doi.org/10.1023/A:1010920819831
+Horsfall, J.G., Barratt, R.W. (1945). An improved grading system for measuring plant diseases. Phytopathology 35, 655.
+O'Brien, R.M. (2007). A caution regarding rules of thumb for variance inflation factors. Quality & Quantity 41, 673–690. https://doi.org/10.1007/s11135-006-9018-6
+Williams, P.C. (2001). Implementation of near-infrared technology. In: Williams, P., Norris, K. (eds) Near-Infrared Technology in the Agricultural and Food Industries, 2nd edn. American Association of Cereal Chemists, St. Paul, 145–169.
+Bijlwan, A., Ranjan, R., Singh, M., Purohit, R., Nath, A.J., Chakravarty, S. (2025). Predicting crop disease severity using real time weather variability through machine learning algorithms. Scientific Reports 15, 34767. https://doi.org/10.1038/s41598-025-18613-7
+DeLong, E.R., DeLong, D.M., Clarke-Pearson, D.L. (1988). Comparing the areas under two or more correlated receiver operating characteristic curves: a nonparametric approach. Biometrics 44(3), 837–845.
+De Wolf, E.D., Isard, S.A. (2007). Disease cycle approach to plant disease prediction. Annual Review of Phytopathology 45, 203–220. https://doi.org/10.1146/annurev.phyto.44.070505.143329
+Efron, B., Tibshirani, R.J. (1993). An Introduction to the Bootstrap. Chapman & Hall, New York.
+Madden, L.V., Hughes, G., van den Bosch, F. (2007). The Study of Plant Disease Epidemics. APS Press, St. Paul.
+Ruan, C., et al. (2022). Integrating remote sensing and meteorological data to predict wheat stripe rust. Remote Sensing 14(5), 1221. https://doi.org/10.3390/rs14051221
+Vabalas, A., Gowen, E., Poliakoff, E., Casson, A.J. (2019). Machine learning algorithm validation with a limited sample size. PLoS ONE 14(11), e0224365. https://doi.org/10.1371/journal.pone.0224365
+Xu, Y., Goodacre, R. (2018). On splitting training and validation set: a comparative study of cross-validation, bootstrap and systematic sampling for estimating the generalization performance of supervised learning. Journal of Analysis and Testing 2, 249–262. https://doi.org/10.1007/s41664-018-0068-2
+Molinaro, A.M., Simon, R., Pfeiffer, R.M. (2005). Prediction error estimation: a comparison of resampling methods. Bioinformatics 21(15), 3301–3307. https://doi.org/10.1093/bioinformatics/bti499
+Dobbin, K.K., Simon, R.M. (2011). Optimally splitting cases for training and testing high dimensional classifiers. BMC Medical Genomics 4, 31. https://doi.org/10.1186/1755-8794-4-31
+Kapoor, S., Narayanan, A. (2023). Leakage and the reproducibility crisis in machine-learning-based science. Patterns 4(9), 100804. https://doi.org/10.1016/j.patter.2023.100804
+Field, C.A., Welsh, A.H. (2007). Bootstrapping clustered data. Journal of the Royal Statistical Society Series B 69(3), 369–390. https://doi.org/10.1111/j.1467-9868.2007.00593.x
+Gholamy, A., Kreinovich, V., Kosheleva, O. (2018). Why 70/30 or 80/20 relation between training and testing sets: a pedagogical explanation. Technical Report UTEP-CS-18-09, Department of Computer Science, University of Texas at El Paso.
+Joseph, V.R. (2022). Optimal ratio for data splitting. Statistical Analysis and Data Mining 15(4), 531–538. https://doi.org/10.1002/sam.11583
+Kattenborn, T., Schiefer, F., Frey, J., Feilhauer, H., Mahecha, M.D., Dormann, C.F. (2022). Spatially autocorrelated training and validation samples inflate performance assessment of convolutional neural networks. ISPRS Open Journal of Photogrammetry and Remote Sensing 5, 100018. https://doi.org/10.1016/j.ophoto.2022.100018
+Ferentinos, K.P. (2018). Deep learning models for plant disease detection and diagnosis. Computers and Electronics in Agriculture 145, 311–318. https://doi.org/10.1016/j.compag.2018.01.009
+Cross, J.F., Cobo, N., Drewry, D.T. (2024). Non-invasive diagnosis of wheat stripe rust progression using hyperspectral reflectance. Frontiers in Plant Science 15, 1429879. https://doi.org/10.3389/fpls.2024.1429879
+Wang, H., et al. (2016). Identification and severity determination of wheat stripe rust and wheat leaf rust based on hyperspectral data acquired using a black-paper-based measuring method. PLoS ONE 11(4), e0154648. https://doi.org/10.1371/journal.pone.0154648
+Ripley, B.D. (1996). Pattern Recognition and Neural Networks. Cambridge University Press, Cambridge. https://doi.org/10.1017/CBO9780511812651
+Goodfellow, I., Bengio, Y., Courville, A. (2016). Deep Learning. MIT Press, Cambridge, MA.
+Prechelt, L. (1998). Early stopping – but when? In: Orr, G.B., Müller, K.-R. (eds) Neural Networks: Tricks of the Trade. Lecture Notes in Computer Science 1524. Springer, Berlin, pp. 55–69. https://doi.org/10.1007/3-540-49430-8_3
+Dietterich, T.G. (1998). Approximate statistical tests for comparing supervised classification learning algorithms. Neural Computation 10(7), 1895–1923. https://doi.org/10.1162/089976698300017197
+Kalousis, A., Prados, J., Hilario, M. (2007). Stability of feature selection algorithms: a study on high-dimensional spaces. Knowledge and Information Systems 12(1), 95–116. https://doi.org/10.1007/s10115-006-0040-8
