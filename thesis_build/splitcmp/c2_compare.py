@@ -9,7 +9,7 @@ and the three-way tables and figures into splitcmp/out and splitcmp/fig (used by
   (3) repeated       light pipeline over 20 other grouped splits vs LORO (from c1_repeat.py)
   (4) leakage        grouped vs random leaf-level splits (from c1_repeat.py)
   (5) overlap        Jaccard similarity of the selected optimal wavelengths and feature sets"""
-import numpy as np, pandas as pd, json, os, warnings
+import numpy as np, pandas as pd, json, os, warnings, glob
 warnings.filterwarnings('ignore')
 from scipy.stats import rankdata
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
@@ -116,7 +116,7 @@ for tag, lab, d in SPLITS:
                      blocktype=json.loads(BS.round(4).to_json(orient='records')))
 
 # ---------------- (3)-(4) repeated splits and leakage ----------------
-REP, REPS, LEAK = {}, {}, {}
+REP, REPS, LEAK, REPP = {}, {}, {}, {}
 for tag, lab, d in SPLITS:
     f = d + 'data/cmp_repeat_runs.csv'
     if not os.path.exists(f): continue
@@ -130,6 +130,34 @@ for tag, lab, d in SPLITS:
             rs.append(dict(task=t, metric=k, LORO_light=lv, main_light=float(mn_.iloc[0]) if len(mn_) else np.nan, rep_mean=g.mean(), rep_sd=g.std(ddof=1), rep_min=g.min(), rep_max=g.max(), rep_above=above, rep_n=len(g),
                            z=(g.mean() - lv) / g.std(ddof=1) * (-1 if k in LOWER else 1)))
             if len(lf): lk.append(dict(task=t, metric=k, grouped=g.mean(), grouped_sd=g.std(ddof=1), leaf=lf.mean(), leaf_sd=lf.std(ddof=1), inflation=(g.mean() - lf.mean()) if k in LOWER else (lf.mean() - g.mean())))
+    # paired within the repeated splits: each split's models vs the LORO light-pipeline predictions of exactly its test leaves
+    jobs_ = [json.load(open(f_)) for f_ in sorted(glob.glob(d + 'data/repeat/job*.json'))]
+    LPL = {t: {} for t in 'ABC'}
+    for jb in jobs_:
+        if jb['scheme'] != 'LORO': continue
+        for t in 'ABC':
+            r_ = jb['results'][t]
+            for i_, lf_ in enumerate(r_['leaf']): LPL[t][lf_] = (r_['y'][i_], r_['pred'][i_], None if r_['score'] is None else r_['score'][i_])
+    pr_ = []
+    for jb in jobs_:
+        if jb['scheme'] == 'LORO': continue
+        for t in 'ABC':
+            r_ = jb['results'][t]; K = {'A': 2, 'B': 6, 'C': None}[t]; lv_ = r_['leaf']
+            if not all(l_ in LPL[t] for l_ in lv_): continue
+            y = np.array(r_['y']); pa = np.array(r_['pred']); pb = np.array([LPL[t][l_][1] for l_ in lv_])
+            sa = np.array(r_['score'], float) if t == 'A' else None; sb = np.array([LPL[t][l_][2] for l_ in lv_], float) if t == 'A' else None
+            if t in 'AB': y, pa, pb = y.astype(int), pa.astype(int), pb.astype(int)
+            else: pa, pb = np.clip(pa, 0, 9), np.clip(pb, 0, 9)
+            for k in PM[t]:
+                if k == 'OA' and t == 'B': continue
+                va, vb = met(k, y, pa, sa, K), met(k, y, pb, sb, K)
+                pr_.append(dict(scheme=jb['scheme'], run=jb['k'], task=t, metric=k, n_leaves=len(lv_), split=va, LORO_same=vb, delta=va - vb))
+    RP = pd.DataFrame(pr_); RP.to_csv(d + 'data/cmp_repeat_paired.csv', index=False); REPP[lab] = RP
+    for i_, r_ in enumerate(rs):
+        g_ = RP[(RP.scheme == 'grouped ' + lab) & (RP.task == r_['task']) & (RP.metric == r_['metric'])]
+        if len(g_):
+            better = (g_.delta < 0) if r_['metric'] in LOWER else (g_.delta > 0)
+            rs[i_].update(paired_mean=float(g_.delta.mean()), paired_sd=float(g_.delta.std(ddof=1)), paired_better=int(better.sum()), loro_same_mean=float(g_.LORO_same.mean()))
     REPS[lab] = pd.DataFrame(rs); LEAK[lab] = pd.DataFrame(lk)
     REPS[lab].to_csv(d + 'data/cmp_repeat_summary.csv', index=False); LEAK[lab].to_csv(d + 'data/cmp_leak.csv', index=False)
 if REPS: pd.concat([v.assign(design=k) for k, v in REPS.items()]).to_csv(OUT + 'cmp3_repeat.csv', index=False)
@@ -273,25 +301,32 @@ for tag, lab, d in SPLITS:
             Rm.loc['A', 'rep_mean'], Rm.loc['B', 'rep_mean'], Rm.loc['C', 'rep_mean'], Rm.loc['A', 'rep_sd'], Rm.loc['B', 'rep_sd'], Rm.loc['C', 'rep_sd'], Rm.loc['A', 'rep_above'], Rm.loc['B', 'rep_above'], Rm.loc['C', 'rep_above'], lab,
             Rm.loc['A', 'main_light'], Rm.loc['B', 'main_light'], Rm.loc['C', 'main_light'],
             'inside' if all(Rm.loc[t, 'rep_min'] <= Rm.loc[t, 'main_light'] <= Rm.loc[t, 'rep_max'] for t in 'ABC') else 'partly outside')
+        if 'paired_mean' in Rm.columns:
+            rep_txt += (' Compared on the same test leaves (which removes the luck of the test set), the %s models of the light pipeline beat the LORO models in %d, %d and %d of the 20 splits (detection, six grades, score; mean difference %+.3f, %+.3f and %+.3f).' % (
+                lab, Rm.loc['A', 'paired_better'], Rm.loc['B', 'paired_better'], Rm.loc['C', 'paired_better'], Rm.loc['A', 'paired_mean'], Rm.loc['B', 'paired_mean'], Rm.loc['C', 'paired_mean']))
         Lk = LEAK[lab]; Lm = Lk[Lk.metric == Lk.task.map(MAINK)].set_index('task')
         leak_txt = ('Random leaf-level %s splits, which put leaves of the same plot in training and test, gave macro-F1 %.3f and %.3f and R² %.3f, against %.3f, %.3f and %.3f for grouped splits: an apparent gain of %+.3f, %+.3f and %+.3f that is due only to leakage '
                     '(Roberts et al., 2017; Kattenborn et al., 2022).') % (lab, Lm.loc['A', 'leaf'], Lm.loc['B', 'leaf'], Lm.loc['C', 'leaf'], Lm.loc['A', 'grouped'], Lm.loc['B', 'grouped'], Lm.loc['C', 'grouped'], Lm.loc['A', 'inflation'], Lm.loc['B', 'inflation'], Lm.loc['C', 'inflation'])
     share = {}
     if lab in REPS:
-        Rs = REPS[lab]; Rm = Rs[Rs.metric == Rs.task.map(MAINK)].set_index('task'); share = {t: float(Rm.loc[t, 'rep_above'] / Rm.loc[t, 'rep_n']) for t in 'ABC'}
+        Rs = REPS[lab]; Rm = Rs[Rs.metric == Rs.task.map(MAINK)].set_index('task'); share = {t: float((Rm.loc[t, 'paired_better'] if 'paired_better' in Rm.columns else Rm.loc[t, 'rep_above']) / Rm.loc[t, 'rep_n']) for t in 'ABC'}
     fh = nh / len(Pm); msh = float(np.mean(list(share.values()))) if share else None
     dg = DIAG[lab]; tr_gain = 100 * (dg['n_train_split'] / np.mean(list(dg['n_train_loro'].values())) - 1)
     why = (' In LORO a whole replication is left out of training, so every test leaf comes from a field block the model has never seen; in the %s split the training plots include every replication (and the training set is %.0f%% larger than a LORO training part), so the test is closer to prediction within known field blocks than to prediction in a new block (Roberts et al., 2017).' % (lab, tr_gain))
     if nh == 0 and nl == 0: verdict = 'No: on the same test leaves the %s models are as accurate as the LORO models; the differences in the raw numbers come from which leaves are tested.' % lab
     elif nl > nh: verdict = 'No: on the same test leaves the %s models are less accurate than the LORO models more often than they are more accurate.' % lab
     elif msh is None: verdict = 'On the same test leaves the %s models are higher than LORO in %d of %d comparisons and lower in %d; whether this holds for other %s splits is tested with the repeated splits.' % (lab, nh, len(Pm), nl, lab)
-    elif fh >= 0.4 and nl == 0 and msh >= 0.75: verdict = ('Yes, the numbers are higher, but for a reason that does not make the models better: the %s split gives higher accuracy than LORO on the same test leaves and in most other %s splits (%.0f%% of them above LORO).' % (lab, lab, 100 * msh)) + why
-    elif fh >= 0.4 and nl == 0: verdict = 'Only partly: the %s models are higher than LORO on these test leaves, but other %s splits are not consistently higher (%.0f%% of them above LORO), so the gain depends on which plots are drawn.' % (lab, lab, 100 * msh)
-    else: verdict = 'Mixed: some %s models are higher and some are not different from LORO on the same leaves; %.0f%% of other %s splits are above LORO.' % (lab, 100 * msh, lab)
+    elif fh >= 0.4 and nl == 0 and msh >= 0.75: verdict = ('Yes, the numbers are higher, but for a reason that does not make the models better: the %s split gives higher accuracy than LORO on the same test leaves and, on the same leaves, in most of 20 other %s splits (%.0f%% of the split–task cases better than LORO).' % (lab, lab, 100 * msh)) + why
+    elif fh >= 0.4 and nl == 0: verdict = 'Only partly: the %s models are higher than LORO on these test leaves, but in 20 other %s splits the models beat LORO on the same leaves in only %.0f%% of the split–task cases, so the gain depends on which plots are drawn.' % (lab, lab, 100 * msh)
+    else: verdict = 'Mixed: some %s models are higher and some are not different from LORO on the same leaves; in 20 other %s splits %.0f%% of the split–task cases were better than LORO on the same leaves.' % (lab, lab, 100 * msh)
     hs = [b for b in dg['blocktype'] if b['task'] == 'A']
-    diag_txt = ('The %d test leaves were harder than average for LORO: on them the LORO models reached mean macro-F1 %.3f (detection) and R² %.3f (score), against %.3f and %.3f over all %d leaves. ' % (J['n_test'], dg['loro_same_mean']['A'], dg['loro_same_mean']['C'], dg['loro_pooled_mean']['A'], dg['loro_pooled_mean']['C'], N)
-                + ('The gain was not limited to the unsprayed plots: detection accuracy rose from %.3f to %.3f on the leaves of the healthy test plots and from %.3f to %.3f on the unsprayed test plots (mean of the ten models). ' % (hs[0]['LORO_same'], hs[0]['split'], hs[1]['LORO_same'], hs[1]['split']) if len(hs) == 2 else '')
-                + ('The healthy test plots (%s) are exactly the healthy plots that LORO fold %d tested, so the healthy training plots were the same in both designs; the difference lies in the unsprayed training plots, which in the %s split come from all three replications.' % (', '.join(map(str, dg['healthy_test_plots'])), dg['healthy_same_as_loro_fold'], lab) if dg['healthy_same_as_loro_fold'] else ''))
+    hard = dg['loro_same_mean']['A'] < dg['loro_pooled_mean']['A']
+    diag_txt = ('The %d test leaves were %s than average for LORO: on them the LORO models reached mean macro-F1 %.3f (detection) and R² %.3f (score), against %.3f and %.3f over all %d leaves, so the raw side-by-side numbers %s the gain. ' % (J['n_test'], 'harder' if hard else 'easier', dg['loro_same_mean']['A'], dg['loro_same_mean']['C'], dg['loro_pooled_mean']['A'], dg['loro_pooled_mean']['C'], N, 'understate' if hard else 'overstate'))
+    if len(hs) == 2:
+        dh, du = hs[0]['split'] - hs[0]['LORO_same'], hs[1]['split'] - hs[1]['LORO_same']
+        where = 'on both the healthy and the unsprayed test plots' if dh > 0.02 and du > 0.02 else ('mainly on the unsprayed test plots' if du > dh else 'mainly on the healthy test plots')
+        diag_txt += 'The detection gain appeared %s: accuracy %.3f → %.3f on the leaves of the healthy test plots and %.3f → %.3f on the unsprayed test plots (mean of the ten models). ' % (where, hs[0]['LORO_same'], hs[0]['split'], hs[1]['LORO_same'], hs[1]['split'])
+    if dg['healthy_same_as_loro_fold']: diag_txt += 'The healthy test plots (%s) are exactly the healthy plots that LORO fold %d tested, so the healthy training plots were the same in both designs; the difference lies in the unsprayed training plots, which in the %s split come from all three replications.' % (', '.join(map(str, dg['healthy_test_plots'])), dg['healthy_same_as_loro_fold'], lab)
     J['diag_sentence'] = diag_txt; J['share_above'] = share
     J['verdict'] = verdict; J['z'] = zs
     J['summary_sentence'] = s1 + ' ' + verdict

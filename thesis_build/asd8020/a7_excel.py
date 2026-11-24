@@ -547,6 +547,21 @@ if os.path.exists(D + 'cmp_repeat_runs.csv'):
     ch = BarChart(); ch.type = 'col'
     for c__, nm_ in ((15, 'LORO'), (17, 'grouped %s (mean of 20)' % LABEL), (22, 'random leaf-level %s' % LABEL)): ch.series.append(_Ser(Reference(ws, min_col=c__, min_row=rr + 1, max_row=rr + 6), title=nm_))
     ch.set_categories(Reference(ws, min_col=14, min_row=rr + 1, max_row=rr + 6)); ws.add_chart(style_chart(ch, 'LORO vs grouped and leaf-level %s splits (light pipeline)' % LABEL, None, 'metric', 20, 9), 'M13'); widths(ws, 12)
+    if os.path.exists(D + 'cmp_repeat_paired.csv'):
+        RPP = pd.read_csv(D + 'cmp_repeat_paired.csv'); r0 = 34; ws.cell(r0 - 1, 13, 'Same test leaves inside every repeated split: split model vs LORO light-pipeline predictions of exactly those leaves (Δ by formula)').font = BF
+        header(ws, r0, 13, ['scheme', 'run', 'task', 'metric', 'leaves', 'split', 'LORO (same leaves)', 'Δ (formula)'])
+        for i, rw in enumerate(RPP.itertuples()):
+            rr_ = r0 + 1 + i
+            for j, v in enumerate([rw.scheme, int(rw.run), rw.task, rw.metric, int(rw.n_leaves), float(rw.split), float(rw.LORO_same)]): c_ = ws.cell(rr_, 13 + j, v); c_.font = NF; c_.number_format = '0.000' if j >= 5 else 'General'
+            ws.cell(rr_, 20, '=R%d-S%d' % (rr_, rr_)).number_format = '+0.000;-0.000'
+        e2 = r0 + len(RPP); s0 = e2 + 3; ws.cell(s0 - 1, 13, 'Summary (formulas): grouped splits better than LORO on the same leaves').font = BF
+        header(ws, s0, 13, ['task', 'metric', 'splits', 'better than LORO', 'mean Δ'])
+        for i, (t_, k_) in enumerate((('A', 'macro_F1'), ('A', 'AUC'), ('B', 'macro_F1'), ('B', 'QWK'), ('C', 'R2'), ('C', 'RMSE'))):
+            rr_ = s0 + 1 + i; G2 = '"grouped %s"' % LABEL; rg_ = lambda c: '$%s$%d:$%s$%d' % (c, r0 + 1, c, e2)
+            ws.cell(rr_, 13, t_).font = NF; ws.cell(rr_, 14, k_).font = NF
+            ws.cell(rr_, 15, '=COUNTIFS(%s,%s,%s,"%s",%s,"%s")' % (rg_('M'), G2, rg_('O'), t_, rg_('P'), k_))
+            ws.cell(rr_, 16, '=COUNTIFS(%s,%s,%s,"%s",%s,"%s",%s,"%s0")' % (rg_('M'), G2, rg_('O'), t_, rg_('P'), k_, rg_('T'), '<' if k_ == 'RMSE' else '>'))
+            ws.cell(rr_, 17, '=AVERAGEIFS(%s,%s,%s,%s,"%s",%s,"%s")' % (rg_('T'), rg_('M'), G2, rg_('O'), t_, rg_('P'), k_)).number_format = '+0.000;-0.000'
 ws = sheet('33_Split_types', 'Types of training / validation / test split in plant-disease studies, and what suits this data set', 'References are in 26_References and in the Word report.')
 TY = [('Random hold-out 80:20', 'images, leaves or pixels drawn at random; 80% train, 20% test', 'Mohanty et al. (2016): 80–20 to 20–80 random splits of PlantVillage images; Ferentinos (2018): 17,548 of 87,848 images held out (about 80:20)'),
       ('Random hold-out 70:30', 'as above, 70% train, 30% test, often stratified by class', 'rule of thumb of 20–30% for testing (Gholamy et al., 2018); no theoretical basis, optimal ratio √p : 1 proposed by Joseph (2022)'),

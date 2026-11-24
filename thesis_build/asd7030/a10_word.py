@@ -459,13 +459,14 @@ if CP is not None:
     if BT_ is not None:
         TAB('cmpblock', [['Task', 'Test leaves from', 'Metric', 'Leaves', 'LORO (same leaves)', '{LBL}', 'Difference']] + [[r.task, r.plots, r.metric, str(int(r.n)), f3(r.LORO_same), f3(r.split), '%+.3f' % r.delta] for r in BT_.itertuples()],
             'Where the paired difference comes from: overall accuracy (A, B) and RMSE (C) on the test leaves of the healthy and of the unsprayed test plots, mean of the ten models (for RMSE a negative difference is an improvement).', [700, 1700, 900, 900, 1700, 1500, 1906], 15)
-        if CMP and CMP.get('diag_sentence'): P(CMP['diag_sentence'].rstrip('.') + ' ([[T:cmpblock]]).')
+        if CMP and CMP.get('diag_sentence'): P(CMP['diag_sentence'].strip().rstrip('.') + ' ([[T:cmpblock]]).')
     FIG('cmppair', 'f37_cmp_paired.png', 'Difference {LBL} − LORO on the same test leaves with 95% plot-bootstrap intervals (right of zero = better with {LBL}; for RMSE left of zero is better).', 600)
 if CR is not None:
     H2('4.3 How much does the answer depend on the split?')
-    rows_ = [['Task', 'Metric', 'LORO (light pipeline)', 'Main {LBL} split', '20 other {LBL} splits: mean ± SD', 'Range', 'Splits above LORO']]
-    for r in CR.itertuples(): rows_.append([r.task, r.metric.replace('macro_F1', 'macro-F1').replace('R2', 'R²'), f3(r.LORO_light), f3(r.main_light), '%.3f ± %.3f' % (r.rep_mean, r.rep_sd), '%.3f – %.3f' % (r.rep_min, r.rep_max), '%d of %d' % (r.rep_above, r.rep_n)])
-    TAB('cmprep', rows_, 'Light pipeline (selection on the training part; A SVM, B random forest, C XGBoost; grid search, no SFFS) under LORO, the main {LBL} split and 20 other grouped, stratified {LBL} splits.', [600, 900, 1500, 1400, 2100, 1500, 1306], 15)
+    rows_ = [['Task', 'Metric', 'LORO (light pipeline, all leaves)', 'Main {LBL} split', '20 other {LBL} splits: mean ± SD (range)', 'Above LORO (all leaves)', 'Same leaves: mean difference', 'Same leaves: better than LORO']]
+    for r in CR.itertuples(): rows_.append([r.task, r.metric.replace('macro_F1', 'macro-F1').replace('R2', 'R²'), f3(r.LORO_light), f3(r.main_light), '%.3f ± %.3f (%.3f – %.3f)' % (r.rep_mean, r.rep_sd, r.rep_min, r.rep_max), '%d of %d' % (r.rep_above, r.rep_n),
+                                            '%+.3f ± %.3f' % (r.paired_mean, r.paired_sd) if hasattr(r, 'paired_mean') else '–', '%d of %d' % (r.paired_better, r.rep_n) if hasattr(r, 'paired_better') else '–'])
+    TAB('cmprep', rows_, 'Light pipeline (selection on the training part; A SVM, B random forest, C XGBoost; grid search, no SFFS) under LORO, the main {LBL} split and 20 other grouped, stratified {LBL} splits. "Same leaves" compares each split with the LORO predictions of exactly its test leaves, which removes the luck of the test set.', [550, 800, 1300, 1100, 1900, 1100, 1300, 1256], 14)
     P(CMP['repeat_sentence'] if CMP else '')
     FIG('cmprep', 'f38_cmp_repeat.png', 'Test accuracy of the light pipeline over 20 grouped {LBL} splits (dots, box) compared with LORO (dashed line) and the main {LBL} split (diamond).', 600)
 if CL is not None:

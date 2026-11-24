@@ -289,7 +289,7 @@ if (DATA.cmp_paired) {
     s = slide('3. How much does the answer depend on the split?', 'Light pipeline (A SVM, B RF, C XGBoost) under LORO and 21 grouped ' + LBL + ' splits.');
     img(s, FG + 'f38_cmp_repeat.png', 0.5, 1.15, 12.3, 3.9);
     const rp = DATA.cmp_repeat.filter(r => r.metric === ({ A: 'macro_F1', B: 'macro_F1', C: 'R2' })[r.task]);
-    tbl(s, [['Task', 'LORO', 'Main ' + LBL, '20 splits mean ± SD', 'Range', 'Above LORO'], ...rp.map(r => [r.task, f3(r.LORO_light), f3(r.main_light), f3(r.rep_mean) + ' ± ' + f3(r.rep_sd), f3(r.rep_min) + '–' + f3(r.rep_max), r.rep_above + ' / ' + r.rep_n])], 0.5, 5.2, 12.3, [1.0, 1.6, 1.8, 3.0, 2.8, 2.1], 13);
+    tbl(s, [['Task', 'LORO', 'Main ' + LBL, '20 splits mean ± SD', 'Above LORO (all leaves)', 'Same leaves: better / mean Δ'], ...rp.map(r => [r.task, f3(r.LORO_light), f3(r.main_light), f3(r.rep_mean) + ' ± ' + f3(r.rep_sd), r.rep_above + ' / ' + r.rep_n, (r.paired_better !== undefined ? r.paired_better + ' / ' + r.rep_n + ' (' + (r.paired_mean >= 0 ? '+' : '') + f3(r.paired_mean) + ')' : '–')])], 0.5, 5.2, 12.3, [0.8, 1.4, 1.6, 2.8, 2.6, 3.1], 13);
   }
   if (DATA.cmp_leak) {
     s = slide('4. Leakage check: splitting leaves instead of plots', 'Leaves of the same plot in training and test make the accuracy look better than it is.');

@@ -158,6 +158,21 @@ if runs:
             cell(ws, rr, 23, '=AVERAGEIFS(%s,%s,"leaf %s",%s,"%s")' % (sr(c), sr('B'), lab, sr('D'), t), fmt='0.000')
             cell(ws, rr, 24, '=%s' % ('R%d-W%d' % (rr, rr) if m_ == 'RMSE' else 'W%d-R%d' % (rr, rr)), fmt='+0.000;-0.000')
             SUMROWS[(lab, t, m_)] = rr; k += 1
+    rp_ = [pd.read_csv(d + 'data/cmp_repeat_paired.csv').assign(design=lab) for lab, d in DES if os.path.exists(d + 'data/cmp_repeat_paired.csv')]
+    if rp_:
+        RPP = pd.concat(rp_, ignore_index=True); r0 = 6 + k + 3; cell(ws, r0 - 1, 13, 'Same test leaves inside every repeated split (Δ = split − LORO light pipeline on exactly those leaves; formulas)', SF)
+        cols2 = ['design', 'scheme', 'run', 'task', 'metric', 'n_leaves', 'split', 'LORO_same']; header(ws, r0, 13, cols2 + ['Δ (formula)'])
+        for i, (_, rw) in enumerate(RPP.iterrows()):
+            for j, c in enumerate(cols2): cell(ws, r0 + 1 + i, 13 + j, rw[c], BLUEF if j >= 6 else NF, fmt='0.000' if j >= 6 else None)
+            cell(ws, r0 + 1 + i, 21, '=S%d-T%d' % (r0 + 1 + i, r0 + 1 + i), fmt='+0.000;-0.000')
+        e2 = r0 + len(RPP); s0 = e2 + 3; cell(ws, s0 - 1, 13, 'Summary (formulas)', SF); header(ws, s0, 13, ['design', 'task', 'metric', 'splits', 'better than LORO', 'mean Δ'])
+        rg_ = lambda c: '$%s$%d:$%s$%d' % (c, r0 + 1, c, e2); kk = 0
+        for lab in LABS[1:]:
+            for t, m_ in (('A', 'macro_F1'), ('B', 'macro_F1'), ('C', 'R2')):
+                rr = s0 + 1 + kk; g = '"grouped %s"' % lab; cell(ws, rr, 13, lab); cell(ws, rr, 14, t); cell(ws, rr, 15, m_)
+                cell(ws, rr, 16, '=COUNTIFS(%s,%s,%s,"%s",%s,"%s")' % (rg_('N'), g, rg_('P'), t, rg_('Q'), m_))
+                cell(ws, rr, 17, '=COUNTIFS(%s,%s,%s,"%s",%s,"%s",%s,">0")' % (rg_('N'), g, rg_('P'), t, rg_('Q'), m_, rg_('U')))
+                cell(ws, rr, 18, '=AVERAGEIFS(%s,%s,%s,%s,"%s",%s,"%s")' % (rg_('U'), rg_('N'), g, rg_('P'), t, rg_('Q'), m_), fmt='+0.000;-0.000'); kk += 1
     widths(ws, 11, 9); ws.column_dimensions['B'].width = 15
 ws6 = wb.create_sheet('6_Leakage'); title(ws6, 'Leakage check: grouped vs random leaf-level splits', how='Linked to the formula summary of 5_Repeated. Inflation = how much better the leaf-level split looks only because leaves of the same plot are in training and test.')
 if SUMROWS:

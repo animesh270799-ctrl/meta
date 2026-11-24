@@ -160,9 +160,10 @@ if CP is not None:
     FIG('pair', 'c03_paired.png', 'Difference split − LORO on the same test leaves with 95% plot-bootstrap intervals (green: really higher, red: really lower, grey: no real difference).', 620)
 if CR is not None:
     H2('4.3 Split-to-split variability')
-    rows_ = [['Design', 'Task', 'Metric', 'LORO', 'Main split', '20 other splits: mean ± SD', 'Range', 'Above LORO']]
-    for r in CR[CR.metric == CR.task.map(MAINK)].itertuples(): rows_.append([r.design, r.task, MK[r.metric], f3(r.LORO_light), f3(r.main_light), '%s ± %s' % (f3(r.rep_mean), f3(r.rep_sd)), '%s – %s' % (f3(r.rep_min), f3(r.rep_max)), '%d of %d' % (r.rep_above, r.rep_n)])
-    TAB('rep', rows_, 'Light pipeline under LORO, the main split and 20 other grouped splits of each ratio. AUC, QWK and RMSE are in the Excel workbook.', [800, 600, 900, 900, 1100, 2000, 1600, 1406], 14)
+    rows_ = [['Design', 'Task', 'Metric', 'LORO (all leaves)', 'Main split', '20 other splits: mean ± SD (range)', 'Above LORO (all leaves)', 'Same leaves: mean difference', 'Same leaves: better than LORO']]
+    for r in CR[CR.metric == CR.task.map(MAINK)].itertuples(): rows_.append([r.design, r.task, MK[r.metric], f3(r.LORO_light), f3(r.main_light), '%s ± %s (%s – %s)' % (f3(r.rep_mean), f3(r.rep_sd), f3(r.rep_min), f3(r.rep_max)), '%d of %d' % (r.rep_above, r.rep_n),
+                                                                             '%s ± %s' % (sg(r.paired_mean), f3(r.paired_sd)) if hasattr(r, 'paired_mean') else '–', '%d of %d' % (r.paired_better, r.rep_n) if hasattr(r, 'paired_better') else '–'])
+    TAB('rep', rows_, 'Light pipeline under LORO, the main split and 20 other grouped splits of each ratio. "Same leaves" compares each split with the LORO predictions of exactly its test leaves. AUC, QWK and RMSE are in the Excel workbook.', [700, 500, 800, 1000, 900, 1900, 1100, 1300, 1106], 13)
     for lab in LABS[1:]:
         if SUMM[lab].get('repeat_sentence'): P(SUMM[lab]['repeat_sentence'])
     FIG('rep', 'c04_repeat.png', 'Test accuracy of the light pipeline over 20 grouped splits of each ratio (dots and box) with LORO (dashed line) and the main split (diamond).', 620)
