@@ -1,0 +1,7 @@
+Anselin, L. (1995). Local indicators of spatial association—LISA. Geographical Analysis 27(2), 93–115.
+Cliff, A.D., Ord, J.K. (1981). Spatial Processes: Models and Applications. Pion, London.
+Dormann, C.F., McPherson, J.M., Araújo, M.B., Bivand, R., Bolliger, J., Carl, G., Davies, R.G., Hirzel, A., Jetz, W., Kissling, W.D., Kühn, I., Ohlemüller, R., Peres-Neto, P.R., Reineking, B., Schröder, B., Schurr, F.M., Wilson, R. (2007). Methods to account for spatial autocorrelation in the analysis of species distributional data: a review. Ecography 30(5), 609–628.
+Foody, G.M. (2002). Status of land cover classification accuracy assessment. Remote Sensing of Environment 80(1), 185–201.
+Harrower, M., Brewer, C.A. (2003). ColorBrewer.org: an online tool for selecting colour schemes for maps. The Cartographic Journal 40(1), 27–37.
+Legendre, P. (1993). Spatial autocorrelation: trouble or new paradigm? Ecology 74(6), 1659–1673.
+Moran, P.A.P. (1950). Notes on continuous stochastic phenomena. Biometrika 37(1–2), 17–23.

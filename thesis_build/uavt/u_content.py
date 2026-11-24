@@ -10,7 +10,8 @@ def load():
     D = dict(GT=pd.read_csv(O + 'ground_truth.csv'), MF=pd.read_csv(O + 'metrics_frozen.csv'), PF=pd.read_csv(O + 'predictions_frozen.csv'), MU=pd.read_csv(O + 'metrics_uav_trained.csv'),
              PU=pd.read_csv(O + 'predictions_uav_trained.csv'), BM=pd.read_csv(O + 'best_models.csv'), DF=pd.read_csv(O + 'domain_features.csv'), SC=pd.read_csv(O + 'spectra_compare.csv'),
              PC=pd.read_csv(O + 'pca_domain.csv'), SU=json.load(open(O + 'summary.json')),
-             CI=pd.read_csv(O + 'ci.csv') if os.path.exists(O + 'ci.csv') else None, PM=pd.read_csv(O + 'permutation.csv') if os.path.exists(O + 'permutation.csv') else None)
+             CI=pd.read_csv(O + 'ci.csv') if os.path.exists(O + 'ci.csv') else None, PM=pd.read_csv(O + 'permutation.csv') if os.path.exists(O + 'permutation.csv') else None,
+             MX=pd.read_csv(O + 'maxstat.csv') if os.path.exists(O + 'maxstat.csv') else None)
     return D
 
 VAR = ['Direct', 'Healthy-reference corrected', 'Corrected + brightness-normalised']
@@ -51,6 +52,7 @@ def facts(D):
         r = CI[(CI.task == t) & (CI.role == role) & (CI.variant == v)]
         return (float(r[k + '_lo'].iloc[0]), float(r[k + '_hi'].iloc[0])) if len(r) and k + '_lo' in r else (np.nan, np.nan)
     F['ci'] = ci; F['perm'] = {r.task: r for r in PM.itertuples()} if PM is not None else {}
+    F['maxs'] = {r.task: r for r in D['MX'].itertuples()} if D['MX'] is not None else {}
     F['n_bands'] = SU['n_bands']; F['asd_n'] = SU['asd_models_trained_on']; F['gaps'] = SU['gaps']
     return F
 
@@ -162,7 +164,8 @@ def steps(D, F):
         'Classification measures (Sokolova and Lapalme, 2009), ROC analysis (Fawcett, 2006), weighted kappa (Cohen, 1968), RPD (Williams, 2001), bootstrap confidence intervals (Efron and Tibshirani, 1993).',
         ['Compare predictions with the true values of step M2 for every model and variant.',
          'Compute the measures below (Excel recomputes the simple ones with live formulas in sheets 3–5).',
-         'Bootstrap: resample the 12 healthy and 36 diseased plots with replacement 2000 times, recompute the measure, take the 2.5th and 97.5th percentiles as the 95 % confidence interval.'],
+         'Bootstrap: resample the 12 healthy and 36 diseased plots with replacement 2000 times, recompute the measure, take the 2.5th and 97.5th percentiles as the 95 % confidence interval.',
+         'Best of all models: because 30 model–input combinations are compared, the best one is tested with a maximum-statistic permutation test: the labels are shuffled 2000 times and the best score of all 30 combinations is recorded each time; p = share of shuffles whose best score reaches the observed best (Westfall and Young, 1993).'],
         'Measures computed in Python (scikit-learn; Pedregosa et al., 2011) and, where possible, again with Excel formulas.', 'Metric tables, confusion matrices, confidence intervals (sheets 2–7, 13).',
         'With 48 plots the confidence intervals are wide; differences smaller than the interval are not meaningful.',
         'Why macro-F1 rather than accuracy? Predicting "diseased" for every plot gives 75 % accuracy but macro-F1 0.43.')
@@ -186,7 +189,8 @@ METRICS = [
     ('Pearson r', 'C', 'covariance / (SD_{pred} × SD_{true})', '=CORREL(pred,true)', 'Strength of the linear relation; ranks plots even when biased.', 'Williams (2001)'),
     ('RPD', 'C', 'SD(true) / RMSE', '=STDEV(true)/RMSE', '> 2 good, 1.4–2 fair, < 1.4 poor.', 'Williams (2001)'),
     ('95 % confidence interval', 'all', '2.5th–97.5th percentile of 2000 bootstrap resamples of plots', 'Python', 'Range of plausible values; overlapping intervals = no clear difference.', 'Efron and Tibshirani (1993)'),
-    ('Permutation p-value', 'UAV-trained', '(1 + #null ≥ observed) / (1 + permutations)', 'Python', 'Probability of the observed score if the spectra carried no information; < 0.05 = significant.', 'Ojala and Garriga (2010)')]
+    ('Permutation p-value', 'UAV-trained', '(1 + #null ≥ observed) / (1 + permutations)', 'Python', 'Probability of the observed score if the spectra carried no information; < 0.05 = significant.', 'Ojala and Garriga (2010)'),
+    ('Maximum-statistic p-value', 'all models', 'share of label shuffles in which the best of the 30 combinations reaches the observed best', 'Python', 'Corrects for picking the best of many models; < 0.05 = the best result is unlikely to be chance.', 'Westfall and Young (1993)')]
 
 GLOSSARY = [('ASD', 'Analytical Spectral Devices FieldSpec spectroradiometer; here used with a contact probe on single leaves.'),
             ('UAV', 'Unmanned aerial vehicle (drone) carrying the hyperspectral camera.'),

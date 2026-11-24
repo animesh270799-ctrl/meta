@@ -34,6 +34,8 @@ def INT(key, parts):
 D = load(); F = facts(D); GT, MF, PF, MU, DF, SC = D['GT'], D['MF'], D['PF'], D['MU'], D['DF'], D['SC']
 best, mu, bv, bo, m, asd = F['best'], F['mu'], F['bv'], F['bo'], F['m'], F['asd']
 dis = F['dis']; gapf = ', '.join(F['gapf']) if F['gapf'] else 'none'
+MX = F['maxs']; mxA = MX.get('A')
+mxs = lambda t: ('%s (%s input): %s %.3f, 95 %% CI %.2f to %.2f, maximum-statistic p = %.3f' % (MX[t].model, VSH[MX[t].variant], KL[t], MX[t].observed, MX[t].ci_lo, MX[t].ci_hi, MX[t].p_value)) if t in MX else ''
 perm = F['perm']; pstr = lambda t: ('permutation p = %.3f' % perm[t].p_value) if t in perm else 'permutation test not run'
 STEPS = steps(D, F)
 
@@ -41,7 +43,8 @@ def findings_list():
     a_, b2, c2 = bo['A'], bo['B'], bo['C']
     return ['Domain shift: canopy NIR reflectance %.2f vs leaf %.2f (healthy plots/leaves); %d of %d model inputs outside the leaf range for > 50 %% of plots (direct input)%s.' % (F['nir_uav'], F['nir_asd'], F['out50']['direct'], F['nfeat'], '; %s lies inside a UAV band gap' % gapf if F['gapf'] else ''),
             'Detection: best ASD model %s macro-F1 %.3f on the leaves vs %.3f on the UAV plots (%s input%s; AUC %s).' % (best['A']['overall'], asd('A', 'overall'), a_.macro_F1, VSH[bv['A']], cis(F, 'A', 'overall', bv['A'], 'macro_F1'), f3(a_.AUC)),
-            'Grades: %s macro-F1 %.3f on the leaves vs %.3f on the UAV plots; predictions concentrated in a few grades.' % (best['B']['overall'], asd('B', 'overall'), b2.macro_F1),
+            ('Best of all 30 frozen model–input combinations for detection: %s (AUC %.2f); partial transfer, to be confirmed on another date.' % (mxs('A'), mxA.AUC) if mxA is not None else 'Best of all models: not computed.'),
+            'Grades: %s macro-F1 %.3f on the leaves vs %.3f on the UAV plots; predictions concentrated in a few grades (best of all combinations: %s).' % (best['B']['overall'], asd('B', 'overall'), b2.macro_F1, mxs('B')),
             'Score: %s R² %.3f on the leaves vs %.3f on the UAV plots (r %.2f).' % (best['C']['overall'], asd('C', 'overall'), c2.R2, c2.r),
             'Corrections (healthy reference, brightness normalisation) moved some inputs into the leaf range but did not restore accuracy.',
             'In-domain check: %s refitted on the UAV plots reached detection macro-F1 %.3f (AUC %s, %s); grades macro-F1 %.3f (%s), score R² %.3f (%s).' % (mu['A'].model, mu['A'].macro_F1, f3(mu['A'].AUC), pstr('A'), mu['B'].macro_F1, pstr('B'), mu['C'].R2, pstr('C')),
@@ -54,9 +57,9 @@ K.append("K.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { aft
 a, b_, c = bo['A'], bo['B'], bo['C']
 summ = ('**Question.** Can the best leaf-level models of the 2025-26 ASD analysis (trained on %d leaf spectra) be applied directly to the canopy-level UAV hyperspectral image of 24 February 2026? '
         '**Data.** %d plot mean spectra (%d healthy, %d diseased; %d bands, 399–2398 nm) and the ASD leaf scores of the same day (diseased plots: mean score %.1f–%.1f, PDI %.0f–%.0f %%). '
-        '**Result.** On the leaves the best models reached macro-F1 %.3f (detection, %s), %.3f (six grades, %s) and R² %.3f (score, %s). On the UAV plots the same frozen models reached at best macro-F1 %.3f (detection%s), %.3f (grades) and R² %.3f (score): '
-        'about chance level for detection and no useful severity information. Correcting the UAV spectra with the healthy plots and removing brightness differences changed little. '
-        '**Why.** Canopy reflectance is far lower than leaf reflectance (NIR %.2f vs %.2f) and %d of the %d model inputs fall outside the leaf training range for more than half of the plots; %s lies inside a band removed from the UAV image. '
+        '**Result.** On the leaves the best models reached macro-F1 %.3f (detection, %s), %.3f (six grades, %s) and R² %.3f (score, %s). On the UAV plots the same frozen models reached at best macro-F1 %.3f%s for detection, %.3f for grades and R² %.3f for the score: '
+        'chance level for detection and no useful severity information. ' + (('Across all 30 frozen model–input combinations only one transferred partly for detection, %s; its AUC interval (%.2f to %.2f) reaches chance, so it needs confirmation on another date. ' % (mxs('A'), mxA.AUC_lo, mxA.AUC_hi)).replace('%', '%%') if mxA is not None and mxA.p_value < 0.05 else '') + 'Grades and score did not transfer with any model. '
+        '**Why.** Canopy reflectance is far lower than leaf reflectance (NIR %.2f vs %.2f) and %d of the %d model inputs fall outside the leaf training range for more than half of the plots (%s inside a band removed from the UAV image). '
         '**In-domain check.** The same model type refitted on the UAV plots reached macro-F1 %.3f and AUC %s for detection (%s), so the canopy spectra do carry a disease signal. '
         '**Meaning.** Leaf models cannot be transferred to the canopy as they are; UAV models must be trained on UAV data, and the ASD analysis is best used to guide which wavelengths and indices to test.') % (
         F['asd_n'], len(GT), F['nH'], F['nD'], F['n_bands'], dis.score.min(), dis.score.max(), dis.PDI.min(), dis.PDI.max(),
@@ -176,8 +179,8 @@ INT('detection', [('What is shown.', '[[T:tA]] gives the detection measures of t
      'It predicted %d, %d and %d of the 48 plots as diseased for the three inputs. The best macro-F1 of any of the 30 models and three inputs was %.3f (%s, %s input).' % (
          best['A']['overall'], asd('A', 'overall'), f3(vv['Direct'].macro_F1), f3(vv['Healthy-reference corrected'].macro_F1), f3(vv['Corrected + brightness-normalised'].macro_F1), VSH[bv['A']], a.sensitivity, a.specificity, f3(a.AUC), cis(F, 'A', 'overall', bv['A'], 'AUC'),
          int(vv['Direct'].pred_diseased), int(vv['Healthy-reference corrected'].pred_diseased), int(vv['Corrected + brightness-normalised'].pred_diseased), tA.macro_F1, tA.model, VSH[tA.variant])),
-    ('Interpretation.', 'The frozen leaf model does not separate healthy and diseased plots: depending on the input, its errors are spread over both classes or it labels almost every plot the same way. '
-     'This follows from the domain check: the inputs lie outside the leaf range, so the decision boundary learned on leaves does not cut the canopy data in the right place.'),
+    ('Interpretation.', 'The frozen leaf model selected as best on the leaves does not separate healthy and diseased plots: depending on the input, its errors are spread over both classes or it labels almost every plot the same way. '
+     'This follows from the domain check: the inputs lie outside the leaf range, so the decision boundary learned on leaves does not cut the canopy data in the right place. ' + (('One exception: %s. A maximum-statistic test over all 30 combinations (Westfall and Young, 1993) shows that this best result is unlikely to be chance, but its AUC interval (%.2f to %.2f) reaches 0.5 and it was found after testing many combinations, so it is a lead to confirm on the next flight, not a validated model.' % (mxs('A'), mxA.AUC_lo, mxA.AUC_hi)) if mxA is not None and mxA.p_value < 0.05 else '')),
     ('Link to the literature.', 'Detection models need same-scale training data; studies that detect disease from UAV hyperspectral images train on UAV features with field labels (Zarco-Tejada et al., 2018; Bohnenkamp et al., 2019), and reviews warn against transferring leaf-scale results without validation (Thomas et al., 2018).')])
 H2('3.4 Six-grade severity')
 rtab('B', 'Six-grade severity on the UAV plots (true grade = nearest grade of the plot mean leaf score).')
@@ -204,7 +207,11 @@ FIG('heat', 'u09_heatmap.png', 'All ASD models on the UAV plots: macro-F1 (A, B)
 MLD = F['MLD']
 INT('allmodels', [('What is shown.', '[[F:heat]] shows the main measure of every one of the 30 ASD models with every input (full tables in Appendix E).'),
     ('Result.', 'Best macro-F1 per input for detection: %s; for grades: %s; best R² per input for the score: %s.' % (', '.join('%.2f (%s)' % (MLD.loc[('A', v), 'macro_F1'], VSH[v]) for v in VAR), ', '.join('%.2f (%s)' % (MLD.loc[('B', v), 'macro_F1'], VSH[v]) for v in VAR), ', '.join('%.2f (%s)' % (MLD.loc[('C', v), 'R2'], VSH[v]) for v in VAR))),
-    ('Interpretation.', 'No model transferred well, and the ranking on the leaves did not predict the ranking on the canopy. The occasional higher value of a single model is within the wide confidence intervals of 48 plots and is not consistent across inputs, so it should not be over-interpreted (Efron and Tibshirani, 1993).')])
+    ('Interpretation.', 'The ranking on the leaves did not predict the ranking on the canopy. For grades (%s) and score (%s) even the best of the 30 combinations was not better than chance. For detection the best combination (%s) passed the maximum-statistic test (Westfall and Young, 1993), so one network transferred partly once brightness was normalised; with an AUC interval reaching 0.5 this needs confirmation (Efron and Tibshirani, 1993).' % (mxs('B'), mxs('C'), mxs('A')))])
+if MX:
+    TAB('maxs', [['Task', 'Best model', 'Input', 'Measure', 'Value', '95 % CI', 'Combinations', 'Best under chance (mean / 95th pct)', 'p (max-statistic)']] +
+        [[TN[t], r.model, VSH[r.variant], KL[t], f3(r.observed), '%.2f to %.2f' % (r.ci_lo, r.ci_hi), r.n_combinations, '%.3f / %.3f' % (r.null_mean_of_max, r.null_p95_of_max), '%.3f' % r.p_value] for t, r in MX.items()],
+        'Best of all 30 frozen model–input combinations per task, tested against chance with a maximum-statistic permutation test (2000 label permutations; Westfall and Young, 1993) and a bootstrap 95 % CI.', [1500, 1300, 900, 800, 700, 1100, 900, 1300, 806], 14)
 H2('3.7 In-domain check (UAV-trained models)')
 TAB('uavt', [['Task', 'Model', 'Features used (gap features removed)', 'Macro-F1', 'Bal. acc.', 'AUC', 'OA', 'QWK', 'Within 1', 'R²', 'RMSE', 'r']] +
     [[TN[t], mu[t].model, '%s%s' % (mu[t].features, ' (removed: %s)' % mu[t].dropped_gap_features if isinstance(mu[t].dropped_gap_features, str) and mu[t].dropped_gap_features else ''), f3(mu[t].macro_F1), f3(mu[t].balanced_acc), f3(mu[t].AUC), f3(mu[t].OA), f3(mu[t].QWK), f3(mu[t].within1), f3(mu[t].R2), f2(mu[t].RMSE), f3(mu[t].r)] for t in 'ABC'],
@@ -230,7 +237,7 @@ H1('4. Discussion')
 H2('4.1 Why the leaf models do not transfer')
 BL(['**Different measurement.** The contact probe measures one leaf with its own lamp; the UAV pixel mixes leaves, flowers, stems, soil and shadow in sunlight. Canopy structure and background change reflectance as much as leaf chemistry (Asner, 1998; Jacquemoud et al., 2009).',
     '**Out-of-range inputs.** Most selected features are first derivatives whose size scales with reflectance; canopy derivatives are smaller than leaf derivatives, so the models see values never met in training ([[T:dom]]; Sahigara et al., 2012).',
-    '**Missing bands.** %s lies inside a water-vapour band removed from the UAV image, so its value is an interpolation, not a measurement.' % (gapf if F['gapf'] else 'No feature'),
+    ('**Missing bands.** %s lies inside a water-vapour band removed from the UAV image, so its value is an interpolation, not a measurement.' % gapf) if F['gapf'] else '**Missing bands.** None of the inputs of the new best models lies inside a removed UAV band, so the band gaps do not explain the failure; the earlier model set used FD1805, which did.',
     '**Brightness and illumination.** Plot brightness varied strongly even between replications of one treatment (UAV spectra workbook); this is radiometric rather than disease-related (Aasen et al., 2018).',
     '**Different target.** A leaf model predicts the score of one leaf; a plot spectrum averages the visible canopy (upper leaves and flowers), while the plot score averages three tagged leaf positions.'])
 H2('4.2 What the corrections can and cannot do')
@@ -253,7 +260,8 @@ BL(['Train the UAV models on UAV features with subplot-level scores (1536 post-s
 
 # ================================================================== 5, 6
 H1('5. Conclusions')
-BL(['The best ASD leaf models, applied unchanged to the UAV plot spectra of 24 Feb 2026, gave about chance-level detection (best macro-F1 %.3f) and no useful grade or score information (best R² %.3f).' % (a.macro_F1, c.R2),
+BL(['The best ASD leaf models, applied unchanged to the UAV plot spectra of 24 Feb 2026, gave chance-level detection (best macro-F1 %.3f) and no useful grade or score information (best R² %.3f).' % (a.macro_F1, c.R2),
+    ('One frozen network transferred partly for detection after brightness normalisation (%s); it is a lead to confirm on the next flight.' % mxs('A')) if mxA is not None and mxA.p_value < 0.05 else 'No frozen model transferred beyond chance.',
     'Healthy-reference correction and brightness normalisation did not fix the leaf–canopy mismatch.',
     'The canopy spectra carry a detection signal: the same model type trained on the UAV plots reached macro-F1 %.3f (AUC %s; %s).' % (mu['A'].macro_F1, f3(mu['A'].AUC), pstr('A')),
     'Leaf models should guide, not replace, UAV models: UAV models must be trained and validated on UAV data with same-scale ground truth.'])
@@ -330,7 +338,7 @@ for r in POOL:
     k = a_refs.rk(r)
     if k in c_ and k not in seen: seen.add(k); used.append(r)
 used.sort(key=lambda r: r.lower())
-FP = {('Golay', '1964'), ('Vapnik', '1995'), ('Yang', '2010'), ('Knapp', '2001'), ('Milton', '1999'), ('Garriga', '2010'), ('Tibshirani', '1993'), ('Rayens', '2003'), ('Guestrin', '2016'), ('Hart', '1967'), ('Lapalme', '2009'), ('Philpot', '1998'), ('Simon', '2006'), ('Talbot', '2010'), ('Cadima', '2016'), ('Le', '2019')}
+FP = {('Young', '1993'), ('Golay', '1964'), ('Vapnik', '1995'), ('Yang', '2010'), ('Knapp', '2001'), ('Milton', '1999'), ('Garriga', '2010'), ('Tibshirani', '1993'), ('Rayens', '2003'), ('Guestrin', '2016'), ('Hart', '1967'), ('Lapalme', '2009'), ('Philpot', '1998'), ('Simon', '2006'), ('Talbot', '2010'), ('Cadima', '2016'), ('Le', '2019')}
 missing = sorted(x for x in c_ if x not in seen and x[0] not in a_refs.SKIP and 1900 < int(x[1]) < 2028 and x not in FP)
 print('missing refs:', missing)
 q = lambda s: "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
