@@ -41,7 +41,7 @@ s = slide('Outline', 'Order of the talk.');
   s.addText(t[0], { x: 0.9, y, w: 0.75, h: 0.75, fontSize: 22, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', isTextBox: true, margin: 0 });
   s.addText(t[1], { x: 1.9, y, w: 6.5, h: 0.75, fontSize: 20, color: '1B2A1E', valign: 'middle', isTextBox: true, margin: 0 });
 });
-stat(s, 9.2, 1.35, 3.4, String(N), 'leaf spectra (350–2500 nm)'); stat(s, 9.2, 2.9, 3.4, '4 dates', '11 Feb – 13 Mar 2026, natural infection'); stat(s, 9.2, 4.45, 3.4, '11 models', '5 machine learning + 6 deep learning');
+stat(s, 9.2, 1.35, 3.4, String(N), 'leaf spectra (350–2500 nm)'); stat(s, 9.2, 2.9, 3.4, '4 dates', '11 Feb – 13 Mar 2026, natural infection'); stat(s, 9.2, 4.45, 3.4, '11 models', '6 machine learning (incl. PLS-DA and PLSR) + 5 deep learning');
 
 // =============================== INTRODUCTION
 sec('Introduction', 'White rust, visual scoring and leaf spectroscopy');
