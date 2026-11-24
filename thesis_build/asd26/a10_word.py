@@ -19,10 +19,13 @@ def NL(items): K.extend("K.push(NL(%s));" % js(i) for i in items)
 def BOX(l, t, fill='FFF6E0', line='C98A00'): K.append("K.push(BOX(%s, %s, '%s', '%s'));" % (js(l), js(t), fill, line))
 def NOTE(t): K.append("K.push(NOTE(%s));" % js(t))
 def EQ(t): K.append("K.push(EQ(%s));" % js(t))
-def FIG(k, file, cap, w=600): K.append("K.push(...fig2('%s', '%s', %s, %d));" % (k, file, js(cap), w))
+RFIG, RTAB = [], []
+def FIG(k, file, cap, w=600):
+    RFIG.append(dict(key=k, file=file, caption=cap)); K.append("K.push(...fig2('%s', '%s', %s, %d));" % (k, file, js(cap), w))
 def TAB(k, rows, cap, widths=None, size=17):
     if widths is None:
         L = [min(max(max(len(str(r[j])) for r in rows), 5), 46) for j in range(len(rows[0]))]; s = sum(L); widths = [int(9306 * x / s) for x in L]
+    RTAB.append(dict(key=k, caption=cap, rows=[[str(c) for c in r] for r in rows]))
     R = '[' + ',\n'.join('[' + ', '.join(js(str(c)) for c in r) + ']' for r in rows) + ']'
     K.append("K.push(...tab2('%s', %s, %s, %s, %d));" % (k, R, json.dumps(widths), js(cap), size))
 def PB(): K.append("K.push(new Paragraph({ children: [new PageBreak()] }));")
@@ -504,6 +507,9 @@ assert len(FO) == len(set(FO)) and len(TO) == len(set(TO)), 'duplicate keys'
 mf = set(re.findall(r"\bF\('([A-Za-z0-9]+)'\)", body)) - set(FO); mt = set(re.findall(r"\bT\('([A-Za-z0-9]+)'\)", body)) - set(TO)
 assert not mf and not mt, (mf, mt)
 head = head.replace('__FORDER__', repr(FO)).replace('__TORDER__', repr(TO))
+_tn = {k_: i_ + 1 for i_, k_ in enumerate(TO)}; _fn = {k_: i_ + 1 for i_, k_ in enumerate(FO)}
+json.dump([dict(t_, number=_tn[t_['key']]) for t_ in RTAB if t_['key'] in _tn], open(D + 'report_tables.json', 'w'), ensure_ascii=False)
+json.dump([dict(f_, number=_fn[f_['key']]) for f_ in RFIG if f_['key'] in _fn], open(D + 'report_figures.json', 'w'), ensure_ascii=False)
 tail = T[T.index('\nconst numcfg'):]
 tail = tail.replace("title: 'AI-based multimodal UAV sensing of white rust in mustard: complete methodology'", "title: 'White rust ASD leaf spectra 2025-26: analysis report'")
 tail = re.sub(r"'eqs', \d+, 'refs', \d+", "'eqs', 0, 'refs', %d" % len(used), tail)

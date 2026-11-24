@@ -69,7 +69,7 @@ rows = [('1_Data', 'Common Activity A', 'leaf metadata and smoothed reflectance 
         ('23_Weather_covariates', 'Step A6', 'daily weather, 7-day summaries and disease progress'),
         ('24_Stability', 'Step 2.5.4', 'selection frequency across folds and models'),
         ('25_Covariate_baseline', 'Step 2.5.5', 'covariates by date, models × inputs, M0/M1/M2 gains (formulas) with plot-block bootstrap intervals, DeLong tests, interpretable model; charts'),
-        ('26_References', '—', 'references of the methods')]
+        ('26_References', '—', 'references of the methods'), ('27_R_Tables', 'Report', 'every table of the Word report (same numbering)'), ('28_R_Figures', 'Report', 'every figure of the Word report (same numbering)')]
 table(ws, 4, 1, pd.DataFrame(rows, columns=['Sheet', 'Methodology step', 'Content']))
 ws['A34'] = 'Assumptions and settings'; ws['A34'].font = Font(name=AR, bold=True)
 notes = ['Plot plan from the field layout (healthy block plots 1–12; R3 13–24; R2 25–36; R1 37–48; treatment codes D×V) – confirmed by the user.',
@@ -450,6 +450,35 @@ ws = sheet('26_References', 'References of the methods used in this workbook')
 refs = json.load(open(D + 'refs_used.json')) if os.path.exists(D + 'refs_used.json') else []
 for i, rf in enumerate(refs): ws.cell(3 + i, 1, rf).font = NF
 ws.column_dimensions['A'].width = 180
+# ------------------------------------------------------------------ 27-28 every table and figure of the Word report
+import re as _re
+_cl = lambda t: _re.sub(r'\[\[(T|F):(\w+)\]\]', lambda m: {'T': 'Table ', 'F': 'Figure '}[m.group(1)] + str((_TN if m.group(1) == 'T' else _FN).get(m.group(2), m.group(2))), str(t)).replace('**', '')
+_RT = json.load(open(D + 'report_tables.json')) if os.path.exists(D + 'report_tables.json') else []
+_RF = json.load(open(D + 'report_figures.json')) if os.path.exists(D + 'report_figures.json') else []
+_TN = {t['key']: t['number'] for t in _RT}; _FN = {f['key']: f['number'] for f in _RF}
+ws = sheet('27_R_Tables', 'Every table of the Word report (same numbering)', 'Tables exactly as in the report; the live-formula versions of the main tables are in sheets 1-26.')
+r = 4
+for t in _RT:
+    ws.cell(r, 1, 'Table %d. %s' % (t['number'], _cl(t['caption']))).font = Font(name=AR, bold=True, size=11, color='1F3864'); r += 1
+    for j, h in enumerate(t['rows'][0]):
+        c = ws.cell(r, 1 + j, _cl(h)); c.font = HF; c.fill = HFILL; c.alignment = Alignment(wrap_text=True, vertical='center'); c.border = Border(left=thin, right=thin, top=thin, bottom=thin)
+    r += 1
+    for row_ in t['rows'][1:]:
+        for j, v in enumerate(row_):
+            c = ws.cell(r, 1 + j, _cl(v)); c.font = NF; c.alignment = Alignment(wrap_text=True, vertical='top'); c.border = Border(left=thin, right=thin, top=thin, bottom=thin)
+            if isinstance(c.value, str) and c.value.startswith('='): c.data_type = 's'
+        ws.row_dimensions[r].height = 15 * max(1, max(len(str(v)) // 40 + 1 for v in row_)); r += 1
+    r += 2
+for c_ in range(1, 15): ws.column_dimensions[CL(c_)].width = 20
+from openpyxl.drawing.image import Image as _XLI
+from PIL import Image as _PI
+ws = sheet('28_R_Figures', 'Every figure of the Word report (same numbering)', 'Static 300-dpi images; native Excel charts of the same data are in the analysis sheets.')
+r = 4
+for f in _RF:
+    p_ = B + 'fig/' + f['file']
+    if not os.path.exists(p_): continue
+    ws.cell(r, 1, 'Figure %d. %s' % (f['number'], _cl(f['caption']))).font = Font(name=AR, bold=True, size=11, color='1F3864'); r += 1
+    im = _XLI(p_); w0, h0 = _PI.open(p_).size; sc = 900 / w0; im.width, im.height = int(w0 * sc), int(h0 * sc); ws.add_image(im, 'A%d' % r); r += int(im.height / 20) + 3
 for w_ in wb.worksheets: w_.sheet_view.zoomScale = 90
 wb._sheets.sort(key=lambda s: int(s.title.split("_")[0])); wb.active = 0
 wb.calculation.fullCalcOnLoad = True

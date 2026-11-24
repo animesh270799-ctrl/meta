@@ -310,6 +310,34 @@ refs.sort((a, b) => a.localeCompare(b)); const third = Math.ceil(refs.length / 3
   s = slide('References (' + (i + 1) + '/3)', 'Key references cited on the slides; the full list is in the Word report.');
   s.addText(part.map((r, j) => ({ text: r, options: { breakLine: j < part.length - 1 } })), { x: 0.5, y: 1.2, w: 12.3, h: 5.6, fontSize: 11, color: '1B2A1E', valign: 'top', paraSpaceAfter: 4, isTextBox: true, fit: 'shrink' });
 });
+// ---------------- appendix: every table and figure of the Word report (same numbering)
+{
+  const fs_ = require('fs'); const RT = JSON.parse(fs_.readFileSync(__dirname + '/data/report_tables.json', 'utf8')); const RF = JSON.parse(fs_.readFileSync(__dirname + '/data/report_figures.json', 'utf8'));
+  const TN = {}, FN = {}; RT.forEach(t => TN[t.key] = t.number); RF.forEach(f => FN[f.key] = f.number);
+  const cl = t => String(t).replace(/\[\[(T|F):(\w+)\]\]/g, (m, a, k) => (a === 'T' ? 'Table ' + (TN[k] || k) : 'Figure ' + (FN[k] || k))).replace(/\*\*/g, '').replace(/_\{([^}]*)\}/g, '$1').replace(/\^\{([^}]*)\}/g, '^$1');
+  const SRC = fs_.readFileSync(__filename, 'utf8').split('// ---------------- appendix')[0];
+  sec('Appendix: all report tables and figures', 'Every table and figure of the Word report with the same number; figures already shown as images earlier are not repeated');
+  RT.forEach(t => {
+    const rows = t.rows.map(r => r.map(cl)); const hdr = rows[0], body = rows.slice(1); const nc = hdr.length;
+    const len = j => Math.min(50, Math.max(4, ...rows.map(r => String(r[j]).length))); const tot = hdr.reduce((a, _, j) => a + len(j), 0); const colW = hdr.map((_, j) => 12.3 * len(j) / tot);
+    const longest = Math.max(...rows.map(r => r.reduce((a, c) => a + String(c).length, 0)));
+    const per = longest > 400 ? 4 : longest > 250 ? 7 : body.length > 16 ? 14 : body.length; const fsz = nc > 10 || longest > 300 ? 8.5 : nc > 7 || longest > 160 ? 10 : 12;
+    const parts = Math.max(1, Math.ceil(body.length / per));
+    for (let p = 0; p < parts; p++) {
+      const s_ = slide('Table ' + t.number + (parts > 1 ? ' (' + (p + 1) + '/' + parts + ')' : ''), cl(t.caption));
+      const hc = hdr.map(c => ({ text: String(c), options: { bold: true, color: 'FFFFFF', fill: { color: '2C5F2D' }, align: 'center', valign: 'middle' } }));
+      const bc = body.slice(p * per, (p + 1) * per).map((r, i) => r.map(c => ({ text: String(c), options: { fill: { color: i % 2 ? 'FFFFFF' : 'F4F7F1' }, valign: 'middle' } })));
+      s_.addTable([hc, ...bc], { x: 0.5, y: 1.15, w: 12.3, colW, fontSize: fsz, fontFace: 'Calibri', color: '1B2A1E', border: { type: 'solid', pt: 0.5, color: 'C9D3C4' }, margin: 0.04, autoPage: false });
+      s_.addText('Table ' + t.number + '. ' + cl(t.caption), { x: 0.5, y: 6.45, w: 12.3, h: 0.55, fontSize: 10, italic: true, color: '6B7B6E', isTextBox: true, fit: 'shrink' });
+    }
+  });
+  RF.forEach(f => {
+    if (SRC.includes(f.file)) return;
+    const s_ = slide('Figure ' + f.number, cl(f.caption));
+    s_.addImage({ path: FG + f.file, x: 0.5, y: 1.15, w: 12.3, h: 5.25, sizing: { type: 'contain', w: 12.3, h: 5.25 } });
+    s_.addText('Figure ' + f.number + '. ' + cl(f.caption), { x: 0.5, y: 6.45, w: 12.3, h: 0.55, fontSize: 10.5, italic: true, color: '6B7B6E', isTextBox: true, fit: 'shrink' });
+  });
+}
 s = pres.addSlide({ masterName: 'TITLE' });
 s.addText('Thank you', { placeholder: 'title' });
 s.addText('Questions and discussion', { placeholder: 'body' });
