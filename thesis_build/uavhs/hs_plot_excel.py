@@ -6,7 +6,6 @@ import sys, os, numpy as np, pandas as pd
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter as CL
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import CellIsRule
 from openpyxl.chart import ScatterChart, BarChart, Reference, Series
 from openpyxl.chart.series import SeriesLabel, StrRef
@@ -38,6 +37,12 @@ STAGE = M.groupby(['plot', 'date']).stage.agg(lambda s: s.mode().iloc[0]).unstac
 SOWD = {'D1': '9 Dec 2025', 'D2': '18 Dec 2025', 'D3': '27 Dec 2025', 'D4': '9 Jan 2026'}
 SOWG = {'D1': '50 DAS', 'D2': '40 DAS', 'D3': '30 DAS', 'D4': '20 DAS'}
 status = lambda p: 'Healthy' if P.loc[p, 'block'] == 'C' else 'Diseased'
+D0 = pd.Timestamp(DEFAULT_DATE)
+_d = M[M.date == D0]
+PDI0 = _d.groupby('plot').score.apply(lambda x: x.sum() / (9 * len(x)) * 100).round(6)
+STG0 = STAGE[D0]
+SOWT = {k: pd.Timestamp(v) for k, v in {'D1': '2025-12-09', 'D2': '2025-12-18', 'D3': '2025-12-27', 'D4': '2026-01-09'}.items()}
+DAS0 = {k: (D0 - v).days for k, v in SOWT.items()}
 trt = lambda p: '%s-%s' % (P.loc[p, 'variety'], P.loc[p, 'timing'])
 
 # ---------------- styles ----------------
@@ -137,10 +142,10 @@ def q(sh): return "'%s'" % sh
 
 wb = Workbook()
 S_CON, S_INFO, S_SPEC, S_PCH = '0_Contents', '1_Plot_info', '2_Spectra', '3_Plot_charts'
-S_HD, S_VAR, S_STG, S_TRT, S_TSV = '4_Healthy_vs_Diseased', '5_By_variety', '6_By_growth_stage', '7_By_treatment', '8_Treatments_by_severity'
+S_HD, S_VAR, S_STG, S_CST, S_TRT, S_TSV = '4_Healthy_vs_Diseased', '5_By_variety', '6_By_growth_stage', '6b_By_crop_stage', '7_By_treatment', '8_Treatments_by_severity'
 S_SEV, S_SRT, S_PSV, S_REG, S_LEAF, S_REF = '9_Severity_groups', '10_Sorted_spectra', '11_Plots_by_severity', '12_Region_means', '13_Leaf_scores', '14_References'
 ws0 = wb.active; ws0.title = S_CON
-for n in (S_INFO, S_SPEC, S_PCH, S_HD, S_VAR, S_STG, S_TRT, S_TSV, S_SEV, S_SRT, S_PSV, S_REG, S_LEAF, S_REF): wb.create_sheet(n)
+for n in (S_INFO, S_SPEC, S_PCH, S_HD, S_VAR, S_STG, S_CST, S_TRT, S_TSV, S_SEV, S_SRT, S_PSV, S_REG, S_LEAF, S_REF): wb.create_sheet(n)
 DATE_CELL = "%s!$C$6" % q(S_CON)
 
 # ---------------- 13 Leaf scores ----------------
@@ -158,7 +163,7 @@ LS = lambda col: "%s!$%s$%d:$%s$%d" % (q(S_LEAF), col, LR1, col, LR2)
 
 # ---------------- 1 Plot info ----------------
 ws = wb[S_INFO]; title(ws, 'Plot information, treatment and disease severity',
-                     'Yellow cell on 0_Contents selects the image date; columns S-X follow it. PDI = sum of leaf scores / (9 x number of leaves) x 100 (Wheeler, 1969), from 13_Leaf_scores.')
+                     'Image date = 0_Contents!C6 (24 Feb 2026); columns S-X use it. PDI = sum of leaf scores / (9 x number of leaves) x 100 (Wheeler, 1969), from 13_Leaf_scores; the other ASD dates are kept for reference.')
 cols = ['Plot', 'ENVI ROI', 'Block', 'Status', 'Variety', 'Sowing (growth stage)', 'Sowing date', 'Treatment', 'DAS on image date'] + \
        ['PDI (%%) %s' % pd.Timestamp(d).strftime('%d %b') for d in DATES] + ['Stage %s' % pd.Timestamp(d).strftime('%d %b') for d in DATES] + \
        ['Leaves scored on image date', 'PDI on image date (%)', 'Severity class (0-9)', 'Severity rank (1 = lowest)', 'Severity group', 'Growth stage on image date', 'Chart label']
@@ -192,18 +197,18 @@ INFO = lambda col, p: "%s!$%s$%d" % (q(S_INFO), col, 4 + p)
 
 # ---------------- 2 Spectra ----------------
 ws = wb[S_SPEC]; title(ws, 'Plot mean reflectance spectra (UAV hyperspectral, ENVI ROI means)',
-                     'Source: %s (ENVI ASCII plot file, 48 ROIs, %d bands, %.0f-%.0f nm). Rows 3-13 = plot attributes (rows 9-12 follow the image date). Blank rows = bands removed in processing.' % (os.path.basename(SRC), len(WL), WL[0], WL[-1]))
-lab = ['Plot', 'Status', 'Block', 'Variety', 'Sowing (growth stage)', 'Treatment', 'PDI on image date (%)', 'Severity class', 'Severity group', 'Severity rank', 'Series name']
+                     'Source: %s (ENVI ASCII plot file, flight of %s, 48 ROIs, %d bands, %.0f-%.0f nm). Rows 3-13 = plot attributes; row 14 = series name. Blank rows = bands removed in processing.' % (os.path.basename(SRC), D0.strftime('%d %b %Y'), len(WL), WL[0], WL[-1]))
+lab = ['Plot', 'Status', 'Block', 'Variety', 'Sowing (growth stage)', 'Treatment', 'PDI on image date (%)', 'Severity class', 'Severity group', 'Severity rank', 'Crop stage on image date']
 for i, t in enumerate(lab): cell(ws, 3 + i, 1, t, BF, LFILL, border=True)
-SPR = {k: 3 + i for i, k in enumerate(['plot', 'status', 'block', 'var', 'sow', 'trt', 'pdi', 'cls', 'grp', 'rank', 'name'])}
+SPR = {k: 3 + i for i, k in enumerate(['plot', 'status', 'block', 'var', 'sow', 'trt', 'pdi', 'cls', 'grp', 'rank', 'stage'])}; SPR['name'] = 14
 for p in range(1, NP + 1):
     c = 1 + p; fill = GFILL if status(p) == 'Healthy' else RFILL
     for k, v in [('plot', p), ('status', status(p)), ('block', P.loc[p, 'block']), ('var', P.loc[p, 'variety']), ('sow', P.loc[p, 'timing']), ('trt', trt(p))]:
         cell(ws, SPR[k], c, v, BF if k == 'plot' else NF, fill, border=True, al=Alignment(horizontal='center'))
     for k, col, fmt in [('pdi', 'S', '0.0'), ('cls', 'T', '0'), ('grp', 'V', None), ('rank', 'U', '0')]:
         cell(ws, SPR[k], c, '=' + INFO(col, p), NF, fill, fmt=fmt, border=True, al=Alignment(horizontal='center'))
-    cell(ws, SPR['name'], c, 'P%d %s %s' % (p, trt(p), 'H' if status(p) == 'Healthy' else P.loc[p, 'block']), NF, fill, border=True, al=Alignment(horizontal='center'))
-    cell(ws, 14, c, 'Plot %d' % p, HF, HFILL, border=True, al=Alignment(horizontal='center'))
+    cell(ws, SPR['stage'], c, '=' + INFO('W', p), NF, fill, border=True, al=Alignment(horizontal='center'))
+    cell(ws, SPR['name'], c, 'P%d %s %s' % (p, trt(p), 'H' if status(p) == 'Healthy' else P.loc[p, 'block']), HF, HFILL, border=True, al=Alignment(horizontal='center'))
 cell(ws, 14, 1, 'Wavelength (nm)', HF, HFILL, border=True)
 R0 = 15; rows = []; r = R0
 for i in range(len(WL)):
@@ -239,8 +244,8 @@ for p in range(1, NP + 1): line(ch, WSS, 1 + p, R0, RL, WSS, ref="%s!$%s$%d" % (
 place(ws, ch, 'A4')
 for p in range(1, NP + 1):
     k = p - 1; rr = 27 + (k // 4) * 17
-    st = status(p); blk = 'Healthy (C)' if st == 'Healthy' else P.loc[p, 'block'] + ', diseased'
-    ch = scatter('Plot %d: %s, %s, %s (sown %s)' % (p, blk, P.loc[p, 'variety'], P.loc[p, 'timing'], SOWD[P.loc[p, 'timing']]), 15, 8.2, ymin=0, ymax=0.4, legend=None, tsize=10)
+    st = status(p); blk = 'Healthy' if st == 'Healthy' else P.loc[p, 'block']
+    ch = scatter('Plot %d: %s, %s-%s | PDI %.1f %% | %s' % (p, blk, P.loc[p, 'variety'], P.loc[p, 'timing'], PDI0[p], STG0[p].lower()), 15, 8.2, ymin=0, ymax=0.4, legend=None, tsize=10)
     line(ch, WSS, 1 + p, R0, RL, WSS, name='Plot %d' % p, color=CH if st == 'Healthy' else CD, w=1.75)
     place_at(ws, ch, rr, (k % 4) * 15.3)
 
@@ -327,12 +332,17 @@ def group_sheet(sh, ttl, sub, groups, crit_row, colors, glabel, extra):
 
 group_sheet(S_VAR, 'Healthy vs diseased by variety', 'Each variety: healthy = mean of its 4 sprayed plots (D1-D4); diseased = mean of its 12 unsprayed plots (D1-D4 x R1-R3).',
             ['V1', 'V2', 'V3'], SPR['var'], CV, 'variety',
-            ([], lambda gv, r: [], lambda gv: 'Variety %s: healthy vs diseased' % gv))
+            ([], lambda gv, r: [], lambda gv: 'Variety %s: healthy vs diseased (mean PDI %.1f %%)' % (gv, np.mean([PDI0[p] for p in range(13, 49) if P.loc[p, 'variety'] == gv]))))
 group_sheet(S_STG, 'Healthy vs diseased by growth stage (sowing date)',
             'Growth stage = sowing date D1-D4. Each stage: healthy = mean of its 3 sprayed plots (V1-V3); diseased = mean of its 9 unsprayed plots (V1-V3 x R1-R3).',
             ['D1', 'D2', 'D3', 'D4'], SPR['sow'], CS, 'growth stage',
             (['Sowing date', 'Group', 'DAS on image date'], lambda gv, r: [(SOWD[gv], None), (SOWG[gv], None), ('=%s-DATEVALUE(E%d)' % (DATE_CELL, r), '0')],
-             lambda gv: '%s (sown %s): healthy vs diseased' % (gv, SOWD[gv])))
+             lambda gv: '%s (sown %s, %d DAS): mean PDI %.1f %%' % (gv, SOWD[gv], DAS0[gv], np.mean([PDI0[p] for p in range(13, 49) if P.loc[p, 'timing'] == gv]))))
+CSTG = sorted(set(STG0.values), key=['Vegetative', 'Flowering', 'Pod formation'].index)
+group_sheet(S_CST, 'Healthy vs diseased by recorded crop stage on the image date',
+            'Crop stage recorded in the field on %s (column W of 1_Plot_info). Healthy = sprayed plots in that stage; diseased = unsprayed plots in that stage. Flowering plots carry yellow petals (500-650 nm), so compare within a stage.' % D0.strftime('%d %b %Y'),
+            CSTG, SPR['stage'], {'Vegetative': '1B9E77', 'Flowering': 'E6AB02', 'Pod formation': '7570B3'}, 'crop stage',
+            ([], lambda gv, r: [], lambda gv: '%s plots: healthy vs diseased (mean PDI %.1f %%)' % (gv, np.mean([PDI0[p] for p in range(13, 49) if STG0[p] == gv]))))
 # DATEVALUE on a text date is fragile across locales -> write real sowing dates instead
 ws = wb[S_STG]
 for g, gv in enumerate(['D1', 'D2', 'D3', 'D4']):
@@ -367,7 +377,7 @@ ws.row_dimensions[14 + OT].height = 30
 cell(ws, 3, 1, 'Chart rows: D1 (sown 9 Dec), D2 (18 Dec), D3 (27 Dec 2025), D4 (9 Jan 2026). Chart columns: V1, V2, V3. Mean PDI of each treatment and its severity rank: sheet 8_Treatments_by_severity.', NOTEF)
 for t, (v, d) in enumerate(TRTS):
     c = 2 + 3 * t; h, reps = TP[(v, d)]
-    ch = scatter('%s x %s (sown %s)' % (v, d, SOWD[d]), 15, 8.5, ymin=0, ymax=0.4, tsize=10)
+    ch = scatter('%s x %s (%d DAS) | mean PDI %.1f %%' % (v, d, DAS0[d], np.mean([PDI0[p] for p in reps])), 15, 8.5, ymin=0, ymax=0.4, tsize=10)
     line(ch, ws, c, R0 + OT, RL + OT, ws, name='Healthy P%d' % h, color=CH, w=2.25)
     for k, p in enumerate(reps): line(ch, WSS, 1 + p, R0, RL, WSS, name='R%d P%d' % (k + 1, p), color='F4A582', w=0.75)
     line(ch, ws, c + 1, R0 + OT, RL + OT, ws, name='Mean R1-R3', color=CD, w=2.25)
@@ -591,29 +601,62 @@ for i, t in enumerate(REFS): cell(ws, 3 + i, 1, t, NF, al=Alignment(wrap_text=Tr
 ws.column_dimensions['A'].width = 150
 
 # ---------------- 0 Contents ----------------
+from scipy import stats
 ws = ws0
-cell(ws, 1, 1, 'UAV hyperspectral plot spectra: healthy vs white-rust-diseased mustard (IARI 2025-26)', TF)
-cell(ws, 2, 1, 'Plot mean reflectance of 48 plots (ENVI ROI means, %d bands, %.0f-%.0f nm) compared by disease status, variety, growth stage (sowing date), treatment and severity.' % (len(WL), WL[0], WL[-1]), NOTEF)
-cell(ws, 4, 1, 'Input', SF)
-cell(ws, 6, 1, 'Image (flight) date', BF); x = cell(ws, 6, 3, pd.Timestamp(DEFAULT_DATE).to_pydatetime(), INF, YEL, fmt='dd-mmm-yyyy', border=True)
-cell(ws, 6, 4, '← choose 11-Feb, 24-Feb, 03-Mar or 13-Mar-2026 (the ASD scoring dates). The ENVI file has no flight date, so 24 Feb 2026 is assumed: please check. Severity (PDI, classes, ranks, groups) and all severity charts follow this cell.', NOTEF)
-dv = DataValidation(type='list', formula1="%s!$J$3:$M$3" % q(S_INFO), allow_blank=False, showErrorMessage=True, errorTitle='Image date', error='Choose one of the four ASD scoring dates.')
-ws.add_data_validation(dv); dv.add('C6')
+pdi_v = np.array([PDI0[p] for p in range(1, NP + 1)]); dis = slice(12, NP)
+def regm(lo, hi): return R[(WL >= lo) & (WL <= hi)].mean(0)
+RS = []
+for n_, lo, hi, _ in REG:
+    m = regm(lo, hi); RS.append((n_, (m[dis].mean() / m[:12].mean() - 1) * 100, stats.ttest_ind(m[:12], m[dis], equal_var=False).pvalue, np.corrcoef(m[dis], pdi_v[dis])[0, 1]))
+nir = regm(780, 880)
+tdiff = [(np.mean(nir[[p - 1 for p in TP[t][1]]]) / nir[TP[t][0] - 1] - 1) * 100 for t in TRTS]
+Hm, Dm = R[:, :12].mean(1), R[:, dis].mean(1); Hn, Dn = Hm / Hm.mean(), Dm / Dm.mean()
+shp = lambda w: (Dn[np.argmin(abs(WL - w))] / Hn[np.argmin(abs(WL - w))] - 1) * 100
+tp = {'%s-%s' % t: np.mean([PDI0[p] for p in TP[t][1]]) for t in TRTS}; tmin, tmax = min(tp, key=tp.get), max(tp, key=tp.get)
+grp_mean = lambda key, val: np.mean([PDI0[p] for p in range(13, NP + 1) if key(p) == val])
+cls = pd.Series(pdi_v[dis]).apply(lambda x: 0 if x == 0 else 1 if x <= 5 else 3 if x <= 10 else 5 if x <= 25 else 7 if x <= 50 else 9).value_counts()
+pv = [x[2] for x in RS]; dv_ = [x[1] for x in RS]; rv = [x[3] for x in RS]
+def stg_nir(st):
+    h = [p - 1 for p in range(1, 13) if STG0[p] == st]; d_ = [p - 1 for p in range(13, NP + 1) if STG0[p] == st]
+    return (nir[d_].mean() / nir[h].mean() - 1) * 100
+cell(ws, 1, 1, 'UAV hyperspectral plot spectra, %s: healthy vs white-rust-diseased mustard (IARI 2025-26)' % D0.strftime('%d %b %Y'), TF)
+cell(ws, 2, 1, 'Plot mean reflectance of 48 plots (ENVI ROI means, %d bands, %.0f-%.0f nm) compared by disease status, variety, growth stage, crop stage, treatment and severity.' % (len(WL), WL[0], WL[-1]), NOTEF)
+cell(ws, 4, 1, 'Image', SF)
+cell(ws, 6, 1, 'Image (flight) date', BF); cell(ws, 6, 3, D0.to_pydatetime(), Font(name=AR, size=11, bold=True, color='1F3864'), LFILL, fmt='dd-mmm-yyyy', border=True)
+cell(ws, 6, 4, 'Headwall hyperspectral flight of %s (the only image processed so far). Plot severity = ASD leaf scores recorded on the same day. All formulas use this cell; images of later flights will be added as they are processed.' % D0.strftime('%d %b %Y'), NOTEF)
 cell(ws, 8, 1, 'Experiment', SF)
 exp = [('Design', '48 plots: 12 treatments (varieties V1-V3 x sowing dates D1-D4) x 3 unsprayed replications (R1-R3) + 12 fungicide-sprayed healthy plots (one per treatment).'),
-       ('Healthy', 'Plots 1-12 (block C, fungicide-sprayed; PDI = 0 on every scoring date).'),
+       ('Healthy', 'Plots 1-12 (block C, fungicide-sprayed; PDI = 0).'),
        ('Diseased', 'Plots 13-48 (R3 = 13-24, R2 = 25-36, R1 = 37-48), unsprayed, natural white rust infection.'),
-       ('Growth stage', 'Sowing date D1 = 9 Dec 2025 (50 DAS group), D2 = 18 Dec (40 DAS), D3 = 27 Dec 2025 (30 DAS), D4 = 9 Jan 2026 (20 DAS); crop age on the image date in 6_By_growth_stage.'),
-       ('Severity', 'Plot PDI on the image date = sum of ASD leaf scores (0-9) / (9 x leaves) x 100 (Wheeler, 1969; Conn et al., 1990), from 13_Leaf_scores; classes 0/1/3/5/7/9 and four equal severity groups of diseased plots.'),
-       ('Spectra', 'ENVI ASCII plot file "Mean: ROI #n" columns; ROI #n = plot n (assumed from the plot-number order). Bands removed in processing (900-915, 1335-1460, 1785-1965 nm) appear as gaps.')]
+       ('Growth stage', 'Sowing date D1 = 9 Dec 2025 (50 DAS group), D2 = 18 Dec (40 DAS), D3 = 27 Dec 2025 (30 DAS), D4 = 9 Jan 2026 (20 DAS) = %d, %d, %d and %d days after sowing on %s; recorded crop stage on the day in 6b_By_crop_stage.' % (DAS0['D1'], DAS0['D2'], DAS0['D3'], DAS0['D4'], D0.strftime('%d %b'))),
+       ('Severity', 'Plot PDI = sum of ASD leaf scores (0-9) / (9 x leaves) x 100 (Wheeler, 1969; Conn et al., 1990), from 13_Leaf_scores; classes 0/1/3/5/7/9 and four equal severity groups (Q1-Q4) of diseased plots.'),
+       ('Spectra', 'ENVI ASCII plot file "Mean: ROI #n" columns; ROI #n = plot n (plot-number order). Bands removed in processing (900-915, 1335-1460, 1785-1965 nm) appear as gaps.')]
 for i, (k, v) in enumerate(exp): cell(ws, 9 + i, 1, k, BF); cell(ws, 9 + i, 3, v)
-cell(ws, 16, 1, 'Sheets', SF)
-guide = [(S_INFO, 'plot, block, status, variety, sowing, treatment, PDI on each date, severity class/rank/group on the image date'),
+F0 = 16; cell(ws, F0, 1, 'Key findings (%s)' % D0.strftime('%d %b %Y'), SF)
+finds = [
+ '1. Disease level: the 36 unsprayed plots had PDI %.1f-%.1f %% (mean %.1f %%; %d plots in class 7, %d in class 9); healthy plots 0 %%. Least severe treatment %s (%.1f %%), most severe %s (%.1f %%). Earlier sowing = more disease: D1 %.1f, D2 %.1f, D3 %.1f, D4 %.1f %%; by variety V1 %.1f, V2 %.1f, V3 %.1f %%; flowering plots %.1f %% vs vegetative plots %.1f %%.'
+   % (pdi_v[dis].min(), pdi_v[dis].max(), pdi_v[dis].mean(), cls.get(7, 0), cls.get(9, 0), tmin, tp[tmin], tmax, tp[tmax],
+      *[grp_mean(lambda p: P.loc[p, 'timing'], d) for d in ('D1', 'D2', 'D3', 'D4')], *[grp_mean(lambda p: P.loc[p, 'variety'], v) for v in ('V1', 'V2', 'V3')], grp_mean(lambda p: STG0[p], 'Flowering'), grp_mean(lambda p: STG0[p], 'Vegetative')),
+ '2. Mean spectra: diseased plots reflect %.1f to %.1f %% less than healthy plots in all seven band regions (largest in SWIR-2 and the NIR plateau), but no region differs significantly (Welch p = %.2f-%.2f) because plot-to-plot variation is large (12_Region_means). Within the recorded crop stage, vegetative diseased plots are %.0f %% darker in the NIR than vegetative healthy plots (5 healthy plots only), while flowering plots hardly differ (%+.0f %%) (6b_By_crop_stage).'
+   % (abs(max(dv_)), abs(min(dv_)), min(pv), max(pv), -stg_nir('Vegetative'), stg_nir('Flowering')),
+ '3. Brightness: single-plot NIR reflectance ranges from %.2f to %.2f, also between replications of one treatment, and D3 plots are dark in healthy and diseased plots alike. Treatment by treatment, diseased NIR is %.0f %% to +%.0f %% of its healthy plot (%d of 12 lower). These are mainly illumination/radiometric differences (Aasen et al., 2018).'
+   % (nir.min(), nir.max(), min(tdiff), max(tdiff), sum(x < 0 for x in tdiff)),
+ '4. Spectral shape (each mean spectrum divided by its own mean): diseased plots are relatively higher in the red (680 nm %+.1f %%) and green (550 nm %+.1f %%) and lower in SWIR-2 (2200 nm %+.1f %%), the expected signs of chlorophyll loss and drier tissue (Carter and Knapp, 2001) (4_Healthy_vs_Diseased, 9_Severity_groups).'
+   % (shp(680), shp(550), shp(2200)),
+ '5. Severity: within the diseased plots, reflectance rises slightly with PDI (r = %+.2f to %+.2f) because the most severe plots are the early-sown D1 plots, which are also the brightest. Severity is mixed with sowing date and canopy brightness, so judge it within treatments (7_, 8_) and from the shape curves.'
+   % (min(rv), max(rv)),
+ '6. Before modelling: check the radiometric calibration (reflectance panels, illumination, flight lines, view angle) or use brightness-independent features (spectral shape, first derivative, normalised indices); then repeat this workbook for the other flight dates.']
+for i, t in enumerate(finds):
+    cell(ws, F0 + 1 + i, 1, t, NF, al=Alignment(wrap_text=True, vertical='top')); ws.merge_cells(start_row=F0 + 1 + i, start_column=1, end_row=F0 + 1 + i, end_column=14)
+    ws.row_dimensions[F0 + 1 + i].height = 15 * (1 + len(t) // 170)
+G0 = F0 + len(finds) + 2; cell(ws, G0, 1, 'Sheets', SF)
+guide = [(S_INFO, 'plot, block, status, variety, sowing, treatment, PDI and severity class/rank/group, crop stage (PDI of other ASD dates for reference)'),
          (S_SPEC, 'the 48 plot spectra (one column per plot) with attribute rows used by all comparisons'),
-         (S_PCH, 'spectrum of every plot (one chart per plot) + all plots overlaid'),
+         (S_PCH, 'spectrum of every plot (one chart per plot, PDI and crop stage in the title) + all plots overlaid'),
          (S_HD, 'mean healthy vs mean diseased spectra, ± SD, % difference and spectral shape'),
          (S_VAR, 'healthy vs diseased for each variety; % difference by variety'),
-         (S_STG, 'healthy vs diseased for each growth stage (sowing date); % difference by stage'),
+         (S_STG, 'healthy vs diseased for each growth stage (sowing date D1-D4); % difference by stage'),
+         (S_CST, 'healthy vs diseased within the recorded crop stage of the day (vegetative, flowering)'),
          (S_TRT, 'each treatment: mean of the 3 replications vs its healthy plot (12 charts, D1-D4 x V1-V3)'),
          (S_TSV, 'the 12 treatment comparisons arranged from least to most severe + % difference by severity rank'),
          (S_SEV, 'mean spectra of healthy and severity groups Q1-Q4, % difference, correlation with PDI, spectral shape; plots per 0-9 class'),
@@ -622,37 +665,35 @@ guide = [(S_INFO, 'plot, block, status, variety, sowing, treatment, PDI on each 
          (S_REG, 'band-region means per plot; healthy vs diseased means, % difference, Welch t-test p, r with PDI; by variety and stage'),
          (S_LEAF, 'ASD leaf scores used for plot PDI'), (S_REF, 'references')]
 for i, (k, v) in enumerate(guide):
-    x = cell(ws, 17 + i, 1, k, Font(name=AR, size=10, color='0563C1', underline='single')); x.hyperlink = "#'%s'!A1" % k; cell(ws, 17 + i, 3, v)
-r = 17 + len(guide) + 1
-cell(ws, r, 1, 'Main results on the image date (live formulas from 12_Region_means)', SF)
+    x = cell(ws, G0 + 1 + i, 1, k, Font(name=AR, size=10, color='0563C1', underline='single')); x.hyperlink = "#'%s'!A1" % k; cell(ws, G0 + 1 + i, 3, v)
+    ws.merge_cells(start_row=G0 + 1 + i, start_column=3, end_row=G0 + 1 + i, end_column=14)
+r = G0 + len(guide) + 2
+cell(ws, r, 1, 'Main results per band region (live formulas from 12_Region_means)', SF)
 header(ws, r + 1, 1, ['Band region', '', 'Healthy mean', 'Diseased mean', '% difference', 'Welch p', 'r with PDI (diseased)'])
 for i, (n, *_r) in enumerate(REG):
     rr = r + 2 + i; L_ = CL(6 + i); cell(ws, rr, 1, n, BF, border=True)
     for j, (off, fmt) in enumerate([(0, '0.0000'), (1, '0.0000'), (2, '0.0'), (3, '0.000'), (4, '0.00')]):
         cell(ws, rr, 3 + j, "=%s!%s%d" % (q(S_REG), L_, SS + off), fmt=fmt, border=True)
+for rr_ in range(r + 1, r + 2 + len(REG)): ws.merge_cells(start_row=rr_, start_column=1, end_row=rr_, end_column=2)
 r2 = r + 2 + len(REG) + 1
 cell(ws, r2, 1, 'Data checks and notes', SF)
-notes = ['1. The flight date is not stored in the ENVI file: default 24 Feb 2026. Change the yellow cell if the image is from another date.',
-         '2. Negative reflectance (red in 2_Spectra) occurs only at the SWIR end (from 1996 nm in plots 13-14, from 2360 nm in plots 16, 30, 31, 32, 41, 42) = sensor noise. Do not interpret > 2350 nm or the noisy band edges next to the removed water bands (about 1310-1330, 1461-1480 and 1971-2000 nm).',
-         '3. Overall brightness differs strongly between plots (NIR 780-880 nm from 0.06 to 0.36), even between replications of the same treatment, and D3 plots are darker in both healthy and diseased plots. '
-         'This is mostly illumination/radiometric (sun, cloud, view angle, flight line; Aasen et al., 2018), not disease. Therefore compare each treatment with its own healthy plot (7_, 8_) and look at the spectral shape curves.',
-         '4. % difference = (diseased - healthy) / healthy x 100, shown only where healthy reflectance > 0.005.',
-         '5. Healthy plots have PDI = 0, so they always take severity ranks 1-12; diseased plots with PDI = 0 on a date (e.g. 11 Feb) come next.',
-         '6. Colours: green = healthy, red = diseased; severity charts run from yellow/orange (low) to dark red (high). Yellow cell = the only input; all other values are formulas or recorded data.']
-for i, t in enumerate(notes): cell(ws, r2 + 1 + i, 1, t, NF, al=Alignment(wrap_text=True, vertical='top')); ws.merge_cells(start_row=r2 + 1 + i, start_column=1, end_row=r2 + 1 + i, end_column=14); ws.row_dimensions[r2 + 1 + i].height = 30 if len(t) < 190 else 45
+notes = ['1. Negative reflectance (red in 2_Spectra) occurs only at the SWIR end (from 1996 nm in plots 13-14, from 2360 nm in plots 16, 30, 31, 32, 41, 42) = sensor noise. Do not interpret > 2350 nm or the noisy band edges next to the removed water bands (about 1310-1330, 1461-1480 and 1971-2000 nm).',
+         '2. Because overall brightness differs strongly between plots (finding 3), compare each treatment with its own healthy plot (7_, 8_) and look at the spectral shape curves rather than raw reflectance alone.',
+         '3. % difference = (diseased - healthy) / healthy x 100, shown only where healthy reflectance > 0.005.',
+         '4. Healthy plots have PDI = 0, so they take severity ranks 1-12; diseased plots are ranked 13-48 by PDI (ties broken by plot number).',
+         '5. Colours: green = healthy, red = diseased; severity charts run from yellow/orange (low) to dark red (high). All values are formulas or recorded data.']
+for i, t in enumerate(notes): cell(ws, r2 + 1 + i, 1, t, NF, al=Alignment(wrap_text=True, vertical='top')); ws.merge_cells(start_row=r2 + 1 + i, start_column=1, end_row=r2 + 1 + i, end_column=14); ws.row_dimensions[r2 + 1 + i].height = 15 * (1 + len(t) // 170)
 ws.column_dimensions['A'].width = 26; ws.column_dimensions['B'].width = 2; ws.column_dimensions['C'].width = 16
-for c in 'DEFGHI': ws.column_dimensions[c].width = 15
+for c in 'DEFGHIJKLMN': ws.column_dimensions[c].width = 15
 for i in range(len(exp)):
     ws.merge_cells(start_row=9 + i, start_column=3, end_row=9 + i, end_column=14); ws.cell(9 + i, 3).alignment = Alignment(wrap_text=True, vertical='top')
-    ws.row_dimensions[9 + i].height = 28 if len(exp[i][1]) > 150 else 15
-ws.merge_cells('D6:N6'); ws['D6'].alignment = Alignment(wrap_text=True, vertical='top'); ws.row_dimensions[6].height = 40
+    ws.row_dimensions[9 + i].height = 15 * (1 + len(exp[i][1]) // 170)
+ws.merge_cells('D6:N6'); ws['D6'].alignment = Alignment(wrap_text=True, vertical='top'); ws.row_dimensions[6].height = 30
 for rr_ in [6] + list(range(9, 9 + len(exp))): ws.cell(rr_, 1).alignment = Alignment(vertical='top')
 ws['C6'].alignment = Alignment(horizontal='center', vertical='top')
-for i in range(len(guide)): ws.merge_cells(start_row=17 + i, start_column=3, end_row=17 + i, end_column=14)
-for rr_ in range(r + 1, r + 2 + len(REG)): ws.merge_cells(start_row=rr_, start_column=1, end_row=rr_, end_column=2)
 
 for w in wb.worksheets: w.sheet_view.zoomScale = 90
-PA = {S_CON: 'A1:N60', S_PCH: 'A1:AJ230', S_HD: 'P1:AF64', S_VAR: 'M1:AD80', S_STG: 'O1:AF100', S_TRT: 'A1:AA74', S_TSV: 'A1:AA112', S_SEV: 'A1:AC78', S_PSV: 'A1:AJ232', S_REG: 'A1:AB100'}
+PA = {S_CON: 'A1:N70', S_CST: 'J1:AA80', S_PCH: 'A1:AJ230', S_HD: 'P1:AF64', S_VAR: 'M1:AD80', S_STG: 'O1:AF100', S_TRT: 'A1:AA74', S_TSV: 'A1:AA112', S_SEV: 'A1:AC78', S_PSV: 'A1:AJ232', S_REG: 'A1:AB100'}
 for sh, a in PA.items():
     w = wb[sh]; w.print_area = a; w.page_setup.orientation = 'landscape'; w.page_setup.fitToWidth = 1; w.page_setup.fitToHeight = 0
     w.sheet_properties.pageSetUpPr.fitToPage = True
