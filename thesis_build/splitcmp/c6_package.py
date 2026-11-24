@@ -29,11 +29,11 @@ STEPS = [
   [(k, ['data/metrics_all.csv', 'data/best_models.json', 'data/all_predictions.csv', 'data/strata_metrics.csv', 'fig/f1[6-9]_*.png', 'fig/f20_*.png', 'fig/f2[4-8]_*.png'], i) for i, k in enumerate(['LORO', '70-30', '80-20'])]),
  ('08_Covariate_baseline', 'Models without spectra (crop age, timing, variety, stage, weather) vs spectra vs spectra + covariates on the unsprayed leaves; gains with plot-bootstrap intervals and DeLong tests.',
   [(k, ['data/cov2_*.csv', 'data/cov2_summary.json', 'fig/f3[1-4]_*.png'], i) for i, k in enumerate(['LORO', '70-30', '80-20'])]),
- ('09_Model_files', 'Saved models with the prediction script. LORO: refitted on all leaves. 70:30 and 80:20: exactly the tested models, trained on the training plots only. CNN weights are in the separate _CNN_weights zip.',
+ ('09_Model_files', 'Saved models with the prediction script: 70:30 and 80:20 = exactly the tested models, trained on the training plots only. The EfficientNet-B0, ResNet18 and ConvNeXt V2-Atto weights are in the separate files ASD_2025-26_70-30_models_CNN_weights.zip and ASD_2025-26_80-20_models_CNN_weights.zip. LORO models (refitted on all leaves) were delivered earlier as ASD_2025-26_models.zip.',
   []),
  ('10_Comparison_LORO_vs_70-30_vs_80-20', 'Is the accuracy improving? Side by side, same test leaves (paired plot bootstrap), 20 repeated splits per ratio, leakage check with random leaf-level splits, feature overlap. Per-design files: cmp_*.csv; three-way: cmp3_*.csv.',
   [('70-30', ['data/cmp_*.csv', 'data/cmp_summary.json', 'fig/f3[6-9]_*.png'], 1), ('80-20', ['data/cmp_*.csv', 'data/cmp_summary.json', 'fig/f3[6-9]_*.png'], 2)]),
- ('11_Reports', 'Word reports (+ PDF), Excel workbooks and slides: LORO (earlier), 70:30, 80:20 and the three-way comparison. Every table and figure is in all three formats.', [])]
+ ('11_Reports', 'Word reports (+ PDF), Excel workbooks and slides: 70:30, 80:20 and the three-way comparison (LORO reports were delivered earlier as ASD_2025-26_leaf_analysis_white_rust*). Every table and figure is in all three formats.', [])]
 SRC = {d[0]: d[1] for d in DES}; keys = [d[0] for d in DES]
 for step, desc, items in STEPS:
     os.makedirs(TOP + step, exist_ok=True); n = 0
@@ -44,15 +44,16 @@ for step, desc, items in STEPS:
     README[step] = (desc, n)
 # models
 for k, d, pre in DES:
-    for z in glob.glob(OUTP + pre + 'models*.zip'):
-        if k == 'LORO' and ('70-30' in z or '80-20' in z): continue
-        os.makedirs(TOP + '09_Model_files/' + k, exist_ok=True); shutil.copy(z, TOP + '09_Model_files/' + k + '/')
+    if k == 'LORO': continue                                   # LORO model files were delivered earlier (ASD_2025-26_models*.zip)
+    z = OUTP + pre + 'models.zip'                              # CNN weights (_models_CNN_weights.zip, ~200 MB) are delivered as separate files
+    if os.path.exists(z): os.makedirs(TOP + '09_Model_files/' + k, exist_ok=True); shutil.copy(z, TOP + '09_Model_files/' + k + '/')
 # comparison
 n = put('10_Comparison_LORO_vs_70-30_vs_80-20', 'three-way', ['out/cmp3_*', 'fig/c0*.png', 'c1_repeat.py', 'c2_compare.py'], T + 'splitcmp/') + put('10_Comparison_LORO_vs_70-30_vs_80-20', 'three-way', ['c1_repeat.py'], T + 'asd7030/')
 for k in ('70-30', '80-20'):
     if k in SRC: put('10_Comparison_LORO_vs_70-30_vs_80-20', k, ['data/cmp_repeat_runs.csv', 'data/cmp_repeat_selection.csv'], SRC[k])
 # reports
 for k, d, pre in DES:
+    if k == 'LORO': continue                                   # LORO reports were delivered earlier (ASD_2025-26_leaf_analysis_white_rust*)
     put('11_Reports', k, [pre + 'leaf_analysis_white_rust.xlsx', pre + 'leaf_analysis_white_rust_report.docx', pre + 'leaf_analysis_white_rust_report.pdf', pre + 'leaf_analysis_seminar.pptx'], OUTP)
 put('11_Reports', 'comparison', ['ASD_2025-26_validation_comparison_LORO_70-30_80-20*'], OUTP)
 # READMEs
