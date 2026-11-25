@@ -138,6 +138,7 @@ REFLECTANCE_SCALE = 'auto'  # 'auto' (divides by 10000 if the data look like 0-1
     libs = LIBS.replace("    DATA_FILE", "    DATA_FILE")
     libs = libs.replace("OUT = os.path.join(SRC, OUT_NAME); os.makedirs(OUT, exist_ok=True); MODEL_DIR = os.path.join(KIT_DIR, 'models')", MODEL_FIND)
     if not dl: libs = libs.replace("import torch, torch.nn as nn, torch.nn.functional as Fn\n", "")
+    else: libs = 'import torch, torch.nn as nn, torch.nn.functional as Fn   # torch first: avoids a Windows DLL clash (WinError 1114, c10.dll)\n' + libs.replace("import torch, torch.nn as nn, torch.nn.functional as Fn\n", "")
     assert 'MODEL_DIR' not in libs
     add('code', libs)
     if dl:
