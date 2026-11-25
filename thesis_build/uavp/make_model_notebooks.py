@@ -144,13 +144,18 @@ REFLECTANCE_SCALE = 'auto'  # 'auto' (divides by 10000 if the data look like 0-1
         add('markdown', '## 3 Network\n' + ('ConvNeXt V2-Atto (Woo et al., 2023) with stride-1 stems for the small pseudo-image: the standardised features are written into a k × k grid (zero-padded; Sharma et al., 2019) – the same architecture as in the ASD analysis.' if kind == 'convnext' else 'DNN-F1: fully connected network on the standardised feature vector (64 → 32 → output, batch normalisation, ReLU) – the same architecture as in the ASD analysis.'))
         add('code', CNX_TXT if kind == 'convnext' else DNN_TXT)
     n0 = 4 if dl else 3
-    add('markdown', f"## {n0} Reference data (embedded)\n`ASD_HEALTHY` = mean of the healthy ASD leaves of 24 Feb at the image wavelengths, `UAV_HEALTHY` = mean of the 12 sprayed plots of this image; their ratio is the healthy-reference gain used by the *corrected* and *normalised* inputs (empirical-line idea; Smith and Milton, 1999; brightness normalisation: Barnes et al., 1989). `TRUTH` = ASD leaf scores of 24 Feb per plot. `EXPECTED` = this model's prediction for the 48 plot-mean spectra (self-check).")
-    ref = ("REF_WL = np.array(%s)\nASD_HEALTHY = np.array(%s)\nUAV_HEALTHY = np.array(%s)\n" % (fmt(MNB.SC.wavelength, 9), fmt(MNB.SC['ASD healthy (24 Feb)']), fmt(MNB.SC['UAV healthy']))
-           + "TRUTH = pd.DataFrame({'plot': %s, 'block': %s, 'status': %s, 'variety': %s, 'sowing': %s, 'mean_score': %s, 'grade': %s, 'PDI': %s})\n" % (
-               list(MNB.GT['plot']), list(MNB.GT.block), list(MNB.GT.status), list(MNB.GT.variety), list(MNB.GT.sowing), fmt(MNB.GT.score.round(4)), list(MNB.GT.grade.astype(int)), fmt(MNB.GT.PDI.round(3)))
-           + "MODEL = %s\n" % json.dumps({k: m[k] for k in ('task', 'model', 'why', 'variant', 'uav_metric', 'uav_value', 'uav_auc', 'file', 'kind', 'features')}).replace('null', 'None')
-           + "EXPECTED = %s\n" % json.dumps(EXPECTED[key]))
-    add('code', ref + """GRADES = [0, 1, 3, 5, 7, 9]; KEY, TASK, VARIANT = '%s', MODEL['task'], MODEL['variant']
+    add('markdown', f"## {n0} Reference data (from `{key}_reference.json` next to the model file)\n`ASD_HEALTHY` = mean of the healthy ASD leaves of 24 Feb at the image wavelengths, `UAV_HEALTHY` = mean of the 12 sprayed plots of this image; their ratio is the healthy-reference gain used by the *corrected* and *normalised* inputs (empirical-line idea; Smith and Milton, 1999; brightness normalisation: Barnes et al., 1989). `TRUTH` = ASD leaf scores of 24 Feb per plot. `EXPECTED` = this model's prediction for the 48 plot-mean spectra (self-check).")
+    REFD = dict(REF_WL=[float(x) for x in MNB.SC.wavelength], ASD_HEALTHY=[float(x) for x in MNB.SC['ASD healthy (24 Feb)']], UAV_HEALTHY=[float(x) for x in MNB.SC['UAV healthy']],
+                TRUTH=dict(plot=[int(x) for x in MNB.GT['plot']], block=list(MNB.GT.block), status=list(MNB.GT.status), variety=list(MNB.GT.variety), sowing=list(MNB.GT.sowing),
+                           mean_score=[round(float(x), 4) for x in MNB.GT.score], grade=[int(x) for x in MNB.GT.grade], PDI=[round(float(x), 3) for x in MNB.GT.PDI]),
+                MODEL={k: m[k] for k in ('task', 'model', 'why', 'variant', 'uav_metric', 'uav_value', 'uav_auc', 'file', 'kind', 'features')}, EXPECTED=EXPECTED[key])
+    json.dump(REFD, open(HERE + 'kit/models/%s_reference.json' % key, 'w'))
+    add('code', """REF_FILE = os.path.splitext(MODEL_FILE)[0] + '_reference.json'     # reference data, stored next to the model file
+assert os.path.isfile(REF_FILE), f'Reference file not found: {REF_FILE} (copy it from the kit folder models)'
+R = json.load(open(REF_FILE))
+REF_WL, ASD_HEALTHY, UAV_HEALTHY = np.array(R['REF_WL']), np.array(R['ASD_HEALTHY']), np.array(R['UAV_HEALTHY'])
+TRUTH = pd.DataFrame(R['TRUTH']); MODEL = R['MODEL']; EXPECTED = R['EXPECTED']
+GRADES = [0, 1, 3, 5, 7, 9]; KEY, TASK, VARIANT = '%s', MODEL['task'], MODEL['variant']
 assert len(REF_WL) == len(WL) and np.abs(REF_WL - WL).max() < 0.01, 'the image wavelengths differ from the 24 Feb image used to build the model inputs'
 GAIN = ASD_HEALTHY / UAV_HEALTHY; TARGET_MEAN = ASD_HEALTHY.mean()
 print(f"{MODEL['model']} – task {TASK}, input '{VARIANT}', accuracy on the 48 UAV plots: {MODEL['uav_metric']} {MODEL['uav_value']:.3f}")""" % key)
