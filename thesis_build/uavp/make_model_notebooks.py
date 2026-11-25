@@ -15,6 +15,12 @@ EXPECTED = json.loads(src0[src0.index('EXPECTED = ') + len('EXPECTED = '):].spli
 TASKN = {'A': 'detection (healthy / diseased)', 'B': 'six severity grades (0, 1, 3, 5, 7, 9)', 'C': 'severity score (0–9)'}
 VARN = {'direct': 'direct UAV reflectance', 'corrected': 'UAV reflectance × healthy-reference gain (ASD healthy / UAV healthy)', 'normalised': 'gain-corrected reflectance scaled to the mean reflectance of the healthy ASD leaves'}
 LIBS = C[4]; NETS = C[6]; FEAT = C[10]; OPEN = C[16]
+MODEL_FIND = '''OUT = os.path.join(OUT_DIR, OUT_NAME); os.makedirs(OUT, exist_ok=True)
+_mf = os.path.basename(MODEL_FILE.replace('\\\\', '/'))
+_cands = [MODEL_FILE, os.path.join(os.getcwd(), 'models', _mf), os.path.join(os.getcwd(), _mf), os.path.join(os.path.dirname(OUT_DIR), 'models', _mf)]
+MODEL_FILE = next((c for c in _cands if os.path.isfile(c)), None)
+if MODEL_FILE is None: raise FileNotFoundError('Model file ' + _mf + ' not found. Looked in:\\n  ' + '\\n  '.join(_cands) + '\\nCopy the kit folder "models" to one of these places or correct MODEL_FILE in step 1.')
+print('model file  :', MODEL_FILE); print('results to  :', OUT)'''
 DNN_TXT = NETS[NETS.index('class DNNF1'):NETS.index('def pseudo')].rstrip() + '\n'
 CNX_TXT = NETS[:NETS.index('class DNNF1')] + NETS[NETS.index('def pseudo'):]
 fmt = MNB.fmt
@@ -105,18 +111,21 @@ UAV hyperspectral image of 24 February 2026 · model trained on the 2025-26 ASD 
 
 {use}
 
-**Steps.** 1 settings · 2 libraries and image helpers{' · 3 network' if dl else ''} · {'4' if dl else '3'} reference data · features · load the model · self-check on the 48 plot means · open the image and crop mask · pixel loop · map · per-plot accuracy · outputs.
+**Steps.** 0 install packages · 1 settings · 2 libraries and image helpers{' · 3 network' if dl else ''} · {'4' if dl else '3'} reference data · features · load the model · self-check on the 48 plot means · open the image and crop mask · pixel loop · map · per-plot accuracy · outputs.
 
 **Requirements.** Python 3.9+, `numpy`, `scipy`, `pandas`, `matplotlib`{', `torch` (CPU: `pip install torch --index-url https://download.pytorch.org/whl/cpu`)' if dl else ''}; optional `rasterio` for GeoTIFF.{'' if dl else ' The model is stored as plain arrays and predicted with NumPy exactly as scikit-learn/xgboost do, so their versions do not matter.'}
 **Time.** Run first with `SPATIAL_STEP = 4` (preview, about 1/16 of the pixels), then `SPATIAL_STEP = 1` for the final map.""")
-    add('markdown', '## 1 Settings\nChange the four paths to your folders. Everything else can stay as it is.')
+    add('markdown', '## 0 Install the packages (run once)\nRun this cell once. If it installs something new, restart the kernel (menu *Kernel → Restart*) and continue with step 1. Later runs can skip it.')
+    add('code', "%pip install -q numpy scipy pandas matplotlib rasterio" + ("\n%pip install -q torch --index-url https://download.pytorch.org/whl/cpu" if dl else ''))
+    add('markdown', '## 1 Settings\nYour paths are already filled in. The results go to a sub-folder of `OUT_DIR` named after the model. If the model file is not found at `MODEL_FILE`, the notebook also looks in a `models` folder next to the notebook.')
     add('code', f"""# ============================ SETTINGS ============================
-HDR_FILE  = r'D:\\Coalighned\\24_02_2026\\subset_200526.hdr'          # ENVI header of the 24 Feb image (the data file 'subset_200526' must be next to it)
+HDR_FILE  = r'D:\\Coalighned\\24_02_2026\\subset_200526.hdr'          # ENVI header of the 24 Feb image (the data file 'subset_200526', ~9 GB, must be next to it)
 DATA_NAME = 'subset_200526'                                         # name of the image data file
 ROI_FILE  = r'D:\\Coalighned\\24_02_2026\\48_plot_roi_new.xml'        # 48 plot ROIs, ROI #n = plot n (None = skip the per-plot accuracy)
-MODEL_FILE = r'D:\\Coalighned\\white_rust_pixel_kit\\models\\{m['file']}'   # this model
-PLOT_AVG_FILE = r'D:\\Coalighned\\24_02_2026\\envi_plot_avg.txt'      # ENVI plot-average file for the self-check (None = skip)
-OUT_NAME  = 'white_rust_pixel_map_24Feb2026_{key}'                  # results folder, created next to the image
+OUT_DIR   = r'C:\\Users\\BDI LAB\\Desktop\\ASD_MODEL_ON_240226_UAV_IMAGE_PIXELWISE\\IMAGE_VALIDATED'   # your output folder
+MODEL_FILE = r'C:\\Users\\BDI LAB\\Desktop\\ASD_MODEL_ON_240226_UAV_IMAGE_PIXELWISE\\models\\{m['file']}'   # this model (from the kit's 'models' folder)
+PLOT_AVG_FILE = r'D:\\Coalighned\\24_02_2026\\envi_plot_avg.txt'      # ENVI plot-average file for the self-check (skipped if the file is not there)
+OUT_NAME  = '{key}'                                                 # sub-folder of OUT_DIR for this model's results
 
 SPATIAL_STEP = 4        # 4 = quick preview; 1 = final full-resolution map
 BLOCK_ROWS   = 16       # image rows processed at a time (reduce if memory is short)
@@ -127,7 +136,7 @@ REFLECTANCE_SCALE = 'auto'  # 'auto' (divides by 10000 if the data look like 0-1
         ('\nBATCH  = 32768          # pixels per network batch\nDEVICE = \'cpu\'' if dl else ''))
     add('markdown', '## 2 Libraries and image helpers\nThe image is memory-mapped: only the rows being processed are read, so a 9 GB image runs in a few GB of memory. The ROI parser converts the plot polygons from map coordinates to image pixels.')
     libs = LIBS.replace("    DATA_FILE", "    DATA_FILE")
-    libs = libs.replace("OUT = os.path.join(SRC, OUT_NAME); os.makedirs(OUT, exist_ok=True); MODEL_DIR = os.path.join(KIT_DIR, 'models')", "OUT = os.path.join(SRC, OUT_NAME); os.makedirs(OUT, exist_ok=True)\nassert os.path.exists(MODEL_FILE), f'Model file not found: {MODEL_FILE}'")
+    libs = libs.replace("OUT = os.path.join(SRC, OUT_NAME); os.makedirs(OUT, exist_ok=True); MODEL_DIR = os.path.join(KIT_DIR, 'models')", MODEL_FIND)
     if not dl: libs = libs.replace("import torch, torch.nn as nn, torch.nn.functional as Fn\n", "")
     assert 'MODEL_DIR' not in libs
     add('code', libs)
