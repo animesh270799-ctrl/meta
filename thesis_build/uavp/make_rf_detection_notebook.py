@@ -39,14 +39,14 @@ md6, c6 = pick(RF, '## 6 Self-check'); md7, c7 = pick(RF, '## 7 Open the image')
 md8, c8 = pick(CX, '## 9 Pixel loop'); md9, c9 = pick(CX, '## 10 Map'); md10, c10 = pick(CX, '## 11 Per-plot accuracy')
 for m_, n_ in ((md8, '8'), (md9, '9'), (md10, '10')):
     s = src(m_); s = '## ' + n_ + s[s.index(' ', 3):]; m_['source'] = cell('markdown', s)['source']
-md1 = cell('markdown', '## 1 Settings\nYour paths are filled in. `MODEL_FILE` is your RF detection model; `NPZ_FILE` is the same model as plain arrays – put it in the same `ALL_model` folder and it is used automatically (no scikit-learn version problems).')
+md1 = cell('markdown', '## 1 Settings\nYour paths are filled in. `MODEL_FILE` is your RF detection model; `NPZ_FILE` is the same model as plain arrays – it is in the same `RF` folder and is used automatically, so the Python / scikit-learn version does not matter.')
 c1 = cell('code', f"""# ============================ SETTINGS ============================
 HDR_FILE  = r'D:\\Coalighned\\24_02_2026\\subset_200526.hdr'          # ENVI header of the 24 Feb image (the data file 'subset_200526', ~9 GB, must be next to it)
 DATA_NAME = 'subset_200526'                                         # name of the image data file
 ROI_FILE  = r'D:\\Coalighned\\24_02_2026\\48_plot_roi_new.xml'        # 48 plot ROIs, ROI #n = plot n (None = skip the per-plot accuracy)
 OUT_DIR   = r'{P}\\IMAGE_VALIDATED'   # your output folder
-MODEL_FILE = r'{P}\\ALL_model\\A_detection_RF.joblib'   # RF detection model (scikit-learn joblib)
-NPZ_FILE   = r'{P}\\ALL_model\\A_detection_RF.npz'      # same model as plain arrays: used if present (works with any scikit-learn version)
+MODEL_FILE = r'{P}\\RF\\A_detection_RF.joblib'   # RF detection model (scikit-learn joblib)
+NPZ_FILE   = r'{P}\\RF\\A_detection_RF.npz'      # same model as plain arrays: used if present (works with any Python / scikit-learn version)
 PLOT_AVG_FILE = r'D:\\Coalighned\\24_02_2026\\envi_plot_avg.txt'      # ENVI plot-average file for the self-check (skipped if the file is not there)
 OUT_NAME  = 'A_detection_RF'                                         # sub-folder of OUT_DIR for this model's results
 
@@ -57,7 +57,7 @@ REFLECTANCE_SCALE = 'auto'  # 'auto' (divides by 10000 if the data look like 0-1
 THRESHOLD    = 0.5      # probability above which a pixel is called diseased (0.5 = the random forest's own decision)
 PLOT_DISEASED_SHARE = 0.5   # a plot is called diseased if more than this share of its crop pixels is diseased""")
 s2 = src(c2); a = s2.index("_mf = os.path.basename("); b = s2.index("print('model file  :', MODEL_FILE); print('results to  :', OUT)")
-s2 = s2[:a] + "if not (os.path.isfile(NPZ_FILE) or os.path.isfile(MODEL_FILE)):\n    raise FileNotFoundError('Neither the model file nor the .npz was found:\\n  ' + MODEL_FILE + '\\n  ' + NPZ_FILE + '\\nCheck MODEL_FILE / NPZ_FILE in step 1.')\nprint('model file  :', NPZ_FILE if os.path.isfile(NPZ_FILE) else MODEL_FILE); print('results to  :', OUT)" + s2[b + len("print('model file  :', MODEL_FILE); print('results to  :', OUT)"):]
+s2 = s2[:a] + "if not (os.path.isfile(NPZ_FILE) or os.path.isfile(MODEL_FILE)):\n    raise FileNotFoundError('Neither the model file nor the .npz was found:\\n  ' + MODEL_FILE + '\\n  ' + NPZ_FILE + '\\nCheck MODEL_FILE / NPZ_FILE in step 1.')\nprint('model file  :', NPZ_FILE if os.path.isfile(NPZ_FILE) else MODEL_FILE); print('results to  :', OUT)\nimport sys, scipy; print('python', sys.version.split()[0], '| numpy', np.__version__, '| scipy', scipy.__version__, '| pandas', pd.__version__)" + s2[b + len("print('model file  :', MODEL_FILE); print('results to  :', OUT)"):]
 c2['source'] = cell('code', s2)['source']
 R = json.load(open(HERE + 'kit/models/B_RF_reference.json')); T = R['TRUTH']
 md3 = cell('markdown', "## 3 Reference data (embedded)\n`TRUTH` = ASD leaf scores of 24 Feb 2026 for the 48 plots; `EXPECTED` = this model's probability of white rust for the 48 plot-mean spectra (self-check). The model uses the UAV reflectance **directly**, so no reference spectra are needed.")
@@ -87,8 +87,12 @@ c5 = cell('code', r"""if os.path.isfile(NPZ_FILE):
         return P[:, 1] / len(OFFSET)
     print(f'random forest (NumPy arrays): {len(OFFSET)} trees')
 else:
-    import joblib, sklearn
-    B = joblib.load(MODEL_FILE); RFM = B['model']; FEATURES = list(B['candidate_features']); IDX = np.array(B['idx']); MU, SD = np.asarray(B['scaler_mean']), np.asarray(B['scaler_sd'])
+    try:
+        import joblib, sklearn
+        B = joblib.load(MODEL_FILE)
+    except Exception as e:
+        raise RuntimeError('The .joblib cannot be read by this Python/scikit-learn (' + type(e).__name__ + '). Put A_detection_RF.npz next to it (NPZ_FILE in step 1) - then the joblib is not needed.') from None
+    RFM = B['model']; FEATURES = list(B['candidate_features']); IDX = np.array(B['idx']); MU, SD = np.asarray(B['scaler_mean']), np.asarray(B['scaler_sd'])
     def proba(Zs): return RFM.predict_proba(Zs)[:, 1]
     print(f"random forest (joblib, scikit-learn {sklearn.__version__}; saved with {B['versions']['sklearn']}): {RFM.n_estimators} trees")
 def predict(S):
