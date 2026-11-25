@@ -22,7 +22,7 @@ UAV hyperspectral image of 24 February 2026 · model `A_detection_RF.joblib` (ra
 
 | Item | This notebook |
 |---|---|
-| Model | **Random forest** (machine learning), `ALL_model\\A_detection_RF.joblib`; the same model as plain arrays in `A_detection_RF.npz` |
+| Model | **Random forest** (machine learning), `RF\\A_detection_RF.joblib`; the same model as plain arrays in `RF\\A_detection_RF.npz` |
 | Input given to the model | direct UAV reflectance (its best input on the 48 UAV plots) |
 | Features (computed from each pixel spectrum) | FD1090, FD1060, FD550, FD1660, FD1245, FD870, FD760, FD595, REP (candidates also FD665, DWSI-2) |
 | Accuracy on the 48 UAV plot spectra | macro-F1 0.621, AUC 0.613, overall accuracy 0.750 |
@@ -100,7 +100,7 @@ def predict(S):
     Z = (features(make_variant(S, VARIANT), FEATURES, OP) - MU) / SD; p = proba(Z[:, IDX]); return p, (p > THRESHOLD).astype(int)
 print('features used:', ', '.join(FEATURES[i] for i in IDX))
 OP = build_operator(FEATURES)""")
-md11s = src(md11).replace('## 11 Outputs', '## 11 Outputs');
+md11 = cell("markdown", "## 11 Outputs\nIn the results folder `A_detection_RF`: `A_detection_RF_score` (probability of white rust) and `A_detection_RF_class` (1 healthy, 2 diseased) as ENVI `.dat/.hdr` and GeoTIFF, `A_detection_RF_map.png`, `A_detection_RF_per_plot.csv`, `A_detection_RF_accuracy.csv` and `run_info.json`. Open the `.dat/.hdr` or `.tif` in ENVI/QGIS – they carry the georeference of the image.\n\n**References.** Apan et al. (2004); Breiman (2001); Congalton (1991); Daughtry et al. (2000); Filella and Peñuelas (1994); Horler et al. (1983); Savitzky and Golay (1964) – full entries in the transfer report.")
 cells = [title, md0, c0, md1, c1, md2, c2, md3, c3, md4, c4, md5, c5, md6, c6, md7, c7, md8, c8, md9, c9, md10, c10, md11, c11]
 for i, c in enumerate(cells): c['id'] = 'c%02d' % i
 nb = dict(nbformat=4, nbformat_minor=5, metadata=RF['metadata'], cells=cells)
