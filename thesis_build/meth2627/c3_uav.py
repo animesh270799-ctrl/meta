@@ -38,9 +38,9 @@ def add():
          check=['483 bands remain; no negative reflectance after smoothing.'],
          out='Clean HS cube → B4.',
          papers=[('Ma et al. (2026)', 'Rice blast; Savitzky–Golay smoothing of the canopy spectra to reduce sensor noise; the noisy 400–450 nm region was not used for analysis.', 'Same filter; noisy regions removed.'),
-                 ('Mandal et al. (2023)', 'Rice blast; removed the water bands affected by atmospheric water vapour.', 'Same reason for removing 1335–1460 and 1785–1965 nm in sunlit UAV data.'),
-                 ('Tian et al. (2021)', 'Rice leaf blast; Savitzky–Golay smoothing of the spectra before derivative features were computed.', 'Smoothing before the derivative.'),
-                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; Savitzky–Golay smoothing of the spectra before feature extraction.', 'Same smoothing step.')])
+                 ('Mandal et al. (2023)', 'Rice blast; 1351–1439, 1801–1949 and 2351–2500 nm removed because of noise from ambient water absorption; Savitzky–Golay filter to reduce random noise.', 'Same reason for removing 1335–1460 and 1785–1965 nm in sunlit UAV data; same filter.'),
+                 ('Chen et al. (2023)', 'Tobacco viruses; Savitzky–Golay smoothing with a second-order polynomial and a 5-point window; smoothing with SVM gave the best severity models.', 'Same window (5) and order (2).'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; noisy spectral regions removed and the spectra smoothed with the Savitzky–Golay function before the indices were computed.', 'Noisy regions removed, then smoothing.')])
     step('B4', 'Projection and co-registration', part=P,
          what='All images are projected to WGS 84 / UTM 43N and the RGB, MS and thermal images are registered to the HS image.',
          why='Features of different cameras must come from the same ground area for feature-level fusion.',
@@ -72,7 +72,7 @@ def add():
          papers=[('Ma et al. (2026)', 'Rice blast; regions of interest delineated in ENVI 5.6; the average reflectance of the rice pixels in each ROI was the sample spectrum.', 'ENVI ROI mean as the sample spectrum.'),
                  ('Guo et al. (2021)', 'Wheat yellow rust; mean canopy spectra of plots related to the disease index.', 'Plot (subplot) means as samples.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; the mean of all pixels in each plot region of interest (and percentile values) used as plot features; the share of soil pixels in the ROI was small after canopy closure.', 'Mean of all ROI pixels as the field-level sample.'),
-                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; mean spectra of regions as samples.', 'Same sampling unit logic.')])
+                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; values of the fluorescence and multispectral phenotyping images extracted from a region of interest of each spike for analysis.', 'Region-of-interest values as the sample.')])
     demo('roimean', [['Date', 'Subplot', 'ROI pixels', 'R_{550}', 'R_{670}', 'R_{800}', 'Mean Tc (°C)', 'DI (%)'], ['18 Jan 2027', '25-1', '6 120', '0.081', '0.046', '0.392', '23.4', '12.3'], ['18 Jan 2027', '25-2', '6 090', '0.084', '0.052', '0.371', '24.1', '28.4'], ['18 Jan 2027', '7-1 (healthy)', '6 150', '0.079', '0.041', '0.418', '22.8', '0.0']],
          'Subplot ROI averages joined to the DI', widths=[1300, 1400, 1100, 1000, 1000, 1000, 1400, 1400])
 
@@ -119,19 +119,21 @@ def add():
          what='Band reflectance, indices and texture of the multispectral camera; colour indices, hue–saturation–value and texture of the RGB camera.',
          why='The cheaper cameras need their own features so that their value can be compared with the HS camera.',
          do=['MS: 5 band means, 12 indices (NDVI, GNDVI, NDRE, CI_{green}, CI_{rededge}, MTCI, OSAVI, SAVI, TCARI, MCARI, MSR, PSRI), 10 two-band normalised differences, GLCM of the 5 bands (40).',
-             'RGB: ExG, ExR, ExG − ExR, VARI, GLI, NGRDI, mean hue, saturation and value; GLCM of R, G and B (24), computed at native resolution.'],
+             'RGB: ExG, ExR, ExG − ExR, VARI, GLI, NGRDI, mean hue, saturation and value; GLCM of R, G and B (24), computed at native resolution.',
+             'GLCM for MS and RGB: 64 grey levels, distance 1 pixel, mean of the four directions 0°, 45°, 90° and 135°; eight measures (mean, variance, homogeneity, contrast, dissimilarity, entropy, second moment, correlation) over the subplot ROI.'],
          check=['MS 67 and RGB 33 features per subplot-date.'],
-         out='MS and RGB groups → 1.6.',
-         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; vegetation indices and three-band texture combination indices from UAV multispectral images.', 'MS indices plus texture.'),
+         out='MS and RGB groups → 1.6.2, 1.6.3.',
+         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; band reflectance, nine vegetation indices (NDRE, PSRI, NDVI, SAVI, MCARI, MTCI, GNDVI, OSAVI, MSR) and eight GLCM textures of each of the five multispectral bands, combined into three-band texture combination indices.', 'Same MS indices and GLCM measures.'),
+                 ('Maimaitijiang et al. (2020)', 'Soybean yield (method support); UAV RGB, multispectral and thermal images gave spectral, structure, thermal and GLCM texture (8 measures) features, kept by modality.', 'Features of each camera kept as their own groups.'),
                  ('Blasch et al. (2023)', 'Wheat yellow and stem rust; multispectral and very-high-resolution indices from UAV and satellite.', 'MS indices for rust detection.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; texture features of RGB and thermal infrared images fused with hyperspectral vegetation indices.', 'RGB texture features.'),
                  ('Nguyen et al. (2023)', 'Spring wheat yellow rust; CRI2, SAVI2 and GLCM contrast from multispectral UAV images were the features most correlated with the disease.', 'Multispectral indices plus texture.')])
     step('C5', 'Thermal features', part=P,
          what='Canopy temperature statistics, normalised temperatures (Step D3) and thermal texture.',
          why='Infection changes transpiration and leaf temperature.',
-         do=['Mean, median, SD, 10th and 90th percentiles and maximum temperature difference (MTD = highest − lowest temperature) of the ROI pixels.', 'Normalised temperatures from Step D3.', 'GLCM texture of the temperature image (8).'],
+         do=['Mean, median, SD, 10th and 90th percentiles and maximum temperature difference (MTD = highest − lowest temperature) of the ROI pixels.', 'Normalised temperatures from Step D3.', 'GLCM texture of the temperature image (8; temperatures quantised to 64 levels over one common range for all dates; distance 1, four directions).'],
          check=['18 thermal features per subplot-date (6 statistics, 4 normalised temperatures, 8 texture).'],
-         out='Thermal group → D3, 1.6.',
+         out='Thermal group → D3, 1.6.4.',
          papers=[('Calderón et al. (2014)', 'Downy mildew of opium poppy; canopy temperature and canopy minus air temperature from UAV thermal images detected infected plants.', 'Canopy temperature and its normalised form.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; thermal infrared temperature parameters as a separate data source in fusion with spectral indices and texture.', 'Thermal features as a fusion group.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; canopy temperature from UAV thermal images analysed with spectral and texture features to estimate the disease index.', 'Canopy temperature added to optical features.'),
@@ -191,10 +193,11 @@ def add():
          do=['Canopy temperature difference CTD = Tc − Ta and canopy temperature ratio CTR = Tc / Ta (Ta = air temperature of the flight).', 'Normalised relative canopy temperature NRCT = (Tc − Tmin) / (Tmax − Tmin), with Tmin and Tmax the lowest and highest canopy temperatures in the image of that date (a min–max scaling within each date; no labels used).',
              'Difference from the mean temperature of the healthy training plots of the same date and variety.'],
          check=['Four normalised thermal features per subplot-date.'],
-         out='Normalised thermal features → C5, 1.6.',
+         out='Normalised thermal features → C5, 1.6.4.',
          papers=[('Calderón et al. (2014)', 'Downy mildew of opium poppy; UAV canopy temperature normalised by air temperature (Tc − Ta) separated infected plants; comparisons made at similar NDVI (growth) levels.', 'CTD used as a normalised thermal feature.'),
                  ('Oerke et al. (2006)', 'Cucumber downy mildew; air temperature and humidity at the time of measurement changed leaf temperature, so temperature alone was not suitable to quantify severity in the field.', 'Temperatures normalised by air temperature and by healthy plots of the same date.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; canopy temperature difference CTD = CT − AT, canopy temperature ratio CTR = CT/AT and normalised relative canopy temperature NRCT = (CT − CTmin)/(CTmax − CTmin) computed to remove the effect of air temperature on canopy temperature.', 'Same three formulas (CTD, CTR, NRCT) for the same reason.')])
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; canopy temperature difference CTD = CT − AT, canopy temperature ratio CTR = CT/AT and normalised relative canopy temperature NRCT = (CT − CTmin)/(CTmax − CTmin) computed to remove the effect of air temperature on canopy temperature.', 'Same three formulas (CTD, CTR, NRCT) for the same reason.'),
+                 ('Maimaitijiang et al. (2020)', 'Soybean yield (method support); NRCT from the UAV thermal camera with the lowest and highest temperature of the whole field trial on the flight date.', 'NRCT scaled within the image of each date.')])
     demo('thermal', [['Subplot', 'Tc (°C)', 'Ta (°C)', 'CTD = Tc − Ta', 'Healthy mean Tc (same date, variety)', 'Difference'], ['25-2', '24.1', '22.0', '+2.1', '22.9', '+1.2'], ['7-1 (healthy)', '22.8', '22.0', '+0.8', '22.9', '−0.1']],
          'Thermal normalisation of two subplots', widths=[1500, 1100, 1100, 1700, 2600, 1600])
     step('D4', 'Standardisation and class balance', part=P,
@@ -206,7 +209,8 @@ def add():
          papers=[
                  ('Ma et al. (2026)', 'Rice blast; cross-entropy loss with label smoothing 0.01 for DT-EDNet and the comparison networks.', 'Same loss settings for the networks.'),
                  ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; inputs of the artificial neural network centred and scaled within the 70% training part (3-fold cross-validation for tuning); random forest used without feature scaling because trees are not affected by scale.', 'z-score inside the training part for scale-sensitive models; no scaling needed for random forest.'),
-                 ('Zhang et al. (2014a)', 'Wheat powdery mildew; the meteorological and remote-sensing variables of the logistic regression models were standardised, and their standardised coefficients compared.', 'Covariates and sensor features standardised before a regression-type model (Step 2.9).')])
+                 ('Zhang et al. (2014a)', 'Wheat powdery mildew; the meteorological and remote-sensing variables of the logistic regression models were standardised, and their standardised coefficients compared.', 'Covariates and sensor features standardised before a regression-type model (Step 2.9).'),
+                 ('Shafiee et al. (2021)', 'Wheat yield from UAV multispectral bands and indices (method support); z-score (mean 0, variance 1) applied before SVR with sequential forward selection, tuned by grid search and 10-fold cross-validation on the 70% training set.', 'z-score before SVM/SVR inside the training data.')])
     step('D5', 'Leakage rules', part=P,
          what='(1) Samples of one plot are never on both sides of any division. (2) Everything learned (selected features, scaling constants, model weights, healthy references) comes from the training plots only. (3) The test plots are used once.',
          why='These rules make the test accuracy an honest estimate for new plots.',
@@ -224,7 +228,7 @@ def add():
             ['C1–C4 features', 'brightness and offsets', 'normalised-difference and ratio indices; first derivative', 'none (formulas)', 'Ma et al. (2026); Lv et al. (2023); Mandal et al. (2023)'],
             ['D3 thermal', 'canopy temperature', 'CTD = Tc − Ta; CTR = Tc/Ta; NRCT (min–max within each date); difference from healthy training plots', 'air temperature; image of the date; healthy training plots', 'Feng et al. (2022); Calderón et al. (2014); Oerke et al. (2006)'],
             ['1.2.2 PLS and CARS', 'candidate R and FD bands', 'z-score', '33 training plots', 'Bijlwan et al. (2025) (scale-sensitive models scaled)'],
-            ['1.4.2, 1.6.1, L5.4 ReliefF', 'index and camera features', 'min–max (0–1), built into the ReliefF difference function', '33 training plots (training leaves in L5.4)', 'Lv et al. (2023); Mahlein et al. (2013); Ma et al. (2026) (Relief)'],
+            ['1.4.2, 1.6.2–1.6.4, L5.4 ReliefF', 'index and camera features', 'min–max (0–1), built into the ReliefF difference function', '33 training plots (training leaves in L5.4)', 'Lv et al. (2023); Mahlein et al. (2013); Ma et al. (2026) (Relief)'],
             ['Filters, mRMR, TTFI, VIF, NDSI/RSI maps, JM', '–', 'none (correlation, mutual information, ratios and R² do not depend on scale)', '–', 'Ma et al. (2026); Lv et al. (2023)'],
             ['2.2 fusion', 'joined camera features', 'none at the join (original units); VIF < 10 again', '–', 'Feng et al. (2022); Liu et al. (2024)'],
             ['D4 models', 'fused feature table', 'z-score (Pipeline) for SVM/SVR, k-NN, PLS, networks; trees unaffected', 'fitting part of each fold; 33 training plots; 22 fitting plots (networks)', 'Bijlwan et al. (2025)'],

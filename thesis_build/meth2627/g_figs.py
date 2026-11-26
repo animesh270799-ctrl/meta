@@ -157,30 +157,43 @@ cand = np.arange(500, 1000, 5.0); shap = np.abs(0.6 * np.exp(-((cand - 715) / 25
 keep = shap >= np.quantile(shap, 0.6)
 fig, ax = plt.subplots(1, 2, figsize=(11.5, 3.6))
 ax[0].bar(cand, shap, width=4, color=np.where(keep, '#2E75B6', '#BBBBBB')); ax[0].set_title('a  Mean |SHAP| of candidate bands; blue = top 40% (demo)', fontsize=9.5); ax[0].set_xlabel('nm')
-k = cand[keep]; freq = np.clip(0.9 * np.exp(-((k - 715) / 15) ** 2) + 0.7 * np.exp(-((k - 560) / 10) ** 2) + 0.15 * rng.random(k.size), 0, 1)
-ax[1].bar(k, freq * 100, width=4, color=np.where(freq >= 0.5, '#C0392B', '#F2B8B0')); ax[1].axhline(50, color='k', ls='--', lw=0.8)
-ax[1].set_title('b  CARS selection frequency in 20 runs; red = optimal wavelengths (≥ 50%)', fontsize=9.5); ax[1].set_xlabel('nm'); ax[1].set_ylabel('% of runs')
+it = np.arange(1, 51); nb = np.round(keep.sum() * np.exp(-it / 12.0)).astype(int) + 2
+rm = 0.9 - 0.25 * (1 - np.exp(-it / 8.0)) + 0.004 * np.maximum(it - 30, 0) ** 1.5 / 3 + 0.01 * rng.random(it.size); best = int(np.argmin(rm))
+ax[1].plot(it, rm, color='#C0392B'); ax[1].plot(it[best], rm[best], 'ko'); ax2 = ax[1].twinx(); ax2.plot(it, nb, color='#888888', ls='--'); ax2.set_ylabel('bands kept', color='#666666')
+ax[1].annotate('lowest RMSE → OW (%d bands)' % nb[best], xy=(it[best], rm[best]), xytext=(it[best] - 22, rm[best] + 0.1), fontsize=8.5, arrowprops=dict(arrowstyle='->'))
+ax[1].set_title('b  CARS: GroupKFold(3) RMSE over 50 iterations (demo)', fontsize=9.5); ax[1].set_xlabel('CARS iteration'); ax[1].set_ylabel('RMSE (DI, demo)')
 save(fig, 'g09_shapcars_demo.png')
 
 # 10 selection chain -----------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(11, 5.4)); ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis('off')
-lanes = [('HS bands R + FD', 'NDSI/RSI R² maps →\neffective ranges', 'SHAP (top 40%) →\nCARS (20 runs)', 'OW (≤ 15)'),
-         ('HS indices (48 + 3 RE\n+ NDSI, RSI, WRI)', '|r| ≥ 0.95\nredundancy filter', 'ReliefF / RReliefF\n(k = 10)', 'VI (top 5)'),
-         ('HS texture (3 PCs ×\n8 GLCM measures)', '|r| ≥ 0.95\nredundancy filter', 'mRMR (top 6) →\nTTFI search', 'TF + TTFI'),
-         ('MS, RGB, thermal\nfeatures', '|r| ≥ 0.95\nredundancy filter', 'ReliefF / RReliefF\n(thermal kept)', 'top 5 per camera')]
-for i, (a, b, c, d) in enumerate(lanes):
-    y = 80 - i * 20
-    boxes(ax, [(1, y, 18, 14, a, '#E2EFDA'), (24, y, 18, 14, b, '#DDEBF7'), (47, y, 18, 14, c, '#DDEBF7'), (70, y, 11, 14, d, '#FFF2CC')], fs=8.2)
-    for x in (19.5, 42.5, 65.5): arrow(ax, (x, y + 7), (x + 4, y + 7))
-    arrow(ax, (81.5, y + 7), (86.5, 50))
-boxes(ax, [(87, 40, 12, 20, 'VIF < 10\n→ DSF of\neach camera\nand task', '#FCE4D6')], fs=8.5)
-ax.text(50, 3, 'Chain run once on the 33 training plots; its feature sets are used unchanged by the models of Objectives 2–3. Description (curves, correlations) uses all plots.', ha='center', fontsize=9, style='italic')
+fig, ax = plt.subplots(figsize=(11.5, 7.6)); ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis('off')
+cams = [('Hyperspectral', '#E2EFDA', [('Bands R + FD (966)', 'NDSI/RSI maps →\neffective ranges', 'SHAP top 40%\n→ CARS', 'OW 10–15'),
+                                     ('Indices 48 + 3 RE\n+ NDSI, RSI, WRI', '|r| ≥ 0.95 filter', 'ReliefF /\nRReliefF', 'VI 5'),
+                                     ('PCA texture (24)', '|r| ≥ 0.95 filter', 'mRMR top 6\n→ TTFI', '6 + TTFI')]),
+        ('Multispectral', '#DDEBF7', [('5 bands + 12 indices\n+ best ND (18)', '|r| ≥ 0.95 filter', 'ReliefF /\nRReliefF', '5'),
+                                      ('GLCM of 5 bands (40)', '|r| ≥ 0.95 filter', 'mRMR top 6\n→ TTFI-MS', '6 + TTFI')]),
+        ('RGB', '#FFF2CC', [('6 colour indices +\nH, S, V (9)', '|r| ≥ 0.95 filter', 'ReliefF /\nRReliefF', '5'),
+                            ('GLCM of R, G, B (24)', '|r| ≥ 0.95 filter', 'mRMR top 6\n→ TTFI-RGB', '6 + TTFI')]),
+        ('Thermal', '#FCE4D6', [('6 statistics + 4 normalised\n+ 8 texture (18)', '|r| ≥ 0.95 filter', 'ReliefF / RReliefF\n(normalised kept)', '5 + 4')])]
+y = 97; h = 8.2
+for name, col, lanes in cams:
+    top = y
+    for (a1, b1, c1, d1) in lanes:
+        y -= h + 1.6
+        boxes(ax, [(11, y, 20, h, a1, col), (34, y, 15, h, b1, '#F2F2F2'), (52, y, 15, h, c1, '#F2F2F2'), (70, y, 9, h, d1, '#FFFFFF')], fs=7.8)
+        for x0, x1 in ((31, 34), (49, 52), (67, 70)): arrow(ax, (x0, y + h / 2), (x1, y + h / 2))
+        arrow(ax, (79, y + h / 2), (83, y + h / 2))
+    yb = y
+    ax.add_patch(matplotlib.patches.FancyBboxPatch((0.5, yb), 9, top - yb - 1.6, boxstyle='round,pad=0.3', fc=col, ec='#555555', lw=0.8))
+    ax.text(5, (top - 1.6 + yb) / 2, name, rotation=90, ha='center', va='center', fontsize=9, fontweight='bold')
+    boxes(ax, [(83, yb, 16, top - yb - 1.6, 'pool → VIF < 10\n→ DSF of the\n' + (name if name == 'RGB' else name.lower()) + ' camera', '#FFFFFF')], fs=8)
+    y -= 2.2
+ax.text(50, 1.5, 'Run once on the 33 training plots for each task (A, B, C); the four DSFs are used unchanged by Objectives 2–3 and joined only for fused sensor sets (Step 2.2).', ha='center', fontsize=8.8, style='italic')
 save(fig, 'g10_selection_chain.png')
 
 # 11 models + pseudo-image --------------------------------------------------------------------------
 fig, ax = plt.subplots(1, 2, figsize=(11.5, 4.2), gridspec_kw=dict(width_ratios=[1.6, 1]))
 a = ax[0]; a.set_xlim(0, 100); a.set_ylim(0, 100); a.axis('off')
-boxes(a, [(2, 70, 30, 24, 'Machine learning\nSVM/SVR, RF, XGBoost,\nk-NN, PLS-DA/PLSR\n(SFFS ≤ 15 features)', '#DDEBF7'),
+boxes(a, [(2, 70, 30, 24, 'Machine learning\nSVM/SVR, random forest,\nk-NN, PLS-DA/PLSR\n(SFFS ≤ 15 features)', '#DDEBF7'),
           (36, 70, 30, 24, 'Feature-fusion networks\nDNN-F1 (input-level)\nDNN-F2 (camera branches,\nSE attention)', '#EDE2F6'),
           (70, 70, 28, 24, 'Pseudo-image networks\nDT-EDNet, EfficientNet-B0,\nResNet18, ConvNeXt V2\n(Tasks A and B)', '#FCE4D6'),
           (2, 30, 96, 26, 'Same 33 training plots and same 15 test plots for every model and sensor set\nML: SFFS and grid search by GroupKFold(3) over the training plots → refit on all 33 training plots\nNetworks: fit on 22 training plots; early stopping on 11 training plots (one third)\nTest plots: predicted once → OA, kappa, macro-F1, per-class F1; R², RMSE, RPD', '#F2F2F2')], fs=8.6)

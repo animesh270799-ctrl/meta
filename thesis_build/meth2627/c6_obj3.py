@@ -37,7 +37,7 @@ def add():
          do=['Take the pre-symptomatic DSF of each camera from Step 1.8.2 (training plots).', 'Join camera DSFs for the 15 sensor sets; VIF < 10; SFFS (at most 10 features).'],
          check=['Pre-symptomatic DSF per sensor set.'],
          out='Inputs → 3.4.',
-         papers=[('Tian et al. (2021)', 'Rice leaf blast; features selected for the asymptomatic stage, then SFFS.', 'Stage-specific selection and SFFS.'),
+         papers=[('Tian et al. (2021)', 'Rice leaf blast; features sensitive on the asymptomatic days chosen by separability (top 5%), VIF < 10, then SFFS with LDA, k-NN and SVM; 2–4 features gave over 65% accuracy at the asymptomatic stage.', 'Stage-specific selection, VIF and SFFS.'),
                  ('Ma et al. (2026)', 'Rice blast; selection on training data only.', 'Training plots only.')])
     step('3.4', 'Pre-symptomatic models', part=P,
          what='SVM, random forest, k-NN and PLS-DA (each with SFFS), DNN-F1 for all 15 sensor sets and DNN-F2 for the 11 fused sets (binary task), tuned as in Steps 2.3–2.5.',
@@ -46,7 +46,7 @@ def add():
          check=['Predictions for every model × sensor set.'],
          out='Predictions → 3.5.',
          papers=[('Zhu et al. (2017)', 'Tobacco mosaic virus; BPNN, ELM and LS-SVM on SPA-selected wavelengths and GLCM texture detected infection 48 h after inoculation (up to 95% accuracy).', 'ML classifiers on selected spectral and texture features before symptoms.'),
-                 ('Tian et al. (2021)', 'Rice leaf blast; LDA, k-NN and SVM with SFFS for asymptomatic detection.', 'Same model types.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; LDA, k-NN and SVM with SFFS for asymptomatic detection (4-fold cross-validation repeated 100 times).', 'Same model types with SFFS.'),
                  ('Nguyen et al. (2023)', 'Spring wheat yellow rust; a 3D-CNN on multispectral UAV images reached 60% accuracy early in the season, rising to 79% later.', 'Detection accuracy reported date by date in the early stage.')])
     step('3.5', 'Evaluation, earliest detection day and covariate baseline', part=P,
          what='Sensitivity, specificity, OA, kappa, macro-F1 and AUC on the test plots for each date; the earliest detection day is the first DAI on which predicted scores of later-infected and healthy test subplots differ significantly (t-test, p < 0.05); the covariate-only model is the reference.',

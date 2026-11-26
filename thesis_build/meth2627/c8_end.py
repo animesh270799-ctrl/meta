@@ -14,6 +14,13 @@ grab("H = [['Group'", "\nP('R_{λ}")
 grab("ms = [['Feature'", "\nTAB('msidx'")
 grab("rgb = [['Feature'", "\nTAB('rgbfeat'")
 grab("tir = ", "\nTAB('tirfeat'")
+NS['tir'] = [['Feature', 'Definition', 'Reference'],
+             ['Canopy temperature statistics (6)', 'mean, median, standard deviation, 10th and 90th percentile of the ROI pixel temperatures; maximum temperature difference MTD = highest − lowest temperature', 'Liu et al. 2024; Oerke et al. 2006'],
+             ['Canopy temperature difference (CTD)', 'CT_{i} − AT, with AT the air temperature at the flight', 'Feng et al. 2022; Calderón et al. 2014'],
+             ['Canopy temperature ratio (CTR)', 'CT_{i} / AT', 'Feng et al. 2022'],
+             ['Normalised relative canopy temperature (NRCT)', '(CT_{i} − CT_{min}) / (CT_{max} − CT_{min}), with the lowest and highest canopy temperature of the field on that date', 'Elsayed et al. 2017; Feng et al. 2022; Maimaitijiang et al. 2020'],
+             ['Difference from healthy plots (ΔT)', 'CT_{i} − mean CT of the healthy training plots of the same date and variety', 'Oerke et al. 2006'],
+             ['Thermal texture (8)', 'GLCM of the temperature image (64 levels over one common range; distance 1; mean of 0°, 45°, 90° and 135°): mean, variance, homogeneity, contrast, dissimilarity, entropy, second moment, correlation', 'Haralick et al. 1973; Feng et al. 2022']]
 
 
 def add():
@@ -47,6 +54,7 @@ def add():
     qa('Why a 7:3 split by whole plots?', 'The 7:3 proportion is that of the DT-EDNet study (Ma et al., 2026) and close to the one-third hold-out of Mandal et al. (2023). Whole plots are assigned so that subplots and leaves of one plot are never in both training and test data; the test then measures performance on new plots.')
     qa('How are the models tuned without the test plots?', 'Inside the 33 training plots: GroupKFold(3) by plot for the machine-learning models, as Tian et al. (2021) and Lv et al. (2023) used cross-validation for SFFS and the SVM, and one third of the training plots for the early stopping of the networks, as Ma et al. (2026) used a validation set.')
     qa('Why five scored plants but only one ASD plant per subplot?', 'Five plants (centre and corners) give a disease index that represents the subplot seen by the UAV, with the leaf-based formula of Mishra et al. (2009) and Liu et al. (2024). The ASD is slow, so only the centre plant is measured: 576 leaves per date, as many per date as the 2025-26 ASD data, and every ASD leaf still has its own grade (Mandal et al., 2023).')
+    qa('Why are features selected for each camera separately?', 'If all cameras were pooled, about 1000 hyperspectral features would compete with 18 thermal and 33 RGB features, and the small cameras would lose for numerical, not biological, reasons. Selecting within each camera gives every camera its own feature set, so single cameras can be compared and fused fairly; Mustafa et al. (2023) selected features within each sensor, applied VIF and only then fused them with SFFS, and Huang et al. (2020) screened spectral, colour and texture features separately before fusion.')
     qa('Why one feature-selection method per type of feature?', 'Bands are many and collinear (SHAP-CARS), indices must separate overlapping classes (ReliefF) and texture features are correlated (mRMR); this is the design of Ma et al. (2026).')
     qa('What is new for white rust?', 'A White Rust Index in the form of Mahlein et al. (2013); the first comparison of four UAV cameras and their 15 combinations for white rust; leaf and canopy analysed on the same subplots and dates; and a pre-symptomatic test with labels from the later status (Zhu et al., 2017).')
     qa('Why are the features of Objective 1 selected on the training plots only?', 'The selected features are the inputs of the models; if the test plots had helped to choose them, the test accuracy would be optimistic. Ma et al. (2026) also selected features on their training data only. The descriptive analyses (curves, correlations, physiology) still use all plots because nothing from them enters a model.')

@@ -65,16 +65,16 @@ def add():
              'Subplot DI = Σ(x × f) / (9 × Σf) × 100, where x is the grade and f the number of leaves with grade x (15 leaves per subplot).',
              'From flowering, record staghead severity (%) per subplot = staghead racemes / total racemes × 100.',
              'If a tagged plant dies, tag the nearest healthy-looking neighbour and note the change.'],
-         settings=['DI classes (Task B): 0 (DI = 0), 1 (0 < DI ≤ 5), 3 (5 < DI ≤ 10), 5 (10 < DI ≤ 25), 7 (25 < DI ≤ 50), 9 (DI > 50). 2880 leaf grades per date (192 subplots × 15).'],
+         settings=['DI classes (Task B): 0 healthy (DI = 0), 1 very low (0 < DI ≤ 5), 3 low (5 < DI ≤ 10), 5 moderate (10 < DI ≤ 25), 7 high (25 < DI ≤ 50), 9 very high (DI > 50). 2880 leaf grades per date (192 subplots × 15).'],
          check=['15 grades per subplot on every date (missing leaves written as missing).', 'DI computed for 192 subplots per date.', 'Scorer, date and time on every sheet.'],
          out='Leaf grades (→ A4, Part L) and subplot DI and DI class (→ A5, all UAV models).',
          alt='Image-based pustule area would avoid rater error but is not available for all leaves in the field; visual grades are the field standard (Bock et al., 2010).',
          q='Why five plants? → The centre and four corners spread the scored plants over the subplot seen by the UAV, and 15 leaves give a finer DI than one plant; the leaf-based DI formula is that of Mishra et al. (2009) and Liu et al. (2024).',
-         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; leaves of each plot graded by severity class (national standard) and combined into DI = Σ(grade × leaves)/(highest grade × leaves examined) × 100 as the target of UAV models.', 'Subplot DI from graded leaves is the target of the UAV models.'),
+         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; the disease was surveyed at the centre and four corners of each plot (twenty plants per point), leaves graded by severity class (national standard) and combined into DI = Σ(grade × leaves)/(highest grade × leaves examined) × 100 as the target of UAV models.', 'Centre and four corners scored; subplot DI from graded leaves is the target of the UAV models.'),
                  ('Mishra et al. (2009)', 'White rust of Indian mustard; DI = sum of all numerical ratings × 100 / (maximum grade × number of leaves examined), on a 0–9 scale (cotyledons) and a 0–5 leaf-area scale (true leaves).', 'Same DI formula for white rust, with grades of leaf area covered by pustules.'),
                  ('Conn et al. (1990)', 'Rapeseed and mustard; disease assessment key with drawings of leaves and siliques showing 1, 5, 10, 20, 30 and 50% of the area diseased, stated to be usable also for white rust (Albugo candida).', 'Area diagrams used to judge the percentage of leaf area with pustules.'),
-                 ('Chen et al. (2023)', 'Tobacco viruses; severity scored in grades 0, 1, 3, 5, 7, 9.', 'The same six grade values.'),
-                 ('Mandal et al. (2023)', 'Rice blast scored on the 0–9 scale and related to leaf spectra.', 'Same 0–9 scale for leaf grades.'),
+                 ('Chen et al. (2023)', 'Tobacco viruses; leaves graded healthy, 1, 3, 5, 7 or 9 by the fraction of the leaf with symptoms (Chinese standard GB/T 23222-2008).', 'The same six grade values defined by leaf area.'),
+                 ('Mandal et al. (2023)', 'Rice blast scored on the IRRI 0–9 scale (lesion type and percentage of leaf area) and related to canopy spectra.', 'A 0–9 scale defined by leaf area.'),
                  ('Bock et al. (2010)', 'Reviewed visual severity assessment: raters disagree most between neighbouring classes; clear class limits and trained raters reduce error.', 'Written grade limits and one trained scorer for all dates.'),
                  ('Zhang et al. (2022)', 'Rice leaf blast; the disease grade of each leaf classified from hyperspectral images at the jointing, booting and heading stages.', 'Leaf grades recorded on every date across growth stages.')])
     myfig('survey', 'g03_survey.png', 'Subplots, inner buffer and the 5 scored plants of each subplot (centre and four corners); the centre plant (star) also carries the ASD readings (left). Leaves graded on each tagged plant (right).')
@@ -95,8 +95,9 @@ def add():
          out='Leaf spectra with leaf grade and identifiers → Part L.',
          alt='Other ways to reduce the ASD work further: measure only L3 and LL (384 leaves per date); measure on every second post-symptomatic date (8 dates); take 1 reading per leaf. Measuring all 5 plants (2880 leaves per date) is not needed for the leaf models.',
          q='Is one plant per subplot enough? → It gives 576 leaves per date, as many per date as the 2025-26 ASD data (419–648 leaves per date), and more than the 800 leaves of a whole rice blast leaf study (Selvaprakash et al., 2026).',
-         papers=[('Mandal et al. (2023)', 'Rice blast; leaf spectra with a handheld spectroradiometer (350–2500 nm) of leaves scored on the 0–9 scale.', 'Leaf spectra of graded leaves, full range.'),
-                 ('Chen et al. (2023)', 'Tobacco TMV and PVY; leaves measured with an ASD FieldSpec 4 (350–2500 nm) and graded 0, 1, 3, 5, 7, 9.', 'Same instrument class and grade scale.'),
+         papers=[('Chen et al. (2023)', 'Tobacco TMV and PVY; leaves measured with an ASD FieldSpec 4 (350–2500 nm; probe 10 cm above the leaf, six points per leaf averaged; white reference every ten plants) and graded healthy, 1, 3, 5, 7, 9.', 'Same instrument, full range, several readings per leaf averaged, graded leaves.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; ASD FieldSpec 4 with a leaf clip (own lamp, white and black panels); three readings per leaf (1/3, 1/2 and 2/3 of the length, midrib avoided) averaged as the leaf spectrum.', 'Leaf clip, readings on the lamina avoiding the midrib, averaged per leaf.'),
+                 ('Mandal et al. (2023)', 'Rice blast (IARI); handheld ASD spectroradiometer (350–2500 nm), white reference before measurement, 30 scans averaged per spectrum; canopy spectra of plants scored 0–9.', 'Full-range ASD spectra related to a 0–9 grade; here at leaf level with the leaf clip.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra (portable spectroradiometer with the halogen lamp of the clip; white and black panels of the clip) of healthy and infected leaves for asymptomatic detection and severity classes.', 'Leaf clip with its own lamp.'),
                  ('Selvaprakash et al. (2026)', 'Rice blast (IARI); 800 leaf spectra (350–2500 nm) used for early detection.', 'A leaf data set of similar size per date is sufficient for leaf models.'),
                  ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; spectra in contact with the leaf estimated severity better than spectra taken above the crop.', 'Contact measurement of single leaves.'),
@@ -118,9 +119,9 @@ def add():
          out='Labelled tables: UAV post-symptomatic (1920 per camera), UAV pre-symptomatic (576 per camera), ASD leaves (7488) → Parts B–D, L.',
          papers=[('Lv et al. (2023)', 'Southern corn leaf blight; asymptomatic and symptomatic detection plus severity classes.', 'Detection task plus severity classes.'),
                  ('Chen et al. (2023)', 'Tobacco viruses; binary (healthy/infected) and six-grade models.', 'Task A and six-class Task B.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; classification and regression of severity from fused UAV data.', 'Classification and regression on the same samples.'),
+                 ('Mandal et al. (2023)', 'Rice blast; the same spectra used for classification of the ten severity levels and for regression of the 0–9 score; regression was more reliable because neighbouring classes overlapped.', 'Classification (Task B) and regression (Task C) on the same samples.'),
                  ('Zhu et al. (2017)', 'Tobacco mosaic virus; leaves of inoculated and healthy plants imaged 2, 4 and 6 days after inoculation, before visible symptoms appeared (about 5 days).', 'Separate early-date samples of infected and healthy plants; here infection is confirmed by later symptoms.'),
-                 ('Tian et al. (2021)', 'Rice leaf blast from asymptomatic to mild stages; infected and healthy classes at each stage.', 'Separate early-stage labels.')])
+                 ('Tian et al. (2021)', 'Rice leaf blast; at the asymptomatic stage, leaves that later showed stable lesions were labelled infected and leaves clean on all days healthy.', 'Pre-symptomatic labels from the later status.')])
 
     step('A6', 'Covariates and weather', part=PART,
          what='For every sample: DAI, variety, crop age at inoculation, growth stage, 7-day weather and the number of favourable days for white rust.',
@@ -153,10 +154,10 @@ def add():
                  ('Chatterjee et al. (2022)', 'White rust of Indian mustard; biochemical changes in infected plants in relation to the pathogenic variability of the pathogen.', 'Recent biochemical study of the same host and disease.'),
                  ('Yu et al. (2025)', 'Rice sheath blight; a dual-branch model that fused spectral and physiological signatures for early detection.', 'Physiological measurements analysed together with spectra.')])
     rows = [['Parameter (unit)', 'Method', 'Method reference'],
-            ['Chlorophyll a, b (mg g^{−1} FW)', 'DMSO extraction; absorbance 645, 663 nm', 'Hiscox and Israelstam (1979); Wellburn (1994)'], ['Carotenoids (mg g^{−1} FW)', 'same extract; 470 nm', 'Lichtenthaler and Wellburn (1983); Wellburn (1994)'],
-            ['Anthocyanin (mg L^{−1})', 'pH differential, 520 and 700 nm', 'Lee et al. (2005)'], ['Total protein (µg mg^{−1} FW)', 'Bradford dye binding, 595 nm', 'Bradford (1976)'],
+            ['Chlorophyll a, b (µg mg^{−1} FW)', 'DMSO extraction; absorbance 645, 663 nm', 'Hiscox and Israelstam (1979); Wellburn (1994)'], ['Carotenoids (mg g^{−1} FW)', 'same extract; 470 nm', 'Lichtenthaler and Wellburn (1983); Wellburn (1994)'],
+            ['Anthocyanin (µg g^{−1} FW)', 'pH differential, 520 and 700 nm', 'Lee et al. (2005)'], ['Total protein (µg mg^{−1} FW)', 'Bradford dye binding, 595 nm', 'Bradford (1976)'],
             ['Relative water content (%)', '(FW − DW)/(TW − DW) × 100', 'Barrs and Weatherley (1962)'], ['Membrane stability index (%)', 'conductivity at 40 and 100 °C', 'Premachandra et al. (1990); Sairam et al. (1994)'],
-            ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable photosynthesis system', 'Long and Bernacchi (2003)']]
+            ['Net photosynthetic rate (µmol CO_{2} m^{−2} s^{−1}), transpiration rate (mmol H_{2}O m^{−2} s^{−1}), stomatal conductance (mol H_{2}O m^{−2} s^{−1})', 'LI-6400 portable gas exchange system (LI-COR, USA)', 'Riches et al. (2020); Long and Bernacchi (2003)']]
     tab('physio', rows=rows, caption='Parameters, methods and method references.', widths=[2800, 3600, 3200], size=16)
 
     step('A8', 'Independent test data at Bharatpur', part=PART,

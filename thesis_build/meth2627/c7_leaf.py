@@ -16,7 +16,7 @@ def add():
          out='Leaf table and spectra → L2.',
          papers=[('Chen et al. (2023)', 'Tobacco viruses; ASD FieldSpec 4 leaf spectra (350–2500 nm) organised with their severity grades.', 'Leaf spectra joined to their grades.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra of asymptomatic and symptomatic leaves organised by stage and severity.', 'One spectrum per leaf with its labels.'),
-                 ('Mandal et al. (2023)', 'Rice blast; handheld spectroradiometer data checked and pre-processed before analysis.', 'Checks before analysis.')])
+                 ('Mandal et al. (2023)', 'Rice blast; ASD spectra pre-processed before analysis (noisy water-absorption bands removed, Savitzky–Golay filter).', 'Checks and pre-processing before analysis.')])
     step('L2', 'Same 7:3 split and inner validation', part=P,
          what='Leaves of the 15 test plots form the leaf test set; leaves of the 33 training plots are used for selection and training, with GroupKFold(3) by plot for ML and the 11 validation plots for the networks.',
          why='Leaf and canopy models must be tested on the same new plots.',
@@ -57,7 +57,7 @@ def add():
          do=['All leaves; 5-nm bands.', 'Mean, SD and difference spectra; r curves; same plots by leaf position and stage.'],
          check=['Curves for all grades and strata.'],
          out='Leaf response → L5.2–L5.7, L9.',
-         papers=[('Mandal et al. (2023)', 'Rice blast; mean and SD spectra of each severity level and difference from healthy plants; correlation of bands and indices with severity.', 'Mean, SD, difference and correlation.'),
+         papers=[('Mandal et al. (2023)', 'Rice blast; spectra of each severity level and their difference from healthy plants; correlation of 26 indices with the score (indices with r ≥ 0.8 used for regression).', 'Class curves, difference from grade 0 and correlation.'),
                  ('Mahlein et al. (2010)', 'Sugar-beet leaves with three diseases; spectral difference at each wavelength.', 'Difference spectra.'),
                  ('Lv et al. (2023); Tian et al. (2021)', 'Leaf spectra compared stage by stage (asymptomatic, symptomatic).', 'Stage-wise comparison.'),
                  ('Zhang et al. (2022)', 'Rice leaf blast; the spread (standard deviation) of whole-leaf reflectance differed between disease grades.', 'Leaf spectra compared between grades.'),
@@ -79,7 +79,7 @@ def add():
          check=['Leaf NDSI_best, RSI_best and WRI formulas.'],
          out='Leaf indices → L5.4, L9.',
          papers=[('Mahlein et al. (2013)', 'Sugar-beet diseases; normalised difference of two wavelengths plus or minus a third; wavelengths ≥ 50 nm apart.', 'WRI form and 50-nm rule.'),
-                 ('Mandal et al. (2023); Selvaprakash et al. (2026)', 'Rice blast; exhaustive two-band searches gave new blast indices (RBI, NDBI; RBI = (R1068 − R1560)/(R1068 + R1560)).', 'Exhaustive pair search.')])
+                 ('Mandal et al. (2023); Selvaprakash et al. (2026)', 'Rice blast; exhaustive two-band searches gave new blast indices (Mandal et al.: RBI = R1148/R1301 and NDBI from the same pair; Selvaprakash et al.: RBI = (R1068 − R1560)/(R1068 + R1560)).', 'Exhaustive pair search.')])
     step('L5.4', 'Redundancy filter and Relief-F ranking of the leaf indices', part=P,
          data='5148 training leaves only.',
          what='Indices correlated at |r| ≥ 0.95 are reduced to the one most correlated with the grade; ReliefF (Tasks A, B) and RReliefF (Task C) with k = 10 rank the rest; the top five per task are the leaf VI.',
@@ -104,7 +104,7 @@ def add():
          do=['JM = 2(1 − e^{−B}), B = Bhattacharyya distance under Gaussian class distributions; all 15 grade pairs.'],
          check=['JM table (0–2; > 1.9 well separated).'],
          out='Separability → interpretation of L7.',
-         papers=[('Mandal et al. (2023)', 'Rice blast; JM distance between severity levels; almost all levels separable (JM > 1.92) except levels 4 and 5.', 'Same JM analysis.')])
+         papers=[('Mandal et al. (2023)', 'Rice blast; Jeffries–Matusita distance between the ten severity levels on the bands chosen by GA-PLS; almost all pairs separable (JM > 1.92) except levels 4 and 5.', 'Same JM analysis between grades.')])
     step('L5.7', 'Principal component analysis of the leaf spectra', part=P,
          data='All 7488 leaves: description only.',
          what='PCA of standardised 5-nm reflectance; scores of the first components with grade ellipses.',
@@ -125,7 +125,7 @@ def add():
          out='Leaf predictions → L7.',
          papers=[('Ma et al. (2026)', 'Rice blast; DT-EDNet and comparison networks with identical settings.', 'Same networks and settings.'),
                  ('Tian et al. (2021); Lv et al. (2023)', 'Leaf spectra; SFFS-wrapped SVM, k-NN and LDA.', 'SFFS + ML models.'),
-                 ('Chen et al. (2023); Mandal et al. (2023)', 'Tobacco viruses; rice blast: SVM, random forest and PLS models on leaf spectra.', 'Same ML models at leaf level.'),
+                 ('Chen et al. (2023); Mandal et al. (2023)', 'Tobacco viruses: SVM and random forest on ASD leaf spectra (binary and six-grade models); rice blast: SVM, random forest, PLS and MARS on ASD canopy spectra.', 'Same ML models on ASD spectra.'),
                  ('Zhang et al. (2022)', 'Rice leaf blast severity grades classified with SVM and a probabilistic neural network from leaf spectra (88–98% accuracy).', 'SVM and a neural network on leaf spectra for grades.')])
     step('L7', 'Leaf test metrics', part=P,
          what='Metrics on the 2340 test leaves: OA, kappa, macro-F1, per-class F1, sensitivity, specificity, AUC (Task A); R², RMSE, RPD (Task C).',

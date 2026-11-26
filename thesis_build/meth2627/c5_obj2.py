@@ -17,23 +17,25 @@ def add():
              'Tabulate class counts of Tasks A and B on the training and test plots.'],
          check=['Class counts table; classes with < 5% merged (Step A5).'],
          out='Task × sensor-set matrix → 2.2.',
-         papers=[('Tian et al. (2021)', 'Rice leaf blast; detection at early stages and discrimination of severity with several models.', 'Detection and severity tasks.'),
+         papers=[('Maimaitijiang et al. (2020)', 'Soybean yield from UAV RGB, multispectral and thermal cameras (method support); PLSR, random forest, SVR and DNN-F1 run on every single camera and every camera combination, DNN-F2 on the two- and three-camera combinations; 70% training and 30% test samples.', 'All single cameras and all combinations modelled with the same models and split.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; infected vs healthy leaves classified separately at the asymptomatic, early and mild stages.', 'Detection task (Task A).'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; models from each single data source (indices, temperature, texture) compared with fused sources.', 'Single cameras and their combinations compared.'),
                  ('Abdulridha et al. (2023)', 'Wheat stem rust; drone hyperspectral data for detection and severity levels.', 'Detection plus severity levels.')])
 
     h2('Activity 2.2 – Feature-level fusion of the selected camera features')
     step('2.2', 'Feature-level fusion of the camera feature sets selected in Objective 1', part=P,
          data='33 training plots only (1320 subplot-dates per camera).',
-         what='The disease-specific feature sets of the cameras, selected once on the training plots in Objective 1 (Step 1.6.2), are joined for each of the 15 sensor sets; VIF < 10 is applied again to the joined set on the training plots.',
+         what='The disease-specific feature sets of the cameras, selected once on the training plots in Objective 1 (Step 1.6.5), are joined for each of the 15 sensor sets; VIF < 10 is applied again to the joined set on the training plots.',
          why='Each sensor set needs one input table; joining features of different cameras creates new collinearity, which VIF removes. No new selection is needed because the camera feature sets were already chosen on the training plots only.',
-         do=['Take the DSF of each camera and task from Step 1.6.2 (training plots).', 'For each sensor set, join the DSFs of its cameras by subplot code and date.', 'Remove the feature with the largest VIF until all VIF < 10 (training plots).', 'Compute the same features for the test samples with the wavelengths and formulas fixed on the training plots.'],
+         do=['Take the DSF of each camera and task from Step 1.6.5 (training plots).', 'For each sensor set, join the DSFs of its cameras by subplot code and date.', 'Remove the feature with the largest VIF until all VIF < 10 (training plots).', 'Compute the same features for the test samples with the wavelengths and formulas fixed on the training plots.'],
          check=['One input table for each of the 15 sensor sets × 3 tasks; no step used the test plots.'],
          out='Inputs of every model → 2.3–2.6.',
          q='Why not select again here? → The Objective 1 selection already used only the 33 training plots, so its feature sets can be used as they are; only the joining of cameras is new.',
          papers=[('Ma et al. (2026)', 'Rice blast; feature selection and model training on the 2023 data only; testing on independent 2024 data.', 'Features chosen on the training data and used unchanged for the models.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices, thermal temperature parameters and texture features fused at feature level; PLSR, random forest and SVR compared.', 'Feature-level fusion by concatenation.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and canopy-temperature features fused after Pearson correlation and recursive feature elimination.', 'Same fusion level after selection.'),
-                 ('Huang et al. (2020)', 'Wheat Fusarium head blight; spectral, colour and texture features of hyperspectral images of ears fused for severity diagnosis.', 'Feature-level fusion of spectral, colour and texture features.')])
+                 ('Huang et al. (2020)', 'Wheat Fusarium head blight; spectral bands, colour and texture features, each screened on its own, fused for severity diagnosis; spectral + colour fusion was best (PSO-SVM, 92% on the prediction set).', 'Features selected within each group, then fused at feature level.'),
+                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; the selected features of the hyperspectral, fluorescence and phenotyping data were fused after VIF < 10 and ML-SFFS chose the combination; two to three kinds of features were optimal for asymptomatic detection (87.04%).', 'Per-sensor selected features joined, VIF, then SFFS (Step 2.3).')])
 
     h2('Activity 2.3 – Machine-learning models')
     step('2.3', 'Sequential floating forward selection', part=P,
@@ -43,22 +45,25 @@ def add():
          check=['Subset and inner score of every model × sensor set × task.'],
          out='Feature subsets → 2.4.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast; SFFS wrapped around LDA, k-NN and SVM found optimal combinations of 2–4 features; SVM-SFFS was best.', 'SFFS wrapped around each model.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F followed by SFFS determined the optimal feature combination; models evaluated by overall accuracy and macro-F1 (SVM, 4-fold cross-validation repeated 100 times).', 'SFFS after Relief-F and VIF; macro-F1 reported.')])
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F followed by SFFS determined the optimal feature combination; models evaluated by overall accuracy and macro-F1 (SVM, 4-fold cross-validation repeated 100 times).', 'SFFS after Relief-F and VIF; macro-F1 reported.'),
+                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; ML-SFFS with k-NN, random forest and SVM (mlxtend) on the VIF-screened features of three sensors; the k-NN model was best for severity (R² 0.92).', 'SFFS wrapped around k-NN, random forest and SVM on fused sensor features.'),
+                 ('Shafiee et al. (2021)', 'Wheat yield from UAV multispectral bands and indices (method support); sequential forward selection wrapped around SVR chose the best feature subset, compared with LASSO.', 'Sequential selection wrapped around SVR (Task C).')])
     step('2.4', 'Models, tuning grids and final fit', part=P,
          what='SVM/SVR, random forest, k-NN and PLS-DA/PLSR are tuned by grid search with the same inner folds, refitted on all 33 training plots and used once on the test plots.',
          why='Classical models are the reference for the networks and are used in most disease studies.',
          do=['Grid search on the SFFS subset (GroupKFold(3)).', 'Refit the best setting on all training samples.', 'Predict the 600 test samples once and save model, subset and predictions.'],
          check=['Model files and test predictions for 4 models × 15 sets × 3 tasks.'],
          out='ML predictions → 2.7.',
-         papers=[('Tian et al. (2021)', 'Rice leaf blast; SVM C and γ by grid search; k-NN and LDA compared.', 'SVM and k-NN tuned by grid search.'),
+         papers=[('Tian et al. (2021)', 'Rice leaf blast; SVM (RBF) C and γ by grid search; k-NN and LDA as the other criterion models; 4-fold cross-validation repeated 100 times.', 'SVM C and γ tuned by grid search with cross-validation.'),
+                 ('Chen et al. (2023)', 'Tobacco viruses; SVM penalty C and the number of random-forest trees chosen by grid search with cross-validation in the training set only (random 8:2 split); test set used once.', 'Grid search inside the training data; test used once.'),
                  ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; model settings tuned by grid search with 3-fold cross-validation inside the 70% training set.', 'Grid search inside the training data.'),
                  ('Abdulridha et al. (2023); Yuan et al. (2025)', 'Wheat stem rust; rice bacterial blight: random forest (and SVM, k-NN) on UAV features.', 'Random forest, SVM and k-NN on UAV data.'),
-                 ('Zhang et al. (2012); Mandal et al. (2023)', 'Wheat powdery mildew; rice blast: PLSR (and PLS-DA / Fisher discriminant) for severity.', 'PLS models for severity.')])
+                 ('Zhang et al. (2012); Mandal et al. (2023); Krishna et al. (2014)', 'Wheat powdery mildew: PLSR of the disease index (7 components) and Fisher discriminant of damage levels; rice blast: PLS, random forest, MARS and SVM for severity regression and classification; wheat yellow rust (IARI): full-spectrum PLSR of disease severity.', 'PLS-DA / PLSR among the models.')])
     rows = [['Model', 'Grid (GroupKFold(3))', 'Disease papers'],
             ['SVM / SVR (RBF)', 'C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5}', 'Tian et al. (2021); Lv et al. (2023); Yuan et al. (2025)'],
             ['Random forest', '500 trees; max_features ∈ {sqrt, 0.3}; min_samples_leaf ∈ {1, 3, 5}', 'Abdulridha et al. (2023); Liu et al. (2024); Yuan et al. (2025)'],
             ['k-NN', 'k ∈ {3, 5, 7, 9, 11}; uniform or distance weights', 'Tian et al. (2021); Yuan et al. (2025)'],
-            ['PLS-DA / PLSR', '1–15 components', 'Zhang et al. (2012); Mandal et al. (2023)']]
+            ['PLS-DA / PLSR', '1–15 components', 'Zhang et al. (2012); Mandal et al. (2023); Krishna et al. (2014)']]
     tab('mlgrid', rows=rows, caption='Machine-learning models and tuning grids.', widths=[1800, 4600, 3200], size=16)
 
     h2('Activity 2.4 – Deep-learning models')
@@ -72,8 +77,9 @@ def add():
              'Record the learned camera weights of DNN-F2 for every fused set.'],
          check=['Learning curves saved; best epoch and DNN-F2 camera weights recorded.'],
          out='DNN-F1 and DNN-F2 predictions → 2.7; camera weights → 2.8.',
-         alt='The two fusion levels follow the input- and intermediate-level fusion networks of Maimaitijiang et al. (2020) (soybean yield, UAV RGB + multispectral + thermal); the camera weights use squeeze-and-excitation (Hu et al., 2018), the same block used inside DT-EDNet (Ma et al., 2026).',
-         papers=[('Deng et al. (2024)', 'Wheat stripe rust; RustQNet, a multimodal deep network that fused image modalities inside the network to estimate the disease index.', 'Fusion of camera data inside the network (intermediate level) and regression of the DI.'),
+         alt='The camera weights of DNN-F2 use squeeze-and-excitation (Hu et al., 2018), the same block used inside DT-EDNet (Ma et al., 2026); without it DNN-F2 is the plain intermediate-level network of Maimaitijiang et al. (2020).',
+         papers=[('Maimaitijiang et al. (2020)', 'Soybean yield from UAV RGB, multispectral and thermal cameras (method support); DNN-F1 joined all features at the input, DNN-F2 had one sub-network per modality joined by a concatenation layer (ReLU, dropout, batch normalisation); DNN-F2 was used only for camera combinations and consistently beat DNN-F1 (best R² 0.72).', 'Same two fusion levels; DNN-F2 only for the fused sensor sets.'),
+                 ('Deng et al. (2024)', 'Wheat stripe rust; RustQNet, a multimodal deep network that fused image modalities inside the network to estimate the disease index.', 'Fusion of camera data inside the network (intermediate level) and regression of the DI.'),
                  ('Yu et al. (2025)', 'Rice sheath blight; dual-branch multimodal model fusing spectral and physiological signatures for early detection.', 'One branch per data source joined inside the network, as in DNN-F2.'),
                  ('Ma et al. (2026)', 'Rice blast; squeeze-and-excitation block in DT-EDNet to re-weight feature channels.', 'Squeeze-and-excitation used to weight the cameras.'),
                  ('Liu et al. (2020)', 'Wheat Fusarium head blight; a neural network classifier on UAV hyperspectral bands, indices and texture.', 'Neural network on selected UAV features.'),
