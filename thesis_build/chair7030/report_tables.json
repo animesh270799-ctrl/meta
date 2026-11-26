@@ -1,0 +1,3634 @@
+[
+ {
+  "caption": "Table 1. Objectives and the questions answered in this report. Objective 3 (pre-symptomatic detection) is not addressed: no pre-symptomatic dates were sampled in 2025-26.",
+  "rows": [
+   [
+    "Objective (thesis)",
+    "Question answered with the 2025-26 leaf spectra",
+    "Main outputs"
+   ],
+   [
+    "1. Spectral response and disease-specific features",
+    "Which wavelengths, derivatives and indices change with white rust severity, and which compact feature set describes it?",
+    "Mean and derivative spectra, correlation curves, NDSI/RSI maps, optimal wavelengths, White Rust Index, ReliefF indices, disease-specific feature set"
+   ],
+   [
+    "2. Machine-learning and deep-learning models",
+    "How well can a leaf be (A) detected as diseased, (B) placed in one of six grades and (C) given a severity score?",
+    "SVM, RF, XGBoost, k-NN, PLS-DA/PLSR, DNN-F1, DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2-Atto; metrics, ablation, SHAP, robustness"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 2. Sowing timings (treatments D1–D4 = 50, 40, 30 and 20 days after sowing) and crop age at the four sampling dates (natural infection).",
+  "rows": [
+   [
+    "Sowing timing",
+    "Sowing date",
+    "Treatment crop age (DAS)",
+    "Date at that crop age",
+    "Crop age at the four sampling dates (DAS)"
+   ],
+   [
+    "D1",
+    "9 Dec 2025",
+    "50",
+    "28 Jan 2026",
+    "64, 77, 84, 94"
+   ],
+   [
+    "D2",
+    "18 Dec 2025",
+    "40",
+    "27 Jan 2026",
+    "55, 68, 75, 85"
+   ],
+   [
+    "D3",
+    "27 Dec 2025",
+    "30",
+    "26 Jan 2026",
+    "46, 59, 66, 76"
+   ],
+   [
+    "D4",
+    "9 Jan 2026",
+    "20",
+    "29 Jan 2026",
+    "33, 46, 53, 63"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 3. Leaf spectra by sampling date and leaf position.",
+  "rows": [
+   [
+    "Date",
+    "L3",
+    "L5",
+    "LL",
+    "Leaves",
+    "Plots",
+    "Leaves per plot (median, range)"
+   ],
+   [
+    "11 Feb 2026",
+    "196",
+    "169",
+    "54",
+    "419",
+    "48",
+    "10 (3–15)"
+   ],
+   [
+    "24 Feb 2026",
+    "216",
+    "216",
+    "108",
+    "540",
+    "48",
+    "10 (6–15)"
+   ],
+   [
+    "03 Mar 2026",
+    "216",
+    "216",
+    "216",
+    "648",
+    "48",
+    "15 (9–15)"
+   ],
+   [
+    "13 Mar 2026",
+    "241",
+    "241",
+    "241",
+    "723",
+    "48",
+    "15 (9–30)"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 4. Sampling dates, growth stages and disease level of the leaf spectra.",
+  "rows": [
+   [
+    "Date",
+    "Crop age (DAS)",
+    "Growth stages",
+    "Leaves",
+    "Mean grade",
+    "Diseased leaves (%)"
+   ],
+   [
+    "11 Feb 2026",
+    "33–64",
+    "Flowering, Vegetative",
+    "419",
+    "0.67",
+    "44.6"
+   ],
+   [
+    "24 Feb 2026",
+    "46–77",
+    "Flowering, Vegetative",
+    "540",
+    "3.39",
+    "83.3"
+   ],
+   [
+    "03 Mar 2026",
+    "53–84",
+    "Flowering, Pod formation",
+    "648",
+    "3.51",
+    "81.2"
+   ],
+   [
+    "13 Mar 2026",
+    "63–94",
+    "Flowering, Pod formation",
+    "723",
+    "4.43",
+    "85.1"
+   ],
+   [
+    "All",
+    "6–36",
+    "vegetative, flowering, pod formation",
+    "2330",
+    "3.26",
+    "76.3"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 5. Number of leaves in each severity grade (pooled data).",
+  "rows": [
+   [
+    "Grade",
+    "0",
+    "1",
+    "3",
+    "5",
+    "7",
+    "9",
+    "Total"
+   ],
+   [
+    "Leaves",
+    "552",
+    "389",
+    "430",
+    "533",
+    "294",
+    "132",
+    "2330"
+   ],
+   [
+    "Share (%)",
+    "23.7",
+    "16.7",
+    "18.5",
+    "22.9",
+    "12.6",
+    "5.7",
+    "100"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 6. Weather covariates of the four sampling dates (7-day windows ending the day before each date; favourable days after Chattopadhyay et al., 2011).",
+  "rows": [
+   [
+    "Date",
+    "Tmax 7 d (°C)",
+    "Tmin 7 d (°C)",
+    "RH I 7 d (%)",
+    "RH II 7 d (%)",
+    "Rain 7 d (mm)",
+    "Favourable leaf days in 7 d",
+    "Favourable leaf days since sowing D1 / D2 / D3 / D4",
+    "Staghead days since sowing"
+   ],
+   [
+    "11 Feb",
+    "23.3",
+    "8.2",
+    "96",
+    "50",
+    "0.0",
+    "1",
+    "17 / 17 / 13 / 7",
+    "0"
+   ],
+   [
+    "24 Feb",
+    "26.8",
+    "11.2",
+    "93",
+    "46",
+    "0.6",
+    "0",
+    "17 / 17 / 13 / 7",
+    "0"
+   ],
+   [
+    "03 Mar",
+    "30.5",
+    "11.4",
+    "92",
+    "33",
+    "0.0",
+    "0",
+    "17 / 17 / 13 / 7",
+    "0"
+   ],
+   [
+    "13 Mar",
+    "34.5",
+    "15.6",
+    "92",
+    "36",
+    "0.0",
+    "0",
+    "17 / 17 / 13 / 7",
+    "0"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 7. Prediction tasks.",
+  "rows": [
+   [
+    "Task",
+    "Target",
+    "Type",
+    "Main metric"
+   ],
+   [
+    "A – detection",
+    "grade 0 (healthy) vs grade > 0 (diseased); 552 vs 1778 leaves",
+    "binary classification",
+    "macro-F1, AUC"
+   ],
+   [
+    "B – six grades",
+    "grade 0, 1, 3, 5, 7, 9",
+    "multi-class (ordinal) classification",
+    "macro-F1, quadratic weighted kappa"
+   ],
+   [
+    "C – severity score",
+    "grade as a number 0–9",
+    "regression",
+    "R², RMSE, RPD"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 8. Step card – Grouped, stratified 70:30 hold-out validation (Steps F1–F3).",
+  "rows": [
+   [
+    "Item",
+    "Grouped, stratified 70:30 hold-out validation (Steps F1–F3)"
+   ],
+   [
+    "Concept",
+    "The 48 plots are divided once into a training set (about 70% of the leaves) and a test set (about 30%). Every step that learns from the data – feature selection, model choice, tuning and training – uses the training plots only; the test plots are used once, at the end, to measure accuracy."
+   ],
+   [
+    "Why here (justification)",
+    "Leaves of one plot share soil, microclimate and inoculum, so a random split of leaves would put near-copies of the same plot in training and test and inflate accuracy; whole plots are therefore assigned to one side only (Roberts et al., 2017). Stratification keeps the test set representative: healthy (sprayed) and unsprayed plots are split separately, the unsprayed test plots come from different treatments and are spread evenly over replications, varieties and sowing timings, and among 5000 candidate splits the one closest to 30% of the leaves and to the overall grade and date distribution was chosen (Kuhn and Johnson, 2013). 70:30 is a common hold-out ratio (Gholamy et al., 2018; Joseph, 2022)."
+   ],
+   [
+    "What papers used",
+    "Hold-out (train/test) validation with stratified splitting (Kuhn and Johnson, 2013); grouped or blocked splitting of dependent samples (Roberts et al., 2017); selection and tuning inside the training set only, to avoid selection bias (Ambroise and McLachlan, 2002; Varma and Simon, 2006; Cawley and Talbot, 2010); hold-out vs cross-validation with small samples (Kohavi, 1995; Vabalas et al., 2019)."
+   ],
+   [
+    "How with my data",
+    "Test plots: healthy 1, 4, 5, 8; unsprayed R1 37, 44, 46, 48, R2 25, 27, 31, 35, R3 13, 14, 18 (11 different treatments). 699 test leaves (30.0%) and 1631 training leaves from 33 plots. Feature selection, SFFS and grid search use only the training plots, with inner GroupKFold(3) by plot; the networks stop early on one third of the training plots. The split is reproducible (seed 2026, split_lib.py)."
+   ],
+   [
+    "Output → next step",
+    "Test predictions of the 699 test leaves for every model. With one test set there are no folds: the uncertainty of each metric comes from a plot bootstrap of the test set (1000 resamples of whole test plots, healthy and unsprayed plots separately; Efron and Tibshirani, 1993; Field and Welsh, 2007)."
+   ],
+   [
+    "Alternatives and notes",
+    "LORO (the earlier analysis) tested every leaf once and pooled three folds. Chapter 4 compares the two designs on the same test leaves and over 20 other 70:30 splits. Leave-one-date-out was not used because the dates differ in growth stage and disease level (see 2.12 for the transfer tests)."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 9. Training and test sets of the grouped 70:30 split.",
+  "rows": [
+   [
+    "Set",
+    "Plots",
+    "Healthy plots",
+    "Unsprayed plots (R1 / R2 / R3)",
+    "Leaves",
+    "Share of leaves (%)",
+    "Mean grade",
+    "Diseased leaves (%)"
+   ],
+   [
+    "Training",
+    "33",
+    "8",
+    "8 / 8 / 9",
+    "1631",
+    "70.0",
+    "3.28",
+    "76.6"
+   ],
+   [
+    "Test",
+    "15",
+    "4",
+    "4 / 4 / 3",
+    "699",
+    "30.0",
+    "3.20",
+    "75.7"
+   ],
+   [
+    "All",
+    "48",
+    "12",
+    "12 / 12 / 12",
+    "2330",
+    "100.0",
+    "3.26",
+    "76.3"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 10. Grade and date distribution of the training and test leaves (the split was chosen to keep them alike).",
+  "rows": [
+   [
+    "Set",
+    "Grade 0 (%)",
+    "Grade 1 (%)",
+    "Grade 3 (%)",
+    "Grade 5 (%)",
+    "Grade 7 (%)",
+    "Grade 9 (%)",
+    "11 Feb (%)",
+    "24 Feb (%)",
+    "03 Mar (%)",
+    "13 Mar (%)"
+   ],
+   [
+    "Training",
+    "23.4",
+    "16.7",
+    "18.2",
+    "23.0",
+    "12.9",
+    "5.7",
+    "18.2",
+    "23.3",
+    "27.4",
+    "31.1"
+   ],
+   [
+    "Test",
+    "24.3",
+    "16.6",
+    "19.0",
+    "22.6",
+    "11.9",
+    "5.6",
+    "17.5",
+    "22.9",
+    "28.8",
+    "30.9"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 11. Which models need a validation part. Networks need a fixed validation set for early stopping; the machine-learning models get it by inner cross-validation, which uses every training plot once for validation (Hastie et al., 2009; Varma and Simon, 2006; Cawley and Talbot, 2010).",
+  "rows": [
+   [
+    "Model / step",
+    "What is chosen from the data",
+    "Validation used",
+    "Split it needs"
+   ],
+   [
+    "SVM / SVR, random forest, XGBoost, k-NN, PLS-DA / PLSR",
+    "hyper-parameters (grid) and the SFFS feature subset",
+    "inner GroupKFold(3) by plot inside the training plots; then refit on all training plots",
+    "train (+ inner CV) : test"
+   ],
+   [
+    "DNN-F1, DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2-Atto",
+    "stopping epoch (other settings fixed from Ma et al., 2026)",
+    "separate validation set: one third of the training plots, checked after every epoch (Prechelt, 1998; Goodfellow et al., 2016)",
+    "train : validation : test = 1090 : 541 : 699 leaves (22 : 11 : 15 plots; 47 : 23 : 30 %)"
+   ],
+   [
+    "Logistic regression (covariate B1, detection)",
+    "penalty C",
+    "inner GroupKFold(3)",
+    "train (+ inner CV) : test"
+   ],
+   [
+    "Ordinal logistic and linear regression (covariate B1)",
+    "nothing (no hyper-parameters)",
+    "none",
+    "train : test"
+   ],
+   [
+    "Objective 1 steps (NDSI/RSI maps, SHAP-CARS, ReliefF, VIF)",
+    "bands and indices",
+    "training plots only (CARS: Monte Carlo CV for the PLS components)",
+    "train : test"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 12. Step card – Spectral range, smoothing and first derivative.",
+  "rows": [
+   [
+    "Item",
+    "Spectral range, smoothing and first derivative"
+   ],
+   [
+    "Concept",
+    "Savitzky–Golay smoothing fits a local polynomial in a moving window; the same fit gives the first derivative, which removes additive offsets and sharpens the red edge (Savitzky and Golay, 1964; Tsai and Philpot, 1998)."
+   ],
+   [
+    "Why here (justification)",
+    "Contact-probe spectra are clean, but the detector ends (350–399 nm and 2401–2500 nm) are noisy. Water-absorption regions (1350–1460 and 1790–1960 nm) were kept: the probe uses its own light source, so atmospheric water does not affect them, and they carry leaf-water information."
+   ],
+   [
+    "What papers used",
+    "Savitzky–Golay with the first derivative in rice blast (Ma et al., 2026) and wheat diseases (Huang et al., 2020; Meng et al., 2020); derivative analysis of leaf spectra (Tsai and Philpot, 1998)."
+   ],
+   [
+    "How with my data",
+    "Savitzky–Golay window 11 nm, order 2, applied on 350–2500 nm; spectra trimmed to 400–2400 nm; first derivative from the same filter; bands taken every 5 nm (401 reflectance + 401 derivative features)."
+   ],
+   [
+    "Output → next step",
+    "Smoothed reflectance Rλ and first derivative FDλ (×10-3 nm-1) at 5 nm."
+   ],
+   [
+    "Alternatives and notes",
+    "The second derivative was not used (agreed rule: it amplifies noise). Standard normal variate and continuum removal were not needed for contact-probe data."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 13. Vegetation indices and red-edge parameters computed for every leaf, with Pearson r against the leaf grade (n = 2330).",
+  "rows": [
+   [
+    "Index",
+    "Formula",
+    "Reference",
+    "r with grade"
+   ],
+   [
+    "NDVI",
+    "(R800−R670)/(R800+R670)",
+    "Rouse et al. (1974)",
+    "-0.48"
+   ],
+   [
+    "NDVI850",
+    "(R850−R650)/(R850+R650)",
+    "Raun et al. (2001)",
+    "-0.49"
+   ],
+   [
+    "SR",
+    "R800/R680",
+    "Jordan (1969)",
+    "-0.51"
+   ],
+   [
+    "RVI",
+    "R800/R670",
+    "Jordan (1969)",
+    "-0.51"
+   ],
+   [
+    "GNDVI",
+    "(R850−R550)/(R850+R550)",
+    "Gitelson et al. (1996)",
+    "-0.15"
+   ],
+   [
+    "RDVI",
+    "(R800−R670)/√(R800+R670)",
+    "Roujean and Bréon (1995)",
+    "-0.49"
+   ],
+   [
+    "MSR",
+    "(R800/R670−1)/√(R800/R670+1)",
+    "Chen (1996)",
+    "-0.51"
+   ],
+   [
+    "OSAVI",
+    "1.16(R800−R670)/(R800+R670+0.16)",
+    "Rondeaux et al. (1996)",
+    "-0.49"
+   ],
+   [
+    "TVI",
+    "0.5[120(R750−R550)−200(R670−R550)]",
+    "Broge and Leblanc (2001)",
+    "-0.43"
+   ],
+   [
+    "MTVI2",
+    "1.5[1.2(R800−R550)−2.5(R670−R550)]/√[(2R800+1)2−(6R800−5√R670)−0.5]",
+    "Haboudane et al. (2004)",
+    "-0.44"
+   ],
+   [
+    "MCARI",
+    "[(R700−R670)−0.2(R700−R550)](R700/R670)",
+    "Daughtry et al. (2000)",
+    "0.08"
+   ],
+   [
+    "TCARI",
+    "3[(R700−R670)−0.2(R700−R550)(R700/R670)]",
+    "Haboudane et al. (2002)",
+    "0.00"
+   ],
+   [
+    "VIgreen",
+    "(R550−R670)/(R550+R670)",
+    "Gitelson et al. (2002)",
+    "-0.42"
+   ],
+   [
+    "GI",
+    "R554/R677",
+    "Guo et al. (2021)",
+    "-0.40"
+   ],
+   [
+    "CIrededge",
+    "R790/R720−1",
+    "Gitelson et al. (2003)",
+    "-0.49"
+   ],
+   [
+    "CIgreen",
+    "R790/R550−1",
+    "Gitelson et al. (2003)",
+    "-0.16"
+   ],
+   [
+    "NDRE",
+    "(R790−R720)/(R790+R720)",
+    "Gitelson and Merzlyak (1994)",
+    "-0.48"
+   ],
+   [
+    "MTCI",
+    "(R754−R709)/(R709−R681)",
+    "Dash and Curran (2004)",
+    "-0.49"
+   ],
+   [
+    "PSSRa",
+    "R800/R680",
+    "Blackburn (1998)",
+    "-0.51"
+   ],
+   [
+    "PSSRb",
+    "R800/R635",
+    "Blackburn (1998)",
+    "-0.53"
+   ],
+   [
+    "PSSRc",
+    "R800/R470",
+    "Blackburn (1998)",
+    "0.04"
+   ],
+   [
+    "SIPI",
+    "(R800−R445)/(R800−R680)",
+    "Peñuelas et al. (1995)",
+    "0.27"
+   ],
+   [
+    "NPCI",
+    "(R680−R430)/(R680+R430)",
+    "Peñuelas et al. (1994)",
+    "0.39"
+   ],
+   [
+    "PSRI",
+    "(R680−R500)/R750",
+    "Merzlyak et al. (1999)",
+    "0.28"
+   ],
+   [
+    "ARI",
+    "1/R550−1/R700",
+    "Gitelson et al. (2001)",
+    "0.53"
+   ],
+   [
+    "PRI",
+    "(R531−R570)/(R531+R570)",
+    "Gamon et al. (1992)",
+    "-0.46"
+   ],
+   [
+    "NPQI",
+    "(R415−R435)/(R415+R435)",
+    "Barnes et al. (1992)",
+    "-0.31"
+   ],
+   [
+    "RVSI",
+    "(R712+R752)/2−R732",
+    "Merton and Huntington (1999)",
+    "0.56"
+   ],
+   [
+    "HI",
+    "(R534−R698)/(R534+R698)−0.5R704",
+    "Mahlein et al. (2013)",
+    "-0.54"
+   ],
+   [
+    "WI",
+    "R900/R970",
+    "Peñuelas et al. (1997)",
+    "-0.40"
+   ],
+   [
+    "WBI",
+    "R970/R900",
+    "Peñuelas et al. (1997)",
+    "0.40"
+   ],
+   [
+    "NDWI",
+    "(R860−R1240)/(R860+R1240)",
+    "Gao (1996)",
+    "-0.38"
+   ],
+   [
+    "MoistSI",
+    "R1600/R820",
+    "Hunt and Rock (1989)",
+    "0.39"
+   ],
+   [
+    "NDII",
+    "(R819−R1649)/(R819+R1649)",
+    "Hardisky et al. (1983)",
+    "-0.37"
+   ],
+   [
+    "DWSI-1",
+    "R800/R1660",
+    "Apan et al. (2004)",
+    "-0.37"
+   ],
+   [
+    "DWSI-2",
+    "R1660/R550",
+    "Apan et al. (2004)",
+    "0.14"
+   ],
+   [
+    "DWSI-3",
+    "R1660/R680",
+    "Apan et al. (2004)",
+    "-0.39"
+   ],
+   [
+    "DWSI-4",
+    "R550/R680",
+    "Apan et al. (2004)",
+    "-0.41"
+   ],
+   [
+    "DWSI-5",
+    "(R800+R550)/(R1660+R680)",
+    "Apan et al. (2004)",
+    "-0.43"
+   ],
+   [
+    "RBI",
+    "R1148/R1301",
+    "Mandal et al. (2023)",
+    "-0.32"
+   ],
+   [
+    "NDBI",
+    "(R1148−R1301)/(R1148+R1301)",
+    "Mandal et al. (2023)",
+    "-0.32"
+   ],
+   [
+    "REP",
+    "wavelength of maximum FD in 680–760 nm",
+    "Filella and Peñuelas (1994)",
+    "-0.50"
+   ],
+   [
+    "Dr",
+    "maximum FD in 680–760 nm (×10-3)",
+    "Filella and Peñuelas (1994)",
+    "-0.38"
+   ],
+   [
+    "REarea",
+    "sum of FD over 680–760 nm",
+    "Filella and Peñuelas (1994)",
+    "-0.48"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 14. Step card – Activity 1.1 – Response analysis.",
+  "rows": [
+   [
+    "Item",
+    "Activity 1.1 – Response analysis"
+   ],
+   [
+    "Concept",
+    "Mean reflectance and first-derivative curves of each grade show where and how the spectrum changes with disease; Pearson correlation of each band with the grade measures the strength of the change."
+   ],
+   [
+    "Why here (justification)",
+    "It is the first, model-free evidence of the disease signal and shows whether the response is consistent across varieties, stages and dates."
+   ],
+   [
+    "What papers used",
+    "Mean spectra and correlation curves are the standard first step in disease spectroscopy (Mahlein et al., 2013; Meng et al., 2020; Mandal et al., 2023; Ma et al., 2026)."
+   ],
+   [
+    "How with my data",
+    "Means ± SD by grade for 400–2400 nm; first derivative; r of each 5-nm band and derivative with the grade; spectra by growth stage; mean grade by stage, variety, leaf position and timing."
+   ],
+   [
+    "Output → next step",
+    "Disease-sensitive regions; evidence for the band selection that follows."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 15. Step card – Activity 1.2 – Effective ranges and optimal wavelengths (SHAP-CARS).",
+  "rows": [
+   [
+    "Item",
+    "Activity 1.2 – Effective ranges and optimal wavelengths (SHAP-CARS)"
+   ],
+   [
+    "Concept",
+    "NDSI and RSI are computed for every pair of bands; the R² with the grade forms a map whose high-value area defines the effective wavelength ranges. Inside them, a gradient-boosting model ranks bands by mean |SHAP| (top 40% kept) and CARS with PLS selects the final optimal wavelengths."
+   ],
+   [
+    "Why here (justification)",
+    "802 correlated bands cannot go into a model directly. SHAP removes uninformative bands before CARS, so CARS works on a smaller, relevant set and is more stable (Ma et al., 2026)."
+   ],
+   [
+    "What papers used",
+    "NDSI/RSI R² maps and SHAP-CARS for rice blast (Ma et al., 2026); CARS (Li et al., 2009); SHAP (Lundberg and Lee, 2017; Lundberg et al., 2020)."
+   ],
+   [
+    "How with my data",
+    "Threshold R² ≥ 0.5 for effective ranges, else the top 5% of pairs (used here: R² ≥ 0.228); red-edge derivatives 680–760 nm always candidates; XGBoost (300 trees, depth 4, learning rate 0.05); bands standardised; PLS components by Monte Carlo cross-validation (50 splits); CARS 50 iterations × 20 runs; bands kept if selected in ≥ 50% of runs (maximum 15)."
+   ],
+   [
+    "Output → next step",
+    "Optimal wavelengths (OW)."
+   ],
+   [
+    "Alternatives and notes",
+    "Reflectance and derivative bands were pooled in one SHAP-CARS run (agreed decision)."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 16. Step card – Activities 1.3–1.4 – Index construction and ReliefF selection.",
+  "rows": [
+   [
+    "Item",
+    "Activities 1.3–1.4 – Index construction and ReliefF selection"
+   ],
+   [
+    "Concept",
+    "The best NDSI and RSI pairs come from the maps; the White Rust Index adds a third band to the best NDSI: WRI = NDSI(λ1, λ2) + w·Rλ3. Indices with |r| ≥ 0.95 are reduced to the one most correlated with the grade; ReliefF (classes) and RReliefF (score) rank the rest."
+   ],
+   [
+    "Why here (justification)",
+    "A three-band index can correct a confounding effect that a two-band index cannot; ReliefF judges an index by how well it separates near neighbours of different classes, so it handles interactions and is not fooled by correlation alone."
+   ],
+   [
+    "What papers used",
+    "Three-band disease indices (Meng et al., 2020; Mandal et al., 2023; Ma et al., 2026); ReliefF and RReliefF (Kira and Rendell, 1992; Kononenko, 1994; Robnik-Šikonja and Kononenko, 2003; Urbanowicz et al., 2018)."
+   ],
+   [
+    "How with my data",
+    "WRI search: the 200 best NDSI pairs at least 50 nm apart, λ3 every 10 nm, w ∈ {−1, −0.5, 0, 0.5, 1}. ReliefF with k = 10 neighbours, neighbours from the same plot excluded; top five indices kept for each task."
+   ],
+   [
+    "Output → next step",
+    "Selected indices (VI) for detection, six grades and score."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 17. Step card – Activity 1.6 – Variance inflation factor and the disease-specific feature set.",
+  "rows": [
+   [
+    "Item",
+    "Activity 1.6 – Variance inflation factor and the disease-specific feature set"
+   ],
+   [
+    "Concept",
+    "VIF = 1/(1 − R²j) measures how well feature j is explained by the others; the feature with the largest VIF is removed until all are below 10."
+   ],
+   [
+    "Why here (justification)",
+    "Optimal wavelengths and indices overlap; strong collinearity makes models unstable and explanations unreliable (Dormann et al., 2013; O'Brien, 2007)."
+   ],
+   [
+    "What papers used",
+    "VIF screening before modelling (Dormann et al., 2013; Mandal et al., 2023)."
+   ],
+   [
+    "How with my data",
+    "Pool = optimal wavelengths + selected indices; iterative removal until all VIF < 10."
+   ],
+   [
+    "Output → next step",
+    "Disease-specific feature set (DSF): the input of Objective 2."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 18. Machine-learning models and tuning grids (class weights balanced; SFFS up to 15 features, smallest subset within 1% of the best inner score).",
+  "rows": [
+   [
+    "Model",
+    "Principle (one line)",
+    "Grid searched",
+    "Reference"
+   ],
+   [
+    "SVM / SVR",
+    "maximum-margin boundary with radial basis kernel",
+    "C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5} (SVR)",
+    "Cortes and Vapnik (1995)"
+   ],
+   [
+    "Random forest",
+    "many decorrelated decision trees, majority vote / mean",
+    "500 trees; max_features ∈ {sqrt, 0.3}; min_samples_leaf ∈ {1, 3, 5}",
+    "Breiman (2001)"
+   ],
+   [
+    "XGBoost",
+    "gradient-boosted trees with regularisation",
+    "trees ∈ {200, 500}; depth ∈ {3, 5}; learning rate ∈ {0.05, 0.1}",
+    "Chen and Guestrin (2016)"
+   ],
+   [
+    "k-NN",
+    "label of the nearest training leaves",
+    "k ∈ {3, 5, 7, 9, 11}; uniform or distance weights",
+    "Cover and Hart (1967)"
+   ],
+   [
+    "PLS-DA / PLSR",
+    "latent components maximising covariance with the target",
+    "components 1–15 (≤ number of features)",
+    "Wold et al. (2001); Barker and Rayens (2003)"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 19. Step card – Activity 2.3 – Deep-learning models.",
+  "rows": [
+   [
+    "Item",
+    "Activity 2.3 – Deep-learning models"
+   ],
+   [
+    "Concept",
+    "DNN-F1 is a fully connected network on the feature vector. The other networks need images, so the p selected features were placed in a k × k pseudo-image (k = ⌈√p⌉, zero-padded). DT-EDNet: 3 × 3 embedding (128 channels) → squeeze-and-excitation (SE) → dual transformer group (one kernel transformer block with CBAM + four token transformer blocks, four heads) → class token → output."
+   ],
+   [
+    "Why here (justification)",
+    "DT-EDNet is the network proposed for early rice-blast detection; EfficientNet-B0, ResNet18 and ConvNeXt V2 are the comparison networks of the same study, so the comparison follows the paper."
+   ],
+   [
+    "What papers used",
+    "DT-EDNet (Ma et al., 2026); EfficientNet (Tan and Le, 2019); ResNet (He et al., 2016); ConvNeXt V2 (Woo et al., 2023); SE (Hu et al., 2018); CBAM (Woo et al., 2018); transformer (Vaswani et al., 2017); tabular-to-image mapping (Sharma et al., 2019)."
+   ],
+   [
+    "How with my data",
+    "Paper settings: AdamW (learning rate 6 × 10-4, weight decay 10-5), cosine decay to 10-6, batch 32, label smoothing 0.01, gradient clipping 1.2, class-weighted loss; maximum 100 epochs with early stopping (patience 20) on one third of the training plots; seed 42; stride-1 stems because the pseudo-images are small (4 × 4). DNN-F1 used learning rate 10-3."
+   ],
+   [
+    "Output → next step",
+    "Test predictions for the three tasks; learning curves; network comparison on three feature configurations (OW, VI, DSF); DT-EDNet ablation (without SE, without the dual transformer group, without both)."
+   ],
+   [
+    "Alternatives and notes",
+    "No separate tuning of the networks (paper settings, CPU training). DNN-F2 (intermediate fusion) is not applicable to a single sensor."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 20. Evaluation metrics.",
+  "rows": [
+   [
+    "Metric",
+    "Formula / meaning",
+    "Use"
+   ],
+   [
+    "Overall accuracy (OA)",
+    "correct / all",
+    "A, B"
+   ],
+   [
+    "Cohen's kappa",
+    "(po − pe)/(1 − pe); agreement beyond chance (Cohen, 1960)",
+    "A, B"
+   ],
+   [
+    "Macro-F1",
+    "mean over classes of 2PR/(P + R); treats small classes equally (Sokolova and Lapalme, 2009)",
+    "A, B (main)"
+   ],
+   [
+    "Sensitivity, specificity, AUC",
+    "true-positive rate, true-negative rate, area under the ROC curve (Fawcett, 2006)",
+    "A"
+   ],
+   [
+    "Quadratic weighted kappa (QWK)",
+    "kappa with penalty growing with the squared grade distance (Cohen, 1968)",
+    "B (ordinal)"
+   ],
+   [
+    "Within one grade",
+    "share of leaves predicted at most one class away",
+    "B"
+   ],
+   [
+    "R², RMSE, MAE",
+    "explained variance, root mean square and mean absolute error (grade units)",
+    "C"
+   ],
+   [
+    "RPD",
+    "SD of observed / RMSE; > 2 good, 1.4–2 fair, < 1.4 poor (Williams, 2001)",
+    "C"
+   ],
+   [
+    "Bias",
+    "mean (predicted − observed)",
+    "C"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 21. Covariate-only models. With four sampling dates the 7-day weather is collinear with the date and favourable days since sowing with the sowing timing; in B1 the time effect is therefore represented by DAS and DAS².",
+  "rows": [
+   [
+    "Model",
+    "Detection (A)",
+    "Six grades (B)",
+    "Severity score (C)",
+    "Covariates used"
+   ],
+   [
+    "B1 – statistical (interpretable)",
+    "logistic regression (C tuned)",
+    "proportional-odds ordinal logistic regression (McCullagh, 1980)",
+    "linear model with DAS and DAS² (Madden et al., 2007)",
+    "variety, timing, growth stage, DAS, DAS²"
+   ],
+   [
+    "Random forest",
+    "tuned in inner folds",
+    "tuned in inner folds",
+    "tuned in inner folds (= best ML for C)",
+    "all covariates incl. weather and favourable days"
+   ],
+   [
+    "B2 – best machine-learning model of Activity 2.2",
+    "SVM",
+    "XGBoost",
+    "random forest",
+    "all covariates incl. weather and favourable days"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 22. Disease progress and 7-day weather before each sampling date. *Days from the first sowing (9 Dec 2025) to the day before the date with T max 16–24 °C, RH I > 97% and RH II > 40% (Chattopadhyay et al., 2011).",
+  "rows": [
+   [
+    "Date",
+    "Crop age (DAS)",
+    "Mean grade",
+    "Diseased (%)",
+    "T max 7 d (°C)",
+    "T min 7 d (°C)",
+    "RH I 7 d (%)",
+    "RH II 7 d (%)",
+    "Rain 7 d (mm)",
+    "Favourable days*"
+   ],
+   [
+    "11 Feb",
+    "33–64",
+    "0.67",
+    "45",
+    "23.3",
+    "8.2",
+    "96",
+    "50",
+    "0.0",
+    "17"
+   ],
+   [
+    "24 Feb",
+    "46–77",
+    "3.39",
+    "83",
+    "26.8",
+    "11.2",
+    "93",
+    "46",
+    "0.6",
+    "17"
+   ],
+   [
+    "03 Mar",
+    "53–84",
+    "3.51",
+    "81",
+    "30.5",
+    "11.4",
+    "92",
+    "33",
+    "0.0",
+    "17"
+   ],
+   [
+    "13 Mar",
+    "63–94",
+    "4.43",
+    "85",
+    "34.5",
+    "15.6",
+    "92",
+    "36",
+    "0.0",
+    "17"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 23. Mean reflectance at key wavelengths and red-edge parameters by grade.",
+  "rows": [
+   [
+    "Band (nm)",
+    "grade 0",
+    "grade 1",
+    "grade 3",
+    "grade 5",
+    "grade 7",
+    "grade 9",
+    "Change 0 → 9 (%)"
+   ],
+   [
+    "550",
+    "0.249",
+    "0.260",
+    "0.252",
+    "0.245",
+    "0.245",
+    "0.264",
+    "+6.0"
+   ],
+   [
+    "680",
+    "0.096",
+    "0.101",
+    "0.110",
+    "0.115",
+    "0.127",
+    "0.139",
+    "+44.6"
+   ],
+   [
+    "760",
+    "0.608",
+    "0.607",
+    "0.574",
+    "0.556",
+    "0.540",
+    "0.542",
+    "-10.9"
+   ],
+   [
+    "800",
+    "0.606",
+    "0.606",
+    "0.575",
+    "0.558",
+    "0.545",
+    "0.549",
+    "-9.5"
+   ],
+   [
+    "1245",
+    "0.530",
+    "0.538",
+    "0.517",
+    "0.507",
+    "0.503",
+    "0.517",
+    "-2.4"
+   ],
+   [
+    "1450",
+    "0.109",
+    "0.116",
+    "0.129",
+    "0.132",
+    "0.146",
+    "0.162",
+    "+49.2"
+   ],
+   [
+    "1650",
+    "0.330",
+    "0.338",
+    "0.339",
+    "0.336",
+    "0.341",
+    "0.359",
+    "+8.7"
+   ],
+   [
+    "1940",
+    "0.059",
+    "0.064",
+    "0.070",
+    "0.071",
+    "0.081",
+    "0.099",
+    "+66.3"
+   ],
+   [
+    "2200",
+    "0.159",
+    "0.171",
+    "0.178",
+    "0.178",
+    "0.189",
+    "0.212",
+    "+33.7"
+   ],
+   [
+    "REP (nm)",
+    "709.0",
+    "708.5",
+    "705.2",
+    "703.5",
+    "701.8",
+    "701.3",
+    "-7.7 nm"
+   ],
+   [
+    "Dr (×10-3)",
+    "12.90",
+    "12.80",
+    "11.99",
+    "11.50",
+    "11.00",
+    "10.83",
+    "-16.1"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 24. Optimal wavelengths selected by SHAP-CARS on all leaves.",
+  "rows": [
+   [
+    "Optimal wavelength",
+    "Type",
+    "Region",
+    "CARS frequency (20 runs)",
+    "mean |SHAP|"
+   ],
+   [
+    "FD1090",
+    "first derivative",
+    "near infrared",
+    "1.00",
+    "0.016"
+   ],
+   [
+    "FD565",
+    "first derivative",
+    "visible",
+    "1.00",
+    "0.007"
+   ],
+   [
+    "FD855",
+    "first derivative",
+    "near infrared",
+    "0.95",
+    "0.011"
+   ],
+   [
+    "FD1060",
+    "first derivative",
+    "near infrared",
+    "0.95",
+    "0.089"
+   ],
+   [
+    "FD550",
+    "first derivative",
+    "visible",
+    "0.90",
+    "0.011"
+   ],
+   [
+    "FD1660",
+    "first derivative",
+    "SWIR-1",
+    "0.90",
+    "0.011"
+   ],
+   [
+    "FD1245",
+    "first derivative",
+    "near infrared",
+    "0.90",
+    "0.031"
+   ],
+   [
+    "FD870",
+    "first derivative",
+    "near infrared",
+    "0.90",
+    "0.033"
+   ],
+   [
+    "FD810",
+    "first derivative",
+    "near infrared",
+    "0.85",
+    "0.106"
+   ],
+   [
+    "FD860",
+    "first derivative",
+    "near infrared",
+    "0.85",
+    "0.110"
+   ],
+   [
+    "FD760",
+    "first derivative",
+    "near infrared",
+    "0.85",
+    "0.010"
+   ],
+   [
+    "FD915",
+    "first derivative",
+    "near infrared",
+    "0.85",
+    "0.009"
+   ],
+   [
+    "FD665",
+    "first derivative",
+    "visible",
+    "0.85",
+    "0.020"
+   ],
+   [
+    "FD830",
+    "first derivative",
+    "near infrared",
+    "0.80",
+    "0.030"
+   ],
+   [
+    "FD595",
+    "first derivative",
+    "visible",
+    "0.75",
+    "0.015"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 25. Disease-specific feature set (Objective 1, all leaves).",
+  "rows": [
+   [
+    "Feature",
+    "Group",
+    "VIF",
+    "r with grade",
+    "Physical meaning"
+   ],
+   [
+    "FD1090",
+    "derivative band",
+    "3.54",
+    "0.31",
+    "near-infrared"
+   ],
+   [
+    "FD1060",
+    "derivative band",
+    "3.07",
+    "-0.20",
+    "near-infrared (mesophyll scattering)"
+   ],
+   [
+    "FD550",
+    "derivative band",
+    "5.64",
+    "0.33",
+    "green peak slope (chlorophyll)"
+   ],
+   [
+    "FD1245",
+    "derivative band",
+    "3.35",
+    "-0.14",
+    "NIR–SWIR water band edge"
+   ],
+   [
+    "FD870",
+    "derivative band",
+    "5.51",
+    "0.49",
+    ""
+   ],
+   [
+    "FD760",
+    "derivative band",
+    "3.47",
+    "0.13",
+    "red-edge shoulder"
+   ],
+   [
+    "FD665",
+    "derivative band",
+    "3.92",
+    "-0.29",
+    ""
+   ],
+   [
+    "FD595",
+    "derivative band",
+    "9.56",
+    "0.26",
+    ""
+   ],
+   [
+    "DWSI-2",
+    "index",
+    "7.71",
+    "0.14",
+    "disease–water stress index R1660/R550"
+   ],
+   [
+    "Dr",
+    "index",
+    "4.38",
+    "-0.38",
+    "height of the red-edge peak (chlorophyll)"
+   ],
+   [
+    "REP",
+    "index",
+    "6.78",
+    "-0.50",
+    ""
+   ]
+  ]
+ },
+ {
+  "caption": "Table 26. Feature selection on the 70:30 training plots (first row, used by all models of this report) and, for comparison, in the three training parts of the earlier LORO analysis.",
+  "rows": [
+   [
+    "Training set",
+    "Optimal wavelengths",
+    "Best NDSI / RSI (nm)",
+    "WRI",
+    "DSF detection",
+    "DSF six grades",
+    "DSF score"
+   ],
+   [
+    "70:30 training plots",
+    "15 (FD550, FD1090, FD595, FD1810, FD1660, FD1245, …)",
+    "(795, 805) / (795, 805)",
+    "NDSI(780, 830)",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, PSSRb",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, HI, MCARI, Dr, DWSI-2"
+   ],
+   [
+    "LORO fold 1 (earlier)",
+    "15 (FD1245, FD1090, FD1060, FD1030, FD570, FD870, …)",
+    "(795, 805) / (795, 805)",
+    "NDSI(780, 830)",
+    "FD1090, FD1060, FD760, FD1270, FD1160, FD1815, FD645, FD860, HI, REP",
+    "FD1090, FD1060, FD570, FD760, FD1270, FD1160, FD1815, FD645, FD860, REP, PSSRb",
+    "FD1090, FD1060, FD760, FD1270, FD1160, FD1660, FD1815, FD645, FD860, VIgreen"
+   ],
+   [
+    "LORO fold 2 (earlier)",
+    "15 (FD1060, FD825, FD565, FD1660, FD600, FD1095, …)",
+    "(795, 805) / (795, 805)",
+    "NDSI(785, 835)",
+    "FD1060, FD600, FD1245, FD830, FD1160, FD1725, FD550, FD760, FD1090, REP, NDVI850",
+    "FD1060, FD600, FD1245, FD830, FD1160, FD1725, FD550, FD760, FD1090, REP, PSSRb",
+    "FD1060, FD600, FD1245, FD830, FD1160, FD1725, FD550, FD760, FD1090, MCARI"
+   ],
+   [
+    "LORO fold 3 (earlier)",
+    "15 (FD1090, FD1810, FD1060, FD1805, FD855, FD760, …)",
+    "(795, 805) / (795, 805)",
+    "NDSI(780, 830)",
+    "FD1090, FD1810, FD1060, FD1805, FD760, FD565, FD870, FD550, FD1245, FD1795, REP, DWSI-2",
+    "FD1090, FD1810, FD1060, FD1805, FD760, FD565, FD870, FD550, FD1245, FD1795, REP, PSSRb",
+    "FD1090, FD1810, FD1060, FD1805, FD760, FD870, FD550, FD1245, FD1795, HI, MCARI"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 27. Sequential floating forward selection and grid search (inner score: macro-F1 for A and B, negative RMSE for C).",
+  "rows": [
+   [
+    "Task",
+    "Model",
+    "Candidates (mean)",
+    "Selected by SFFS (mean)",
+    "Inner score (mean)",
+    "Hyper-parameters chosen"
+   ],
+   [
+    "A",
+    "SVM",
+    "11.0",
+    "9.0",
+    "0.853",
+    "C = 10, gamma = scale"
+   ],
+   [
+    "A",
+    "RF",
+    "11.0",
+    "8.0",
+    "0.829",
+    "max_features = sqrt, min_samples_leaf = 1, n_estimators = 500"
+   ],
+   [
+    "A",
+    "XGBoost",
+    "11.0",
+    "9.0",
+    "0.837",
+    "learning_rate = 0.05, max_depth = 5, n_estimators = 200"
+   ],
+   [
+    "A",
+    "k-NN",
+    "11.0",
+    "6.0",
+    "0.796",
+    "n_neighbors = 7, weights = distance"
+   ],
+   [
+    "A",
+    "PLS-DA",
+    "11.0",
+    "6.0",
+    "0.753",
+    "n_components = 6"
+   ],
+   [
+    "B",
+    "SVM",
+    "11.0",
+    "9.0",
+    "0.400",
+    "C = 10, gamma = 0.1"
+   ],
+   [
+    "B",
+    "RF",
+    "11.0",
+    "8.0",
+    "0.389",
+    "max_features = sqrt, min_samples_leaf = 3, n_estimators = 500"
+   ],
+   [
+    "B",
+    "XGBoost",
+    "11.0",
+    "8.0",
+    "0.396",
+    "learning_rate = 0.05, max_depth = 5, n_estimators = 200"
+   ],
+   [
+    "B",
+    "k-NN",
+    "11.0",
+    "6.0",
+    "0.364",
+    "n_neighbors = 7, weights = distance"
+   ],
+   [
+    "B",
+    "PLS-DA",
+    "11.0",
+    "7.0",
+    "0.248",
+    "n_components = 5"
+   ],
+   [
+    "C",
+    "SVR",
+    "12.0",
+    "6.0",
+    "-1.995",
+    "C = 10, epsilon = 0.5, gamma = 0.1"
+   ],
+   [
+    "C",
+    "RF",
+    "12.0",
+    "7.0",
+    "-1.927",
+    "max_features = sqrt, min_samples_leaf = 1, n_estimators = 500"
+   ],
+   [
+    "C",
+    "XGBoost",
+    "12.0",
+    "7.0",
+    "-1.942",
+    "learning_rate = 0.05, max_depth = 3, n_estimators = 200"
+   ],
+   [
+    "C",
+    "k-NN",
+    "12.0",
+    "4.0",
+    "-2.038",
+    "n_neighbors = 11, weights = uniform"
+   ],
+   [
+    "C",
+    "PLSR",
+    "12.0",
+    "6.0",
+    "-2.107",
+    "n_components = 4"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 28. Deep-learning runs (validation score: macro-F1 on the validation plots, tasks A and B).",
+  "rows": [
+   [
+    "Network",
+    "Parameters",
+    "Epochs (median over the 3 tasks)",
+    "Best validation score (mean)"
+   ],
+   [
+    "DNN-F1",
+    "3,106",
+    "62",
+    "0.630"
+   ],
+   [
+    "DT-EDNet",
+    "949,749",
+    "28",
+    "0.613"
+   ],
+   [
+    "EfficientNet-B0",
+    "4,009,534",
+    "36",
+    "0.593"
+   ],
+   [
+    "ResNet18",
+    "11,168,706",
+    "34",
+    "0.612"
+   ],
+   [
+    "ConvNeXt V2-Atto",
+    "3,386,282",
+    "57",
+    "0.652"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 29. Task A – detection: test metrics (test plots of the 70:30 split; n = 699 test leaves).",
+  "rows": [
+   [
+    "Model",
+    "Type",
+    "OA",
+    "Kappa",
+    "Macro-F1 (± bootstrap SE)",
+    "Sensitivity",
+    "Specificity",
+    "AUC"
+   ],
+   [
+    "SVM",
+    "ML",
+    "0.857",
+    "0.657",
+    "0.826 ± 0.017",
+    "0.843",
+    "0.900",
+    "0.930"
+   ],
+   [
+    "DNN-F1",
+    "DL",
+    "0.860",
+    "0.650",
+    "0.824 ± 0.015",
+    "0.866",
+    "0.841",
+    "0.926"
+   ],
+   [
+    "ResNet18",
+    "DL",
+    "0.871",
+    "0.645",
+    "0.822 ± 0.018",
+    "0.922",
+    "0.712",
+    "0.882"
+   ],
+   [
+    "ConvNeXt V2-Atto",
+    "DL",
+    "0.861",
+    "0.635",
+    "0.818 ± 0.028",
+    "0.892",
+    "0.765",
+    "0.911"
+   ],
+   [
+    "XGBoost",
+    "ML",
+    "0.854",
+    "0.627",
+    "0.813 ± 0.017",
+    "0.873",
+    "0.794",
+    "0.923"
+   ],
+   [
+    "RF",
+    "ML",
+    "0.853",
+    "0.623",
+    "0.811 ± 0.018",
+    "0.873",
+    "0.788",
+    "0.909"
+   ],
+   [
+    "DT-EDNet",
+    "DL",
+    "0.860",
+    "0.616",
+    "0.808 ± 0.014",
+    "0.911",
+    "0.700",
+    "0.917"
+   ],
+   [
+    "EfficientNet-B0",
+    "DL",
+    "0.800",
+    "0.531",
+    "0.762 ± 0.014",
+    "0.792",
+    "0.824",
+    "0.875"
+   ],
+   [
+    "k-NN",
+    "ML",
+    "0.815",
+    "0.498",
+    "0.749 ± 0.019",
+    "0.879",
+    "0.618",
+    "0.867"
+   ],
+   [
+    "PLS-DA",
+    "ML",
+    "0.817",
+    "0.442",
+    "0.719 ± 0.019",
+    "0.930",
+    "0.465",
+    "0.825"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 30. Task B – six grades: test metrics and F1 of each grade.",
+  "rows": [
+   [
+    "Model",
+    "Type",
+    "OA",
+    "Kappa",
+    "Macro-F1",
+    "QWK",
+    "±1 grade",
+    "F1 g0",
+    "F1 g1",
+    "F1 g3",
+    "F1 g5",
+    "F1 g7",
+    "F1 g9"
+   ],
+   [
+    "RF",
+    "ML",
+    "0.413",
+    "0.273",
+    "0.374",
+    "0.657",
+    "0.773",
+    "0.68",
+    "0.36",
+    "0.21",
+    "0.35",
+    "0.32",
+    "0.31"
+   ],
+   [
+    "SVM",
+    "ML",
+    "0.418",
+    "0.284",
+    "0.358",
+    "0.658",
+    "0.777",
+    "0.76",
+    "0.43",
+    "0.23",
+    "0.31",
+    "0.25",
+    "0.16"
+   ],
+   [
+    "XGBoost",
+    "ML",
+    "0.401",
+    "0.256",
+    "0.354",
+    "0.634",
+    "0.765",
+    "0.69",
+    "0.37",
+    "0.21",
+    "0.30",
+    "0.27",
+    "0.28"
+   ],
+   [
+    "ConvNeXt V2-Atto",
+    "DL",
+    "0.403",
+    "0.260",
+    "0.342",
+    "0.613",
+    "0.755",
+    "0.70",
+    "0.29",
+    "0.30",
+    "0.39",
+    "0.26",
+    "0.12"
+   ],
+   [
+    "DNN-F1",
+    "DL",
+    "0.395",
+    "0.257",
+    "0.336",
+    "0.635",
+    "0.718",
+    "0.70",
+    "0.42",
+    "0.17",
+    "0.29",
+    "0.23",
+    "0.20"
+   ],
+   [
+    "k-NN",
+    "ML",
+    "0.395",
+    "0.240",
+    "0.335",
+    "0.588",
+    "0.757",
+    "0.63",
+    "0.36",
+    "0.18",
+    "0.39",
+    "0.24",
+    "0.21"
+   ],
+   [
+    "EfficientNet-B0",
+    "DL",
+    "0.353",
+    "0.205",
+    "0.327",
+    "0.580",
+    "0.777",
+    "0.58",
+    "0.41",
+    "0.28",
+    "0.28",
+    "0.21",
+    "0.20"
+   ],
+   [
+    "ResNet18",
+    "DL",
+    "0.366",
+    "0.218",
+    "0.322",
+    "0.543",
+    "0.750",
+    "0.69",
+    "0.32",
+    "0.26",
+    "0.21",
+    "0.28",
+    "0.18"
+   ],
+   [
+    "DT-EDNet",
+    "DL",
+    "0.356",
+    "0.216",
+    "0.313",
+    "0.557",
+    "0.711",
+    "0.66",
+    "0.41",
+    "0.24",
+    "0.12",
+    "0.25",
+    "0.20"
+   ],
+   [
+    "PLS-DA",
+    "ML",
+    "0.371",
+    "0.186",
+    "0.209",
+    "0.462",
+    "0.681",
+    "0.54",
+    "0.28",
+    "0.00",
+    "0.43",
+    "0.00",
+    "0.00"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 31. Task C – severity score: test metrics (grade units).",
+  "rows": [
+   [
+    "Model",
+    "Type",
+    "R²",
+    "RMSE (± bootstrap SE)",
+    "MAE",
+    "RPD",
+    "Bias",
+    "r"
+   ],
+   [
+    "RF",
+    "ML",
+    "0.517",
+    "1.919 ± 0.115",
+    "1.506",
+    "1.440",
+    "-0.118",
+    "0.721"
+   ],
+   [
+    "XGBoost",
+    "ML",
+    "0.512",
+    "1.930 ± 0.125",
+    "1.493",
+    "1.432",
+    "-0.137",
+    "0.717"
+   ],
+   [
+    "DNN-F1",
+    "DL",
+    "0.481",
+    "1.990 ± 0.102",
+    "1.535",
+    "1.389",
+    "-0.131",
+    "0.695"
+   ],
+   [
+    "SVR",
+    "ML",
+    "0.478",
+    "1.995 ± 0.114",
+    "1.491",
+    "1.385",
+    "-0.207",
+    "0.699"
+   ],
+   [
+    "DT-EDNet",
+    "DL",
+    "0.473",
+    "2.004 ± 0.079",
+    "1.497",
+    "1.379",
+    "-0.183",
+    "0.695"
+   ],
+   [
+    "ResNet18",
+    "DL",
+    "0.450",
+    "2.048 ± 0.121",
+    "1.556",
+    "1.349",
+    "-0.138",
+    "0.673"
+   ],
+   [
+    "PLSR",
+    "ML",
+    "0.445",
+    "2.057 ± 0.082",
+    "1.639",
+    "1.343",
+    "-0.202",
+    "0.673"
+   ],
+   [
+    "k-NN",
+    "ML",
+    "0.419",
+    "2.104 ± 0.112",
+    "1.625",
+    "1.313",
+    "-0.095",
+    "0.651"
+   ],
+   [
+    "ConvNeXt V2-Atto",
+    "DL",
+    "0.373",
+    "2.187 ± 0.075",
+    "1.652",
+    "1.264",
+    "+0.082",
+    "0.635"
+   ],
+   [
+    "EfficientNet-B0",
+    "DL",
+    "0.287",
+    "2.331 ± 0.132",
+    "1.874",
+    "1.186",
+    "-0.608",
+    "0.642"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 32. Macro-F1 (six grades) of the networks on the three feature configurations.",
+  "rows": [
+   [
+    "Network",
+    "OW",
+    "VI",
+    "DSF"
+   ],
+   [
+    "ConvNeXt V2-Atto",
+    "0.336",
+    "0.319",
+    "0.342"
+   ],
+   [
+    "DT-EDNet",
+    "0.342",
+    "0.328",
+    "0.313"
+   ],
+   [
+    "EfficientNet-B0",
+    "0.318",
+    "0.261",
+    "0.327"
+   ],
+   [
+    "ResNet18",
+    "0.347",
+    "0.333",
+    "0.322"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 33. DT-EDNet module ablation (six grades; SE = squeeze-and-excitation, DTG = dual transformer group).",
+  "rows": [
+   [
+    "Variant",
+    "OA",
+    "Kappa",
+    "Macro-recall",
+    "Macro-F1",
+    "QWK"
+   ],
+   [
+    "DT-EDNet",
+    "0.356",
+    "0.216",
+    "0.337",
+    "0.313",
+    "0.557"
+   ],
+   [
+    "DT-EDNet-DTG",
+    "0.379",
+    "0.242",
+    "0.366",
+    "0.356",
+    "0.596"
+   ],
+   [
+    "DT-EDNet-SE",
+    "0.408",
+    "0.267",
+    "0.342",
+    "0.332",
+    "0.582"
+   ],
+   [
+    "DT-EDNet-SE-DTG",
+    "0.382",
+    "0.246",
+    "0.363",
+    "0.352",
+    "0.631"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 34. Covariate-only, spectra and spectra + covariate models on unsprayed leaves (test leaves of the 70:30 split; B1 = logistic / ordinal logistic / linear model; B2 = SVM, XGBoost, random forest for tasks A, B, C).",
+  "rows": [
+   [
+    "Input",
+    "Model",
+    "A macro-F1",
+    "A AUC",
+    "A balanced acc.",
+    "B macro-F1",
+    "B QWK",
+    "C R²",
+    "C RMSE"
+   ],
+   [
+    "covariates only",
+    "B1 statistical",
+    "0.735",
+    "0.917",
+    "0.875",
+    "0.297",
+    "0.497",
+    "0.340",
+    "2.080"
+   ],
+   [
+    "covariates only",
+    "Random forest",
+    "0.716",
+    "0.924",
+    "0.886",
+    "0.281",
+    "0.462",
+    "0.256",
+    "2.208"
+   ],
+   [
+    "covariates only",
+    "Best ML (B2)",
+    "0.735",
+    "0.916",
+    "0.875",
+    "0.281",
+    "0.462",
+    "0.256",
+    "2.208"
+   ],
+   [
+    "leaf spectra",
+    "B1 statistical",
+    "0.647",
+    "0.904",
+    "0.842",
+    "0.294",
+    "0.618",
+    "0.434",
+    "1.926"
+   ],
+   [
+    "leaf spectra",
+    "Random forest",
+    "0.792",
+    "0.931",
+    "0.867",
+    "0.385",
+    "0.629",
+    "0.442",
+    "1.913"
+   ],
+   [
+    "leaf spectra",
+    "Best ML (B2)",
+    "0.731",
+    "0.915",
+    "0.819",
+    "0.369",
+    "0.598",
+    "0.442",
+    "1.913"
+   ],
+   [
+    "spectra + covariates",
+    "B1 statistical",
+    "0.745",
+    "0.944",
+    "0.888",
+    "0.396",
+    "0.660",
+    "0.460",
+    "1.881"
+   ],
+   [
+    "spectra + covariates",
+    "Random forest",
+    "0.815",
+    "0.963",
+    "0.892",
+    "0.402",
+    "0.623",
+    "0.462",
+    "1.878"
+   ],
+   [
+    "spectra + covariates",
+    "Best ML (B2)",
+    "0.783",
+    "0.925",
+    "0.883",
+    "0.400",
+    "0.623",
+    "0.462",
+    "1.878"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 35. Gains with 95% plot-block bootstrap confidence intervals (2000 resamples). ✓ = real gain: the 95% interval excludes zero (one test set, so no fold rules); ✗ = a real loss by the same rule. For RMSE a negative value is an improvement.",
+  "rows": [
+   [
+    "Task",
+    "Metric",
+    "ΔS = M1 − M0 (95% CI)",
+    "ΔC = M2 − M1 (95% CI)",
+    "ΔT = M2 − M0 (95% CI)"
+   ],
+   [
+    "Detection",
+    "macro-F1",
+    "-0.003 (-0.072 to +0.053)",
+    "+0.052 (-0.014 to +0.109)",
+    "+0.048 (-0.007 to +0.103)"
+   ],
+   [
+    "Detection",
+    "AUC",
+    "-0.002 (-0.051 to +0.048)",
+    "+0.009 (-0.058 to +0.072)",
+    "+0.007 (-0.031 to +0.052)"
+   ],
+   [
+    "Detection",
+    "balanced accuracy",
+    "-0.056 (-0.110 to -0.007) ✗",
+    "+0.063 (-0.003 to +0.124)",
+    "+0.008 (-0.042 to +0.042)"
+   ],
+   [
+    "Six grades",
+    "macro-F1",
+    "+0.072 (+0.028 to +0.119) ✓",
+    "+0.031 (-0.003 to +0.073)",
+    "+0.103 (+0.078 to +0.134) ✓"
+   ],
+   [
+    "Six grades",
+    "QWK",
+    "+0.101 (+0.030 to +0.187) ✓",
+    "+0.024 (-0.021 to +0.058)",
+    "+0.126 (+0.063 to +0.199) ✓"
+   ],
+   [
+    "Score",
+    "R²",
+    "+0.102 (+0.005 to +0.193) ✓",
+    "+0.020 (+0.002 to +0.037) ✓",
+    "+0.122 (+0.009 to +0.220) ✓"
+   ],
+   [
+    "Score",
+    "RMSE",
+    "-0.167 (-0.305 to -0.008) ✓",
+    "-0.035 (-0.065 to -0.003) ✓",
+    "-0.202 (-0.356 to -0.018) ✓"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 36. Step card – Comparing two validation designs on the same data.",
+  "rows": [
+   [
+    "Item",
+    "Comparing two validation designs on the same data"
+   ],
+   [
+    "Concept",
+    "A validation design is a way to estimate how accurate a model will be on new plots. LORO trains on two replications and tests on the third, three times, so every leaf is tested once; the 70:30 hold-out trains once on 70% of the plots and tests once on the other 30%. Both keep whole plots apart, so both are free of plot leakage."
+   ],
+   [
+    "Why here (justification)",
+    "A hold-out estimate depends on which plots happen to be in the test set, and with few test plots its variance is large; cross-validation averages over several test sets and uses every sample for testing (Kohavi, 1995; Molinaro et al., 2005; Vabalas et al., 2019; Xu and Goodacre, 2018). A higher 70:30 number is therefore an improvement only if it holds on the same leaves and across other 70:30 splits, not only for one lucky split."
+   ],
+   [
+    "What papers used",
+    "Hold-out vs cross-validation for accuracy estimation (Kohavi, 1995; Molinaro et al., 2005); small-sample bias of single splits (Vabalas et al., 2019); split ratios (Dobbin and Simon, 2011; Xu and Goodacre, 2018; Joseph, 2022); leakage from non-independent samples (Roberts et al., 2017; Kapoor and Narayanan, 2023); plot (cluster) bootstrap (Field and Welsh, 2007)."
+   ],
+   [
+    "How with my data",
+    "(1) All metrics side by side: LORO (earlier analysis) vs 70:30. (2) Same test leaves: the LORO predictions of exactly the 70:30 test leaves (each leaf was tested once in LORO) vs the 70:30 predictions; difference with a 95% plot-bootstrap interval (2000 resamples of the test plots). (3) Split-to-split variability: a light, identical pipeline (selection on the training part, best ML model per task, grid search; no SFFS) run on LORO, on the main 70:30 split and on 20 other rule-conforming 70:30 splits. (4) Leakage check: the same light pipeline on 5 random 70:30 splits of leaves that ignore plots."
+   ],
+   [
+    "Output → next step",
+    "Answer to the question \"does 70:30 improve accuracy?\" with its evidence."
+   ],
+   [
+    "Alternatives and notes",
+    "The 80:20 and 70:30 splits are compared with LORO in the same way; the separate comparison report puts all three side by side."
+   ]
+  ]
+ },
+ {
+  "caption": "Table 37. Types of training/test split used in plant-disease detection studies. 80:20 has no theoretical basis; an optimal ratio of √p : 1 has been proposed (Joseph, 2022).",
+  "rows": [
+   [
+    "Split type",
+    "How it works",
+    "Example in plant-disease studies"
+   ],
+   [
+    "Random hold-out 80:20",
+    "images, leaves or pixels drawn at random; 80% train, 20% test",
+    "PlantVillage images: 80–20 to 20–80 random splits (Mohanty et al., 2016); 17,548 of 87,848 images held out, about 80:20 (Ferentinos, 2018)"
+   ],
+   [
+    "Random hold-out 70:30",
+    "as above with 70% train, 30% test, often stratified by class",
+    "common in hyperspectral machine-learning studies; rule of thumb of 20–30% for testing (Gholamy et al., 2018)"
+   ],
+   [
+    "Repeated random hold-out",
+    "the random split repeated many times and averaged",
+    "wheat stripe rust leaf and canopy spectra: 80:20 repeated 100 times (Cross et al., 2024)"
+   ],
+   [
+    "k-fold or leave-one-out cross-validation",
+    "every sample tested once; small data sets",
+    "wheat stripe and leaf rust severity: leave-one-out plus external validation (Wang et al., 2016)"
+   ],
+   [
+    "Grouped / blocked split (plot, field, leaf, replication)",
+    "all samples of a group stay on one side",
+    "recommended for dependent samples (Roberts et al., 2017); random hold-outs overestimated accuracy by up to 28% against spatial blocks (Kattenborn et al., 2022)"
+   ],
+   [
+    "Independent test (other season, site or condition)",
+    "model applied to data collected elsewhere",
+    "PlantVillage model: 99.35% on the random hold-out but 31.4% on images taken under other conditions (Mohanty et al., 2016)"
+   ],
+   [
+    "This study",
+    "grouped, stratified 70:30 hold-out of whole plots (and LORO = grouped cross-validation by replication)",
+    "Chapter 4.4 runs a random leaf-level 70:30 split on the same data to show the inflation that random splitting would cause"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 38. Main metric of every model under LORO and under the 70:30 split (macro-F1 for detection and six grades, R² for the score). All other metrics are in the Excel sheet 29.",
+  "rows": [
+   [
+    "Task",
+    "Model",
+    "Type",
+    "Metric",
+    "LORO (all 2330 leaves)",
+    "70:30 (699 test leaves)",
+    "Difference (70:30 − LORO)"
+   ],
+   [
+    "A",
+    "SVM",
+    "ML",
+    "macro-F1",
+    "0.792",
+    "0.826",
+    "+0.035"
+   ],
+   [
+    "A",
+    "RF",
+    "ML",
+    "macro-F1",
+    "0.765",
+    "0.811",
+    "+0.046"
+   ],
+   [
+    "A",
+    "XGBoost",
+    "ML",
+    "macro-F1",
+    "0.767",
+    "0.813",
+    "+0.046"
+   ],
+   [
+    "A",
+    "k-NN",
+    "ML",
+    "macro-F1",
+    "0.719",
+    "0.749",
+    "+0.030"
+   ],
+   [
+    "A",
+    "PLS-DA",
+    "ML",
+    "macro-F1",
+    "0.719",
+    "0.719",
+    "-0.000"
+   ],
+   [
+    "A",
+    "DNN-F1",
+    "DL",
+    "macro-F1",
+    "0.790",
+    "0.824",
+    "+0.034"
+   ],
+   [
+    "A",
+    "DT-EDNet",
+    "DL",
+    "macro-F1",
+    "0.759",
+    "0.808",
+    "+0.049"
+   ],
+   [
+    "A",
+    "EfficientNet-B0",
+    "DL",
+    "macro-F1",
+    "0.771",
+    "0.762",
+    "-0.009"
+   ],
+   [
+    "A",
+    "ResNet18",
+    "DL",
+    "macro-F1",
+    "0.785",
+    "0.822",
+    "+0.037"
+   ],
+   [
+    "A",
+    "ConvNeXt V2-Atto",
+    "DL",
+    "macro-F1",
+    "0.783",
+    "0.818",
+    "+0.034"
+   ],
+   [
+    "B",
+    "SVM",
+    "ML",
+    "macro-F1",
+    "0.346",
+    "0.358",
+    "+0.012"
+   ],
+   [
+    "B",
+    "RF",
+    "ML",
+    "macro-F1",
+    "0.349",
+    "0.374",
+    "+0.025"
+   ],
+   [
+    "B",
+    "XGBoost",
+    "ML",
+    "macro-F1",
+    "0.342",
+    "0.354",
+    "+0.011"
+   ],
+   [
+    "B",
+    "k-NN",
+    "ML",
+    "macro-F1",
+    "0.304",
+    "0.335",
+    "+0.031"
+   ],
+   [
+    "B",
+    "PLS-DA",
+    "ML",
+    "macro-F1",
+    "0.223",
+    "0.209",
+    "-0.014"
+   ],
+   [
+    "B",
+    "DNN-F1",
+    "DL",
+    "macro-F1",
+    "0.344",
+    "0.336",
+    "-0.009"
+   ],
+   [
+    "B",
+    "DT-EDNet",
+    "DL",
+    "macro-F1",
+    "0.337",
+    "0.313",
+    "-0.024"
+   ],
+   [
+    "B",
+    "EfficientNet-B0",
+    "DL",
+    "macro-F1",
+    "0.329",
+    "0.327",
+    "-0.002"
+   ],
+   [
+    "B",
+    "ResNet18",
+    "DL",
+    "macro-F1",
+    "0.339",
+    "0.322",
+    "-0.017"
+   ],
+   [
+    "B",
+    "ConvNeXt V2-Atto",
+    "DL",
+    "macro-F1",
+    "0.360",
+    "0.342",
+    "-0.018"
+   ],
+   [
+    "C",
+    "SVR",
+    "ML",
+    "R²",
+    "0.445",
+    "0.478",
+    "+0.033"
+   ],
+   [
+    "C",
+    "RF",
+    "ML",
+    "R²",
+    "0.449",
+    "0.517",
+    "+0.068"
+   ],
+   [
+    "C",
+    "XGBoost",
+    "ML",
+    "R²",
+    "0.459",
+    "0.512",
+    "+0.053"
+   ],
+   [
+    "C",
+    "k-NN",
+    "ML",
+    "R²",
+    "0.394",
+    "0.419",
+    "+0.025"
+   ],
+   [
+    "C",
+    "PLSR",
+    "ML",
+    "R²",
+    "0.415",
+    "0.445",
+    "+0.030"
+   ],
+   [
+    "C",
+    "DNN-F1",
+    "DL",
+    "R²",
+    "0.448",
+    "0.481",
+    "+0.033"
+   ],
+   [
+    "C",
+    "DT-EDNet",
+    "DL",
+    "R²",
+    "0.419",
+    "0.473",
+    "+0.054"
+   ],
+   [
+    "C",
+    "EfficientNet-B0",
+    "DL",
+    "R²",
+    "0.408",
+    "0.287",
+    "-0.121"
+   ],
+   [
+    "C",
+    "ResNet18",
+    "DL",
+    "R²",
+    "0.378",
+    "0.450",
+    "+0.072"
+   ],
+   [
+    "C",
+    "ConvNeXt V2-Atto",
+    "DL",
+    "R²",
+    "0.425",
+    "0.373",
+    "-0.052"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 39. Paired comparison on the 699 70:30 test leaves (15 plots): LORO predictions of the same leaves vs 70:30 predictions. Verdict \"higher/lower\" only when the 95% plot-bootstrap interval excludes zero.",
+  "rows": [
+   [
+    "Task",
+    "Model",
+    "Metric",
+    "LORO on the same leaves",
+    "70:30",
+    "Difference",
+    "95% interval (plots)",
+    "Verdict"
+   ],
+   [
+    "A",
+    "SVM",
+    "macro-F1",
+    "0.710",
+    "0.826",
+    "+0.117",
+    "+0.082 to +0.156",
+    "higher"
+   ],
+   [
+    "A",
+    "RF",
+    "macro-F1",
+    "0.677",
+    "0.811",
+    "+0.134",
+    "+0.074 to +0.194",
+    "higher"
+   ],
+   [
+    "A",
+    "XGBoost",
+    "macro-F1",
+    "0.702",
+    "0.813",
+    "+0.111",
+    "+0.065 to +0.158",
+    "higher"
+   ],
+   [
+    "A",
+    "k-NN",
+    "macro-F1",
+    "0.629",
+    "0.749",
+    "+0.120",
+    "+0.058 to +0.181",
+    "higher"
+   ],
+   [
+    "A",
+    "PLS-DA",
+    "macro-F1",
+    "0.631",
+    "0.719",
+    "+0.088",
+    "+0.041 to +0.132",
+    "higher"
+   ],
+   [
+    "A",
+    "DNN-F1",
+    "macro-F1",
+    "0.738",
+    "0.824",
+    "+0.086",
+    "+0.043 to +0.133",
+    "higher"
+   ],
+   [
+    "A",
+    "DT-EDNet",
+    "macro-F1",
+    "0.701",
+    "0.808",
+    "+0.107",
+    "+0.048 to +0.161",
+    "higher"
+   ],
+   [
+    "A",
+    "EfficientNet-B0",
+    "macro-F1",
+    "0.703",
+    "0.762",
+    "+0.059",
+    "-0.003 to +0.112",
+    "no real difference"
+   ],
+   [
+    "A",
+    "ResNet18",
+    "macro-F1",
+    "0.704",
+    "0.822",
+    "+0.119",
+    "+0.069 to +0.167",
+    "higher"
+   ],
+   [
+    "A",
+    "ConvNeXt V2-Atto",
+    "macro-F1",
+    "0.747",
+    "0.818",
+    "+0.070",
+    "+0.020 to +0.120",
+    "higher"
+   ],
+   [
+    "B",
+    "SVM",
+    "macro-F1",
+    "0.328",
+    "0.358",
+    "+0.030",
+    "-0.020 to +0.083",
+    "no real difference"
+   ],
+   [
+    "B",
+    "RF",
+    "macro-F1",
+    "0.329",
+    "0.374",
+    "+0.045",
+    "-0.000 to +0.094",
+    "no real difference"
+   ],
+   [
+    "B",
+    "XGBoost",
+    "macro-F1",
+    "0.316",
+    "0.354",
+    "+0.038",
+    "-0.002 to +0.079",
+    "no real difference"
+   ],
+   [
+    "B",
+    "k-NN",
+    "macro-F1",
+    "0.269",
+    "0.335",
+    "+0.066",
+    "+0.002 to +0.120",
+    "higher"
+   ],
+   [
+    "B",
+    "PLS-DA",
+    "macro-F1",
+    "0.219",
+    "0.209",
+    "-0.010",
+    "-0.034 to +0.015",
+    "no real difference"
+   ],
+   [
+    "B",
+    "DNN-F1",
+    "macro-F1",
+    "0.354",
+    "0.336",
+    "-0.019",
+    "-0.087 to +0.043",
+    "no real difference"
+   ],
+   [
+    "B",
+    "DT-EDNet",
+    "macro-F1",
+    "0.298",
+    "0.313",
+    "+0.014",
+    "-0.037 to +0.061",
+    "no real difference"
+   ],
+   [
+    "B",
+    "EfficientNet-B0",
+    "macro-F1",
+    "0.314",
+    "0.327",
+    "+0.013",
+    "-0.032 to +0.054",
+    "no real difference"
+   ],
+   [
+    "B",
+    "ResNet18",
+    "macro-F1",
+    "0.333",
+    "0.322",
+    "-0.011",
+    "-0.066 to +0.038",
+    "no real difference"
+   ],
+   [
+    "B",
+    "ConvNeXt V2-Atto",
+    "macro-F1",
+    "0.341",
+    "0.342",
+    "+0.001",
+    "-0.042 to +0.041",
+    "no real difference"
+   ],
+   [
+    "C",
+    "SVR",
+    "R²",
+    "0.367",
+    "0.478",
+    "+0.111",
+    "+0.066 to +0.181",
+    "higher"
+   ],
+   [
+    "C",
+    "RF",
+    "R²",
+    "0.402",
+    "0.517",
+    "+0.115",
+    "+0.070 to +0.174",
+    "higher"
+   ],
+   [
+    "C",
+    "XGBoost",
+    "R²",
+    "0.410",
+    "0.512",
+    "+0.102",
+    "+0.067 to +0.141",
+    "higher"
+   ],
+   [
+    "C",
+    "k-NN",
+    "R²",
+    "0.328",
+    "0.419",
+    "+0.091",
+    "+0.040 to +0.170",
+    "higher"
+   ],
+   [
+    "C",
+    "PLSR",
+    "R²",
+    "0.437",
+    "0.445",
+    "+0.008",
+    "-0.025 to +0.038",
+    "no real difference"
+   ],
+   [
+    "C",
+    "DNN-F1",
+    "R²",
+    "0.388",
+    "0.481",
+    "+0.093",
+    "+0.035 to +0.158",
+    "higher"
+   ],
+   [
+    "C",
+    "DT-EDNet",
+    "R²",
+    "0.355",
+    "0.473",
+    "+0.119",
+    "+0.023 to +0.234",
+    "higher"
+   ],
+   [
+    "C",
+    "EfficientNet-B0",
+    "R²",
+    "0.373",
+    "0.287",
+    "-0.085",
+    "-0.164 to +0.013",
+    "no real difference"
+   ],
+   [
+    "C",
+    "ResNet18",
+    "R²",
+    "0.318",
+    "0.450",
+    "+0.131",
+    "+0.056 to +0.226",
+    "higher"
+   ],
+   [
+    "C",
+    "ConvNeXt V2-Atto",
+    "R²",
+    "0.371",
+    "0.373",
+    "+0.002",
+    "-0.091 to +0.079",
+    "no real difference"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 40. Where the paired difference comes from: overall accuracy (A, B) and RMSE (C) on the test leaves of the healthy and of the unsprayed test plots, mean of the ten models (for RMSE a negative difference is an improvement).",
+  "rows": [
+   [
+    "Task",
+    "Test leaves from",
+    "Metric",
+    "Leaves",
+    "LORO (same leaves)",
+    "70:30",
+    "Difference"
+   ],
+   [
+    "A",
+    "healthy plots",
+    "OA",
+    "126",
+    "0.648",
+    "0.754",
+    "+0.106"
+   ],
+   [
+    "A",
+    "unsprayed plots",
+    "OA",
+    "573",
+    "0.780",
+    "0.865",
+    "+0.084"
+   ],
+   [
+    "B",
+    "healthy plots",
+    "OA",
+    "126",
+    "0.619",
+    "0.729",
+    "+0.110"
+   ],
+   [
+    "B",
+    "unsprayed plots",
+    "OA",
+    "573",
+    "0.299",
+    "0.312",
+    "+0.013"
+   ],
+   [
+    "C",
+    "healthy plots",
+    "RMSE",
+    "126",
+    "2.064",
+    "1.729",
+    "-0.336"
+   ],
+   [
+    "C",
+    "unsprayed plots",
+    "RMSE",
+    "573",
+    "2.205",
+    "2.120",
+    "-0.085"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 41. Light pipeline (selection on the training part; A SVM, B random forest, C XGBoost; grid search, no SFFS) under LORO, the main 70:30 split and 20 other grouped, stratified 70:30 splits. \"Same leaves\" compares each split with the LORO predictions of exactly its test leaves, which removes the luck of the test set.",
+  "rows": [
+   [
+    "Task",
+    "Metric",
+    "LORO (light pipeline, all leaves)",
+    "Main 70:30 split",
+    "20 other 70:30 splits: mean ± SD (range)",
+    "Above LORO (all leaves)",
+    "Same leaves: mean difference",
+    "Same leaves: better than LORO"
+   ],
+   [
+    "A",
+    "macro-F1",
+    "0.796",
+    "0.848",
+    "0.807 ± 0.027 (0.770 – 0.863)",
+    "12 of 20",
+    "+0.002 ± 0.030",
+    "10 of 20"
+   ],
+   [
+    "A",
+    "AUC",
+    "0.902",
+    "0.948",
+    "0.918 ± 0.023 (0.877 – 0.959)",
+    "14 of 20",
+    "+0.010 ± 0.023",
+    "12 of 20"
+   ],
+   [
+    "A",
+    "OA",
+    "0.831",
+    "0.877",
+    "0.842 ± 0.025 (0.799 – 0.889)",
+    "12 of 20",
+    "+0.006 ± 0.028",
+    "11 of 20"
+   ],
+   [
+    "B",
+    "macro-F1",
+    "0.358",
+    "0.399",
+    "0.370 ± 0.021 (0.328 – 0.413)",
+    "15 of 20",
+    "+0.007 ± 0.021",
+    "12 of 20"
+   ],
+   [
+    "B",
+    "QWK",
+    "0.620",
+    "0.693",
+    "0.632 ± 0.033 (0.564 – 0.684)",
+    "14 of 20",
+    "+0.000 ± 0.028",
+    "8 of 20"
+   ],
+   [
+    "C",
+    "R²",
+    "0.476",
+    "0.510",
+    "0.478 ± 0.040 (0.392 – 0.547)",
+    "9 of 20",
+    "-0.012 ± 0.028",
+    "4 of 20"
+   ],
+   [
+    "C",
+    "RMSE",
+    "2.010",
+    "1.933",
+    "2.001 ± 0.074 (1.863 – 2.137)",
+    "12 of 20",
+    "+0.022 ± 0.054",
+    "4 of 20"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 42. Grouped (whole plots) vs random leaf-level 70:30 splits with the same light pipeline.",
+  "rows": [
+   [
+    "Task",
+    "Metric",
+    "Grouped 70:30 (20 splits, mean)",
+    "Random leaf-level 70:30 (5 splits, mean)",
+    "Inflation"
+   ],
+   [
+    "A",
+    "macro-F1",
+    "0.807",
+    "0.815",
+    "+0.008"
+   ],
+   [
+    "A",
+    "AUC",
+    "0.918",
+    "0.929",
+    "+0.011"
+   ],
+   [
+    "A",
+    "OA",
+    "0.842",
+    "0.853",
+    "+0.011"
+   ],
+   [
+    "B",
+    "macro-F1",
+    "0.370",
+    "0.425",
+    "+0.055"
+   ],
+   [
+    "B",
+    "QWK",
+    "0.632",
+    "0.656",
+    "+0.024"
+   ],
+   [
+    "C",
+    "R²",
+    "0.478",
+    "0.504",
+    "+0.026"
+   ],
+   [
+    "C",
+    "RMSE",
+    "2.001",
+    "1.951",
+    "+0.051"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 43. Methodology steps and their status for the 2025-26 leaf spectra.",
+  "rows": [
+   [
+    "Methodology step",
+    "Status in this analysis",
+    "Where"
+   ],
+   [
+    "A1 Design and treatments",
+    "Done: 48 plots, healthy block + R1–R3, D × V layout checked for all plots",
+    "2.1, Table design"
+   ],
+   [
+    "A4 Leaf spectra (ASD)",
+    "Done: 2330 leaf spectra, L3/L5/LL, 4 dates; files parsed and checked",
+    "2.2, 2.4"
+   ],
+   [
+    "A5 Labels",
+    "Done: tasks A, B (six grades) and C",
+    "2.5"
+   ],
+   [
+    "A6 Covariates",
+    "Done: variety, sowing timing, crop age (DAS), growth stage, 7-day weather (no look-ahead), favourable days since sowing",
+    "2.3, 3.12"
+   ],
+   [
+    "B3 Smoothing; D3 spectral features; D4 indices",
+    "Done: Savitzky–Golay 11/2, first derivative, 5-nm bands, 41 indices + REP, Dr, REarea; water bands kept (contact probe)",
+    "2.7–2.8"
+   ],
+   [
+    "E3 Standardisation; E4 class weights",
+    "Done with training statistics; balanced class weights",
+    "2.10"
+   ],
+   [
+    "E2 Healthy-plot normalisation",
+    "Not used (healthy plots are fungicide-sprayed)",
+    "–"
+   ],
+   [
+    "F1–F3 validation, nested inner folds, leakage checks",
+    "Done: grouped, stratified 70:30 hold-out of whole plots, inner GroupKFold by plot, selection on the training plots only; compared with LORO in Chapter 4",
+    "2.6, 4"
+   ],
+   [
+    "1.1.1–1.1.3 Response analysis",
+    "Done: mean and derivative spectra, correlation, strata, weather",
+    "3.1–3.2"
+   ],
+   [
+    "1.2.1–1.2.4 Effective ranges, SHAP-CARS, OW",
+    "Done (top-5% rule because no pair reached R² 0.5)",
+    "3.3"
+   ],
+   [
+    "1.3.1–1.3.2 NDSI, RSI, WRI",
+    "Done",
+    "3.4"
+   ],
+   [
+    "1.3.3 Multispectral two-band indices",
+    "Not applicable (no camera)",
+    "–"
+   ],
+   [
+    "1.4.1–1.4.3 Index group, redundancy, ReliefF",
+    "Done",
+    "3.4"
+   ],
+   [
+    "1.5 Texture and TTFI",
+    "Not applicable (non-imaging data)",
+    "–"
+   ],
+   [
+    "1.6.2 VIF across groups",
+    "Done → DSF",
+    "3.4"
+   ],
+   [
+    "1.7 Biochemical parameters",
+    "Not measured in 2025-26",
+    "–"
+   ],
+   [
+    "2.1.1–2.1.2 Tasks, selection on the training plots",
+    "Done",
+    "3.5"
+   ],
+   [
+    "2.1.3 Fusion of 15 sensor sets",
+    "Not applicable (one sensor)",
+    "–"
+   ],
+   [
+    "2.1.4 SFFS",
+    "Done",
+    "3.6"
+   ],
+   [
+    "2.1.5 Feature configurations",
+    "Done: OW, VI, DSF",
+    "3.9"
+   ],
+   [
+    "2.2.1–2.2.6 SVM/SVR, RF, XGBoost, k-NN, PLS-DA/PLSR, grids",
+    "Done",
+    "3.6, 3.8"
+   ],
+   [
+    "2.3.1 DNN-F1; 2.3.3–2.3.8 pseudo-images, DT-EDNet, EfficientNet-B0, ResNet18, ConvNeXt V2",
+    "Done (paper settings, CPU, no extra tuning)",
+    "3.7–3.9"
+   ],
+   [
+    "2.3.2 DNN-F2",
+    "Not applicable (one sensor)",
+    "–"
+   ],
+   [
+    "2.4.1–2.4.3 Metrics",
+    "Done",
+    "3.8"
+   ],
+   [
+    "2.5.3 Network comparison and ablation",
+    "Done",
+    "3.9"
+   ],
+   [
+    "2.5.4 SHAP and stability",
+    "Done",
+    "3.5, 3.10"
+   ],
+   [
+    "2.5.5 Covariate baseline",
+    "Done: B1 statistical, random forest and best ML on covariates only; M0/M1/M2; gains with plot-block bootstrap and DeLong (unsprayed plots only)",
+    "2.11, 3.12"
+   ],
+   [
+    "2.6.1–2.6.2 Strata, LOVO, LOTO",
+    "Done",
+    "3.11"
+   ],
+   [
+    "2.6.3 Severity maps",
+    "Not applicable (no images)",
+    "–"
+   ],
+   [
+    "2.7.1 Final models on all data",
+    "Done: models saved with prediction script",
+    "2.13, Appendix"
+   ],
+   [
+    "2.7.2–2.7.4 Bharatpur validation",
+    "Next season",
+    "–"
+   ],
+   [
+    "3.1–3.5 Pre-symptomatic objective (Objective 3)",
+    "Not addressed: no pre-symptomatic dates in 2025-26",
+    "–"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 44. Main sheets of the Excel workbook.",
+  "rows": [
+   [
+    "Sheet",
+    "Content"
+   ],
+   [
+    "1_Data",
+    "leaf metadata and 5-nm reflectance (input of the formula sheets)"
+   ],
+   [
+    "2_Counts",
+    "COUNTIFS tables by factor and grade, with charts"
+   ],
+   [
+    "3_Mean_spectra",
+    "AVERAGEIFS mean spectra by grade, line chart"
+   ],
+   [
+    "4–7",
+    "first derivative, correlation (CORREL), NDSI/RSI R² grid, SHAP-CARS"
+   ],
+   [
+    "8_WRI",
+    "White Rust Index with editable wavelengths and weight (INDEX/MATCH)"
+   ],
+   [
+    "9–12",
+    "indices as formulas and values, ReliefF, VIF and the disease-specific feature set"
+   ],
+   [
+    "13–14",
+    "selection on the training plots, SFFS and grid search"
+   ],
+   [
+    "15–17",
+    "metrics, confusion matrices with formula metrics, observed vs predicted with formula metrics"
+   ],
+   [
+    "18–24",
+    "deep learning, SHAP, strata, transfer, weather, selection stability"
+   ],
+   [
+    "25_Covariate_baseline",
+    "covariates by date, models × inputs, gains with bootstrap intervals (Δ as formulas), DeLong tests, interpretable model; charts"
+   ],
+   [
+    "26_References",
+    "references"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 45. Machine-learning model files (trained on all 2330 leaves; load with predict_white_rust.py).",
+  "rows": [
+   [
+    "File",
+    "Task",
+    "Model",
+    "Features"
+   ],
+   [
+    "ml/A_detection_PLS-DA.joblib",
+    "A",
+    "PLS-DA",
+    "FD1245, FD760, FD1060, FD1075, FD860, DWSI-2"
+   ],
+   [
+    "ml/A_detection_RF.joblib",
+    "A",
+    "RF",
+    "FD550, FD1810, FD760, FD1060, FD1075, FD860, FD985, REP"
+   ],
+   [
+    "ml/A_detection_SVM.joblib",
+    "A",
+    "SVM",
+    "FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2"
+   ],
+   [
+    "ml/A_detection_XGBoost.joblib",
+    "A",
+    "XGBoost",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985"
+   ],
+   [
+    "ml/A_detection_k-NN.joblib",
+    "A",
+    "k-NN",
+    "FD595, FD1810, FD1060, FD860, FD985, DWSI-2"
+   ],
+   [
+    "ml/B_six_grades_PLS-DA.joblib",
+    "B",
+    "PLS-DA",
+    "FD1810, FD1245, FD760, FD1060, FD860, REP, PSSRb"
+   ],
+   [
+    "ml/B_six_grades_RF.joblib",
+    "B",
+    "RF",
+    "FD550, FD1810, FD760, FD1060, FD1075, FD860, FD985, PSSRb"
+   ],
+   [
+    "ml/B_six_grades_SVM.joblib",
+    "B",
+    "SVM",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985"
+   ],
+   [
+    "ml/B_six_grades_XGBoost.joblib",
+    "B",
+    "XGBoost",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD860, FD985, REP"
+   ],
+   [
+    "ml/B_six_grades_k-NN.joblib",
+    "B",
+    "k-NN",
+    "FD550, FD595, FD1810, FD1245, FD1060, FD860"
+   ],
+   [
+    "ml/C_severity_score_PLS.joblib",
+    "C",
+    "PLS",
+    "FD550, FD1245, FD1060, FD860, HI, MCARI"
+   ],
+   [
+    "ml/C_severity_score_RF.joblib",
+    "C",
+    "RF",
+    "FD550, FD1810, FD1245, FD1060, FD1075, FD860, HI"
+   ],
+   [
+    "ml/C_severity_score_SVM.joblib",
+    "C",
+    "SVM",
+    "FD1810, FD1060, FD1075, FD860, FD985, HI"
+   ],
+   [
+    "ml/C_severity_score_XGBoost.joblib",
+    "C",
+    "XGBoost",
+    "FD1810, FD1245, FD1060, FD1075, FD860, FD985, HI"
+   ],
+   [
+    "ml/C_severity_score_k-NN.joblib",
+    "C",
+    "k-NN",
+    "FD1810, FD1075, FD860, HI"
+   ]
+  ]
+ },
+ {
+  "caption": "Table 46. Deep-learning model files (trained on all 2330 leaves; load with predict_white_rust.py).",
+  "rows": [
+   [
+    "File",
+    "Task",
+    "Model",
+    "Features"
+   ],
+   [
+    "dl/A_detection_DNN-F1.pt",
+    "A",
+    "DNN-F1",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2"
+   ],
+   [
+    "dl/A_detection_DT-EDNet.pt",
+    "A",
+    "DT-EDNet",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2"
+   ],
+   [
+    "dl/A_detection_EfficientNet-B0.pt",
+    "A",
+    "EfficientNet-B0",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2"
+   ],
+   [
+    "dl/A_detection_ResNet18.pt",
+    "A",
+    "ResNet18",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2"
+   ],
+   [
+    "dl/A_detection_ConvNeXt_V2-Atto.pt",
+    "A",
+    "ConvNeXt V2-Atto",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, DWSI-2"
+   ],
+   [
+    "dl/B_six_grades_DNN-F1.pt",
+    "B",
+    "DNN-F1",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, PSSRb"
+   ],
+   [
+    "dl/B_six_grades_DT-EDNet.pt",
+    "B",
+    "DT-EDNet",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, PSSRb"
+   ],
+   [
+    "dl/B_six_grades_EfficientNet-B0.pt",
+    "B",
+    "EfficientNet-B0",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, PSSRb"
+   ],
+   [
+    "dl/B_six_grades_ResNet18.pt",
+    "B",
+    "ResNet18",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, PSSRb"
+   ],
+   [
+    "dl/B_six_grades_ConvNeXt_V2-Atto.pt",
+    "B",
+    "ConvNeXt V2-Atto",
+    "FD550, FD595, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, REP, PSSRb"
+   ],
+   [
+    "dl/C_severity_score_DNN-F1.pt",
+    "C",
+    "DNN-F1",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, HI, MCARI, Dr, DWSI-2"
+   ],
+   [
+    "dl/C_severity_score_DT-EDNet.pt",
+    "C",
+    "DT-EDNet",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, HI, MCARI, Dr, DWSI-2"
+   ],
+   [
+    "dl/C_severity_score_EfficientNet-B0.pt",
+    "C",
+    "EfficientNet-B0",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, HI, MCARI, Dr, DWSI-2"
+   ],
+   [
+    "dl/C_severity_score_ResNet18.pt",
+    "C",
+    "ResNet18",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, HI, MCARI, Dr, DWSI-2"
+   ],
+   [
+    "dl/C_severity_score_ConvNeXt_V2-Atto.pt",
+    "C",
+    "ConvNeXt V2-Atto",
+    "FD550, FD1810, FD1245, FD760, FD1060, FD1075, FD860, FD985, HI, MCARI, Dr, DWSI-2"
+   ]
+  ]
+ }
+]
