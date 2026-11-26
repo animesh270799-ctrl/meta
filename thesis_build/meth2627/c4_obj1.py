@@ -57,13 +57,14 @@ def add():
     step('1.2.2', 'Optimal wavelengths by Shapley additive explanations and competitive adaptive reweighted sampling', part=P,
          what='Candidates are the R and FD bands inside the effective ranges. (1) A random forest predicts the DI and the bands are ranked by mean |SHAP|; the top-ranked bands are kept. (2) Monte Carlo cross-validation chooses the number of PLS components. (3) CARS eliminates redundant bands; the subset with the best cross-validated performance gives the optimal wavelengths (OW).',
          why='Hundreds of correlated bands cannot be given directly to a model; SHAP removes uninformative bands, then CARS removes redundant ones.',
-         do=['Standardise the candidate bands.', 'Random forest regression of the DI (500 trees); mean |SHAP| per band (TreeSHAP); keep the top 40%.', 'MCCV (50 random 80/20 divisions by plot) chooses the PLS components (1–15).',
+         do=['Standardise the candidate bands (z-score; PLS is scale-sensitive and reflectance and first-derivative values differ by about 100 times).', 'Random forest regression of the DI (500 trees); mean |SHAP| per band (TreeSHAP); keep the top 40%.', 'MCCV (50 random 80/20 divisions by plot) chooses the PLS components (1–15).',
              'CARS: 50 iterations of PLS-weighted, exponentially decreasing band subsets with adaptive reweighted sampling; keep the subset with the lowest GroupKFold(3) RMSE.', 'Label the bands R_{λ} or FD_{λ}.'],
          settings=['Random forest 500 trees, seed 42; CARS 50 iterations; MCCV 50 divisions.'],
          check=['OW list of about 10–15 bands with wavelength and type.'],
          out='OW → 1.6.2, 2.6 (configurations).',
          papers=[('Ma et al. (2026)', 'Rice blast; SHAP-CARS – an ensemble model ranked the bands by mean |SHAP|, MCCV chose the PLS components, CARS eliminated redundant variables over many iterations, and the subset was fixed by validation performance; 12 key wavelengths were kept.', 'The three stages in the same order.'),
-                 ('Tian et al. (2021)', 'Rice leaf blast; disease-sensitive bands selected from leaf spectra before model building.', 'Band selection before the models.')])
+                 ('Tian et al. (2021)', 'Rice leaf blast; disease-sensitive bands selected from leaf spectra before model building.', 'Band selection before the models.'),
+                 ('Bijlwan et al. (2025)', 'Crop disease severity models; inputs of scale-sensitive models centred and scaled, tree models used without scaling.', 'Bands z-scored before PLS/CARS; the random forest SHAP ranking uses unscaled bands.')])
     myfig('shapdemo', 'g09_shapcars_demo.png', 'Demo of Step 1.2.2 (simulated): (a) SHAP ranking and the top 40% kept; (b) bands kept by CARS.')
 
     h2('Activity 1.3 – Spectral index construction')
@@ -107,7 +108,7 @@ def add():
     step('1.4.2', 'Relief-F ranking of the indices', part=P,
          what='The remaining indices are ranked with ReliefF (DI classes, Tasks A and B) and RReliefF (DI, Task C); the top five per task are the selected indices (VI).',
          why='ReliefF rewards features that separate classes among similar samples and can reward a feature that is useful together with others.',
-         do=['Min–max scale the indices.', 'ReliefF / RReliefF with k = 10 nearest neighbours.', 'Keep the top five per task.'],
+         do=['Min–max scale the indices to 0–1 (the ReliefF difference between two samples is |x1 − x2| divided by the feature range, so every feature counts equally).', 'ReliefF / RReliefF with k = 10 nearest neighbours.', 'Keep the top five per task.'],
          check=['VI lists of Tasks A, B and C.'],
          out='VI → 1.6.2.',
          papers=[('Ma et al. (2026)', 'Rice blast; the Relief algorithm selected the five vegetation indices with the highest weights (RVI, PSSRb, CIre, CIgreen, SR).', 'Relief ranking, top five.'),

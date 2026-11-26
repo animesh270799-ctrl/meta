@@ -101,7 +101,8 @@ def add():
                  ('Selvaprakash et al. (2026)', 'Rice blast (IARI); 800 leaf spectra (350–2500 nm) used for early detection.', 'A leaf data set of similar size per date is sufficient for leaf models.'),
                  ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; spectra in contact with the leaf estimated severity better than spectra taken above the crop.', 'Contact measurement of single leaves.'),
                  ('Yu et al. (2021)', 'Pine wilt disease; field portable spectrometer measurements collected with UAV hyperspectral images.', 'Leaf spectra collected on the same dates as the UAV flights.'),
-                 ('Mandal et al. (2022)', 'Rice blast (IARI); reflectance of ten genotypes scored 0–9; correlation above 0.6 with severity in 550–760 and 1140–1300 nm.', 'Leaf reflectance of plants scored on the 0–9 scale.')])
+                 ('Mandal et al. (2022)', 'Rice blast (IARI); reflectance of ten genotypes scored 0–9; correlation above 0.6 with severity in 550–760 and 1140–1300 nm.', 'Leaf reflectance of plants scored on the 0–9 scale.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast; hyperspectral images normalised against the white reference; the whole leaf traced as the region of interest and its average reflectance extracted.', 'Readings relative to a white reference; one average spectrum per leaf.')])
     demo('rec', [['Date', 'Plot', 'Subplot', 'Plant', 'Leaf', 'Grade', 'ASD files', 'White ref.'],
                  ['18 Jan 2027', '25', '2', 'centre', 'L3', '1', '25_2_C_L3_01, _02', '10:42'], ['18 Jan 2027', '25', '2', 'centre', 'L5', '3', '25_2_C_L5_01, _02', '10:42'], ['18 Jan 2027', '25', '2', 'corner 1', 'L3', '0', '– (graded only)', '–']],
          'Record sheet for leaf grades and ASD readings', widths=[1300, 700, 900, 1000, 700, 800, 2700, 1100])

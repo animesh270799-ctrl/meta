@@ -116,7 +116,7 @@ def add():
          what='Three models are compared on the same 33 training and 15 test plots: M0 uses only the covariates of Step A6 (DAI, variety, sowing date, growth stage, 7-day weather, favourable days); M1 uses only camera features (the best sensor set and model of the task, Step 2.8); M2 uses camera features + covariates with the same model type as M1.',
          why='White rust severity rises with time and depends on weather, variety and stage, so a camera model can look accurate by learning the calendar. As in disease-forecasting studies, the sensors are credited only with what they add to a weather-only model.',
          do=['Build the covariate table for every sample (Step A6); weather windows end the day before each flight (no look-ahead).',
-             'M0: random forest on the covariates only, tuned with GroupKFold(3) by plot on the training plots (same grid as Step 2.4).',
+             'M0: random forest on the covariates only (numeric covariates z-scored in the pipeline, variety and sowing date one-hot coded), tuned with GroupKFold(3) by plot on the training plots (same grid as Step 2.4).',
              'M1: the best sensor model of the task (Step 2.8), unchanged.',
              'M2: the M1 model type on sensor features + covariates; the covariates are added to the DSF and SFFS and grid search are repeated.',
              'Predict the 15 test plots with M0, M1 and M2; compute all metrics of Step 2.7 (main: macro-F1 for Tasks A, B; R² for Task C).',

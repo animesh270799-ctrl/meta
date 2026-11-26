@@ -153,10 +153,24 @@ img(s, 'g05_split.png', 0.45, 4.8, 7.3, 1.75);
 refline(s, '7:3 stratified split, 10% of training as validation, highest-validation model tested once: Ma et al. (2026); one-third hold-out: Mandal et al. (2023); 4-fold CV for SFFS/SVM: Tian et al. (2021), Lv et al. (2023) – here always by whole plots.', 6.55, 0.5);
 // ------------------------------------------------------------------ D prep
 s = S('Part D: Thermal normalisation, scaling, class balance and leakage rules', 'Data preparation');
-tb(s, [['Step', 'What is done', 'Disease papers'], ['D3 Thermal normalisation', 'CTD = Tc − Ta; NRCT; difference from healthy training plots of the same date and variety', 'Calderón et al. (2014); Oerke et al. (2006)'],
-  ['D4 Scaling and balance', 'z-score with fitting-part statistics (inside every fold); balanced class weights (SVM, RF); networks: label smoothing 0.01', 'Lv et al. (2023); Ma et al. (2026)'],
+tb(s, [['Step', 'What is done', 'Disease papers'], ['D3 Thermal normalisation', 'CTD = Tc − Ta; CTR = Tc/Ta; NRCT = (Tc − Tmin)/(Tmax − Tmin) within each date; difference from healthy training plots of the same date and variety', 'Feng et al. (2022); Calderón et al. (2014); Oerke et al. (2006)'],
+  ['D4 Scaling and balance', 'z-score with fitting-part statistics (inside every fold) for SVM, k-NN, PLS, networks (random forest needs none); balanced class weights; networks: label smoothing 0.01', 'Bijlwan et al. (2025); Lv et al. (2023); Ma et al. (2026)'],
   ['D5 Leakage rules', 'no plot on both sides; selection, scaling, healthy references and weights from training plots only; test plots used once', 'Ma et al. (2026); Mandal et al. (2023)']], 0.45, 1.25, 12.43, [2.8, 6.0, 3.63], { firstCol: true });
 BL(s, ['**Objective 1 (description)** uses all samples; **for the models** the same selection is repeated on the training plots only (Step 2.2).'], 0.45, 4.0, 12.43, 0.8);
+// ------------------------------------------------------------------ normalisation summary
+s = S('Normalisation at each stage of the methodology', 'Data preparation');
+tb(s, [['Stage', 'Normalisation', 'Constants from', 'Disease papers'],
+  ['Calibration (B1), ASD (A4)', 'reflectance with panels / white reference; temperature from radiance', 'panels, white reference', 'Ma et al. (2026); Liu et al. (2024); Zhang et al. (2022)'],
+  ['Subplot sample (B6)', 'mean of all pixels of the region of interest', 'the ROI', 'Ma et al. (2026); Liu et al. (2024)'],
+  ['Features (C1–C4)', 'normalised-difference and ratio indices; first derivative (no z-score of spectra)', 'formulas', 'Ma et al. (2026); Lv et al. (2023)'],
+  ['Thermal (D3)', 'CTD, CTR, NRCT (min–max within each date), difference from healthy plots', 'air temperature; image; healthy training plots', 'Feng et al. (2022); Calderón et al. (2014)'],
+  ['PLS/CARS (1.2.2)', 'z-score of candidate bands', 'samples used for selection', 'Bijlwan et al. (2025)'],
+  ['ReliefF (1.4.2, 1.6.1, L5.4)', 'min–max 0–1 (built into the ReliefF difference)', 'samples used for selection', 'Lv et al. (2023); Ma et al. (2026)'],
+  ['Filters, mRMR, TTFI, VIF, maps', 'none (scale-free methods)', '–', 'Ma et al. (2026); Lv et al. (2023)'],
+  ['Feature fusion (2.2)', 'none at the join; VIF < 10 again', '–', 'Feng et al. (2022); Liu et al. (2024)'],
+  ['Models (D4), covariates (2.9)', 'z-score in the pipeline (trees unaffected); categorical one-hot', 'fitting part of each fold; training plots', 'Bijlwan et al. (2025); Zhang et al. (2014a)'],
+  ['Pre-symptomatic (3.2)', 'z relative to healthy plants of the same date and variety', 'healthy training plots', 'Oerke et al. (2006); Zarco-Tejada et al. (2018)'],
+  ['Bharatpur (2.11)', 'same formulas; frozen IARI constants', 'IARI training plots', 'Ma et al. (2026)']], 0.45, 1.2, 12.43, [2.6, 4.6, 2.5, 2.73], { firstCol: true, fs: 12 });
 // ------------------------------------------------------------------ Objective 1
 sec('Objective 1');
 s = S('Objective 1: Characterisation of white rust (overview)', 'Objective 1');

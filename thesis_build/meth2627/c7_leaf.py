@@ -105,7 +105,8 @@ def add():
          check=['Explained variance of the first five components.'],
          out='Visual check → discussion.',
          papers=[('Selvaprakash et al. (2026)', 'Rice blast; PCA of leaf spectra; most variance in five components.', 'Exploratory PCA.'),
-                 ('Shukla et al. (2024)', 'Aphid-infested mustard; PCA loadings identified key bands.', 'PCA on mustard spectra.')])
+                 ('Shukla et al. (2024)', 'Aphid-infested mustard; PCA loadings identified key bands.', 'PCA on mustard spectra.'),
+                 ('Bijlwan et al. (2025)', 'Wheat diseases; variables z-scored (mean 0, SD 1) before principal component analysis so that variables with large values do not dominate.', 'z-score before PCA.')])
 
     h2('L6–L10 – Leaf models, evaluation and links')
     step('L6', 'Leaf models', part=P,
