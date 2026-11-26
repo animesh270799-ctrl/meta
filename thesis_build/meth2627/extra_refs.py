@@ -24,4 +24,5 @@ EXTRA = [
  'Landis, J.R., Koch, G.G. (1977). The measurement of observer agreement for categorical data. Biometrics 33(1), 159–174. https://doi.org/10.2307/2529310',
  'Cheng, T., Rivard, B., Sánchez-Azofeifa, G.A., et al. (2010). Continuous wavelet analysis for the detection of green attack damage due to mountain pine beetle infestation. Remote Sensing of Environment 114(4), 899–910.',
  'Ma, J., Wu, P., Guo, S., Lin, Y., Yu, F., Liu, T. (2026). Early detection of rice blast disease using a dual transformer network (DT-EDNet) based on hyperspectral imaging and multi-feature fusion. IAENG International Journal of Applied Mathematics 56(11), 5380–5398.',
+ 'Zhang, G., Xu, T., Tian, Y., Feng, S., Zhao, D., Guo, Z. (2022). Classification of rice leaf blast severity using hyperspectral imaging. Scientific Reports 12, 19757. https://doi.org/10.1038/s41598-022-22074-7',
 ]

@@ -29,7 +29,8 @@ def add():
          out='Inputs of every model → 2.3–2.6.',
          papers=[('Ma et al. (2026)', 'Rice blast; feature selection on the training data (2023) only; testing on independent 2024 data.', 'Selection on the training plots only.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; feature-level fusion of selected hyperspectral, thermal and RGB features.', 'Feature-level fusion by concatenation.'),
-                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and thermal features combined at feature level.', 'Same fusion level.')])
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and thermal features combined at feature level.', 'Same fusion level.'),
+                 ('Huang et al. (2020)', 'Wheat Fusarium head blight; spectral, colour and texture features of hyperspectral images of ears fused for severity diagnosis.', 'Feature-level fusion of spectral, colour and texture features.')])
 
     h2('Activity 2.3 – Machine-learning models')
     step('2.3', 'Sequential floating forward selection', part=P,
@@ -66,7 +67,8 @@ def add():
          out='DNN-F1 predictions → 2.7.',
          papers=[('Deng et al. (2024)', 'Wheat stripe rust; RustQNet, a multimodal deep network that estimated the disease index from UAV data.', 'A neural network on multimodal UAV features, including regression of the DI.'),
                  ('Liu et al. (2020)', 'Wheat Fusarium head blight; a neural network classifier on UAV hyperspectral bands, indices and texture.', 'Neural network on selected UAV features.'),
-                 ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; neural networks estimated severity from reflectance.', 'Network regression of severity.')])
+                 ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; neural networks estimated severity from reflectance.', 'Network regression of severity.'),
+                 ('Yu et al. (2025)', 'Rice sheath blight; dual-branch multimodal network fusing spectral and physiological signatures.', 'A neural network on fused multimodal features.')])
     step('2.6', 'Pseudo-image networks: Dual Transformer Early Detection Network and its comparison networks', part=P,
          what='The selected features are arranged as a k × k pseudo-image and classified (Tasks A and B) by DT-EDNet, EfficientNet-B0, ResNet18 and ConvNeXt V2-Atto with identical settings.',
          why='DT-EDNet is the network of the core reference paper; the three others are its comparison networks.',
@@ -152,4 +154,5 @@ def add():
          out='Independent test results and farm maps → conclusions.',
          papers=[('Ma et al. (2026)', 'Rice blast; trained models evaluated on an independent 2024 data set from natural infection.', 'Frozen models tested once on independent data.'),
                  ('Yuan et al. (2025)', 'Rice bacterial blight; UAV disease models applied at another scale and area.', 'Transfer of UAV models.'),
-                 ('Liu et al. (2026)', 'Wheat powdery mildew; an index developed on the ground applied to UAV images of other fields.', 'Application to new fields.')])
+                 ('Liu et al. (2026)', 'Wheat powdery mildew; an index developed on the ground applied to UAV images of other fields.', 'Application to new fields.'),
+                 ('Poblete et al. (2023)', 'Vascular pathogens (Xylella, Verticillium) in olive and almond; detection with WorldView-2 and -3 satellite imagery compared with airborne hyperspectral and thermal results.', 'Testing whether UAV-level detection holds on other data.')])

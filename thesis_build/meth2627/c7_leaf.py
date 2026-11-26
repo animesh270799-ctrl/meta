@@ -57,7 +57,9 @@ def add():
          out='Leaf response → L5.2–L5.7, L9.',
          papers=[('Mandal et al. (2023)', 'Rice blast; mean and SD spectra of each severity level and difference from healthy plants; correlation of bands and indices with severity.', 'Mean, SD, difference and correlation.'),
                  ('Mahlein et al. (2010)', 'Sugar-beet leaves with three diseases; spectral difference at each wavelength.', 'Difference spectra.'),
-                 ('Lv et al. (2023); Tian et al. (2021)', 'Leaf spectra compared stage by stage (asymptomatic, symptomatic).', 'Stage-wise comparison.')])
+                 ('Lv et al. (2023); Tian et al. (2021)', 'Leaf spectra compared stage by stage (asymptomatic, symptomatic).', 'Stage-wise comparison.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast; the spread (standard deviation) of whole-leaf reflectance differed between disease grades.', 'Leaf spectra compared between grades.'),
+                 ('Cross et al. (2024)', 'Wheat stripe rust; progression followed with hyperspectral reflectance.', 'Leaf spectra over disease progression.')])
     step('L5.2', 'Effective wavelength ranges and optimal wavelengths by Shapley additive explanations and competitive adaptive reweighted sampling', part=P,
          what='NDSI and RSI R² maps of all 5-nm band pairs with the leaf grade; effective ranges (R² > 0.5, else top 5%); SHAP-CARS on the R and FD bands inside the ranges.',
          why='Same chain as the UAV data (Steps 1.2.1–1.2.2).',
@@ -114,7 +116,8 @@ def add():
          out='Leaf predictions → L7.',
          papers=[('Ma et al. (2026)', 'Rice blast; DT-EDNet and comparison networks with identical settings.', 'Same networks and settings.'),
                  ('Tian et al. (2021); Lv et al. (2023)', 'Leaf spectra; SFFS-wrapped SVM, k-NN and LDA.', 'SFFS + ML models.'),
-                 ('Chen et al. (2023); Mandal et al. (2023)', 'Tobacco viruses; rice blast: SVM, random forest and PLS models on leaf spectra.', 'Same ML models at leaf level.')])
+                 ('Chen et al. (2023); Mandal et al. (2023)', 'Tobacco viruses; rice blast: SVM, random forest and PLS models on leaf spectra.', 'Same ML models at leaf level.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast severity grades classified with SVM and a probabilistic neural network from leaf spectra (88–98% accuracy).', 'SVM and a neural network on leaf spectra for grades.')])
     step('L7', 'Leaf test metrics', part=P,
          what='Metrics on the 7 020 test leaves: OA, kappa, macro-F1, per-class F1, sensitivity, specificity, AUC (Task A); R², RMSE, RPD (Task C).',
          why='Same metrics as the UAV models (Step 2.7).',
@@ -140,7 +143,9 @@ def add():
          out='Leaf-to-canopy transfer → conclusions, satellite up-scaling.',
          papers=[('Liu et al. (2026)', 'Wheat powdery mildew; a specific vegetation index developed from ground spectra and used to track the disease from UAV.', 'Leaf/ground index tested at UAV scale.'),
                  ('Yu et al. (2021)', 'Pine wilt disease; field spectrometer and UAV hyperspectral data compared for early detection.', 'Ground and UAV spectra compared.'),
-                 ('Zheng et al. (2018)', 'Wheat yellow rust; hyperspectral data simulated to Sentinel-2 bands to build a new index.', 'Resampling to another sensor\'s bands.')])
+                 ('Zheng et al. (2018)', 'Wheat yellow rust; hyperspectral data simulated to Sentinel-2 bands to build a new index.', 'Resampling to another sensor\'s bands.'),
+                 ('Bohnenkamp et al. (2019)', 'Wheat yellow rust; ground-vehicle and UAV hyperspectral imaging compared; feature sets transferred between scales performed worse than features selected on the data set itself.', 'Leaf and canopy selections are made separately and only compared.'),
+                 ('Poblete et al. (2023)', 'Vascular pathogens; satellite multispectral detection compared with airborne hyperspectral and thermal detection.', 'Transfer of disease features to coarser sensors.')])
     step('L10', 'Pre-symptomatic leaves', part=P,
          what='Leaves of 1, 4 and 7 January: healthy = leaves of tagged plants in healthy plots; later-infected = leaves of tagged plants in inoculated plots that show pustules later; the leaf selection chain and models are run for this binary task.',
          why='Tests whether the leaf spectrum shows white rust before symptoms and compares this with the canopy (Objective 3).',
@@ -150,4 +155,5 @@ def add():
          papers=[('Gold et al. (2020)', 'Potato late and early blight; leaf spectra detected infection before symptoms.', 'Pre-symptomatic leaf spectra.'),
                  ('Tian et al. (2021)', 'Rice leaf blast; asymptomatic leaves detected from leaf spectra.', 'Asymptomatic leaf detection.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; asymptomatic detection from leaf-clip spectra.', 'Asymptomatic leaf detection.'),
-                 ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral changes before visible symptoms.', 'Early leaf changes.')])
+                 ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral changes before visible symptoms.', 'Early leaf changes.'),
+                 ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; water (about 1400 nm) and 750 nm bands drove pre-symptomatic detection.', 'Pre-symptomatic leaf features.')])

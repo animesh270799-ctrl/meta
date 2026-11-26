@@ -38,7 +38,8 @@ def add():
          check=['Predictions for every model × sensor set.'],
          out='Predictions → 3.5.',
          papers=[('Zhu et al. (2017)', 'Tobacco disease; machine-learning classifiers on selected bands detected infection before symptoms.', 'ML classifiers for pre-symptomatic detection.'),
-                 ('Tian et al. (2021)', 'Rice leaf blast; LDA, k-NN and SVM with SFFS for asymptomatic detection.', 'Same model types.')])
+                 ('Tian et al. (2021)', 'Rice leaf blast; LDA, k-NN and SVM with SFFS for asymptomatic detection.', 'Same model types.'),
+                 ('Nguyen et al. (2023)', 'Spring wheat yellow rust; a 3D-CNN on multispectral UAV images reached 60% accuracy early in the season, rising to 79% later.', 'Detection accuracy reported date by date in the early stage.')])
     step('3.5', 'Evaluation, earliest detection day and covariate baseline', part=P,
          what='Sensitivity, specificity, OA, kappa, macro-F1 and AUC on the test plots for each date; the earliest detection day is the first DAI on which predicted scores of later-infected and healthy test subplots differ significantly (t-test, p < 0.05); the covariate-only model is the reference.',
          why='Tells how early and with which camera white rust can be predicted.',
@@ -47,7 +48,8 @@ def add():
          out='Earliest detection day → conclusions, 3.6.',
          papers=[('Mahlein et al. (2019)', 'Fusarium head blight; the day after inoculation on which each sensor first detected infection was compared.', 'Earliest detection day per sensor.'),
                  ('Gold et al. (2020)', 'Potato late and early blight; pre-symptomatic detection accuracy by day after inoculation.', 'Accuracy by date before symptoms.'),
-                 ('Zhang et al. (2014a)', 'Wheat powdery mildew; meteorological model as the reference for remote-sensing models.', 'Covariate reference.')])
+                 ('Zhang et al. (2014a)', 'Wheat powdery mildew; meteorological model as the reference for remote-sensing models.', 'Covariate reference.'),
+                 ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; hyperspectral detection compared at pre-symptomatic and symptomatic stages.', 'Accuracy compared between pre-symptomatic dates.')])
     step('3.6', 'Risk maps and independent testing', part=P,
          what='Probability of later infection is mapped per subplot for each pre-symptomatic date; if an early flight is made at Bharatpur, the frozen models are tested there.',
          why='Risk maps show where preventive sprays would be needed.',

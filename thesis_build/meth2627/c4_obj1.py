@@ -18,7 +18,8 @@ def add():
          papers=[('Ma et al. (2026)', 'Rice blast; mean canopy spectra of each severity level after smoothing; the red edge (680–800 nm) and near-infrared separated the levels best.', 'Mean spectra by severity class from UAV hyperspectral data.'),
                  ('Mahlein et al. (2013)', 'Sugar-beet diseases; spectral signatures of each disease and severity.', 'Class-wise spectral signatures.'),
                  ('Guo et al. (2021)', 'Wheat yellow rust; canopy spectra of plots with different disease index.', 'Canopy spectra by severity from a UAV.'),
-                 ('Mandal et al. (2023)', 'Rice blast; mean and SD spectra of each severity level and difference from healthy plants.', 'Mean ± SD and difference from class 0.')])
+                 ('Mandal et al. (2023)', 'Rice blast; mean and SD spectra of each severity level and difference from healthy plants.', 'Mean ± SD and difference from class 0.'),
+                 ('Bohnenkamp et al. (2021)', 'Wheat foliar diseases; hyperspectral library from infection to symptoms with spectral turning points confirmed by histology.', 'Spectral signatures described stage by stage and class by class.')])
     myfig('specdemo', 'g07_spectra_demo.png', 'Demo of the outputs of Step 1.1.1 (simulated spectra): (a) mean reflectance by DI class, (b) % difference from class 0, (c) first derivative at the red edge.')
     step('1.1.2', 'Correlation of each feature with the disease index', part=P,
          what='Pearson r between the DI and every band, derivative band and feature of every camera.',
@@ -37,7 +38,8 @@ def add():
          out='Strata → 2.10.',
          papers=[('Blasch et al. (2023)', 'Wheat rusts; UAV detection depended on the crop growth stage.', 'Results by growth stage.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and thermal responses compared across growth stages.', 'Stage-wise responses.'),
-                 ('Chattopadhyay et al. (2011)', 'White rust of mustard; disease development related to weather in different sowings.', 'DI related to weather and sowing date.')])
+                 ('Chattopadhyay et al. (2011)', 'White rust of mustard; disease development related to weather in different sowings.', 'DI related to weather and sowing date.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast severity classified separately at the jointing, booting and heading stages.', 'Results reported within each growth stage.')])
 
     h2('Activity 1.2 – Optimal wavelengths by Shapley additive explanations and competitive adaptive reweighted sampling')
     step('1.2.1', 'Effective wavelength ranges from normalised difference spectral index and ratio spectral index maps', part=P,
@@ -186,7 +188,8 @@ def add():
          out='Responding features → 1.8.2.',
          papers=[('Zhu et al. (2017)', 'Tobacco disease; hyperspectral differences between inoculated and healthy plants before symptoms.', 'Pre-symptomatic comparison of the two groups.'),
                  ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral changes in inoculated plants before visible symptoms.', 'Early spectral differences day by day.'),
-                 ('Gold et al. (2020)', 'Potato late and early blight; leaf spectra separated infected plants before symptoms.', 'Pre-symptomatic spectral difference.')])
+                 ('Gold et al. (2020)', 'Potato late and early blight; leaf spectra separated infected plants before symptoms.', 'Pre-symptomatic spectral difference.'),
+                 ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; pre-symptomatic detection relied on water-related (about 1400 nm) and red-edge (about 750 nm) bands rather than pigments.', 'Water and red-edge features examined before symptoms.')])
     step('1.8.2', 'Pre-symptomatic feature selection', part=P,
          what='The selection chain of Activities 1.2–1.6 is run with the binary label (later-infected vs healthy) on the 576 pre-symptomatic samples.',
          why='Features that respond before symptoms can differ from those that grade visible severity.',
@@ -194,7 +197,8 @@ def add():
          check=['Pre-symptomatic DSF of each camera.'],
          out='Pre-symptomatic DSF → 3.3.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast at the asymptomatic stage; features selected separately for that stage.', 'Separate selection for the early stage.'),
-                 ('Ma et al. (2026)', 'Rice blast; the same selection chain for early detection.', 'Same chain.')])
+                 ('Ma et al. (2026)', 'Rice blast; the same selection chain for early detection.', 'Same chain.'),
+                 ('Terentev et al. (2023)', 'Wheat leaf rust detected from the fourth day after inoculation with an SVM; the most important wavebands were identified.', 'Selection of the bands that respond earliest.')])
     step('1.8.3', 'Earliest-responding features', part=P,
          what='For every feature of the pre-symptomatic DSF, the first date with a significant difference (Step 1.8.1) is recorded.',
          why='Tells which camera and feature responds first.',

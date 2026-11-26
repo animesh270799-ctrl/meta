@@ -90,10 +90,38 @@ def add():
             ['Chattopadhyay et al. (2011)', 'white rust of Indian mustard; weather', 'A6, A8'],
             ['Mishra et al. (2009)', 'white rust of Indian mustard; pathological and biochemical changes', 'A1, A7, A9, 1.7']]
     tab('papers_main', rows=rows, caption='Main disease papers and the steps that follow them.', widths=[2500, 3700, 3400], size=16)
-    h2('1.7 Master checklist')
+    h2('1.7 Recent disease studies (2021–2026) behind the methodology')
+    p('Most steps follow studies published in the last five years. The table lists them with what each contributes; older papers are used mainly for the original definitions of methods and indices.')
+    rows = [['Study', 'Disease, crop and data', 'What it contributes', 'Steps'],
+            ['Ma et al. (2026)', 'rice blast; UAV hyperspectral; DT-EDNet', '7:3 split; effective ranges; SHAP-CARS; Relief indices; mRMR texture; TTFI; network comparison and ablation', 'D1, 1.2–1.5, 2.6, 2.8'],
+            ['Liu et al. (2026)', 'wheat powdery mildew; leaf and canopy spectrometers, UAV', 'disease-specific index carried from ground to UAV', '1.3.2, L9'],
+            ['Selvaprakash et al. (2026)', 'rice blast (IARI); leaf spectra 350–2500 nm', 'smoothing, exhaustive index search, PCA', 'L3, L5'],
+            ['Yuan et al. (2025)', 'rice bacterial blight; UAV + satellite', 'mRMR; RF, SVM, k-NN; UAV-to-satellite transfer', '1.5.1, 2.4, 2.11'],
+            ['Yu et al. (2025)', 'rice sheath blight; spectral + physiological signatures', 'physiology analysed with spectra; multimodal network', 'A7, 2.5'],
+            ['Bijlwan et al. (2025)', 'crop disease severity; weather variables', 'weather-only machine-learning baseline', '2.9, L8'],
+            ['Deng et al. (2024)', 'wheat stripe rust; multimodal deep learning', 'deep network for the disease index; maps', '2.5, 2.10'],
+            ['Liu et al. (2024)', 'wheat powdery mildew; UAV multispectral + thermal', 'multi-features, thermal features, results by stage', 'A2, C4, C5, 2.10'],
+            ['Zhang et al. (2024)', 'tomato bacterial leaf spot; hyperspectral imaging', 'water and red-edge bands before symptoms', '1.8.1, 3.5, L10'],
+            ['Cross et al. (2024)', 'wheat stripe rust; hyperspectral reflectance', 'disease progression; hold-out testing', 'D1, L5.1'],
+            ['Abdulridha et al. (2023)', 'wheat stem rust; drone hyperspectral', 'random forest; severity levels; maps', '2.1, 2.4, 2.10'],
+            ['Blasch et al. (2023)', 'wheat yellow and stem rust; UAV + satellite', 'varieties of different resistance; growth stages; calibration', 'A1, B1, 1.1.3, 2.10'],
+            ['Nguyen et al. (2023)', 'wheat yellow rust; multispectral UAV', 'red-edge and NIR bands; MS indices and texture; early detection by date', 'A2, C4, 3.4'],
+            ['Mandal et al. (2023)', 'rice blast (IARI); handheld spectroradiometer', 'leaf spectra, indices, JM distance, RPD', 'A4, L3–L7'],
+            ['Lv et al. (2023)', 'southern corn leaf blight; leaf-clip spectra', 'ReliefF, VIF, SFFS; inner cross-validation', 'D2, 1.4, 1.6, 2.3'],
+            ['Terentev et al. (2023)', 'wheat leaf rust; hyperspectral', 'detection from the fourth day after inoculation', '1.8, L10'],
+            ['Mustafa et al. (2023)', 'wheat Fusarium head blight; multimodal', 'smoothing; VIF', 'B3, 1.6.2'],
+            ['Poblete et al. (2023)', 'vascular pathogens of tree crops; satellite vs airborne', 'transfer of detection to other sensors', '2.11, L9'],
+            ['Chen et al. (2023)', 'tobacco viruses; ASD FieldSpec 4 leaves', 'grades 0, 1, 3, 5, 7, 9; smoothing', 'A3, A4, L1, L3'],
+            ['Zhang et al. (2022)', 'rice leaf blast; hyperspectral imaging of leaves', 'leaf grades at several growth stages; SVM', 'A3, 1.1.3, L6'],
+            ['Mandal et al. (2022)', 'rice blast (IARI); 0–9 scale', 'sensitive regions; red-edge amplitude', 'A4, C1'],
+            ['Chatterjee et al. (2022)', 'white rust of Indian mustard', 'biochemical changes in infected plants', 'A7'],
+            ['Feng et al. (2022); Ruan et al. (2022)', 'wheat powdery mildew; wheat stripe rust', 'fusion of hyperspectral, thermal and RGB; remote sensing + weather', 'A2, 2.2, 2.8, 2.9'],
+            ['Tian et al. (2021); Guo et al. (2021); Yu et al. (2021); Bohnenkamp et al. (2021); Kundu et al. (2021)', 'rice leaf blast; wheat yellow rust; pine wilt; wheat foliar diseases; potato late blight', 'SFFS and early stages; PCA texture and NDVI mask; red-edge parameters; spectral library; DWSI', 'many steps']]
+    tab('recent', rows=rows, caption='Recent disease studies (2021–2026) and the steps that follow them.', widths=[2300, 2700, 3400, 1200], size=15)
+    h2('1.8 Master checklist')
     p('Tick each step when every box of its "Check before the next step" row is ticked.')
     B.append(dict(t='placeholder', name='master'))
-    h2('1.8 Expected outcomes')
+    h2('1.9 Expected outcomes')
     rows = [['Objective', 'Expected outcome'],
             ['1', 'Sensitive spectral ranges, signatures and indices for the characterisation of white rust of mustard under glasshouse and field conditions, across crop stages and severity levels, for large-scale application.'],
             ['2', 'The best suitable sensor or fusion of sensors for detection and monitoring of white rust throughout the crop growth stages.'],

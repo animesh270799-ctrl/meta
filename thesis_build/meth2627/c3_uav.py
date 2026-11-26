@@ -87,7 +87,8 @@ def add():
          papers=[('Yu et al. (2021)', 'Pine wilt disease; red-edge parameters were the best features for the early stage from UAV hyperspectral data.', 'Red-edge parameters as features.'),
                  ('Zhang et al. (2012)', 'Wheat powdery mildew; derivative features (amplitude, position and area of the red edge) among the spectral features.', 'Same three red-edge parameters.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; first derivatives at every band improved severity classification.', 'First derivative at every band.'),
-                 ('Ma et al. (2026)', 'Rice blast; reflectance bands as the first feature group.', 'Reflectance bands as a feature group.')])
+                 ('Ma et al. (2026)', 'Rice blast; reflectance bands as the first feature group.', 'Reflectance bands as a feature group.'),
+                 ('Mandal et al. (2022)', 'Rice blast; the amplitude of the red-edge first-derivative peak fell as severity increased.', 'Red-edge amplitude as a feature.')])
     step('C2', 'Published vegetation and disease indices', part=P,
          what='48 published hyperspectral indices (39 base + 9 SWIR disease indices) are computed for every subplot (definitions in Chapter 11).',
          why='Indices summarise pigments, structure, water and disease effects and can be compared with other studies and sensors.',
@@ -98,7 +99,8 @@ def add():
                  ('Mandal et al. (2023)', 'Rice blast; 26 published indices evaluated and two new blast indices (RBI, NDBI).', 'RBI and NDBI included.'),
                  ('Mahlein et al. (2013)', 'Sugar-beet diseases; the Healthy Index and disease-specific indices.', 'HI included.'),
                  ('Apan et al. (2004)', 'Sugarcane orange rust; disease–water stress indices (DWSI) from Hyperion.', 'DWSI-1 to DWSI-5 included.'),
-                 ('Das et al. (2015)', 'Rice bacterial leaf blight; PSRI and PSSRb from ground hyperspectral data.', 'PSRI and PSSR included.')])
+                 ('Das et al. (2015)', 'Rice bacterial leaf blight; PSRI and PSSRb from ground hyperspectral data.', 'PSRI and PSSR included.'),
+                 ('Kundu et al. (2021)', 'Potato late blight; field hyperspectral observations; the disease–water stress index correlated with severity (r ≈ −0.84).', 'DWSI indices included for a foliar disease.')])
     step('C3', 'Hyperspectral texture', part=P,
          what='Grey-level co-occurrence matrix (GLCM) texture of the first three principal-component images of the HS cube.',
          why='Pustules and chlorotic patches make the canopy uneven; spectra do not record this spatial pattern.',
@@ -120,7 +122,8 @@ def add():
          out='MS and RGB groups → 1.6.',
          papers=[('Liu et al. (2024)', 'Wheat powdery mildew; multispectral red-edge indices and texture features from UAV images to estimate severity.', 'MS indices plus texture.'),
                  ('Blasch et al. (2023)', 'Wheat yellow and stem rust; multispectral and very-high-resolution indices from UAV and satellite.', 'MS indices for rust detection.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; colour and texture features of RGB images fused with hyperspectral and thermal features.', 'RGB colour and texture features.')])
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; colour and texture features of RGB images fused with hyperspectral and thermal features.', 'RGB colour and texture features.'),
+                 ('Nguyen et al. (2023)', 'Spring wheat yellow rust; CRI2, SAVI2 and GLCM contrast from multispectral UAV images were the features most correlated with the disease.', 'Multispectral indices plus texture.')])
     step('C5', 'Thermal features', part=P,
          what='Canopy temperature statistics, normalised temperatures (Step D3) and thermal texture.',
          why='Infection changes transpiration and leaf temperature.',
@@ -160,7 +163,8 @@ def add():
          alt='A random split of samples (Ma et al., 2026) is simpler but would put subplots and leaves of one plot on both sides.',
          q='Were the test plots chosen after seeing results? → No; they are fixed by the design before the first flight, using only plot, block, variety and sowing date.',
          papers=[('Ma et al. (2026)', 'Rice blast; samples divided by stratified sampling into training and test sets at 7:3, with 10% of the training set as validation; features selected and models trained on the 2023 data and tested on an independent 2024 data set.', 'Same 7:3 proportion and stratification; whole plots are assigned instead of single samples, as the cross-year test of Ma et al. kept test data independent.'),
-                 ('Mandal et al. (2023)', 'Rice blast; data divided by stratified sampling into two-thirds calibration and one-third validation; all modelling on the calibration part.', 'A stratified hold-out of about one third, with all modelling on the training part.')])
+                 ('Mandal et al. (2023)', 'Rice blast; data divided by stratified sampling into two-thirds calibration and one-third validation; all modelling on the calibration part.', 'A stratified hold-out of about one third, with all modelling on the training part.'),
+                 ('Cross et al. (2024)', 'Wheat stripe rust progression from hyperspectral reflectance; models checked with 80:20 hold-out splits repeated 100 times.', 'A hold-out test set kept apart from training, as in recent disease spectroscopy.')])
     myfig('split', 'g05_split.png', 'Division of the three datasets: 33 training plots (22 fit + 11 validation plots for the networks) and 15 test plots.')
     step('D2', 'Validation inside the training plots', part=P,
          what='Settings, feature subsets and stopping epochs are chosen inside the 33 training plots: GroupKFold(3) by plot for machine learning (three rounds of 22 fitting and 11 scoring plots) and a fixed set of 11 validation plots (one third) for the networks.',

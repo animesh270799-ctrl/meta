@@ -45,7 +45,8 @@ def add():
                  ('Liu et al. (2024)', 'Wheat powdery mildew; UAV optical (multispectral) and thermal infrared images to estimate severity.', 'Multispectral and thermal cameras flown together.'),
                  ('Calderón et al. (2014)', 'Downy mildew of opium poppy; UAV multispectral and thermal imagery at high resolution.', 'UAV thermal + multispectral for a foliar disease.'),
                  ('Guo et al. (2021)', 'Wheat yellow rust; UAV hyperspectral imaging with reflectance panels.', 'UAV hyperspectral flights with panels.'),
-                 ('Ma et al. (2026)', 'Rice blast; UAV hyperspectral images (400–1000 nm, 1.26 cm ground pixel).', 'UAV hyperspectral camera at centimetre resolution.')])
+                 ('Ma et al. (2026)', 'Rice blast; UAV hyperspectral images (400–1000 nm, 1.26 cm ground pixel).', 'UAV hyperspectral camera at centimetre resolution.'),
+                 ('Nguyen et al. (2023)', 'Spring wheat yellow rust; multispectral UAV imagery: red-edge (690–740 nm) and near-infrared bands separated healthy and severely infected plots.', 'A multispectral camera with red-edge and near-infrared bands.')])
     myfig('timeline', 'g04_timeline.png', 'Data collection timeline, 2026-27: sowings, inoculation, 13 flight dates (pre- and post-symptomatic) with leaf scoring and ASD, and the 4 physiology dates.')
     rows = [['No.', 'Date', 'DAI', 'Stage of the data', 'Cameras', 'Leaf scoring + ASD', 'Physiology'],
             ['1', '1 Jan 2027', '2', 'pre-symptomatic', 'HS, MS, RGB, TIR', '✓', ''], ['2', '4 Jan', '5', 'pre-symptomatic', 'all four', '✓', ''], ['3', '7 Jan', '8', 'pre-symptomatic', 'all four', '✓', '✓'],
@@ -74,7 +75,8 @@ def add():
                  ('Chen et al. (2023)', 'Tobacco viruses; severity scored in grades 0, 1, 3, 5, 7, 9.', 'The same six grade values.'),
                  ('Mandal et al. (2023)', 'Rice blast scored on the 0–9 scale and related to leaf spectra.', 'Same 0–9 scale for leaf grades.'),
                  ('Conn et al. (1990)', 'Alternaria blackspot of rapeseed and mustard; a disease assessment key that grades leaves 0–9 by the percentage of leaf area affected.', 'The same 0–9 leaf-area key, applied to white rust pustules.'),
-                 ('Bock et al. (2010)', 'Reviewed visual severity assessment: raters disagree most between neighbouring classes; clear class limits and trained raters reduce error.', 'Written grade limits and one trained scorer for all dates.')])
+                 ('Bock et al. (2010)', 'Reviewed visual severity assessment: raters disagree most between neighbouring classes; clear class limits and trained raters reduce error.', 'Written grade limits and one trained scorer for all dates.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast; the disease grade of each leaf classified from hyperspectral images at the jointing, booting and heading stages.', 'Leaf grades recorded on every date across growth stages.')])
     myfig('survey', 'g03_survey.png', 'Subplots, inner buffer and the 3 survey points of each subplot (left); leaves graded and measured on each tagged plant (right).')
     demo('di_ex', [['Point', 'Leaf', 'Grade x', 'x × f contribution'],
                    ['1', 'L3 / L5 / LL', '0 / 1 / 3', '0 + 1 + 3'], ['2', 'L3 / L5 / LL', '1 / 3 / 5', '1 + 3 + 5'], ['3', 'L3 / L5 / LL', '0 / 3 / 7', '0 + 3 + 7'],
@@ -95,7 +97,8 @@ def add():
                  ('Chen et al. (2023)', 'Tobacco TMV and PVY; leaves measured with an ASD FieldSpec 4 (350–2500 nm) and graded 0, 1, 3, 5, 7, 9.', 'Same instrument class and grade scale.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra (350–2500 nm) for asymptomatic detection and severity classes.', 'Leaf clip with its own lamp.'),
                  ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; spectra in contact with the leaf estimated severity better than spectra taken above the crop.', 'Contact measurement of single leaves.'),
-                 ('Yu et al. (2021)', 'Pine wilt disease; field portable spectrometer measurements collected with UAV hyperspectral images.', 'Leaf spectra collected on the same dates as the UAV flights.')])
+                 ('Yu et al. (2021)', 'Pine wilt disease; field portable spectrometer measurements collected with UAV hyperspectral images.', 'Leaf spectra collected on the same dates as the UAV flights.'),
+                 ('Mandal et al. (2022)', 'Rice blast (IARI); reflectance of ten genotypes scored 0–9; correlation above 0.6 with severity in 550–760 and 1140–1300 nm.', 'Leaf reflectance of plants scored on the 0–9 scale.')])
     demo('rec', [['Date', 'Plot', 'Subplot', 'Point', 'Leaf', 'Grade', 'ASD files', 'White ref.'],
                  ['18 Jan 2027', '25', '2', '1', 'L3', '1', '25_2_1_L3_01, _02', '10:42'], ['18 Jan 2027', '25', '2', '1', 'L5', '3', '25_2_1_L5_01, _02', '10:42'], ['18 Jan 2027', '25', '2', '1', 'LL', '5', '25_2_1_LL_01, _02', '10:42']],
          'Record sheet for leaf grades and ASD readings', widths=[1300, 700, 900, 800, 800, 800, 2700, 1100])
@@ -143,7 +146,9 @@ def add():
          papers=[('Mishra et al. (2009)', 'White rust of Indian mustard; pathological and biochemical changes in infected compared with healthy plants.', 'Same pathogen and crop; biochemical parameters of infected vs healthy plants.'),
                  ('Calderón et al. (2013)', 'Verticillium wilt of olive; airborne fluorescence, temperature and narrow-band indices related to disease severity and to field physiological measurements.', 'Plant physiology measured to explain thermal and spectral signals.'),
                  ('Zarco-Tejada et al. (2018)', 'Xylella in olive; plant traits (pigments, fluorescence, temperature) retrieved from imagery changed before visible symptoms.', 'Pigments and gas exchange explain pre-symptomatic signals (7 January).'),
-                 ('Baranowski et al. (2015)', 'Oilseed rape (~~Brassica napus~~) leaves infected by ~~Alternaria~~; hyperspectral and thermal responses.', 'Brassica leaf responses to a fungal disease.')])
+                 ('Baranowski et al. (2015)', 'Oilseed rape (~~Brassica napus~~) leaves infected by ~~Alternaria~~; hyperspectral and thermal responses.', 'Brassica leaf responses to a fungal disease.'),
+                 ('Chatterjee et al. (2022)', 'White rust of Indian mustard; biochemical changes in infected plants in relation to the pathogenic variability of the pathogen.', 'Recent biochemical study of the same host and disease.'),
+                 ('Yu et al. (2025)', 'Rice sheath blight; a dual-branch model that fused spectral and physiological signatures for early detection.', 'Physiological measurements analysed together with spectra.')])
     rows = [['Parameter (unit)', 'Method', 'Method reference'],
             ['Chlorophyll a, b (mg g^{−1} FW)', 'DMSO extraction; absorbance 645, 663 nm', 'Hiscox and Israelstam (1979); Wellburn (1994)'], ['Carotenoids (mg g^{−1} FW)', 'same extract; 470 nm', 'Lichtenthaler and Wellburn (1983); Wellburn (1994)'],
             ['Anthocyanin (mg L^{−1})', 'pH differential, 520 and 700 nm', 'Lee et al. (2005)'], ['Total protein (µg mg^{−1} FW)', 'Bradford dye binding, 595 nm', 'Bradford (1976)'],
