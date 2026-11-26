@@ -56,7 +56,7 @@ def add():
          mine=steps('Join each plot to block, timing and variety; check that the variety in the file equals the plot plan.',
                     'Remove the 9 spectra labelled L4 (not a sampled position).',
                     'Find identical spectra (all 2151 values equal) and keep one copy: 75 copies removed (13 March 2026; plots 13, 34, 38, 41, 42).',
-                    'Splice correction at 1000/1001 nm: shift 1001–2500 nm by the difference between the value at 1001 nm and the value extrapolated from 990–1000 nm; check the 1800/1801-nm join the same way.',
+                    'Splice correction at each detector join (1000/1001 and 1800/1801 nm): the jump between the two bands is compared with the local slope on both sides; where the median excess is larger than 0.0005 reflectance, the bands above the join are shifted leaf by leaf so that the jump equals the local slope (needed at 1000 nm; no step at 1800 nm).',
                     'Check grades (0, 1, 3, 5, 7, 9 only), 2151 bands, no missing values, reflectance range, all 48 plots on every date.') + '\nResult: %d leaf spectra.' % CNT['all'],
          out='meta.csv and corrected spectra → B1 (split), C (features).',
          alt='Leaving the detector step in place would let ReliefF and wavelet selection pick the artefact (as found in my earlier Lv et al. (2023) replication).',

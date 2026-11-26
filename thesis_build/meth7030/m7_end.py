@@ -74,13 +74,13 @@ def add():
 
     h2('9.3 Settings of every step (Appendix B)')
     rows = [['Step', 'Setting', 'Value'],
-            ['A5', 'quality control', 'L4 spectra removed; identical spectra removed (one copy kept); additive splice correction at 1000/1001 nm and check at 1800/1801 nm'],
+            ['A5', 'quality control', 'L4 spectra removed; identical spectra removed (one copy kept); splice correction at a detector join when the median excess jump > 0.0005 (applies at 1000/1001 nm; none at 1800/1801 nm)'],
             ['B1', 'split', 'test share 0.30; 4 healthy + 11 unsprayed test plots; 5000 candidates; seed 2026; test plots 1, 4, 5, 8, 13, 14, 18, 25, 27, 31, 35, 37, 44, 46, 48'],
             ['B2', 'inner validation', 'GroupKFold(3) by plot (ML); 11 training plots for early stopping (seed 42)'],
-            ['C1', 'join zones excluded from selection', '990–1010 nm; 1790–1835 nm'],
+            ['C1', 'join zones excluded from selection', '990–1010 nm; 1790–1835 nm; wavelet windows ± 2 × scale clear of these zones'],
             ['C2–C5', 'smoothing, range, derivative', 'Savitzky–Golay window 11, order 2; 400–2400 nm; water bands kept; first derivative from the same filter'],
             ['C6', 'band grid', '5-nm means of 1-nm values (λ − 2 … λ + 2 nm)'],
-            ['C9', 'continuum removal', '550–750 nm; features near 970, 1200, 1450, 1940 nm; depth, width, area, position'],
+            ['C9', 'continuum removal', 'windows 530–760, 1080–1280, 1300–1650, 1840–2150 nm; depth, width, area, position'],
             ['C10', 'wavelets', 'Mexican hat; scales 2, 4, 8, 16, 32, 64'],
             ['D4', 'effective ranges', 'R² ≥ 0.5, else top 5% of NDSI/RSI pairs'],
             ['D5', 'SHAP-CARS', 'XGBoost 300 trees, depth 4, learning rate 0.05; SHAP top 40%; MCCV 50 splits by plot, ≤ 15 PLS components; CARS 50 iterations × 20 runs; kept if ≥ 50% of runs; ≤ 15 bands'],

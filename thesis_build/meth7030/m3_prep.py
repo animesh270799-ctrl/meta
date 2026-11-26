@@ -8,7 +8,7 @@ def add():
     p('Part C turns every corrected spectrum into the same set of numbers. Each operation works on one leaf at a time and learns nothing from other leaves, so it is applied to all leaves. '
       'Three families of features are produced: spectral bands and derivatives (C5–C6), indices including red-edge and continuum-removal features (C7–C9), and wavelet features (C10).')
     card('C1', 'Handling of the ASD detector joins',
-         what='After the splice correction of Step A5, the two detector-join zones (990–1010 nm and 1790–1835 nm) are excluded from the candidate bands and wavelet coefficients of Objective 1 and 2 feature selection; indices whose bands lie outside these zones are unaffected.',
+         what='After the splice correction of Step A5, the two detector-join zones (990–1010 nm and 1790–1835 nm) are excluded from the candidate bands of Objective 1 and 2 feature selection; wavelet coefficients are excluded when their window (± 2 × scale) reaches a join zone; continuum-removal features whose window crosses a join are not used. Indices whose bands lie outside these zones are unaffected.',
          why='Even a small residual step at a join creates a sharp derivative and wavelet response that a selection method can mistake for a disease feature. Screening the zones before any selection removes that risk.',
          papers=L('No disease paper reports this check; it follows Hueni and Bialek (2017), who showed that ASD inter-detector steps vary with instrument temperature.',
                   'In my replication of Lv et al. (2023) on these leaves, RELIEF-F ranked the 1800-nm step first in every task until the join zones were excluded; in my replication of Tian et al. (2021), two selected features lay on the joins (1005 and 1808 nm).'),
@@ -89,7 +89,7 @@ def add():
          mine='REP = 680 + index of the maximum derivative in 680–760 nm; Dr in 10^{−3} nm^{−1}; REarea in reflectance units.',
          out='Three parameters added to the index table → D6, D7.')
     card('C9', 'Continuum-removal absorption features',
-         what='The continuum (convex hull) is removed over the chlorophyll absorption feature (550–750 nm) and the leaf-water features near 970, 1200, 1450 and 1940 nm; for each feature the depth, width (at half depth), area and position are computed.',
+         what='The continuum (convex hull) is removed over the chlorophyll absorption feature (530–760 nm) and the leaf-water features near 1200, 1450 and 1940 nm; for each feature the depth, width (at half depth), area and position are computed. The 970-nm water feature is not used because its window crosses the 1000-nm detector join.',
          why='Continuum removal isolates the shape of an absorption feature from the overall brightness of the leaf (Clark and Roush, 1984; Kokaly and Clark, 1999).',
          papers=L('Zhang et al. (2012): depth, width and area of the 550–750 nm continuum-removed absorption feature among the spectral features of wheat powdery mildew.',
                   'In my earlier combined-feature analysis of these leaves (Mandal et al. (2023) workflow), continuum-removal features were among the features chosen by GA-PLS.'),
