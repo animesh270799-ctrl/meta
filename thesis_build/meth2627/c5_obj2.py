@@ -17,7 +17,7 @@ def add():
          check=['Class counts table; classes with < 5% merged (Step A5).'],
          out='Task × sensor-set matrix → 2.2.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast; detection at early stages and discrimination of severity with several models.', 'Detection and severity tasks.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; single sources and fused hyperspectral, thermal and RGB data compared.', 'Single cameras and their combinations compared.'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; models from each single data source (indices, temperature, texture) compared with fused sources.', 'Single cameras and their combinations compared.'),
                  ('Abdulridha et al. (2023)', 'Wheat stem rust; drone hyperspectral data for detection and severity levels.', 'Detection plus severity levels.')])
 
     h2('Activity 2.2 – Feature selection on the training plots and fusion')
@@ -28,8 +28,8 @@ def add():
          check=['A DSF for each of the 15 sensor sets × 3 tasks, chosen on training plots only.'],
          out='Inputs of every model → 2.3–2.6.',
          papers=[('Ma et al. (2026)', 'Rice blast; feature selection on the training data (2023) only; testing on independent 2024 data.', 'Selection on the training plots only.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; feature-level fusion of selected hyperspectral, thermal and RGB features.', 'Feature-level fusion by concatenation.'),
-                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and thermal features combined at feature level.', 'Same fusion level.'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices, thermal temperature parameters and texture features fused at feature level; PLSR, random forest and SVR compared.', 'Feature-level fusion by concatenation.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and canopy-temperature features fused after Pearson correlation and recursive feature elimination.', 'Same fusion level after selection.'),
                  ('Huang et al. (2020)', 'Wheat Fusarium head blight; spectral, colour and texture features of hyperspectral images of ears fused for severity diagnosis.', 'Feature-level fusion of spectral, colour and texture features.')])
 
     h2('Activity 2.3 – Machine-learning models')
@@ -97,7 +97,7 @@ def add():
          out='Metric table → 2.8–2.10.',
          papers=[('Ma et al. (2026)', 'Rice blast; OA, specificity, precision, recall, F1, kappa, macro-average recall and F1, and per-class precision, recall and F1 on the test set.', 'Same classification metrics.'),
                  ('Liu et al. (2020)', 'Wheat Fusarium head blight; the area under the ROC curve to judge disease detection.', 'AUC for Task A.'),
-                 ('Guo et al. (2021); Feng et al. (2022)', 'Wheat yellow rust; wheat powdery mildew: R² and RMSE of severity estimation.', 'R² and RMSE for Task C.'),
+                 ('Guo et al. (2021); Feng et al. (2022)', 'Wheat yellow rust; wheat powdery mildew: R² and RMSE of disease-index estimation (Feng et al.: R² 0.87 calibration, 0.86 validation for the fused random forest).', 'R² and RMSE for Task C.'),
                  ('Mandal et al. (2023)', 'Rice blast; R², RMSE and RPD of severity models.', 'RPD for Task C.')])
     myfig('evaldemo', 'g12_eval_demo.png', 'Demo of Steps 2.7–2.8 (simulated): (a) confusion matrix of DI classes on the test plots; (b) macro-F1 of sensor sets.')
     demo('metrics_ex', [['', 'Predicted healthy', 'Predicted diseased', 'Metric', 'Value'], ['Observed healthy', '150 (TN)', '30 (FP)', 'OA = (150 + 380)/600', '0.883'], ['Observed diseased', '40 (FN)', '380 (TP)', 'sensitivity = 380/420; specificity = 150/180', '0.905; 0.833'],
@@ -110,7 +110,7 @@ def add():
          do=['Rank all model × sensor-set results per task.', 'Fusion gain = metric(fused set) − metric(best single camera in it).', 'Network comparison and DT-EDNet ablation (Step 2.6).', 'SHAP of the best ML model of each task.'],
          check=['Ranking table, fusion-gain table, ablation table, SHAP plots.'],
          out='Best camera / combination → conclusions.',
-         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; accuracy of fused data compared with each single source.', 'Fusion gain over single cameras.'),
+         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; accuracy of the fused model compared with each single data source; random forest regression was stable in multi-source fusion.', 'Fusion gain over single cameras.'),
                  ('Ma et al. (2026)', 'Rice blast; network comparison on feature configurations, DT-EDNet module ablation and SHAP analysis of features.', 'Same comparison, ablation and SHAP.')])
     step('2.9', 'Covariate baseline: what the cameras add to time, crop and weather', part=P,
          what='Three models are compared on the same 33 training and 15 test plots: M0 uses only the covariates of Step A6 (DAI, variety, sowing date, growth stage, 7-day weather, favourable days); M1 uses only camera features (the best sensor set and model of the task, Step 2.8); M2 uses camera features + covariates with the same model type as M1.',
@@ -126,10 +126,10 @@ def add():
          out='Table of M0, M1, M2 and gains → conclusions; best practical model.',
          alt='In one season, weather has one value per date for all plots, so M0 mostly learns date and crop differences; it is reported as a within-season baseline.',
          q='Why compare with weather? → For wheat powdery mildew, adding remotely sensed data to meteorological data raised forecast accuracy (overall accuracy from about 69% to 78%; Zhang et al., 2014a); the same comparison shows what the UAV cameras add for white rust.',
-         papers=[('Zhang et al. (2014a)', 'Wheat powdery mildew at regional scale: a forecast from meteorological data alone compared with one that also used remotely sensed variables; overall accuracy rose from about 69% to 78%.', 'M0 (covariates only) vs M2 (sensors + covariates), on the same samples.'),
-                 ('Bijlwan et al. (2025)', 'Crop disease severity predicted from real-time weather variables with machine-learning algorithms.', 'A weather-only machine-learning model as the baseline M0.'),
-                 ('Ruan et al. (2022)', 'Wheat stripe rust predicted by integrating remote sensing and meteorological data.', 'Sensor + weather model M2.'),
-                 ('Chattopadhyay et al. (2011)', 'Weather-based forecasting of white rust of Indian mustard.', 'Weather is a known predictor of white rust; M0 uses the same kind of variables.'),
+         papers=[('Zhang et al. (2014a)', 'Wheat powdery mildew at regional scale: a logistic regression forecast from meteorological factors (precipitation, temperature, sun radiation, humidity) compared with one that added two remotely sensed features; overall accuracy rose from 69% to 78%.', 'M0 (covariates only) vs M2 (sensors + covariates), on the same samples.'),
+                 ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; randomised block design with four sowing dates over two seasons; weekly severity predicted from meteorological variables with ANN and random forest (validation R² 0.93 and 0.90) and regularised regression.', 'A weather-only random forest as M0, in a design with four sowing dates like this one.'),
+                 ('Ruan et al. (2022)', 'Wheat stripe rust; random forest on phenology-based Sentinel-2 vegetation indices plus meteorological features (overall accuracy 88.7%, kappa 0.772).', 'Sensor + weather model M2 with a random forest.'),
+                 ('Chattopadhyay et al. (2011)', 'White rust of Indian mustard; stepwise regression models on weather forecast crop age at first appearance, peak leaf severity and staghead numbers.', 'Weather is a proven predictor of white rust; M0 uses the same kind of variables.'),
                  ('Bhattacharya and Chattopadhyay (2013)', 'Mustard rot tracked by combining surface meteorology with satellite remote sensing.', 'Weather combined with sensor data for a mustard disease.')])
     demo('covtab', [['Task', 'Main metric', 'M0 covariates', 'M1 sensors', 'M2 sensors + covariates', 'ΔS = M1 − M0', 'ΔC = M2 − M1'],
                     ['A detection', 'macro-F1', '0.71', '0.84', '0.86', '+0.13', '+0.02'], ['B DI class', 'macro-F1', '0.38', '0.52', '0.55', '+0.14', '+0.03'], ['C DI (%)', 'R²', '0.41', '0.63', '0.66', '+0.22', '+0.03']],

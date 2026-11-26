@@ -18,7 +18,8 @@ def add():
          papers=[('Ma et al. (2026)', 'Rice blast; two-point (empirical line) reflectance calibration of the UAV hyperspectral images with calibration targets.', 'Same empirical line calibration with panels.'),
                  ('Guo et al. (2021)', 'Wheat yellow rust; radiometric calibration of the UAV hyperspectral camera before every flight.', 'Calibration on every flight date.'),
                  ('Yuan et al. (2025)', 'Rice bacterial blight; a calibrated white panel placed on the ground before and after the flight for radiometric calibration.', 'Panels before and after the flight.'),
-                 ('Blasch et al. (2023)', 'Wheat yellow and stem rust; multispectral images calibrated with the manufacturer\'s reflectance panel and the sunshine sensor of each flight.', 'Panel plus downwelling light sensor for the multispectral camera.')])
+                 ('Blasch et al. (2023)', 'Wheat yellow and stem rust; multispectral images calibrated with the manufacturer\'s reflectance panel and the sunshine sensor of each flight.', 'Panel plus downwelling light sensor for the multispectral camera.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; UAV multispectral images converted to reflectance with an empirical method and three target cloths.', 'Empirical line calibration with reference targets.')])
     step('B2', 'Orthomosaics and georeferencing', part=P,
          what='Frame images (MS, RGB, thermal) are mosaicked; push-broom HS lines are georectified; all dates share one coordinate frame through the same GCPs.',
          why='Subplot ROIs (B6) must fall on the same ground on every date and in every camera.',
@@ -27,7 +28,7 @@ def add():
          out='Georeferenced mosaics → B3, B4.',
          papers=[('Ma et al. (2026)', 'Rice blast; lens distortion correction, reflectance calibration and mosaicking of the hyperspectral images before extracting samples.', 'Same correction and mosaicking chain.'),
                  ('Guo et al. (2021)', 'Wheat yellow rust; georeferenced UAV hyperspectral mosaics of the field.', 'Georeferenced hyperspectral mosaics.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; hyperspectral, thermal and RGB images mosaicked before feature extraction.', 'All cameras mosaicked before features.')])
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; multispectral and thermal images aligned and mosaicked in Photoscan (structure-from-motion) with ground control points (errors within 1 cm).', 'Structure-from-motion mosaics with the same ground control points.')])
     step('B3', 'Hyperspectral quality control and smoothing', part=P,
          what='Noisy and water-vapour bands are removed and every spectrum is smoothed with a Savitzky–Golay filter.',
          why='Water-vapour regions and the detector ends are noisy under sunlight; smoothing is needed before the first derivative (Step C1).',
@@ -46,8 +47,9 @@ def add():
          do=['Project every image to WGS 84 / UTM zone 43N.', 'Register RGB, MS and thermal images to the HS image with tie points (plot corners, markers) and a first- or second-order polynomial.', 'Accept when the root-mean-square error of check points is below one HS pixel (2.2 cm).'],
          check=['RMSE of check points < 2.2 cm for each camera and date.'],
          out='Co-registered images → B5.',
-         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; hyperspectral, thermal and RGB images co-registered so that features of the same area could be fused.', 'Co-registration before fusion.'),
-                 ('Calderón et al. (2014)', 'Downy mildew of opium poppy; thermal and multispectral images of the same plots analysed together.', 'Thermal and multispectral layers on the same plots.')])
+         papers=[
+                 ('Calderón et al. (2014)', 'Downy mildew of opium poppy; thermal and multispectral images of the same plots analysed together.', 'Thermal and multispectral layers on the same plots.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; multispectral and thermal images geographically corrected with the same ground control points.', 'All cameras on one coordinate frame through common ground control points.')])
     step('B5', 'Resampling to the hyperspectral grid', part=P,
          what='RGB, MS and thermal layers are resampled to the 2.2-cm HS grid.',
          why='One pixel grid lets one set of subplot ROIs (B6) serve all cameras.',
@@ -69,7 +71,7 @@ def add():
          q='Why the average of the whole ROI? → It is the field-level signal that the camera records for the subplot whose DI was surveyed; ROI-mean spectra were the samples of the DT-EDNet study (Ma et al., 2026).',
          papers=[('Ma et al. (2026)', 'Rice blast; regions of interest delineated in ENVI 5.6; the average reflectance of the rice pixels in each ROI was the sample spectrum.', 'ENVI ROI mean as the sample spectrum.'),
                  ('Guo et al. (2021)', 'Wheat yellow rust; mean canopy spectra of plots related to the disease index.', 'Plot (subplot) means as samples.'),
-                 ('Liu et al. (2024)', 'Wheat powdery mildew; plot polygons and plot means of the multispectral and thermal images.', 'Same polygons and means for every camera.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; the mean of all pixels in each plot region of interest (and percentile values) used as plot features; the share of soil pixels in the ROI was small after canopy closure.', 'Mean of all ROI pixels as the field-level sample.'),
                  ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; mean spectra of regions as samples.', 'Same sampling unit logic.')])
     demo('roimean', [['Date', 'Subplot', 'ROI pixels', 'R_{550}', 'R_{670}', 'R_{800}', 'Mean Tc (°C)', 'DI (%)'], ['18 Jan 2027', '25-1', '6 120', '0.081', '0.046', '0.392', '23.4', '12.3'], ['18 Jan 2027', '25-2', '6 090', '0.084', '0.052', '0.371', '24.1', '28.4'], ['18 Jan 2027', '7-1 (healthy)', '6 150', '0.079', '0.041', '0.418', '22.8', '0.0']],
          'Subplot ROI averages joined to the DI', widths=[1300, 1400, 1100, 1000, 1000, 1000, 1400, 1400])
@@ -120,9 +122,9 @@ def add():
              'RGB: ExG, ExR, ExG − ExR, VARI, GLI, NGRDI, mean hue, saturation and value; GLCM of R, G and B (24), computed at native resolution.'],
          check=['MS 67 and RGB 33 features per subplot-date.'],
          out='MS and RGB groups → 1.6.',
-         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; multispectral red-edge indices and texture features from UAV images to estimate severity.', 'MS indices plus texture.'),
+         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; vegetation indices and three-band texture combination indices from UAV multispectral images.', 'MS indices plus texture.'),
                  ('Blasch et al. (2023)', 'Wheat yellow and stem rust; multispectral and very-high-resolution indices from UAV and satellite.', 'MS indices for rust detection.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; colour and texture features of RGB images fused with hyperspectral and thermal features.', 'RGB colour and texture features.'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; texture features of RGB and thermal infrared images fused with hyperspectral vegetation indices.', 'RGB texture features.'),
                  ('Nguyen et al. (2023)', 'Spring wheat yellow rust; CRI2, SAVI2 and GLCM contrast from multispectral UAV images were the features most correlated with the disease.', 'Multispectral indices plus texture.')])
     step('C5', 'Thermal features', part=P,
          what='Canopy temperature statistics, normalised temperatures (Step D3) and thermal texture.',
@@ -131,8 +133,8 @@ def add():
          check=['17 thermal features per subplot-date.'],
          out='Thermal group → D3, 1.6.',
          papers=[('Calderón et al. (2014)', 'Downy mildew of opium poppy; canopy temperature and canopy minus air temperature from UAV thermal images detected infected plants.', 'Canopy temperature and its normalised form.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; thermal infrared features fused with hyperspectral and RGB features.', 'Thermal features as a fusion group.'),
-                 ('Liu et al. (2024)', 'Wheat powdery mildew; thermal infrared features improved severity estimation with optical features.', 'Thermal features added to optical ones.'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; thermal infrared temperature parameters as a separate data source in fusion with spectral indices and texture.', 'Thermal features as a fusion group.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; canopy temperature from UAV thermal images analysed with spectral and texture features to estimate the disease index.', 'Canopy temperature added to optical features.'),
                  ('Oerke et al. (2006)', 'Cucumber downy mildew; thermal imaging showed infection-related temperature changes that also depended on environmental conditions.', 'Temperature features normalised for the environment.')])
     step('C6', 'Feature table of each camera', part=P,
          what='One table per camera, one row per subplot-date, with identifiers, labels, covariates and features with a group prefix.',
@@ -140,7 +142,7 @@ def add():
          do=['Columns: identifiers (date, DAI, plot, subplot, replication, treatment, variety, timing, split), labels (DI, DI class, detection), covariates, features (prefixes R_, FD_, RE_, VI_, TX_, TH_).'],
          check=['Same rows (subplot-dates) in the four camera tables.'],
          out='Four camera tables → Part D.',
-         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; spectral, thermal and texture features of each plot arranged for feature-level fusion.', 'One feature table per camera for fusion.'),
+         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices, temperature parameters and texture features of each sample combined for modelling.', 'One feature table per camera for fusion.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; multi-feature table (spectral, texture, thermal) per plot.', 'Same organisation of feature groups.')])
     rows = [['Camera', 'Feature groups', 'Number'], ['Hyperspectral', 'reflectance 483, first derivative 483, red-edge parameters 3, published indices 48, PCA texture 24 (+ NDSI, RSI, WRI and TTFI of Objective 1)', '≈ 1040'],
             ['Multispectral', '5 bands, 12 indices, 10 normalised differences, 40 texture', '67'], ['RGB', '6 colour indices, 3 colour means, 24 texture', '33'], ['Thermal', '5 temperature statistics, 4 normalised temperatures, 8 texture', '17'],
@@ -151,13 +153,13 @@ def add():
     h1('5. Part D – Data split and data preparation')
     P = 'D Split'
     step('D1', 'The 7:3 split by whole plots', part=P,
-         what='The 48 plots are divided once into 33 training plots and 15 test plots. All samples of a plot – its 4 subplots on all dates and its 36 leaves – go to the same side. Healthy and inoculated plots are split separately.',
+         what='The 48 plots are divided once into 33 training plots and 15 test plots. All samples of a plot – its 4 subplots on all dates and its 12 ASD leaves per date – go to the same side. Healthy and inoculated plots are split separately.',
          why='The test plots must be fixed before any step learns from the data; whole plots are kept together because subplots and leaves of one plot share soil, microclimate and inoculum, and a test on new plots is what the model will face.',
          do=['Test plots per block type = 30% of the plots: 4 of the 12 healthy plots and 11 of the 36 inoculated plots.',
              'Test plots: 1, 4, 5, 8 (healthy; four different sowing dates, all varieties) and 13, 14, 18, 25, 27, 31, 35, 37, 44, 46, 48 (inoculated; 11 different treatments spread over R1–R3, varieties and sowing dates) – the same plots as in the 2025-26 analysis (same plot plan).',
              'All other 33 plots are training plots.',
              'Write the split column (TEST / TRAIN) into every table before any analysis.'],
-         settings=['UAV post-symptomatic: TRAIN 1320, TEST 600 subplot-dates; pre-symptomatic: TRAIN 396, TEST 180; leaves: TRAIN 15 444, TEST 7 020.'],
+         settings=['UAV post-symptomatic: TRAIN 1320, TEST 600 subplot-dates; pre-symptomatic: TRAIN 396, TEST 180; ASD leaves: TRAIN 5148, TEST 2340.'],
          check=['No plot on both sides.', 'TEST contains all four sowing dates, all three varieties and all three replications.'],
          out='Split column → every later step.',
          alt='A random split of samples (Ma et al., 2026) is simpler but would put subplots and leaves of one plot on both sides.',
@@ -172,7 +174,7 @@ def add():
          do=['Machine learning: GroupKFold(3) over the 33 training plots (plots, not samples, are divided).',
              'Networks: validation plots 6, 7, 11, 19, 24, 26, 28, 30, 36, 39, 41 (random, seed 42); the other 22 training plots fit the weights.',
              'Use the same folds and validation plots for every camera, sensor set and model.'],
-         settings=['Networks, UAV post-symptomatic: fit 880, validation 440 subplot-dates; leaves: fit 10 296, validation 5 148.'],
+         settings=['Networks, UAV post-symptomatic: fit 880, validation 440 subplot-dates; ASD leaves: fit 3432, validation 1716.'],
          check=['No plot in both the fitting and the scoring part of any fold.'],
          out='Inner folds and validation plots → 2.2–2.6, 3.3–3.4, L6.',
          alt='10% of the training samples as in Ma et al. (2026) would be about three plots – too few to represent the blocks, and samples of one plot would be in fitting and validation.',

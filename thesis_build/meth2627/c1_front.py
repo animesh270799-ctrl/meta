@@ -5,7 +5,7 @@ def add():
     B.append(dict(t='title', title='AI-based multimodal UAV sensing of white rust in Indian mustard: complete research methodology, season 2026-27',
                   subtitle='Step-by-step protocol for the UAV cameras and the ASD leaf spectra, with the disease papers behind every step. Grouped 7:3 split by whole plots. No results – demo data only.',
                   lines=['Animesh Panda · Ph.D. (Agricultural Physics) · ICAR-Indian Agricultural Research Institute, New Delhi',
-                         'For the Advisory Committee, 2026-27. Leaf scoring and ASD leaf spectra at 3 survey points per subplot.',
+                         'For the Advisory Committee, 2026-27. Leaf scoring on 5 plants per subplot; ASD leaf spectra on the centre plant of each subplot.',
                          'Every step: what is done, why at this position, disease papers – what they did, how my step follows them, with my data (exact settings), checks, output → next step.']))
     B.append(dict(t='toc'))
 
@@ -32,18 +32,18 @@ def add():
       'These changes alter canopy reflectance, temperature and texture, which UAV cameras can record (Mahlein, 2016). '
       'The methodology follows the disease studies that used the same cameras or the same analysis steps, above all the DT-EDNet study of rice blast (Ma et al., 2026).')
     rows = [['Objective', 'Question', 'Data', 'Main outputs'],
-            ['1. Characterise white rust through multimodal UAV sensing', 'How does each camera (and the leaf spectrum) see white rust, and which features carry the disease signal?', 'post-symptomatic (1920 subplot-dates per camera) and pre-symptomatic (576) samples; leaf spectra; physiology', 'response curves, optimal wavelengths, White Rust Index, selected indices and texture, disease-specific feature set (DSF), physiological basis'],
+            ['1. Characterise white rust through multimodal UAV sensing', 'How does each camera (and the leaf spectrum) see white rust, and which features carry the disease signal?', 'post-symptomatic (1920 subplot-dates per camera) and pre-symptomatic (576) samples; 7488 ASD leaf spectra; physiology', 'response curves, optimal wavelengths, White Rust Index, selected indices and texture, disease-specific feature set (DSF), physiological basis'],
             ['2. Detect and discriminate severity through AI-based multimodal data fusion', 'Which camera or camera combination detects white rust and grades its severity best?', 'post-symptomatic samples, 15 sensor sets', 'accuracy on the 15 test plots of every sensor set and model; gain over a covariate-only model; maps; Bharatpur test'],
             ['3. Predict white rust at the pre-symptomatic stage', 'Can subplots that will develop white rust be separated from healthy subplots before pustules appear?', '576 pre-symptomatic samples (2, 5, 8 DAI)', 'pre-symptomatic models, earliest detection day, risk maps']]
     tab('objectives', rows=rows, caption='Objectives, questions, data and outputs.', widths=[2300, 2600, 2300, 2400], size=16)
     h2('1.2 Overall workflow')
-    myfig('workflow', 'g01_workflow.png', 'Overall workflow: Parts A–D are done once; Objectives 1–3 use the UAV data; Part L analyses the ASD leaf spectra taken at the same survey points.')
+    myfig('workflow', 'g01_workflow.png', 'Overall workflow: Parts A–D are done once; Objectives 1–3 use the UAV data; Part L analyses the ASD leaf spectra of the centre plant of every subplot.')
     h2('1.3 Data of the 2026-27 season')
     rows = [['Data', 'Unit of one sample', 'Dates', 'Samples', 'Training plots (33)', 'Test plots (15)'],
             ['UAV images, 4 cameras (HS, MS, RGB, TIR)', 'one subplot on one date', '10 post-symptomatic dates', '48 plots × 4 subplots × 10 = 1920 per camera', '1320', '600'],
             ['', '', '3 pre-symptomatic dates', '48 × 4 × 3 = 576 per camera', '396', '180'],
-            ['Leaf score + ASD leaf spectrum', 'one leaf on one date', '13 dates', '48 × 4 subplots × 3 survey points × 3 leaves = 1728 per date; 22 464 in all', '15 444', '7 020'],
-            ['Disease index (DI)', 'one subplot on one date', '13 dates', 'from the 9 graded leaves of the subplot', '–', '–'],
+            ['ASD leaf spectrum + leaf grade', 'one leaf on one date', '13 dates', '48 × 4 subplots × 1 centre plant × 3 leaves = 576 per date; 7488 in all', '5148', '2340'],
+            ['Disease index (DI)', 'one subplot on one date', '13 dates', 'from the 15 graded leaves of 5 plants per subplot (2880 grades per date)', '–', '–'],
             ['Biochemical and biophysical parameters', 'one designated subplot per plot', '4 dates', '48 per date (LAI: 192 per date)', '–', '–'],
             ['Covariates (DAI, variety, timing, stage, weather)', 'one subplot on one date', '13 dates', 'one row per sample', '–', '–'],
             ['Bharatpur independent test', 'one quadrat on one date', '2–3 dates', '≥ 300 quadrat-dates', 'not used for training', 'all']]
@@ -58,12 +58,12 @@ def add():
             ['5', 'UAV RGB images', 'RAW/JPG frames', '13 dates', 'whole field per date', 'B2–B6, C4'],
             ['6', 'UAV thermal images', 'radiometric frames', '13 dates', 'whole field per date', 'B1–B6, C5'],
             ['7', 'Calibration and flight data', 'panel certificates; panel images before and after each flight; GCP coordinates (RTK); flight log (time, sky, wind, air temperature, RH, height)', 'every flight', '13 sets', 'B1, B2, B4, D3'],
-            ['8', 'Leaf scoring sheets', 'date, plot, subplot, survey point, plant tag, leaf position (L3, L5, LL), grade 0–9; staghead racemes', '13 dates', '1728 grades per date (22 464)', 'A3, A5, Part L'],
-            ['9', 'ASD leaf spectra', '.asd files (2 readings per leaf) and ASCII export; white-reference log', '13 dates', '3456 readings per date (44 928)', 'A4, Part L'],
+            ['8', 'Leaf scoring sheets', 'date, plot, subplot, plant (centre or corner 1–4), leaf position (L3, L5, LL), grade 0–9; staghead racemes', '13 dates', '2880 grades per date (37 440)', 'A3, A5, Part L'],
+            ['9', 'ASD leaf spectra', '.asd files of the centre plant (2 readings per leaf) and ASCII export; white-reference log', '13 dates', '1152 readings per date (14 976)', 'A4, Part L'],
             ['10', 'Growth stage', 'BBCH stage of every plot', '13 dates', '624 records', 'A6, 1.1.3, 2.10'],
             ['11', 'Weather', 'daily Tmax, Tmin, RH I, RH II, rainfall from the IARI observatory, 1 Dec 2026 – 31 Mar 2027', 'daily', '≈ 120 days', 'A6, 2.9, 3.5, L8'],
             ['12', 'Biochemical and biophysical parameters', '11 parameters of the designated subplot; LI-6400 and canopy-analyser files', '4 dates', '48 per parameter and date (LAI 192)', 'A7, 1.7'],
-            ['13', 'Bharatpur test data', 'images of the 4 cameras, quadrat positions (RTK), survey sheets (3 points per quadrat), covariates, local weather', '2–3 dates', '≥ 300 quadrat-dates', 'A8, 2.11'],
+            ['13', 'Bharatpur test data', 'images of the 4 cameras, quadrat positions (RTK), scoring sheets (5 plants per quadrat), covariates, local weather', '2–3 dates', '≥ 300 quadrat-dates', 'A8, 2.11'],
             ['14', 'Glasshouse data', 'pot plan, inoculation record, 0–6 severity, ASD spectra', '2, 5, 8, 11 DAI, then weekly', '48 pots', 'A9'],
             ['15', 'Tables made during the analysis', 'subplot ROI means of each camera; feature tables; leaf table; split file (test plots); inner folds and validation plots', 'after Parts B–D', '–', 'all later steps']]
     tab('datasets_needed', rows=rows, caption='Data sets needed for the whole analysis.', widths=[500, 1800, 3500, 1300, 1400, 1100], size=15)

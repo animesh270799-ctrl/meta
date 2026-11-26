@@ -37,7 +37,7 @@ def add():
          check=['Every stratum has a table row.'],
          out='Strata → 2.10.',
          papers=[('Blasch et al. (2023)', 'Wheat rusts; UAV detection depended on the crop growth stage.', 'Results by growth stage.'),
-                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and thermal responses compared across growth stages.', 'Stage-wise responses.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and canopy-temperature features compared between healthy and infected plots at early, middle and late infection stages (Zadoks stage recorded).', 'Responses reported by stage.'),
                  ('Chattopadhyay et al. (2011)', 'White rust of mustard; disease development related to weather in different sowings.', 'DI related to weather and sowing date.'),
                  ('Zhang et al. (2022)', 'Rice leaf blast severity classified separately at the jointing, booting and heading stages.', 'Results reported within each growth stage.')])
 
@@ -141,7 +141,7 @@ def add():
          check=['Selected features of MS, RGB and thermal for Tasks A–C.'],
          out='Camera feature lists → 1.6.2.',
          papers=[('Ma et al. (2026)', 'Rice blast; one selection method per feature group (SHAP-CARS for bands, Relief for indices, mRMR for texture).', 'One method per group.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; thermal features kept as their own group in the fusion.', 'Thermal group kept.')])
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; thermal temperature parameters kept as their own data source in the fusion.', 'Thermal group kept.')])
     step('1.6.2', 'Variance inflation factor and the disease-specific feature set', part=P,
          what='For each camera and task, the selected features (HS: OW + VI + TF + TTFI) are pooled; the feature with the largest VIF is removed one at a time until all VIF < 10. The rest is the disease-specific feature set (DSF).',
          why='Bands, indices and texture overlap; collinear inputs make models unstable and explanations unreliable.',
@@ -159,7 +159,7 @@ def add():
          check=['Correlation heat map and treatment table.'],
          out='Expected fusion benefit → 2.8.',
          papers=[('Mahlein et al. (2019)', 'Fusarium head blight of wheat; thermal, fluorescence and hyperspectral imaging compared and combined; the sensors carried complementary information.', 'Complementarity of sensors before fusion.'),
-                 ('Feng et al. (2022)', 'Wheat powdery mildew; hyperspectral, thermal and RGB features fused because they described different effects.', 'Fusion of complementary cameras.')])
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices were the best single source, followed by temperature parameters and texture; fusing all three gave the best model.', 'Fusion of complementary cameras.')])
 
     h2('Activity 1.7 – Physiological basis of the camera responses')
     step('1.7.1', 'Effect of white rust on the plant parameters', part=P,
@@ -168,7 +168,7 @@ def add():
          do=['Mean of the three replications per treatment and date.', 'Paired t-test inoculated vs healthy (12 pairs) per date.', 'Two-way ANOVA (variety × sowing date) within R1–R3, LSD at 5%.'],
          check=['Table of means, differences and p-values per parameter and date.'],
          out='Changed parameters → 1.7.2.',
-         papers=[('Mishra et al. (2009)', 'White rust of Indian mustard; biochemical constituents of infected plants compared with healthy plants.', 'Infected vs healthy comparison of biochemical parameters.'),
+         papers=[('Mishra et al. (2009)', 'White rust of Indian mustard; protein, phenols and sugars of inoculated leaves of six genotypes related to the disease index.', 'Infected vs healthy comparison of biochemical parameters.'),
                  ('Calderón et al. (2013)', 'Verticillium wilt of olive; physiological measurements compared between severity levels.', 'Physiology by disease level.')])
     step('1.7.2', 'Relation of the plant parameters with the disease index and the camera features', part=P,
          what='Pearson r between each parameter and the subplot DI, and between each parameter and the DSF features of the same subplot and date.',
@@ -186,7 +186,7 @@ def add():
          do=['Labels of Step A5 (healthy vs later-infected).', 'Mean curves of the two groups per date and their difference.', 't-test of plot means (plot = unit) per feature and date.'],
          check=['Curves and test table for the three dates.'],
          out='Responding features → 1.8.2.',
-         papers=[('Zhu et al. (2017)', 'Tobacco disease; hyperspectral differences between inoculated and healthy plants before symptoms.', 'Pre-symptomatic comparison of the two groups.'),
+         papers=[('Zhu et al. (2017)', 'Tobacco mosaic virus; hyperspectral images of inoculated and healthy leaves 2, 4 and 6 days after inoculation, before visible symptoms.', 'Pre-symptomatic comparison of the two groups.'),
                  ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral changes in inoculated plants before visible symptoms.', 'Early spectral differences day by day.'),
                  ('Gold et al. (2020)', 'Potato late and early blight; leaf spectra separated infected plants before symptoms.', 'Pre-symptomatic spectral difference.'),
                  ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; pre-symptomatic detection relied on water-related (about 1400 nm) and red-edge (about 750 nm) bands rather than pigments.', 'Water and red-edge features examined before symptoms.')])

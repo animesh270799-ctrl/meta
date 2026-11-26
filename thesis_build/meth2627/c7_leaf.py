@@ -3,16 +3,16 @@ from c_lib import *
 
 def add():
     h1('9. Part L – Analysis of the ASD FieldSpec leaf spectra')
-    p('Part L analyses the 22 464 leaf spectra taken at the 3 survey points of every subplot on the 13 dates (Step A4), each with its own leaf grade. It uses the same 7:3 split by plots, the same three tasks at leaf level and the same selection and model steps as the UAV data, '
+    p('Part L analyses the 7488 leaf spectra of the centre plant of every subplot on the 13 dates (Step A4), each with its own leaf grade. It uses the same 7:3 split by plots, the same three tasks at leaf level and the same selection and model steps as the UAV data, '
       'so that leaf and canopy results can be compared (Step L9). The spectra are already splice-corrected by the instrument software.')
     myfig('leafchain', 'g14_leaf_chain.png', 'Steps of Part L.')
     P = 'L ASD leaf spectra'
     step('L1', 'Leaf table and data checks', part=P,
          what='The ASD files of each date are read into one leaf table (one row per leaf) with its grade and identifiers; the 2 readings of a leaf are averaged; the table is checked.',
          why='Every later step assumes one correct spectrum per leaf with the right label.',
-         do=['Read all files; join each leaf to plot, subplot, survey point, leaf position, date and grade (record sheet, Step A4).', 'Average the 2 readings of each leaf; flag a leaf if its two readings differ by more than 0.02 reflectance on average and check the record sheet.',
+         do=['Read all files; join each leaf to plot, subplot, leaf position, date and grade (record sheet, Step A4).', 'Average the 2 readings of each leaf; flag a leaf if its two readings differ by more than 0.02 reflectance on average and check the record sheet.',
              'Keep leaf positions L3, L5 and LL only; check grades (0, 1, 3, 5, 7, 9), 2151 bands, no missing values, all 48 plots on every date.', 'Remove exact duplicate spectra (all values equal), keeping one copy.'],
-         check=['1728 leaves per date (minus missing leaves); duplicates and flags listed in a report.'],
+         check=['576 leaves per date (minus missing leaves); duplicates and flags listed in a report.'],
          out='Leaf table and spectra → L2.',
          papers=[('Chen et al. (2023)', 'Tobacco viruses; ASD FieldSpec 4 leaf spectra (350–2500 nm) organised with their severity grades.', 'Leaf spectra joined to their grades.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra of asymptomatic and symptomatic leaves organised by stage and severity.', 'One spectrum per leaf with its labels.'),
@@ -21,7 +21,7 @@ def add():
          what='Leaves of the 15 test plots form the leaf test set; leaves of the 33 training plots are used for selection and training, with GroupKFold(3) by plot for ML and the 11 validation plots for the networks.',
          why='Leaf and canopy models must be tested on the same new plots.',
          do=['Copy the split column of Step D1 to every leaf by plot number.', 'Use the folds and validation plots of Step D2.'],
-         settings=['TRAIN 15 444 leaves (network fit 10 296, validation 5 148); TEST 7 020 leaves.'],
+         settings=['TRAIN 5148 leaves (network fit 3432, validation 1716); TEST 2340 leaves.'],
          check=['No plot on both sides.'],
          out='Split leaf table → L3–L10.',
          papers=[('Ma et al. (2026)', 'Rice blast; 7:3 stratified split; 10% of the training set as validation; model with the highest validation accuracy tested once.', 'Same proportion, validation inside training, test once – by whole plots.'),
@@ -119,7 +119,7 @@ def add():
                  ('Chen et al. (2023); Mandal et al. (2023)', 'Tobacco viruses; rice blast: SVM, random forest and PLS models on leaf spectra.', 'Same ML models at leaf level.'),
                  ('Zhang et al. (2022)', 'Rice leaf blast severity grades classified with SVM and a probabilistic neural network from leaf spectra (88–98% accuracy).', 'SVM and a neural network on leaf spectra for grades.')])
     step('L7', 'Leaf test metrics', part=P,
-         what='Metrics on the 7 020 test leaves: OA, kappa, macro-F1, per-class F1, sensitivity, specificity, AUC (Task A); R², RMSE, RPD (Task C).',
+         what='Metrics on the 2340 test leaves: OA, kappa, macro-F1, per-class F1, sensitivity, specificity, AUC (Task A); R², RMSE, RPD (Task C).',
          why='Same metrics as the UAV models (Step 2.7).',
          do=['Compute all metrics once on the test leaves; confusion matrices; results by leaf position and stage.'],
          check=['One metric row per model × task.'],
@@ -136,9 +136,9 @@ def add():
          papers=[('Zhang et al. (2014a)', 'Wheat powdery mildew; meteorological model compared with meteorological + remote-sensing model.', 'Covariate-only vs sensor + covariate.'),
                  ('Bijlwan et al. (2025)', 'Crop disease severity from weather variables with machine learning.', 'Weather-only baseline.')])
     step('L9', 'Leaf–canopy link', part=P,
-         what='Leaf and canopy results are compared: (1) leaf vs canopy optimal wavelengths, VI and WRI; (2) subplot mean leaf spectrum (9 leaves) resampled to the Headwall bands vs the UAV subplot spectrum; (3) leaf WRI and leaf indices computed from the UAV subplot spectra and related to the subplot DI.',
+         what='Leaf and canopy results are compared: (1) leaf vs canopy optimal wavelengths, VI and WRI; (2) mean leaf spectrum of the centre plant (3 leaves) resampled to the Headwall bands vs the UAV subplot spectrum; (3) leaf WRI and leaf indices computed from the UAV subplot spectra and related to the subplot DI.',
          why='Shows which leaf-level white rust features survive at canopy scale and can be carried to UAV and satellite sensors.',
-         do=['Overlap table of leaf and canopy OW (± 10 nm) and VI.', 'Resample the subplot mean leaf spectrum to the Headwall band centres; r between leaf and UAV reflectance per band and date.', 'Compute the leaf WRI on UAV subplot spectra; r and balanced accuracy with the subplot DI (test plots).'],
+         do=['Overlap table of leaf and canopy OW (± 10 nm) and VI.', 'Resample the mean leaf spectrum of the centre plant to the Headwall band centres; r between leaf and UAV reflectance per band and date.', 'Compute the leaf WRI on UAV subplot spectra; r and balanced accuracy with the subplot DI (test plots).'],
          check=['Overlap table, band-wise r curve and transfer metrics.'],
          out='Leaf-to-canopy transfer → conclusions, satellite up-scaling.',
          papers=[('Liu et al. (2026)', 'Wheat powdery mildew; a specific vegetation index developed from ground spectra and used to track the disease from UAV.', 'Leaf/ground index tested at UAV scale.'),

@@ -25,10 +25,10 @@ refline(s, 'Saharan et al. (2014); Mishra et al. (2009); Chattopadhyay et al. (2
 // ------------------------------------------------------------------ objectives
 s = S('Research needs, objectives, data and outputs', 'Introduction');
 tb(s, [['Objective', 'Research need (question answered)', 'Data used', 'Main output'],
-  ['1. To characterise white rust of mustard through multimodal sensing from a UAV platform', 'Which wavelengths, indices, texture and thermal features of each camera (and of the leaf spectrum) respond to severity, and which already differ before symptoms?', '1920 post- and 576 pre-symptomatic subplot samples per camera; 22 464 leaf spectra', 'optimal wavelengths, White Rust Index, selected indices, TTFI, disease-specific feature sets; physiological basis'],
+  ['1. To characterise white rust of mustard through multimodal sensing from a UAV platform', 'Which wavelengths, indices, texture and thermal features of each camera (and of the leaf spectrum) respond to severity, and which already differ before symptoms?', '1920 post- and 576 pre-symptomatic subplot samples per camera; 7488 ASD leaf spectra', 'optimal wavelengths, White Rust Index, selected indices, TTFI, disease-specific feature sets; physiological basis'],
   ['2. To detect and discriminate disease severity of white rust through AI-based multimodal data fusion', 'How accurately do 15 sensor sets with ML and deep learning predict (a) healthy vs diseased, (b) DI class, (c) DI (%) on new plots?', '1920 post-symptomatic subplot samples per camera; leaf spectra', 'best sensor set and model per task; gain over a covariate-only model; maps; Bharatpur test'],
   ['3. To predict white rust at the pre-symptomatic stage', 'Can subplots that will develop white rust be separated from healthy subplots before pustules appear, and how early?', '576 pre-symptomatic subplot samples (2, 5, 8 DAI); early leaf spectra', 'pre-symptomatic models; earliest detection day; risk maps']], 0.45, 1.25, 12.43, [2.9, 4.4, 2.4, 2.73], { firstCol: true, fs: 13 });
-T(s, 'UAV sample = one subplot on one date (48 plots × 4 subplots = 192 per flight). ASD sample = one leaf on one date (9 leaves per subplot = 1728 per date).', 0.45, 6.2, 12.43, 0.6, { italic: true, color: C.g });
+T(s, 'UAV sample = one subplot on one date (48 plots × 4 subplots = 192 per flight). ASD sample = one leaf on one date (3 leaves of the centre plant per subplot = 576 per date).', 0.45, 6.2, 12.43, 0.6, { italic: true, color: C.g });
 // ------------------------------------------------------------------ framework
 sec('Research framework');
 s = S('Overall research framework', 'Framework');
@@ -53,7 +53,7 @@ BL(s, ['**Site and season:** IARI research farm, New Delhi; rabi 2026-27; field 
   '**Treatments:** 12 (4 sowing dates × 3 varieties) × 3 replications (R1–R3) inoculated = 36 plots + 12 healthy plots = 48 plots.'], 0.45, 1.2, 6.6, 4.6);
 tb(s, [['Timing', 'Sowing date', 'Crop age at inoculation'], ['D1', '19 Nov 2026', '41 days'], ['D2', '26 Nov 2026', '34 days'], ['D3', '3 Dec 2026', '27 days'], ['D4', '10 Dec 2026', '20 days']], 7.35, 1.25, 5.53, [1.1, 1.9, 2.53], { firstCol: true });
 [['Healthy block', 'plots 1–12; uninoculated, 10 m from the inoculated block; 1 plot per treatment', C.g, C.lt], ['Inoculated block', 'R3 plots 13–24, R2 25–36, R1 37–48; 12 treatments per replication', C.red, C.lred]].forEach((b, i) => box(s, 7.35, 3.55 + i * 1.25, 5.53, 1.05, b[0], b[1], b[2], b[3]));
-refline(s, 'inoculation of B. juncea with A. candida: Mishra et al. (2009); inoculated + healthy plots for UAV disease studies: Guo et al. (2021), Liu et al. (2024); varieties: Blasch et al. (2023); sowing dates: Chattopadhyay et al. (2011).', 6.15, 0.75);
+refline(s, 'inoculation of B. juncea with A. candida (1.44 × 10⁵ zoosporangia mL⁻¹): Mishra et al. (2009); inoculated + healthy plots for UAV disease studies: Guo et al. (2021), Liu et al. (2024); varieties: Blasch et al. (2023); sowing dates: Chattopadhyay et al. (2011).', 6.15, 0.75);
 // ------------------------------------------------------------------ A2
 s = S('Step A2: Unmanned aerial vehicle flights and the four cameras', 'Data collection');
 tb(s, [['Camera', 'Sensor', 'Spectral range / bands', 'Ground pixel', 'Plant response recorded'],
@@ -62,27 +62,27 @@ tb(s, [['Camera', 'Sensor', 'Spectral range / bands', 'Ground pixel', 'Plant res
   ['Red–green–blue', 'DJI camera', 'red, green, blue', '≈ 0.8 cm', 'colour, pustule and canopy texture'],
   ['Thermal', 'FLIR Vue Pro R (640 × 480)', '7.5–13.5 µm', '≈ 3.9 cm', 'canopy temperature (transpiration)']], 0.45, 1.25, 12.43, [1.7, 2.9, 3.4, 1.4, 3.03], { firstCol: true });
 BL(s, ['**Flight protocol:** 11:00–14:00 h, clear sky, low wind; 30 m above ground; ≈ 85% forward and 80% side overlap.', '**Before every flight:** reflectance panels (imaged before and after) and ground control points; air temperature and relative humidity recorded.',
-  '**Dates:** 13 flights with all four cameras (3 pre-symptomatic + 10 post-symptomatic); leaf scoring and ASD at the survey points on the flight day (or within one day).'], 0.45, 3.2, 12.43, 1.9);
+  '**Dates:** 13 flights with all four cameras (3 pre-symptomatic + 10 post-symptomatic); scoring of 5 plants per subplot and ASD of the centre plant on the flight day (or within one day).'], 0.45, 3.2, 12.43, 1.9);
 refline(s, 'hyperspectral + thermal + RGB: Feng et al. (2022); multispectral + thermal: Liu et al. (2024), Calderón et al. (2014); multispectral red edge for yellow rust: Nguyen et al. (2023); UAV hyperspectral: Guo et al. (2021), Ma et al. (2026).', 6.15, 0.6);
 // ------------------------------------------------------------------ timeline
 s = S('Data collection timeline, 2026-27', 'Data collection');
 img(s, 'g04_timeline.png', 0.6, 1.2, 12.1, 4.4);
-BL(s, ['**All 13 dates:** four cameras; leaf scoring (L3, L5, LL) and ASD leaf spectra at 3 survey points per subplot. **Purple squares:** biochemical and biophysical parameters (7 Jan, 18 Jan, 8 Feb, 1 Mar).'], 0.45, 5.75, 12.43, 0.7);
+BL(s, ['**All 13 dates:** four cameras; leaf scoring (L3, L5, LL) of 5 plants per subplot; ASD leaf spectra of the centre plant. **Purple squares:** biochemical and biophysical parameters (7 Jan, 18 Jan, 8 Feb, 1 Mar).'], 0.45, 5.75, 12.43, 0.7);
 refline(s, 'leaf measurements on UAV flight days: Yu et al. (2021); Calderón et al. (2014).', 6.5, 0.4);
 // ------------------------------------------------------------------ A3/A5
-s = S('Steps A3 and A5: Survey points, leaf scoring, disease index and labels', 'Data collection');
+s = S('Steps A3 and A5: Plant scoring, disease index and labels', 'Data collection');
 img(s, 'g03_survey.png', 0.45, 1.15, 6.4, 2.6);
-box(s, 0.45, 3.95, 6.4, 1.15, 'Disease index of a subplot (Liu et al., 2024)', ['DI = Σ(x × f) / (9 × Σf) × 100 over its 9 graded leaves', 'x = leaf grade 0–9 (Conn et al., 1990); f = number of leaves at grade x'], C.red, C.lred, { fs: 13 });
-BL(s, ['**3 survey points per subplot** on the diagonal (1/4, 1/2, 3/4), inside the inner buffer; one tagged plant per point (576 plants).',
-  '**Leaf scoring:** leaves L3, L5 and LL of each tagged plant graded 0, 1, 3, 5, 7, 9 by % leaf area with pustules; same trained scorer, written limits (Bock et al., 2010).',
+box(s, 0.45, 3.95, 6.4, 1.15, 'Disease index of a subplot (Liu et al., 2024)', ['DI = Σ(x × f) / (9 × Σf) × 100 over its 15 graded leaves (Mishra et al., 2009)', 'x = leaf grade 0–9; f = number of leaves at grade x'], C.red, C.lred, { fs: 13 });
+BL(s, ['**5 tagged plants per subplot:** centre + four corners inside the inner buffer (960 plants); the centre plant is the ASD plant.',
+  '**Leaf scoring:** L3, L5, LL of each plant graded 0, 1, 3, 5, 7, 9 by % leaf area with pustules, judged with the area diagrams of Conn et al. (1990); one trained scorer (Bock et al., 2010).',
   '**Task A:** healthy (DI = 0) vs diseased (DI > 0). **Task B:** DI class. **Task C:** DI (%).', '**Pre-symptomatic label:** healthy plots vs inoculated subplots that show pustules later (Zhu et al., 2017).',
   '**Leaf level (ASD):** grade 0 vs > 0; six grades; grade as a number.'], 7.05, 1.15, 5.83, 4.1, { ps: 3 });
 tb(s, [['DI (%)', '0', '0–5', '5–10', '10–25', '25–50', '> 50'], ['DI class', '0', '1', '3', '5', '7', '9']], 0.45, 5.3, 12.43, [2.0, 1.73, 1.74, 1.74, 1.74, 1.74, 1.74], { fs: 13, firstCol: true });
-refline(s, 'Liu et al. (2024); Conn et al. (1990); Bock et al. (2010); Chen et al. (2023) (grades 0, 1, 3, 5, 7, 9); Ma et al. (2026) (DI label); Zhu et al. (2017).', 6.2, 0.6);
+refline(s, 'DI from graded leaves: Liu et al. (2024), Mishra et al. (2009); area diagrams usable for white rust: Conn et al. (1990); Bock et al. (2010); grades 0, 1, 3, 5, 7, 9: Chen et al. (2023); early labels: Zhu et al. (2017).', 6.2, 0.6);
 // ------------------------------------------------------------------ A4
-s = S('Step A4: ASD FieldSpec leaf spectra at the same survey points', 'Data collection');
-chain(s, [{ h: 'Same leaves', b: 'L3, L5, LL of the 3 tagged plants per subplot, right after grading' }, { h: 'White reference', b: 'start, then every 10–15 min or each plot' }, { h: 'Readings', b: '2 per leaf, contact probe + leaf clip, 350–2500 nm' },
-  { h: 'Record', b: 'date, plot, subplot, point, leaf, reading, grade' }, { h: 'Volume', b: '1728 leaves per date; 22 464 leaves in 13 dates' }], 0.45, 1.3, 12.43, 1.65, 0.28, C.teal, C.lteal);
+s = S('Step A4: ASD FieldSpec leaf spectra of the centre plant of each subplot', 'Data collection');
+chain(s, [{ h: 'Same leaves', b: 'L3, L5, LL of the centre plant of each subplot, right after grading' }, { h: 'White reference', b: 'start, then every 10–15 min or each plot' }, { h: 'Readings', b: '2 per leaf, contact probe + leaf clip, 350–2500 nm' },
+  { h: 'Record', b: 'date, plot, subplot, leaf, reading, grade' }, { h: 'Volume', b: '576 leaves (1152 readings) per date; 7488 leaves in 13 dates' }], 0.45, 1.3, 12.43, 1.65, 0.28, C.teal, C.lteal);
 BL(s, ['**Why:** a leaf spectrum of a graded leaf records the disease without sun, sky, soil or atmosphere, and links leaf and canopy at the same points.',
   '**When:** all 13 flight dates (same day or ± 1 day); the clip has its own lamp, so the time of day does not matter.', '**Unit of analysis:** one leaf on one date (leaf level); the UAV data stay at subplot level.'], 0.45, 3.2, 12.43, 2.2);
 refline(s, 'Mandal et al. (2023) (handheld spectroradiometer, 0–9 scale); Chen et al. (2023) (ASD FieldSpec 4); Lv et al. (2023) (leaf clip); Martínez-Martínez et al. (2018) (contact spectra); Yu et al. (2021).', 6.1, 0.7);
@@ -95,7 +95,7 @@ tb(s, [['Parameter (unit)', 'Method', 'Reference'],
   ['Membrane stability index (%)', 'conductivity at 40 °C (C₁) and 100 °C (C₂)', 'Sairam (1994); Premachandra et al. (1990)'],
   ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable gas exchange', 'Riches et al. (2020); Long and Bernacchi (2003)'],
   ['Leaf area index (m² m⁻²)', 'canopy analyser: 1 reading above, 4 below; diffuse light', 'Singh et al. (2021); Bréda (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
-box(s, 9.2, 1.2, 3.68, 3.4, 'Sampling design', ['Dates: 7 Jan (pre), 18 Jan, 8 Feb, 1 Mar 2027', 'One designated subplot per plot, rotated (plot mod 4 + 1)', 'Gas exchange on L3 of one tagged plant, 09:30–11:30 h', 'Lab samples: L3 of 3 untagged plants', 'LAI in all 4 subplots'], C.teal, C.lteal, { valign: 'top', fs: 13 });
+box(s, 9.2, 1.2, 3.68, 3.4, 'Sampling design', ['Dates: 7 Jan (pre), 18 Jan, 8 Feb, 1 Mar 2027', 'One designated subplot per plot, rotated (plot mod 4 + 1)', 'Gas exchange on L3 of the centre plant, 09:30–11:30 h', 'Lab samples: L3 of 3 untagged plants', 'LAI in all 4 subplots'], C.teal, C.lteal, { valign: 'top', fs: 13 });
 BL(s, ['**Use:** explain the camera responses (Activity 1.7) and pre-symptomatic changes; not model inputs.'], 0.45, 5.35, 12.43, 0.5);
 refline(s, 'white rust biochemistry: Mishra et al. (2009), Chatterjee et al. (2022); spectra + physiology: Yu et al. (2025); physiology explaining thermal and spectral signals: Calderón et al. (2013), Zarco-Tejada et al. (2018); Brassica leaves: Baranowski et al. (2015).', 5.9, 0.7);
 // ------------------------------------------------------------------ A6 covariates
@@ -103,12 +103,12 @@ s = S('Step A6: Covariates and weather data', 'Data collection');
 tb(s, [['Covariate', 'Coding', 'Main use'], ['Days after inoculation (DAI)', 'numeric (flight date − 30 Dec 2026)', 'covariate baseline'], ['Variety (V1–V3)', 'categorical', 'baseline; results by variety'],
   ['Sowing date / crop age at inoculation', 'D1–D4 or 41, 34, 27, 20 days', 'baseline; results by sowing date'], ['Growth stage (BBCH)', '1 vegetative (10–49), 2 flowering (60–69), 3 pod formation (70+)', 'baseline; results by stage'],
   ['Weather (Tmax, Tmin, RH I, RH II, rainfall)', '7-day summaries ending the day before each flight; favourable days since inoculation', 'baseline; interpretation']], 0.45, 1.25, 12.43, [3.6, 5.2, 3.63], { firstCol: true });
-BL(s, ['**Favourable days** (weather-based white rust forecasting, Chattopadhyay et al., 2011): leaf infection Tmax 16–24 °C, RH I > 97%, RH II > 40%; staghead Tmax 20–29 °C, Tmin > 12 °C, RH I > 97% (limits to be confirmed against the original paper).', '**Covariates are not camera features:** they enter only the covariate models (Steps 2.9, 3.5, L8) and the results by stratum.'], 0.45, 4.3, 12.43, 1.3);
+BL(s, ['**Favourable days** (weather-based white rust forecasting, Chattopadhyay et al., 2011): leaf infection Tmax 16–24 °C, RH I > 97%, RH II > 40%; staghead Tmax 20–29 °C, Tmin > 12 °C, RH I > 97% (RH I = morning, RH II = afternoon; checked in the paper).', '**Covariates are not camera features:** they enter only the covariate models (Steps 2.9, 3.5, L8) and the results by stratum.'], 0.45, 4.3, 12.43, 1.3);
 refline(s, 'Chattopadhyay et al. (2011); weather vs weather + remote sensing: Zhang et al. (2014a); mustard rot: Bhattacharya and Chattopadhyay (2013); stage effects: Blasch et al. (2023).', 6.1, 0.6);
 // ------------------------------------------------------------------ A8 Bharatpur
 s = S('Step A8: Independent test data at Bharatpur', 'Data collection');
 chain(s, [{ h: 'Sites', b: 'research farms and farmers\' fields, natural white rust' }, { h: 'Quadrats', b: '2.5 m × 1.5 m; pegs, markers, RTK GNSS; 15–20 per field' }, { h: 'Flights', b: 'same four cameras, 2–3 dates (Feb–Mar)' },
-  { h: 'Ground truth', b: '3 survey points per quadrat; same 0–9 key and scorer' }, { h: 'Covariates', b: 'variety, sowing, stage, sprays, weather' }], 0.45, 1.3, 12.43, 1.75, 0.28, C.gold, C.lgold);
+  { h: 'Ground truth', b: '5 plants per quadrat; same 0–9 grades and scorer' }, { h: 'Covariates', b: 'variety, sowing, stage, sprays, weather' }], 0.45, 1.3, 12.43, 1.75, 0.28, C.gold, C.lgold);
 BL(s, ['**Size:** ≥ 300 quadrat-dates covering healthy to severe.', '**Rule:** never used for selection, tuning or training; used once to test the frozen IARI models (Step 2.11).'], 0.45, 3.3, 12.43, 1.5);
 refline(s, 'independent test data: Ma et al. (2026); transfer of UAV disease models: Yuan et al. (2025), Liu et al. (2026); Bharatpur white rust site: Chattopadhyay et al. (2011).', 6.1, 0.6);
 // ------------------------------------------------------------------ data sets
@@ -117,8 +117,8 @@ tb(s, [['Data set', 'Content', 'When', 'Amount'],
   ['Field plan', 'plot, block, replication, sowing date, variety; plot and subplot corners (GPS)', 'before sowing', '48 plots, 192 subplots'],
   ['UAV images (4 cameras)', 'HS VNIR–SWIR cubes + GNSS/IMU; MS frames + light sensor; RGB frames; thermal frames', '13 dates', 'whole field per date'],
   ['Calibration and flight data', 'panel certificates and images (before/after); GCPs (RTK); flight log (time, sky, wind, air temperature, RH)', 'every flight', '13 sets'],
-  ['Leaf scoring sheets', 'plot, subplot, survey point, plant, leaf (L3, L5, LL), grade 0–9; staghead racemes', '13 dates', '1728 grades per date'],
-  ['ASD leaf spectra', '.asd files (2 readings per leaf) + ASCII; white-reference log', '13 dates', '3456 readings per date'],
+  ['Leaf scoring sheets', 'plot, subplot, plant (centre, corners 1–4), leaf (L3, L5, LL), grade 0–9; staghead racemes', '13 dates', '2880 grades per date'],
+  ['ASD leaf spectra', 'centre plant: .asd files (2 readings per leaf) + ASCII; white-reference log', '13 dates', '1152 readings per date'],
   ['Growth stage, inoculation record', 'BBCH stage per plot and date; inoculation date, concentration, method', '13 dates; 30 Dec', '624 records'],
   ['Weather', 'daily Tmax, Tmin, RH I, RH II, rainfall (IARI observatory), 1 Dec 2026 – 31 Mar 2027', 'daily', '≈ 120 days'],
   ['Plant parameters', '11 biochemical/biophysical parameters; LI-6400 and canopy-analyser files', '4 dates', '48 per date (LAI 192)'],
@@ -235,14 +235,14 @@ refline(s, 'earliest detection day per sensor: Mahlein et al. (2019); accuracy b
 sec('ASD leaf spectra');
 s = S('Part L: Analysis of the ASD FieldSpec leaf spectra (leaf level)', 'ASD analysis');
 img(s, 'g14_leaf_chain.png', 0.45, 1.15, 7.8, 3.2);
-BL(s, ['**Data:** 22 464 leaves (13 dates × 1728); each spectrum = mean of 2 readings; already splice-corrected.', '**Same split:** leaves of the 15 test plots = 7 020 test leaves; 15 444 training leaves.', '**Tasks:** grade 0 vs > 0; six grades; grade as a number.'], 8.45, 1.15, 4.43, 3.6);
+BL(s, ['**Data:** 7488 leaves (13 dates × 576, centre plant of every subplot); each spectrum = mean of 2 readings; already splice-corrected.', '**Same split:** leaves of the 15 test plots = 2340 test leaves; 5148 training leaves.', '**Tasks:** grade 0 vs > 0; six grades; grade as a number.'], 8.45, 1.15, 4.43, 3.6);
 tb(s, [['Step', 'Settings', 'Disease papers'], ['L1 Leaf table', 'join grades; average 2 readings; L3, L5, LL only; duplicates removed', 'Chen et al. (2023); Lv et al. (2023)'],
   ['L3 Pre-processing', 'Savitzky–Golay (11, 2); 400–2400 nm, water bands kept; FD; 5-nm band means for searches', 'Ma et al. (2026); Selvaprakash et al. (2026); Meng et al. (2020); Mandal et al. (2023)'],
   ['L4 Indices', '48 published indices + REP, Dr, SDr (1 nm)', 'Mandal et al. (2023); Zhang et al. (2012)']], 0.45, 4.45, 12.43, [2.2, 6.0, 4.23], { firstCol: true, fs: 12 });
 s = S('Part L: Leaf Objective 1, models and the leaf–canopy link', 'ASD analysis');
 tb(s, [['Step', 'What is done', 'Disease papers'], ['L5 Leaf Objective 1', 'mean/difference/r spectra; NDSI/RSI maps; SHAP-CARS; NDSI, RSI, WRI; filter + ReliefF; VIF → leaf DSF; JM distance; PCA', 'Ma et al. (2026); Mahlein et al. (2013); Mandal et al. (2023); Lv et al. (2023)'],
   ['L6 Leaf models', 'selection on training leaves; SVM, RF, k-NN, PLS (SFFS + grid, GroupKFold(3)); DNN-F1; four networks (A, B)', 'Tian et al. (2021); Lv et al. (2023); Zhang et al. (2022); Ma et al. (2026)'],
-  ['L7 Test metrics', 'OA, kappa, macro-F1, per-class F1, AUC; R², RMSE, RPD on 7 020 test leaves', 'Ma et al. (2026); Lv et al. (2023); Mandal et al. (2023)'],
+  ['L7 Test metrics', 'OA, kappa, macro-F1, per-class F1, AUC; R², RMSE, RPD on 2340 test leaves', 'Ma et al. (2026); Lv et al. (2023); Mandal et al. (2023)'],
   ['L8 Covariate baseline', 'M0, M1, M2 at leaf level', 'Zhang et al. (2014a); Bijlwan et al. (2025)'],
   ['L9 Leaf–canopy link', 'leaf vs canopy OW and VI; subplot mean leaf spectrum resampled to Headwall bands vs UAV spectrum; leaf WRI on UAV subplot spectra vs DI', 'Liu et al. (2026); Bohnenkamp et al. (2019); Poblete et al. (2023); Zheng et al. (2018)'],
   ['L10 Pre-symptomatic leaves', 'leaves of 1, 4, 7 Jan; later-infected plants vs healthy; selection and models', 'Gold et al. (2020); Tian et al. (2021); Lv et al. (2023)']], 0.45, 1.25, 12.43, [2.4, 6.0, 4.03], { firstCol: true, fs: 12 });

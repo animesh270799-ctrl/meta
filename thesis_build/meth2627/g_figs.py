@@ -33,7 +33,7 @@ boxes(ax, [(1, 80, 22, 15, 'Part A\nField experiment and\ndata collection (A1–
            (1, 47, 30, 22, 'Objective 1\nCharacterisation\nresponses, optimal wavelengths,\nWRI, indices, texture, DSF,\nphysiology, pre-symptomatic stage', B_),
            (35, 47, 30, 22, 'Objective 2\nDetection and severity\n15 sensor sets; ML + DL;\ntest plots; covariate baseline;\nmaps; Bharatpur test', B_),
            (69, 47, 30, 22, 'Objective 3\nPre-symptomatic prediction\nlater-infected vs healthy;\nearliest detection day;\nrisk maps', B_),
-           (1, 14, 62, 20, 'Part L – ASD leaf spectra (same survey points and leaves)\nL1 assembly and quality control → L2 same 7:3 split → L3 pre-processing → L4 indices →\nL5 Objective 1 (leaf) → L6 models (leaf) → L7 evaluation → L8 covariate baseline → L9 leaf–canopy link', P_),
+           (1, 14, 62, 20, 'Part L – ASD leaf spectra (centre plant of every subplot)\nL1 assembly and quality control → L2 same 7:3 split → L3 pre-processing → L4 indices →\nL5 Objective 1 (leaf) → L6 models (leaf) → L7 evaluation → L8 covariate baseline → L9 leaf–canopy link', P_),
            (69, 14, 30, 20, 'Outputs\nwavelengths and indices,\nbest sensor set, models,\nmaps, earliest detection day', O)], fs=9)
 for x in (23.5, 49.5, 75.5): arrow(ax, (x, 87.5), (x + 3, 87.5))
 arrow(ax, (88, 80), (84, 69.5)); arrow(ax, (88, 80), (50, 69.5)); arrow(ax, (88, 80), (16, 69.5))
@@ -69,16 +69,17 @@ a1.plot([0, 5], [1.5, 1.5], 'k-', lw=1)
 for i, (x0, y0) in enumerate([(0, 1.5), (2.5, 1.5), (0, 0), (2.5, 0)]):
     a1.add_patch(Rectangle((x0 + 0.25, y0 + 0.2), 2.0, 1.1, fill=False, ec='#888', ls='--', lw=0.8))
     a1.text(x0 + 1.25, y0 + 1.36, 'subplot %d' % (i + 1), ha='center', fontsize=8.5, fontweight='bold')
-    for f in (0.25, 0.5, 0.75):
-        px, py = x0 + 0.25 + 2.0 * f, y0 + 0.2 + 1.1 * f
-        a1.add_patch(Circle((px, py), 0.09, fc='#C0392B', ec='k', lw=0.5))
-a1.text(2.5, -0.35, 'Plot 5 m × 3 m → 4 subplots (2.5 m × 1.5 m); dashed line = inner buffer; red dots = 3 survey points on the diagonal\n(1/4, 1/2 and 3/4 of the diagonal), one tagged plant per point', ha='center', fontsize=8.3)
+    for k, (fx, fy) in enumerate([(0.08, 0.12), (0.92, 0.12), (0.08, 0.88), (0.92, 0.88), (0.5, 0.5)]):
+        px, py = x0 + 0.25 + 2.0 * fx, y0 + 0.2 + 1.1 * fy
+        if k < 4: a1.add_patch(Circle((px, py), 0.08, fc='#C0392B', ec='k', lw=0.5))
+        else: a1.plot(px, py, marker='*', ms=13, color='#1F4E79', mec='k', mew=0.5)
+a1.text(2.5, -0.35, 'Plot 5 m × 3 m → 4 subplots (2.5 m × 1.5 m); dashed line = inner buffer; 5 tagged plants per subplot:\ncentre (blue star = ASD plant) and four corners (red dots), all graded', ha='center', fontsize=8.3)
 a2.set_xlim(0, 10); a2.set_ylim(0, 10); a2.axis('off')
 a2.plot([5, 5], [0.5, 9.3], color='#5B8C3A', lw=3)
 for y, s, lab in ((8.2, 1, 'L3 (3rd fully expanded leaf from top)'), (6.4, -1, 'L5 (5th fully expanded leaf)'), (1.8, 1, 'LL (lowest green leaf)')):
     a2.add_patch(matplotlib.patches.Ellipse((5 + s * 1.3, y), 2.4, 0.9, angle=s * 20, fc='#8BC34A', ec='#33691E'))
     a2.text(5 + s * 2.8, y + 0.7, lab, ha='left' if s > 0 else 'right', fontsize=8.3)
-a2.text(5, 0.1, 'At each survey point: grade the three leaves 0–9,\nthen take 2 ASD contact-probe readings of the same leaves', ha='center', fontsize=8.3)
+a2.text(5, 0.1, 'Every tagged plant: grade the three leaves 0–9;\ncentre plant: also 2 ASD contact-probe readings per leaf', ha='center', fontsize=8.3)
 save(fig, 'g03_survey.png')
 
 # 4 timeline -------------------------------------------------------------------------
@@ -95,14 +96,14 @@ for d in pre + post:
     c = '#E67E22' if d in pre else '#2E75B6'; ax.plot([day(d)] * 2, [0.15, 1.15], color=c, lw=2.5)
     ax.text(day(d), 1.3, '%d/%d' % (d[2], d[1]), rotation=90, fontsize=7, ha='center', va='bottom')
 for d in [(2027, 1, 7), (2027, 1, 18), (2027, 2, 8), (2027, 3, 1)]: ax.plot(day(d), 2.75, 's', color='#7B1FA2', ms=7)
-ax.text(day((2027, 1, 1)) - 2, 3.5, 'flights of all four cameras + leaf scoring + ASD at 3 survey points per subplot (13 dates)', fontsize=8.5)
+ax.text(day((2027, 1, 1)) - 2, 3.5, 'flights of all four cameras + scoring of 5 plants per subplot + ASD of the centre plant (13 dates)', fontsize=8.5)
 ax.text(day((2026, 11, 20)), 2.7, 'physiology and LAI (4 dates) ■', fontsize=8.5, color='#7B1FA2')
 ax.text(day((2027, 1, 3)), -1.25, 'pre-symptomatic: 2, 5, 8 DAI (orange)          post-symptomatic: 12–75 DAI, weekly (blue)', fontsize=8.5)
 save(fig, 'g04_timeline.png')
 
 # 5 split ------------------------------------------------------------------------------
 fig, ax = plt.subplots(figsize=(10, 3.2))
-rows = [('Leaf dataset (ASD)\n22 464 leaves', 22 * 36 * 13, 11 * 36 * 13, 15 * 36 * 13), ('UAV pre-symptomatic\n576 subplot-dates', 22 * 4 * 3, 11 * 4 * 3, 15 * 4 * 3), ('UAV post-symptomatic\n1920 subplot-dates', 22 * 4 * 10, 11 * 4 * 10, 15 * 4 * 10)]
+rows = [('Leaf dataset (ASD)\n7488 leaves', 22 * 12 * 13, 11 * 12 * 13, 15 * 12 * 13), ('UAV pre-symptomatic\n576 subplot-dates', 22 * 4 * 3, 11 * 4 * 3, 15 * 4 * 3), ('UAV post-symptomatic\n1920 subplot-dates', 22 * 4 * 10, 11 * 4 * 10, 15 * 4 * 10)]
 for i, (lab, tr, va, te) in enumerate(rows):
     tot = tr + va + te; l = 0
     for v, c, t in ((tr, C_TR, 'training: network fit'), (va, C_VA, 'training: network validation'), (te, C_TE, 'test')):

@@ -12,7 +12,7 @@ def add():
          do=['Read the DI of every inoculated subplot on all later dates.', 'Label each pre-symptomatic sample; count healthy and later-infected samples in training and test plots.'],
          check=['Label table per date.'],
          out='Pre-symptomatic labels → 3.2.',
-         papers=[('Zhu et al. (2017)', 'Tobacco disease; pre-symptomatic hyperspectral samples labelled by the later infection status.', 'Labels from the later status.'),
+         papers=[('Zhu et al. (2017)', 'Tobacco mosaic virus; inoculated and healthy leaves imaged 2, 4 and 6 days after inoculation, before visible symptoms.', 'Early-date samples of infected and healthy plants; here infection is confirmed by later symptoms.'),
                  ('Tian et al. (2021)', 'Rice leaf blast; asymptomatic infected leaves labelled by the inoculation and later symptoms.', 'Asymptomatic infected class.'),
                  ('Yu et al. (2021)', 'Pine wilt disease; early-stage trees identified by their later development.', 'Early stage defined by later status.')])
     step('3.2', 'Healthy-plot normalisation', part=P,
@@ -37,7 +37,7 @@ def add():
          do=['GroupKFold(3) tuning for ML; 11 validation plots for DNN-F1.', 'Predict the 180 test samples once.'],
          check=['Predictions for every model × sensor set.'],
          out='Predictions → 3.5.',
-         papers=[('Zhu et al. (2017)', 'Tobacco disease; machine-learning classifiers on selected bands detected infection before symptoms.', 'ML classifiers for pre-symptomatic detection.'),
+         papers=[('Zhu et al. (2017)', 'Tobacco mosaic virus; BPNN, ELM and LS-SVM on SPA-selected wavelengths and GLCM texture detected infection 48 h after inoculation (up to 95% accuracy).', 'ML classifiers on selected spectral and texture features before symptoms.'),
                  ('Tian et al. (2021)', 'Rice leaf blast; LDA, k-NN and SVM with SFFS for asymptomatic detection.', 'Same model types.'),
                  ('Nguyen et al. (2023)', 'Spring wheat yellow rust; a 3D-CNN on multispectral UAV images reached 60% accuracy early in the season, rising to 79% later.', 'Detection accuracy reported date by date in the early stage.')])
     step('3.5', 'Evaluation, earliest detection day and covariate baseline', part=P,
