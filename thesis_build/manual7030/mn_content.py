@@ -65,7 +65,7 @@ def add():
             [BOX, '6 Selection on TRAIN', 'python s06_select_train.py', '03, 04', '06_selection_train.json, 06_model_features.csv', '"selection used 1571 training leaves"'],
             [BOX, '7 Machine learning', 'python s07_ml.py', '03, 06', '07_ml_models, 07_ml_predictions.csv', '15 models; 684 predictions each'],
             [BOX, '8 Deep learning', 'python s08_dl.py main / config / ablation', '03, 06', '08_dl_models, 08_dl_predictions_*.csv', '15 networks; 16 + 4 extra runs'],
-            [BOX, '9 Evaluation', 'python s09_evaluate.py', '07, 08', '09_test_metrics.csv, figures', '30 models with bootstrap intervals'],
+            [BOX, '9 Evaluation', 'python s09_evaluate.py', '07, 08', '09_test_metrics.csv, 09_dl_config_ablation_metrics.csv, figures', '30 models + 20 extra runs scored'],
             [BOX, '10 Interpretation', 'python s10_interpret.py', '05–09', '10_shap, strata, transfer, stability', '22 transfer rows'],
             [BOX, '11 Covariate baseline', 'python s11_covariate.py', '03, 06, weather', '11_covariate_models, gains, delong', 'unsprayed 1319 / 558 leaves'],
             [BOX, '12 Design check', 'python s12_design_check.py', '03, 04', '12_design_runs.csv, 12_paired_LORO_vs_7030.csv', '27 runs'],
@@ -190,13 +190,14 @@ def add():
          ['PyTorch not found: install the CPU version (Step 0.1).', 'Out of memory: close other programs; networks are small but run on the CPU.'],
          's08_dl.py')
     step('9', 'Evaluation on the test plots', 'Compute every metric of every model on the 684 test leaves with a bootstrap of whole test plots.', 'F1–F4',
-         ['Steps 7 and 8 (main) finished.'],
+         ['Steps 7 and 8 (main, config and ablation) finished.'],
          ['python s09_evaluate.py', 'Open 09_test_metrics.csv, 09_model_comparison.png and 09_roc.png.'],
          ['Task A: OA, kappa, macro-F1, sensitivity, specificity, balanced accuracy, AUC. Task B: OA, kappa, macro-F1, QWK, within one class, F1 of each grade. Task C: R², RMSE, MAE, RPD, bias, r.',
-          'Bootstrap: draws the 4 healthy and the 11 unsprayed test plots with replacement 1000 times and recomputes the main metric → standard error and 95% interval.', 'Writes confusion matrices and two figures.'],
+          'Bootstrap: draws the 4 healthy and the 11 unsprayed test plots with replacement 1000 times and recomputes the main metric → standard error and 95% interval.', 'Writes confusion matrices and two figures.',
+          'Scores the 16 configuration runs and 4 ablation runs of Step 8 (task B: OA, kappa, macro-F1, QWK, within one class, with the same plot bootstrap).'],
          ['N_BOOT = 1000; SEED = 42'],
-         ['09_test_metrics.csv has 30 rows (10 models × 3 tasks) with boot_SE, CI_low and CI_high.', 'Task-A rows have AUC; task-B rows have QWK and within1; task-C rows have R², RMSE and RPD.', 'From this point do not change any earlier step.'],
-         [['09_test_metrics.csv', 'all metrics, bootstrap SE and 95% interval'], ['09_confusion_matrices.csv', 'confusion matrices of tasks A and B'], ['09_model_comparison.png', 'main metric of every model'], ['09_roc.png', 'ROC curves of task A']],
+         ['09_test_metrics.csv has 30 rows (10 models × 3 tasks) with boot_SE, CI_low and CI_high.', 'Task-A rows have AUC; task-B rows have QWK and within1; task-C rows have R², RMSE and RPD.', 'CHECK line: 20 configuration / ablation runs scored (09_dl_config_ablation_metrics.csv has 20 rows).', 'From this point do not change any earlier step.'],
+         [['09_test_metrics.csv', 'all metrics, bootstrap SE and 95% interval'], ['09_confusion_matrices.csv', 'confusion matrices of tasks A and B'], ['09_model_comparison.png', 'main metric of every model'], ['09_roc.png', 'ROC curves of task A'], ['09_dl_config_ablation_metrics.csv', 'metrics of the 16 configuration and 4 ablation runs']],
          ['A model missing from the table: its predictions file is missing; re-run Step 7 or 8.'],
          's09_evaluate.py')
     step('10', 'Interpretation and robustness', 'SHAP importance, metrics by stratum, transfer to a held-out variety, sowing date and sampling date, and stability of the optimal wavelengths.', 'F5–F7',
@@ -247,10 +248,9 @@ def add():
     rows = [['Output file', 'Thesis item'], ['02_qc_report.txt', 'Methods: data and quality control (numbers of leaves, removed spectra, splice correction)'], ['03_split.json', 'Methods: split table (training and test plots and leaves)'],
             ['05_D1, 05_D2, 05_D4 figures and csv', 'Objective 1: mean spectra, correlation curves, NDSI/RSI maps'], ['05_obj1_selection.json', 'Objective 1: effective ranges, optimal wavelengths, WRI, selected indices, wavelet features, DSF, JM table, PCA'],
             ['06_selection_train.json', 'Objective 2: model inputs (DSF per task)'], ['07_ml_selection.csv', 'Objective 2: SFFS and grid-search table'], ['09_test_metrics.csv and figures', 'Objective 2: detection, six-grade and score tables; comparison and ROC figures'],
-            ['08_dl_predictions_config / _ablation (through 09-style metrics)', 'Objective 2: network configurations and ablation'], ['10_*.csv', 'SHAP, strata, transfer and stability'], ['11_*.csv', 'Covariate baseline tables'],
+            ['09_dl_config_ablation_metrics.csv', 'Objective 2: network configurations and ablation'], ['10_*.csv', 'SHAP, strata, transfer and stability'], ['11_*.csv', 'Covariate baseline tables'],
             ['12_*.csv', 'Check of the validation design'], ['deliver/', 'Model files and prediction script (appendix)']]
     tab('thesis', rows=rows, caption='Where each output is used.', widths=[3400, 6200], size=16)
-    p('Metrics of the configuration and ablation runs: open 08_dl_predictions_config.csv or _ablation.csv in Python and use lib_metrics.cls_metrics on each run, or ask for a small helper script.')
 
     h1('Appendix – library files')
     for fn, t in (('config.py', 'every setting'), ('lib_spec.py', 'pre-processing and features'), ('lib_select.py', 'feature selection chain'), ('lib_metrics.py', 'metrics and bootstrap'),

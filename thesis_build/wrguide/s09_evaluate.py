@@ -25,4 +25,15 @@ fig, ax = plt.subplots(figsize=(6, 6))
 for (model), d in P[(P.task == 'A') & P.score.notna()].groupby('model'):
     f, t, _ = roc_curve(d.y, d.score); ax.plot(f, t, label=model)
 ax.plot([0, 1], [0, 1], 'k:'); ax.set_xlabel('false-positive rate'); ax.set_ylabel('sensitivity'); ax.legend(fontsize=8); fig.savefig(os.path.join(O, '09_roc.png'), dpi=150); plt.close(fig)
+# E7 extra runs: feature configurations (OW, VI, WF, DSF) and DT-EDNet ablation, task B, same test leaves and bootstrap
+ext = []
+for stage in ('config', 'ablation'):
+    fn = os.path.join(O, '08_dl_predictions_%s.csv' % stage)
+    if not os.path.exists(fn): continue
+    for (model, cfg), d in pd.read_csv(fn).groupby(['model', 'config'], sort=False):
+        y, p = d.y.values.astype(int), d.pred.values.astype(int); m, _ = cls_metrics(y, p, 6)
+        se, lo, hi = boot_ci('B', 'macro_F1', y, p, plots_all[d.leaf.values])
+        ext.append(dict(stage=stage, model=model, features=cfg, n=m['n'], OA=m['OA'], kappa=m['kappa'], macro_F1=m['macro_F1'], QWK=m['QWK'], within1=m['within1'], boot_SE=se, CI_low=lo, CI_high=hi))
+if ext: pd.DataFrame(ext).to_csv(os.path.join(O, '09_dl_config_ablation_metrics.csv'), index=False)
+print('CHECK: %d configuration / ablation runs scored (09_dl_config_ablation_metrics.csv)' % len(ext))
 print('CHECK: metrics of %d models written to 09_test_metrics.csv (main metric, bootstrap SE and 95 %% interval for each)' % len(R))
