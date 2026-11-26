@@ -11,12 +11,14 @@ def add():
          what='The ASD files of each date are read into one leaf table (one row per leaf) with its grade and identifiers; the 2 readings of a leaf are averaged; the table is checked.',
          why='Every later step assumes one correct spectrum per leaf with the right label.',
          do=['Read all files; join each leaf to plot, subplot, leaf position, date and grade (record sheet, Step A4).', 'Average the 2 readings of each leaf; flag a leaf if its two readings differ by more than 0.02 reflectance on average and check the record sheet.',
-             'Keep leaf positions L3, L5 and LL only; check grades (0, 1, 3, 5, 7, 9), 2151 bands, no missing values, all 48 plots on every date.', 'Remove exact duplicate spectra (all values equal), keeping one copy.'],
+             'Keep leaf positions L3, L5 and LL only; check grades (0, 1, 3, 5, 7, 9), 2151 bands, no missing values, all 48 plots on every date.', 'Remove exact duplicate spectra (all values equal), keeping one copy.',
+             'Outlier spectra: Isolation Forest within each date and grade; flagged spectra are checked against the record sheet and removed only if faulty (wrong placement, saturation, reference error); the number removed is reported.'],
          check=['576 leaves per date (minus missing leaves); duplicates and flags listed in a report.'],
          out='Leaf table and spectra → L2.',
          papers=[('Chen et al. (2023)', 'Tobacco viruses; ASD FieldSpec 4 leaf spectra (350–2500 nm) organised with their severity grades.', 'Leaf spectra joined to their grades.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra of asymptomatic and symptomatic leaves organised by stage and severity.', 'One spectrum per leaf with its labels.'),
-                 ('Mandal et al. (2023)', 'Rice blast; ASD spectra pre-processed before analysis (noisy water-absorption bands removed, Savitzky–Golay filter).', 'Checks and pre-processing before analysis.')])
+                 ('Mandal et al. (2023)', 'Rice blast; ASD spectra pre-processed before analysis (noisy water-absorption bands removed, Savitzky–Golay filter).', 'Checks and pre-processing before analysis.'),
+                 ('Selvaprakash et al. (2026)', 'Rice blast (IARI); anomalous leaf spectra excluded with an Isolation Forest before band selection, which made the models more robust (4.7%).', 'Isolation Forest screening of the leaf spectra.')])
     step('L2', 'Same 7:3 split and inner validation', part=P,
          what='Leaves of the 15 test plots form the leaf test set; leaves of the 33 training plots are used for selection and training, with GroupKFold(3) by plot for ML and the 11 validation plots for the networks.',
          why='Leaf and canopy models must be tested on the same new plots.',
@@ -61,7 +63,7 @@ def add():
                  ('Mahlein et al. (2010)', 'Sugar-beet leaves with three diseases; spectral difference at each wavelength.', 'Difference spectra.'),
                  ('Lv et al. (2023); Tian et al. (2021)', 'Leaf spectra compared stage by stage (asymptomatic, symptomatic).', 'Stage-wise comparison.'),
                  ('Zhang et al. (2022)', 'Rice leaf blast; the spread (standard deviation) of whole-leaf reflectance differed between disease grades.', 'Leaf spectra compared between grades.'),
-                 ('Cross et al. (2024)', 'Wheat stripe rust; progression followed with hyperspectral reflectance.', 'Leaf spectra over disease progression.')])
+                 ('Cross et al. (2024)', 'Wheat stripe rust; leaf spectra scored in 10 classes and canopy spectra in 5; exact class accuracy 45–52%, rising to 79–96% when one class off was allowed (neighbouring classes overlap).', 'Leaf spectra by severity class; overlap of neighbouring grades expected.')])
     step('L5.2', 'Effective wavelength ranges and optimal wavelengths by Shapley additive explanations and competitive adaptive reweighted sampling', part=P,
          data='5148 training leaves only; fixed here and used unchanged in L6.',
          what='NDSI and RSI R² maps of all 5-nm band pairs with the leaf grade; effective ranges (R² > 0.5, else top 5%); SHAP-CARS on the R and FD bands inside the ranges.',
@@ -130,7 +132,7 @@ def add():
     step('L7', 'Leaf test metrics', part=P,
          what='Metrics on the 2340 test leaves: OA, kappa, macro-F1, per-class F1, sensitivity, specificity, AUC (Task A); R², RMSE, RPD (Task C).',
          why='Same metrics as the UAV models (Step 2.7).',
-         do=['Compute all metrics once on the test leaves; confusion matrices; results by leaf position and stage.'],
+         do=['Compute all metrics once on the test leaves (as Step 2.7, including accuracy within one grade and quadratic weighted kappa for Task B); confusion matrices; results by leaf position and stage.'],
          check=['One metric row per model × task.'],
          out='Leaf results → L9, conclusions.',
          papers=[('Ma et al. (2026)', 'Rice blast; OA, kappa, macro recall, macro-F1 and per-class scores.', 'Same classification metrics.'),
@@ -164,5 +166,5 @@ def add():
          papers=[('Gold et al. (2020)', 'Potato late and early blight; leaf spectra detected infection before symptoms.', 'Pre-symptomatic leaf spectra.'),
                  ('Tian et al. (2021)', 'Rice leaf blast; asymptomatic leaves detected from leaf spectra.', 'Asymptomatic leaf detection.'),
                  ('Lv et al. (2023)', 'Southern corn leaf blight; asymptomatic detection from leaf-clip spectra.', 'Asymptomatic leaf detection.'),
-                 ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral changes before visible symptoms.', 'Early leaf changes.'),
+                 ('Terentev et al. (2023)', 'Wheat leaf rust; VIS-NIR leaf spectrometry agreed with hyperspectral images and detected infection from the fourth day after inoculation.', 'Early leaf changes.'),
                  ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; water (about 1400 nm) and 750 nm bands drove pre-symptomatic detection.', 'Pre-symptomatic leaf features.')])

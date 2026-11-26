@@ -54,10 +54,10 @@ def add():
          do=['Metrics per date (2, 5, 8 DAI) and pooled.', 't-test of predicted scores per date → earliest detection day per sensor set.', 'Covariate-only model (Step 2.9) for the same samples.'],
          check=['Metrics and earliest day per sensor set.'],
          out='Earliest detection day → conclusions, 3.6.',
-         papers=[('Mahlein et al. (2019)', 'Fusarium head blight; the day after inoculation on which each sensor first detected infection was compared.', 'Earliest detection day per sensor.'),
-                 ('Gold et al. (2020)', 'Potato late and early blight; pre-symptomatic detection accuracy by day after inoculation.', 'Accuracy by date before symptoms.'),
+         papers=[('Mahlein et al. (2019)', 'Fusarium head blight; SVM accuracy of each sensor 3 days after inoculation (thermal 78%, fluorescence 56%, hyperspectral 78%) and over time compared.', 'Accuracy and earliest detection day per sensor.'),
+                 ('Gold et al. (2020)', 'Potato late and early blight; PLS-DA accuracy and kappa (100 permutations) for each day of disease development; above 80% two to four days before symptoms.', 'Accuracy by date before symptoms.'),
                  ('Zhang et al. (2014a)', 'Wheat powdery mildew; meteorological model as the reference for remote-sensing models.', 'Covariate reference.'),
-                 ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; hyperspectral detection compared at pre-symptomatic and symptomatic stages.', 'Accuracy compared between pre-symptomatic dates.')])
+                 ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; seven models compared at four disease stages; accuracy rose from the pre-symptomatic to the symptomatic stages, and indices as inputs beat raw spectra by 26–37%.', 'Accuracy compared between dates and stages.')])
     step('3.6', 'Risk maps and independent testing', part=P,
          what='Probability of later infection is mapped per subplot for each pre-symptomatic date; if an early flight is made at Bharatpur, the frozen models are tested there.',
          why='Risk maps show where preventive sprays would be needed.',
@@ -65,4 +65,4 @@ def add():
          check=['Risk maps for 1, 4 and 7 January.'],
          out='Risk maps → conclusions.',
          papers=[('Zarco-Tejada et al. (2018)', 'Xylella; maps of pre-visual infection over orchards from airborne imagery.', 'Maps of infection before symptoms.'),
-                 ('Abdulridha et al. (2023)', 'Wheat stem rust; disease maps from drone hyperspectral models.', 'Maps from UAV models.')])
+                 ('Nguyen et al. (2023)', 'Spring wheat yellow rust; plots of the field identified as healthy, mild or severe from multispectral UAV images early in the season, giving growers a prevention period (3–7% of yield).', 'Plot-level predictions on the field layout before damage.')])

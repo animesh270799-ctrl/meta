@@ -122,6 +122,7 @@ def add():
              'RGB: ExG, ExR, ExG − ExR, VARI, GLI, NGRDI, mean hue, saturation and value; GLCM of R, G and B (24), computed at native resolution.',
              'GLCM for MS and RGB: 64 grey levels, distance 1 pixel, mean of the four directions 0°, 45°, 90° and 135°; eight measures (mean, variance, homogeneity, contrast, dissimilarity, entropy, second moment, correlation) over the subplot ROI.'],
          check=['MS 67 and RGB 33 features per subplot-date.'],
+         alt='Nguyen et al. (2023) found GLCM contrast at a distance of 5 pixels and 135° most related to yellow rust; if the distance-1 texture carries little signal, distances 3 and 5 can be added before the mRMR step (Steps 1.6.2–1.6.3).',
          out='MS and RGB groups → 1.6.2, 1.6.3.',
          papers=[('Liu et al. (2024)', 'Wheat powdery mildew; band reflectance, nine vegetation indices (NDRE, PSRI, NDVI, SAVI, MCARI, MTCI, GNDVI, OSAVI, MSR) and eight GLCM textures of each of the five multispectral bands, combined into three-band texture combination indices.', 'Same MS indices and GLCM measures.'),
                  ('Maimaitijiang et al. (2020)', 'Soybean yield (method support); UAV RGB, multispectral and thermal images gave spectral, structure, thermal and GLCM texture (8 measures) features, kept by modality.', 'Features of each camera kept as their own groups.'),
@@ -168,7 +169,7 @@ def add():
          q='Were the test plots chosen after seeing results? → No; they are fixed by the design before the first flight, using only plot, block, variety and sowing date.',
          papers=[('Ma et al. (2026)', 'Rice blast; samples divided by stratified sampling into training and test sets at 7:3, with 10% of the training set as validation; features selected and models trained on the 2023 data and tested on an independent 2024 data set.', 'Same 7:3 proportion and stratification; whole plots are assigned instead of single samples, as the cross-year test of Ma et al. kept test data independent.'),
                  ('Mandal et al. (2023)', 'Rice blast; data divided by stratified sampling into two-thirds calibration and one-third validation; all modelling on the calibration part.', 'A stratified hold-out of about one third, with all modelling on the training part.'),
-                 ('Cross et al. (2024)', 'Wheat stripe rust progression from hyperspectral reflectance; models checked with 80:20 hold-out splits repeated 100 times.', 'A hold-out test set kept apart from training, as in recent disease spectroscopy.'),
+                 ('Cross et al. (2024)', 'Wheat stripe rust; random-forest severity models on leaf and canopy reflectance checked on a random 20% hold-out, repeated 200 times.', 'A hold-out test set kept apart from training, as in recent disease spectroscopy.'),
                  ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; data split into 70% training and 30% testing sets.', 'Same 70:30 proportion.')])
     myfig('split', 'g05_split.png', 'Division of the three datasets: 33 training plots (22 fit + 11 validation plots for the networks) and 15 test plots.')
     step('D2', 'Validation inside the training plots', part=P,

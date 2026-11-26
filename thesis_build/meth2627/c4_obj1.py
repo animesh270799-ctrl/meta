@@ -241,7 +241,8 @@ def add():
          out='Stable and stage-dependent features → interpretation, 2.10.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast; sensitive features found on each day after inoculation, and only the features common to the days were kept as disease-specific features.', 'Features judged by their consistency over time.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and temperature features compared between healthy and infected plots at early, middle and late stages; only NDRE, PSRI and MTCI captured the change consistently in the middle to late stages.', 'Stage-by-stage check of the features.'),
-                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; only seven spectral features (CAR, SRPI, RR, PSSRb, NDVI, PSNDa, RARSb) showed consistently stable responses to the disease.', 'Consistency reported for each selected feature.')])
+                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; only seven spectral features (CAR, SRPI, RR, PSSRb, NDVI, PSNDa, RARSb) showed consistently stable responses to the disease.', 'Consistency reported for each selected feature.'),
+                 ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; the critical bands and indices changed between the four disease stages (water and 750 nm early, leaf structure later).', 'Stage-dependent features are expected and reported.')])
     step('1.6.7', 'Complementarity of the cameras', part=P,
          data=SEL,
          what='Correlation between the DSFs of different cameras and the DI response of each DSF by treatment.',
@@ -249,7 +250,7 @@ def add():
          do=['Cross-camera correlation matrix of the DSFs.', 'Mean DSF values by treatment and DI class.'],
          check=['Correlation heat map and treatment table.'],
          out='Expected fusion benefit → 2.8.',
-         papers=[('Mahlein et al. (2019)', 'Fusarium head blight of wheat; thermal, fluorescence and hyperspectral imaging compared and combined; the sensors carried complementary information.', 'Complementarity of sensors before fusion.'),
+         papers=[('Mahlein et al. (2019)', 'Fusarium head blight of wheat; thermal, fluorescence and hyperspectral parameters were correlated with each other and with severity (except MTD); an SVM on thermal + hyperspectral parameters was best (mean 90%), and adding the third sensor did not improve accuracy (87%).', 'Correlation between cameras judges what a fusion can add.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices were the best single source, followed by temperature parameters and texture; fusing all three gave the best model.', 'Fusion of complementary cameras.')])
 
     h2('Activity 1.7 – Physiological basis of the camera responses')
@@ -257,11 +258,12 @@ def add():
          data='All 48 plots (designated subplots): description only.',
          what='Each parameter of Step A7 is compared between inoculated plots and the healthy plot of the same treatment on each date (paired t-test), and between varieties and sowing dates within the inoculated plots (two-way ANOVA of the RBD).',
          why='Shows what white rust does to pigments, water, membranes and gas exchange in this experiment.',
-         do=['Mean of the three replications per treatment and date.', 'Paired t-test inoculated vs healthy (12 pairs) per date.', 'Two-way ANOVA (variety × sowing date) within R1–R3, LSD at 5%.'],
+         do=['Flag values beyond the median ± 3 SD of each parameter and date, check them against the sample sheet and remove them only if faulty.', 'Mean of the three replications per treatment and date.', 'Paired t-test inoculated vs healthy (12 pairs) per date (Wilcoxon signed-rank test if the differences are not normal).', 'Two-way ANOVA (variety × sowing date) within R1–R3, LSD at 5%.'],
          check=['Table of means, differences and p-values per parameter and date.'],
          out='Changed parameters → 1.7.2.',
          papers=[('Mishra et al. (2009)', 'White rust of Indian mustard; protein, phenols and sugars of inoculated leaves of six genotypes related to the disease index.', 'Infected vs healthy comparison of biochemical parameters.'),
-                 ('Calderón et al. (2013)', 'Verticillium wilt of olive; physiological measurements compared between severity levels.', 'Physiology by disease level.')])
+                 ('Calderón et al. (2013)', 'Verticillium wilt of olive; physiological measurements compared between severity levels.', 'Physiology by disease level.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; chlorophyll, carotenoid, anthocyanin and water content of infected and healthy leaves compared on each day by paired t-test (Wilcoxon test if not normal), after outliers beyond the median ± 3 SD were removed.', 'Infected vs healthy tests per date after outlier screening.')])
     step('1.7.2', 'Relation of the plant parameters with the disease index and the camera features', part=P,
          data='All 48 plots (designated subplots): description only.',
          what='Pearson r between each parameter and the subplot DI, and between each parameter and the DSF features of the same subplot and date.',
@@ -281,8 +283,8 @@ def add():
          check=['Curves and test table for the three dates.'],
          out='Responding features → 1.8.2.',
          papers=[('Zhu et al. (2017)', 'Tobacco mosaic virus; hyperspectral images of inoculated and healthy leaves 2, 4 and 6 days after inoculation, before visible symptoms.', 'Pre-symptomatic comparison of the two groups.'),
-                 ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral changes in inoculated plants before visible symptoms.', 'Early spectral differences day by day.'),
-                 ('Gold et al. (2020)', 'Potato late and early blight; leaf spectra separated infected plants before symptoms.', 'Pre-symptomatic spectral difference.'),
+                 ('Terentev et al. (2023)', 'Wheat leaf rust; hyperspectral images (snapshot camera) of inoculated and healthy plants compared day by day; changes found before visible symptoms.', 'Early spectral differences day by day.'),
+                 ('Gold et al. (2020)', 'Potato late and early blight; contact leaf spectra separated infected from healthy plants with more than 80% accuracy two to four days before visible symptoms; shortwave-infrared bands were important.', 'Pre-symptomatic spectral difference, including SWIR.'),
                  ('Zhang et al. (2024)', 'Tomato bacterial leaf spot; pre-symptomatic detection relied on water-related (about 1400 nm) and red-edge (about 750 nm) bands rather than pigments.', 'Water and red-edge features examined before symptoms.')])
     step('1.8.2', 'Pre-symptomatic feature selection', part=P,
          data=SELP,
@@ -293,7 +295,7 @@ def add():
          out='Pre-symptomatic DSF → 3.3.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast; asymptomatic leaves labelled by their later lesions; sensitive features chosen by their separability of infected and healthy leaves on each day (top 5%), and SFFS found the optimal combination for each infection stage.', 'Separate selection for the early stage with the later-status label.'),
                  ('Ma et al. (2026)', 'Rice blast; the same selection chain for early detection.', 'Same chain.'),
-                 ('Terentev et al. (2023)', 'Wheat leaf rust detected from the fourth day after inoculation with an SVM; the most important wavebands were identified.', 'Selection of the bands that respond earliest.')])
+                 ('Terentev et al. (2023)', 'Wheat leaf rust detected with 97–100% accuracy from the fourth day after inoculation with an SVM; the most important wavebands (502, 466, 598, 718 nm …) were identified.', 'Selection of the bands that respond earliest.')])
     step('1.8.3', 'Earliest-responding features', part=P,
          data=DESCP,
          what='For every feature of the pre-symptomatic DSF, the first date with a significant difference (Step 1.8.1) is recorded.',
@@ -301,6 +303,6 @@ def add():
          do=['Earliest significant date per feature; summary per camera.'],
          check=['Table of earliest dates.'],
          out='Earliest features → 3.5.',
-         papers=[('Mahlein et al. (2019)', 'Fusarium head blight; compared the day on which thermal, fluorescence and hyperspectral sensors first detected infection.', 'Earliest detection day per sensor.'),
+         papers=[('Mahlein et al. (2019)', 'Fusarium head blight; a water index from hyperspectral images responded from 3 days after inoculation, thermal and fluorescence parameters from 5 days.', 'Earliest responding feature per sensor.'),
                  ('Zarco-Tejada et al. (2018)', 'Xylella; traits that changed before visual symptoms.', 'Earliest responding traits.')])
     myfig('presdemo', 'g15_presym_demo.png', 'Demo of Steps 1.8.1–1.8.3 and 3.5 (simulated): (a) difference of one feature between later-infected and healthy subplots; (b) pre-symptomatic AUC by date.')
