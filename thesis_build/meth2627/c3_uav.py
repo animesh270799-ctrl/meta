@@ -88,7 +88,7 @@ def add():
          out='HS spectral group → 1.2.',
          papers=[('Yu et al. (2021)', 'Pine wilt disease; red-edge parameters were the best features for the early stage from UAV hyperspectral data.', 'Red-edge parameters as features.'),
                  ('Zhang et al. (2012)', 'Wheat powdery mildew; derivative features (amplitude, position and area of the red edge) among the spectral features.', 'Same three red-edge parameters.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; first derivatives at every band improved severity classification.', 'First derivative at every band.'),
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; first-order spectral derivatives at every band were one of four spectral enhancement features; combining them with bands and indices improved accuracy by about 1–2%.', 'First derivative at every band.'),
                  ('Ma et al. (2026)', 'Rice blast; reflectance bands as the first feature group.', 'Reflectance bands as a feature group.'),
                  ('Mandal et al. (2022)', 'Rice blast; the amplitude of the red-edge first-derivative peak fell as severity increased.', 'Red-edge amplitude as a feature.')])
     step('C2', 'Published vegetation and disease indices', part=P,
@@ -129,13 +129,13 @@ def add():
     step('C5', 'Thermal features', part=P,
          what='Canopy temperature statistics, normalised temperatures (Step D3) and thermal texture.',
          why='Infection changes transpiration and leaf temperature.',
-         do=['Mean, median, SD, 10th and 90th percentiles of the temperature of the ROI pixels.', 'Normalised temperatures from Step D3.', 'GLCM texture of the temperature image (8).'],
-         check=['17 thermal features per subplot-date.'],
+         do=['Mean, median, SD, 10th and 90th percentiles and maximum temperature difference (MTD = highest − lowest temperature) of the ROI pixels.', 'Normalised temperatures from Step D3.', 'GLCM texture of the temperature image (8).'],
+         check=['18 thermal features per subplot-date (6 statistics, 4 normalised temperatures, 8 texture).'],
          out='Thermal group → D3, 1.6.',
          papers=[('Calderón et al. (2014)', 'Downy mildew of opium poppy; canopy temperature and canopy minus air temperature from UAV thermal images detected infected plants.', 'Canopy temperature and its normalised form.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; thermal infrared temperature parameters as a separate data source in fusion with spectral indices and texture.', 'Thermal features as a fusion group.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; canopy temperature from UAV thermal images analysed with spectral and texture features to estimate the disease index.', 'Canopy temperature added to optical features.'),
-                 ('Oerke et al. (2006)', 'Cucumber downy mildew; thermal imaging showed infection-related temperature changes that also depended on environmental conditions.', 'Temperature features normalised for the environment.')])
+                 ('Oerke et al. (2006)', 'Cucumber downy mildew; the maximum temperature difference within a leaf increased during pathogenesis and was related to severity, but air temperature and humidity also changed leaf temperature.', 'MTD as a thermal feature; temperatures normalised for weather (Step D3).')])
     step('C6', 'Feature table of each camera', part=P,
          what='One table per camera, one row per subplot-date, with identifiers, labels, covariates and features with a group prefix.',
          why='Sensor sets are then simple joins of camera tables by subplot and date.',
@@ -145,7 +145,7 @@ def add():
          papers=[('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices, temperature parameters and texture features of each sample combined for modelling.', 'One feature table per camera for fusion.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; multi-feature table (spectral, texture, thermal) per plot.', 'Same organisation of feature groups.')])
     rows = [['Camera', 'Feature groups', 'Number'], ['Hyperspectral', 'reflectance 483, first derivative 483, red-edge parameters 3, published indices 48, PCA texture 24 (+ NDSI, RSI, WRI and TTFI of Objective 1)', '≈ 1040'],
-            ['Multispectral', '5 bands, 12 indices, 10 normalised differences, 40 texture', '67'], ['RGB', '6 colour indices, 3 colour means, 24 texture', '33'], ['Thermal', '5 temperature statistics, 4 normalised temperatures, 8 texture', '17'],
+            ['Multispectral', '5 bands, 12 indices, 10 normalised differences, 40 texture', '67'], ['RGB', '6 colour indices, 3 colour means, 24 texture', '33'], ['Thermal', '6 temperature statistics (incl. MTD), 4 normalised temperatures (CTD, CTR, NRCT, difference from healthy), 8 texture', '18'],
             ['Covariates', 'DAI, variety, timing, growth stage, weather', 'not features']]
     tab('featgroups', rows=rows, caption='Feature groups before selection.', widths=[1700, 6400, 1500], size=16)
 
@@ -181,7 +181,7 @@ def add():
          alt='10% of the training samples as in Ma et al. (2026) would be about three plots – too few to represent the blocks, and samples of one plot would be in fitting and validation.',
          papers=[('Ma et al. (2026)', 'Rice blast; 10% of the training set as validation; the model with the highest validation accuracy was kept and then tested once.', 'Validation inside the training part, test used once – but by whole plots.'),
                  ('Tian et al. (2021)', 'Rice leaf blast; SFFS wrapped around LDA, k-NN and SVM with 4-fold cross-validation repeated 100 times.', 'k-fold cross-validation inside the training data for the ML models.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F, SFFS and SVM with 4-fold stratified cross-validation repeated 100 times.', 'Cross-validated SFFS and tuning; here GroupKFold(3) by plot.'),
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F, SFFS and an SVM evaluated with 4-fold cross-validation repeated 100 times.', 'Cross-validated SFFS and tuning; here GroupKFold(3) by plot.'),
                  ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; 3-fold cross-validation inside the 70% training set for hyper-parameter tuning.', 'Three inner folds for tuning, here grouped by plot.')])
     demo('folds', [['Inner fold', 'Fitting plots', 'Scoring plots', 'Used for'], ['1', '22 training plots', '11 training plots', 'SFFS score, grid search'], ['2', '22 (different)', '11 (different)', 'SFFS score, grid search'], ['3', '22 (different)', '11 (different)', 'SFFS score, grid search'],
                    ['Networks', '22 training plots', '11 validation plots', 'early stopping, epoch choice']], 'Inner validation of the training plots', widths=[1500, 2500, 2500, 3100])
@@ -192,8 +192,8 @@ def add():
              'Difference from the mean temperature of the healthy training plots of the same date and variety.'],
          check=['Four normalised thermal features per subplot-date.'],
          out='Normalised thermal features → C5, 1.6.',
-         papers=[('Calderón et al. (2014)', 'Downy mildew of opium poppy; canopy minus air temperature from UAV thermal images separated infected plants.', 'CTD used as a normalised thermal feature.'),
-                 ('Oerke et al. (2006)', 'Cucumber downy mildew; leaf temperature differences between infected and healthy tissue depended on environmental conditions.', 'Healthy-plot reference of the same date removes the environmental effect.'),
+         papers=[('Calderón et al. (2014)', 'Downy mildew of opium poppy; UAV canopy temperature normalised by air temperature (Tc − Ta) separated infected plants; comparisons made at similar NDVI (growth) levels.', 'CTD used as a normalised thermal feature.'),
+                 ('Oerke et al. (2006)', 'Cucumber downy mildew; air temperature and humidity at the time of measurement changed leaf temperature, so temperature alone was not suitable to quantify severity in the field.', 'Temperatures normalised by air temperature and by healthy plots of the same date.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; canopy temperature difference CTD = CT − AT, canopy temperature ratio CTR = CT/AT and normalised relative canopy temperature NRCT = (CT − CTmin)/(CTmax − CTmin) computed to remove the effect of air temperature on canopy temperature.', 'Same three formulas (CTD, CTR, NRCT) for the same reason.')])
     demo('thermal', [['Subplot', 'Tc (°C)', 'Ta (°C)', 'CTD = Tc − Ta', 'Healthy mean Tc (same date, variety)', 'Difference'], ['25-2', '24.1', '22.0', '+2.1', '22.9', '+1.2'], ['7-1 (healthy)', '22.8', '22.0', '+0.8', '22.9', '−0.1']],
          'Thermal normalisation of two subplots', widths=[1500, 1100, 1100, 1700, 2600, 1600])
@@ -203,17 +203,17 @@ def add():
          do=['Fit the scaler inside every inner fold and then on all 33 training plots (scikit-learn Pipeline(StandardScaler, model)).', 'class_weight = balanced for SVM and random forest (k-NN and PLS-DA have no class weights).', 'Networks: label smoothing 0.01 in the cross-entropy loss.'],
          check=['No scaler fitted on test samples.'],
          out='Prepared inputs → 2.3–2.6, 3.4, L6.',
-         papers=[('Lv et al. (2023)', 'Southern corn leaf blight; standardised inputs and balanced classes for the SVM.', 'Same standardisation and balancing.'),
+         papers=[
                  ('Ma et al. (2026)', 'Rice blast; cross-entropy loss with label smoothing 0.01 for DT-EDNet and the comparison networks.', 'Same loss settings for the networks.'),
                  ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; inputs of the artificial neural network centred and scaled within the 70% training part (3-fold cross-validation for tuning); random forest used without feature scaling because trees are not affected by scale.', 'z-score inside the training part for scale-sensitive models; no scaling needed for random forest.'),
                  ('Zhang et al. (2014a)', 'Wheat powdery mildew; the meteorological and remote-sensing variables of the logistic regression models were standardised, and their standardised coefficients compared.', 'Covariates and sensor features standardised before a regression-type model (Step 2.9).')])
     step('D5', 'Leakage rules', part=P,
          what='(1) Samples of one plot are never on both sides of any division. (2) Everything learned (selected features, scaling constants, model weights, healthy references) comes from the training plots only. (3) The test plots are used once.',
          why='These rules make the test accuracy an honest estimate for new plots.',
-         do=['Run the Objective 1 selection on all samples only for description; re-run it on the training plots for the models (Step 2.2).', 'Compute indices of test samples with the wavelengths chosen on the training plots.', 'Freeze all models before the test plots are predicted.'],
+         do=['Run every feature-selection step of Objective 1 (and L5) on the training plots only; descriptive steps may use all plots but never decide model inputs.', 'Compute indices of test samples with the wavelengths chosen on the training plots.', 'Freeze all models before the test plots are predicted.'],
          check=['A log file records, for every step, which plots were used.'],
          out='Rules → all later steps.',
-         papers=[('Ma et al. (2026)', 'Rice blast; feature selection and model training on the 2023 data; evaluation on the independent 2024 data.', 'Selection repeated on the training plots only.'),
+         papers=[('Ma et al. (2026)', 'Rice blast; feature selection and model training on the 2023 data; evaluation on the independent 2024 data.', 'Features selected on the training plots only and used unchanged by the models.'),
                  ('Mandal et al. (2023)', 'Rice blast; all selection and calibration on the calibration set; validation set kept apart.', 'Test plots kept apart from all selection.')])
 
     h2('D6 – Normalisation at each stage (summary)')
@@ -223,13 +223,13 @@ def add():
             ['B6 subplot sample', 'pixels of the region of interest', 'mean of all ROI pixels', 'the ROI itself', 'Ma et al. (2026); Liu et al. (2024); Guo et al. (2021)'],
             ['C1–C4 features', 'brightness and offsets', 'normalised-difference and ratio indices; first derivative', 'none (formulas)', 'Ma et al. (2026); Lv et al. (2023); Mandal et al. (2023)'],
             ['D3 thermal', 'canopy temperature', 'CTD = Tc − Ta; CTR = Tc/Ta; NRCT (min–max within each date); difference from healthy training plots', 'air temperature; image of the date; healthy training plots', 'Feng et al. (2022); Calderón et al. (2014); Oerke et al. (2006)'],
-            ['1.2.2 PLS and CARS', 'candidate R and FD bands', 'z-score', 'samples used for selection (training plots for the models)', 'Bijlwan et al. (2025) (scale-sensitive models scaled)'],
-            ['1.4.2, 1.6.1, L5.4 ReliefF', 'index and camera features', 'min–max (0–1), built into the ReliefF difference function', 'samples used for selection', 'Lv et al. (2023); Mahlein et al. (2013); Ma et al. (2026) (Relief)'],
+            ['1.2.2 PLS and CARS', 'candidate R and FD bands', 'z-score', '33 training plots', 'Bijlwan et al. (2025) (scale-sensitive models scaled)'],
+            ['1.4.2, 1.6.1, L5.4 ReliefF', 'index and camera features', 'min–max (0–1), built into the ReliefF difference function', '33 training plots (training leaves in L5.4)', 'Lv et al. (2023); Mahlein et al. (2013); Ma et al. (2026) (Relief)'],
             ['Filters, mRMR, TTFI, VIF, NDSI/RSI maps, JM', '–', 'none (correlation, mutual information, ratios and R² do not depend on scale)', '–', 'Ma et al. (2026); Lv et al. (2023)'],
             ['2.2 fusion', 'joined camera features', 'none at the join (original units); VIF < 10 again', '–', 'Feng et al. (2022); Liu et al. (2024)'],
-            ['D4 models', 'fused feature table', 'z-score (Pipeline) for SVM/SVR, k-NN, PLS, networks; trees unaffected', 'fitting part of each fold; 33 training plots; 22 fitting plots (networks)', 'Bijlwan et al. (2025); Lv et al. (2023)'],
+            ['D4 models', 'fused feature table', 'z-score (Pipeline) for SVM/SVR, k-NN, PLS, networks; trees unaffected', 'fitting part of each fold; 33 training plots; 22 fitting plots (networks)', 'Bijlwan et al. (2025)'],
             ['2.9 covariate models', 'numeric covariates', 'z-score; categorical one-hot', 'training plots', 'Zhang et al. (2014a); Bijlwan et al. (2025)'],
-            ['3.2 pre-symptomatic', 'every feature', 'z relative to healthy plants: (x − healthy mean)/healthy SD', 'healthy training plots of the same date and variety', 'Oerke et al. (2006); Zarco-Tejada et al. (2018)'],
+            ['3.2 pre-symptomatic', 'spectra; thermal features', 'spectra × [healthy baseline / healthy mean of the date] per variety; thermal as in D3', 'healthy training plots (first flight and each date)', 'Lv et al. (2023); Oerke et al. (2006); Calderón et al. (2014)'],
             ['L5.7 leaf PCA', '5-nm reflectance', 'z-score before PCA', 'all leaves (description)', 'Bijlwan et al. (2025)'],
             ['2.11 Bharatpur', 'all features', 'same formulas; frozen IARI constants (no re-fitting)', 'IARI training plots', 'Ma et al. (2026)']]
     tab('normsum', rows=rows, caption='Normalisation at each stage of the methodology.', widths=[1700, 1700, 2600, 1800, 1800], size=15)

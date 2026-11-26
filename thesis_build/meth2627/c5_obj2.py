@@ -3,8 +3,9 @@ from c_lib import *
 
 def add():
     h1('7. Objective 2 – Detection and severity discrimination through artificial intelligence-based multimodal data fusion')
-    p('Objective 2 builds and compares predictive models on the post-symptomatic subplot-dates: 1320 from the 33 training plots for selection and training, 600 from the 15 test plots for the single final test. '
-      'Every single camera and every combination of cameras (15 sensor sets) is modelled for the three tasks with the same plots, so that cameras, combinations and models can be compared directly.')
+    p('Objective 2 builds and compares predictive models on the post-symptomatic subplot-dates: 1320 from the 33 training plots for fusion, tuning and training, 600 from the 15 test plots for the single final test. '
+      'All 15 sensor sets – the 4 single cameras and their 11 combinations – are modelled for the three tasks. Their inputs are the features selected in Objective 1 on the training plots, joined at feature level (Step 2.2). '
+      'Models: SVM/SVR, random forest, k-NN and PLS-DA/PLSR, each with SFFS (Step 2.3) and grid search (Step 2.4); DNN-F1 for all 15 sets and DNN-F2 for the 11 fused sets (Step 2.5); DT-EDNet and its three comparison networks for Tasks A and B (Step 2.6).')
     myfig('models', 'g11_models.png', 'Model families, inner validation and test of Objective 2 (left); demo of a pseudo-image for the networks (right).')
     P = 'Objective 2'
 
@@ -20,14 +21,16 @@ def add():
                  ('Feng et al. (2022)', 'Wheat powdery mildew; models from each single data source (indices, temperature, texture) compared with fused sources.', 'Single cameras and their combinations compared.'),
                  ('Abdulridha et al. (2023)', 'Wheat stem rust; drone hyperspectral data for detection and severity levels.', 'Detection plus severity levels.')])
 
-    h2('Activity 2.2 – Feature selection on the training plots and fusion')
-    step('2.2', 'Selection repeated on the training plots; feature-level fusion', part=P,
-         what='The selection chain of Objective 1 (1.2–1.6) is run again on the 1320 training samples only; the DSFs of the cameras of a sensor set are concatenated and VIF < 10 is applied again.',
-         why='Features chosen with the test plots would make the test accuracy optimistic.',
-         do=['Run 1.2.1–1.6.2 on the training plots for each camera and task.', 'For a sensor set, join the camera DSFs; remove features until all VIF < 10.', 'Compute the index values of the test samples with the wavelengths chosen on the training plots.'],
-         check=['A DSF for each of the 15 sensor sets × 3 tasks, chosen on training plots only.'],
+    h2('Activity 2.2 – Feature-level fusion of the selected camera features')
+    step('2.2', 'Feature-level fusion of the camera feature sets selected in Objective 1', part=P,
+         data='33 training plots only (1320 subplot-dates per camera).',
+         what='The disease-specific feature sets of the cameras, selected once on the training plots in Objective 1 (Step 1.6.2), are joined for each of the 15 sensor sets; VIF < 10 is applied again to the joined set on the training plots.',
+         why='Each sensor set needs one input table; joining features of different cameras creates new collinearity, which VIF removes. No new selection is needed because the camera feature sets were already chosen on the training plots only.',
+         do=['Take the DSF of each camera and task from Step 1.6.2 (training plots).', 'For each sensor set, join the DSFs of its cameras by subplot code and date.', 'Remove the feature with the largest VIF until all VIF < 10 (training plots).', 'Compute the same features for the test samples with the wavelengths and formulas fixed on the training plots.'],
+         check=['One input table for each of the 15 sensor sets × 3 tasks; no step used the test plots.'],
          out='Inputs of every model → 2.3–2.6.',
-         papers=[('Ma et al. (2026)', 'Rice blast; feature selection on the training data (2023) only; testing on independent 2024 data.', 'Selection on the training plots only.'),
+         q='Why not select again here? → The Objective 1 selection already used only the 33 training plots, so its feature sets can be used as they are; only the joining of cameras is new.',
+         papers=[('Ma et al. (2026)', 'Rice blast; feature selection and model training on the 2023 data only; testing on independent 2024 data.', 'Features chosen on the training data and used unchanged for the models.'),
                  ('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices, thermal temperature parameters and texture features fused at feature level; PLSR, random forest and SVR compared.', 'Feature-level fusion by concatenation.'),
                  ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and canopy-temperature features fused after Pearson correlation and recursive feature elimination.', 'Same fusion level after selection.'),
                  ('Huang et al. (2020)', 'Wheat Fusarium head blight; spectral, colour and texture features of hyperspectral images of ears fused for severity diagnosis.', 'Feature-level fusion of spectral, colour and texture features.')])
@@ -40,7 +43,7 @@ def add():
          check=['Subset and inner score of every model × sensor set × task.'],
          out='Feature subsets → 2.4.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast; SFFS wrapped around LDA, k-NN and SVM found optimal combinations of 2–4 features; SVM-SFFS was best.', 'SFFS wrapped around each model.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; SFFS with the SVM macro-F1 as criterion after RELIEF-F and VIF.', 'Macro-F1 criterion after ReliefF and VIF.')])
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F followed by SFFS determined the optimal feature combination; models evaluated by overall accuracy and macro-F1 (SVM, 4-fold cross-validation repeated 100 times).', 'SFFS after Relief-F and VIF; macro-F1 reported.')])
     step('2.4', 'Models, tuning grids and final fit', part=P,
          what='SVM/SVR, random forest, k-NN and PLS-DA/PLSR are tuned by grid search with the same inner folds, refitted on all 33 training plots and used once on the test plots.',
          why='Classical models are the reference for the networks and are used in most disease studies.',
@@ -48,7 +51,7 @@ def add():
          check=['Model files and test predictions for 4 models × 15 sets × 3 tasks.'],
          out='ML predictions → 2.7.',
          papers=[('Tian et al. (2021)', 'Rice leaf blast; SVM C and γ by grid search; k-NN and LDA compared.', 'SVM and k-NN tuned by grid search.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; SVM C and γ by grid search with cross-validation.', 'Grid search inside the training data.'),
+                 ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; model settings tuned by grid search with 3-fold cross-validation inside the 70% training set.', 'Grid search inside the training data.'),
                  ('Abdulridha et al. (2023); Yuan et al. (2025)', 'Wheat stem rust; rice bacterial blight: random forest (and SVM, k-NN) on UAV features.', 'Random forest, SVM and k-NN on UAV data.'),
                  ('Zhang et al. (2012); Mandal et al. (2023)', 'Wheat powdery mildew; rice blast: PLSR (and PLS-DA / Fisher discriminant) for severity.', 'PLS models for severity.')])
     rows = [['Model', 'Grid (GroupKFold(3))', 'Disease papers'],
@@ -59,16 +62,22 @@ def add():
     tab('mlgrid', rows=rows, caption='Machine-learning models and tuning grids.', widths=[1800, 4600, 3200], size=16)
 
     h2('Activity 2.4 – Deep-learning models')
-    step('2.5', 'Deep neural network with input-level feature fusion', part=P,
-         what='A small fully connected network takes the fused feature vector (input-level fusion) for Tasks A, B and C.',
-         why='Tests whether a neural network gains over the ML models on the same fused features, including the regression of DI.',
-         do=['Two hidden layers (64 and 32 units), batch normalisation, ReLU, dropout 0.3; softmax (A, B) or linear output (C).', 'AdamW and the schedule of Step 2.6; fit on 22 training plots, early stopping on the 11 validation plots.'],
-         check=['Learning curves saved; best epoch recorded.'],
-         out='DNN-F1 predictions → 2.7.',
-         papers=[('Deng et al. (2024)', 'Wheat stripe rust; RustQNet, a multimodal deep network that estimated the disease index from UAV data.', 'A neural network on multimodal UAV features, including regression of the DI.'),
+    step('2.5', 'Feature-fusion networks: input-level (DNN-F1) and intermediate-level with camera attention (DNN-F2)', part=P,
+         data='Fitted on 22 training plots; early stopping on the 11 validation plots; test plots used once.',
+         what='DNN-F1 takes the joined feature vector of a sensor set (input-level fusion); DNN-F2 gives each camera its own branch, weights the branches with a squeeze-and-excitation camera attention and then joins them (intermediate-level fusion). Both are trained for Tasks A, B and C; DNN-F2 only for the 11 sensor sets with two or more cameras.',
+         why='Tests whether a neural network gains over the ML models on the same Objective 1 features, and whether letting the network weigh each camera (DNN-F2) helps more than simple joining (DNN-F1).',
+         do=['DNN-F1: two hidden layers (64 and 32 units), batch normalisation, ReLU, dropout 0.3; softmax (Tasks A, B) or linear output (Task C).',
+             'DNN-F2: one branch per camera (dense 32 units, batch normalisation, ReLU, dropout 0.3) on that camera\'s selected features; squeeze-and-excitation layer that learns one weight per camera; weighted branch outputs joined, dense 32 units, output layer.',
+             'Inputs z-scored with the 22 fitting plots (Step D4); AdamW and the schedule of Step 2.6; early stopping on the 11 validation plots; best epoch kept.',
+             'Record the learned camera weights of DNN-F2 for every fused set.'],
+         check=['Learning curves saved; best epoch and DNN-F2 camera weights recorded.'],
+         out='DNN-F1 and DNN-F2 predictions → 2.7; camera weights → 2.8.',
+         alt='The two fusion levels follow the input- and intermediate-level fusion networks of Maimaitijiang et al. (2020) (soybean yield, UAV RGB + multispectral + thermal); the camera weights use squeeze-and-excitation (Hu et al., 2018), the same block used inside DT-EDNet (Ma et al., 2026).',
+         papers=[('Deng et al. (2024)', 'Wheat stripe rust; RustQNet, a multimodal deep network that fused image modalities inside the network to estimate the disease index.', 'Fusion of camera data inside the network (intermediate level) and regression of the DI.'),
+                 ('Yu et al. (2025)', 'Rice sheath blight; dual-branch multimodal model fusing spectral and physiological signatures for early detection.', 'One branch per data source joined inside the network, as in DNN-F2.'),
+                 ('Ma et al. (2026)', 'Rice blast; squeeze-and-excitation block in DT-EDNet to re-weight feature channels.', 'Squeeze-and-excitation used to weight the cameras.'),
                  ('Liu et al. (2020)', 'Wheat Fusarium head blight; a neural network classifier on UAV hyperspectral bands, indices and texture.', 'Neural network on selected UAV features.'),
-                 ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; neural networks estimated severity from reflectance.', 'Network regression of severity.'),
-                 ('Yu et al. (2025)', 'Rice sheath blight; dual-branch multimodal network fusing spectral and physiological signatures.', 'A neural network on fused multimodal features.')])
+                 ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; neural networks estimated severity from reflectance.', 'Network regression of severity.')])
     step('2.6', 'Pseudo-image networks: Dual Transformer Early Detection Network and its comparison networks', part=P,
          what='The selected features are arranged as a k × k pseudo-image and classified (Tasks A and B) by DT-EDNet, EfficientNet-B0, ResNet18 and ConvNeXt V2-Atto with identical settings.',
          why='DT-EDNet is the network of the core reference paper; the three others are its comparison networks.',
@@ -107,7 +116,7 @@ def add():
     step('2.8', 'Comparison of sensor sets and models, ablation and Shapley additive explanations', part=P,
          what='Sensor sets and models are ranked by the main metric; the fusion gain is the difference between a fused set and its best single camera; networks are compared on the HS configurations; DT-EDNet modules are ablated; SHAP shows the features used by the best models.',
          why='Answers which camera or combination is best and why.',
-         do=['Rank all model × sensor-set results per task.', 'Fusion gain = metric(fused set) − metric(best single camera in it).', 'Network comparison and DT-EDNet ablation (Step 2.6).', 'SHAP of the best ML model of each task.'],
+         do=['Rank all model × sensor-set results per task.', 'Fusion gain = metric(fused set) − metric(best single camera in it).', 'Drop-one-camera ablation: for the all-camera set S15, remove each camera in turn and record the loss of accuracy; compare with the DNN-F2 camera weights.', 'Network comparison and DT-EDNet ablation (Step 2.6).', 'SHAP of the best ML model of each task.'],
          check=['Ranking table, fusion-gain table, ablation table, SHAP plots.'],
          out='Best camera / combination → conclusions.',
          papers=[('Feng et al. (2022)', 'Wheat powdery mildew; accuracy of the fused model compared with each single data source; random forest regression was stable in multi-source fusion.', 'Fusion gain over single cameras.'),

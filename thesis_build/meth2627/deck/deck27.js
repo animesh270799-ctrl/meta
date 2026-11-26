@@ -93,9 +93,8 @@ tb(s, [['Parameter (unit)', 'Method', 'Reference'],
   ['Total carotenoids (mg g⁻¹ FW)', 'same DMSO extract; A480', 'Lichtenthaler and Wellburn (1983)'], ['Anthocyanin (µg g⁻¹ FW)', 'pH-differential: 520 and 700 nm at pH 1.0 and 4.5', 'Lee et al. (2005)'],
   ['Total protein (µg mg⁻¹ FW)', 'Bradford dye binding; 595 nm; BSA standard', 'Bradford (1976); Kuril (2024)'], ['Relative water content (%)', 'fresh, turgid (4 h) and dry (48 h, 70 °C) weight', 'Barrs and Weatherley (1962)'],
   ['Membrane stability index (%)', 'conductivity at 40 °C (C₁) and 100 °C (C₂)', 'Sairam (1994); Premachandra et al. (1990)'],
-  ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable gas exchange', 'Riches et al. (2020); Long and Bernacchi (2003)'],
-  ['Leaf area index (m² m⁻²)', 'canopy analyser: 1 reading above, 4 below; diffuse light', 'Singh et al. (2021); Bréda (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
-box(s, 9.2, 1.2, 3.68, 3.4, 'Sampling design', ['Dates: 7 Jan (pre), 18 Jan, 8 Feb, 1 Mar 2027', 'One designated subplot per plot, rotated (plot mod 4 + 1)', 'Gas exchange on L3 of the centre plant, 09:30–11:30 h', 'Lab samples: L3 of 3 untagged plants', 'LAI in all 4 subplots'], C.teal, C.lteal, { valign: 'top', fs: 13 });
+  ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable gas exchange', 'Riches et al. (2020); Long and Bernacchi (2003)']], 0.45, 1.2, 8.55, [2.6, 3.65, 2.3], { firstCol: true, fs: 12 });
+box(s, 9.2, 1.2, 3.68, 3.4, 'Sampling design', ['Dates: 7 Jan (pre), 18 Jan, 8 Feb, 1 Mar 2027', 'One designated subplot per plot, rotated (plot mod 4 + 1)', 'Gas exchange on L3 of the centre plant, 09:30–11:30 h', 'Lab samples: L3 of 3 untagged plants'], C.teal, C.lteal, { valign: 'top', fs: 13 });
 BL(s, ['**Use:** explain the camera responses (Activity 1.7) and pre-symptomatic changes; not model inputs.'], 0.45, 5.35, 12.43, 0.5);
 refline(s, 'white rust biochemistry: Mishra et al. (2009), Chatterjee et al. (2022); spectra + physiology: Yu et al. (2025); physiology explaining thermal and spectral signals: Calderón et al. (2013), Zarco-Tejada et al. (2018); Brassica leaves: Baranowski et al. (2015).', 5.9, 0.7);
 // ------------------------------------------------------------------ A6 covariates
@@ -121,7 +120,7 @@ tb(s, [['Data set', 'Content', 'When', 'Amount'],
   ['ASD leaf spectra', 'centre plant: .asd files (2 readings per leaf) + ASCII; white-reference log', '13 dates', '1152 readings per date'],
   ['Growth stage, inoculation record', 'BBCH stage per plot and date; inoculation date, concentration, method', '13 dates; 30 Dec', '624 records'],
   ['Weather', 'daily Tmax, Tmin, RH I, RH II, rainfall (IARI observatory), 1 Dec 2026 – 31 Mar 2027', 'daily', '≈ 120 days'],
-  ['Plant parameters', '11 biochemical/biophysical parameters; LI-6400 and canopy-analyser files', '4 dates', '48 per date (LAI 192)'],
+  ['Plant parameters', '10 biochemical/biophysical parameters; LI-6400 files', '4 dates', '48 per parameter and date'],
   ['Bharatpur test data', 'images of 4 cameras; quadrat positions; 3-point surveys; covariates; local weather', '2–3 dates', '≥ 300 quadrat-dates'],
   ['Glasshouse data', 'pot plan; inoculation record; 0–6 severity; ASD spectra', '2, 5, 8, 11 DAI, then weekly', '48 pots']], 0.45, 1.2, 12.43, [2.6, 6.4, 1.8, 1.63], { firstCol: true, fs: 12 });
 // ------------------------------------------------------------------ B
@@ -138,7 +137,7 @@ tb(s, [['Camera', 'Features', 'Number', 'Disease papers'],
   ['Hyperspectral', 'reflectance 483; first derivative 483; red-edge position, amplitude, area; 48 published indices; PCA texture (3 PCs × 8 GLCM, 3 × 3, 64 levels)', '≈ 1040', 'Yu et al. (2021); Lv et al. (2023); Ma et al. (2026); Guo et al. (2021); Mandal et al. (2023)'],
   ['Multispectral', '5 bands; 12 indices; 10 normalised differences; GLCM of 5 bands', '67', 'Liu et al. (2024); Blasch et al. (2023)'],
   ['RGB', 'ExG, ExR, ExG − ExR, VARI, GLI, NGRDI; hue, saturation, value; GLCM of R, G, B', '33', 'Feng et al. (2022)'],
-  ['Thermal', 'ROI temperature statistics; CTD = Tc − Ta, NRCT, difference from healthy plots; thermal GLCM', '17', 'Calderón et al. (2014); Oerke et al. (2006); Feng et al. (2022)']], 0.45, 1.25, 12.43, [1.7, 5.9, 1.1, 3.73], { firstCol: true, fs: 13 });
+  ['Thermal', 'ROI temperature statistics incl. maximum temperature difference; CTD, CTR, NRCT, difference from healthy plots; thermal GLCM', '18', 'Feng et al. (2022); Calderón et al. (2014); Oerke et al. (2006)']], 0.45, 1.25, 12.43, [1.7, 5.9, 1.1, 3.73], { firstCol: true, fs: 13 });
 BL(s, ['**No second derivative, no continuum removal, no wavelets:** the feature families of the DT-EDNet study (bands, indices, texture) plus thermal.', '**Feature table:** one per camera, one row per subplot-date, with identifiers, labels, covariates and group prefixes (R_, FD_, RE_, VI_, TX_, TH_).'], 0.45, 4.75, 12.43, 1.3);
 refline(s, 'Ma et al. (2026); Feng et al. (2022); Liu et al. (2024); Nguyen et al. (2023); Mandal et al. (2022) (red-edge amplitude); Kundu et al. (2021) (DWSI); Calderón et al. (2014).', 6.3, 0.45);
 require('./adv_idx.js')();
@@ -156,7 +155,7 @@ s = S('Part D: Thermal normalisation, scaling, class balance and leakage rules',
 tb(s, [['Step', 'What is done', 'Disease papers'], ['D3 Thermal normalisation', 'CTD = Tc − Ta; CTR = Tc/Ta; NRCT = (Tc − Tmin)/(Tmax − Tmin) within each date; difference from healthy training plots of the same date and variety', 'Feng et al. (2022); Calderón et al. (2014); Oerke et al. (2006)'],
   ['D4 Scaling and balance', 'z-score with fitting-part statistics (inside every fold) for SVM, k-NN, PLS, networks (random forest needs none); balanced class weights; networks: label smoothing 0.01', 'Bijlwan et al. (2025); Lv et al. (2023); Ma et al. (2026)'],
   ['D5 Leakage rules', 'no plot on both sides; selection, scaling, healthy references and weights from training plots only; test plots used once', 'Ma et al. (2026); Mandal et al. (2023)']], 0.45, 1.25, 12.43, [2.8, 6.0, 3.63], { firstCol: true });
-BL(s, ['**Objective 1 (description)** uses all samples; **for the models** the same selection is repeated on the training plots only (Step 2.2).'], 0.45, 4.0, 12.43, 0.8);
+BL(s, ['**Objective 1:** description (curves, correlations, physiology) on all 48 plots; every feature-selection step on the 33 training plots only, and those features are the model inputs of Objectives 2–3 (Ma et al., 2026).'], 0.45, 4.0, 12.43, 0.8);
 // ------------------------------------------------------------------ normalisation summary
 s = S('Normalisation at each stage of the methodology', 'Data preparation');
 tb(s, [['Stage', 'Normalisation', 'Constants from', 'Disease papers'],
@@ -164,19 +163,20 @@ tb(s, [['Stage', 'Normalisation', 'Constants from', 'Disease papers'],
   ['Subplot sample (B6)', 'mean of all pixels of the region of interest', 'the ROI', 'Ma et al. (2026); Liu et al. (2024)'],
   ['Features (C1–C4)', 'normalised-difference and ratio indices; first derivative (no z-score of spectra)', 'formulas', 'Ma et al. (2026); Lv et al. (2023)'],
   ['Thermal (D3)', 'CTD, CTR, NRCT (min–max within each date), difference from healthy plots', 'air temperature; image; healthy training plots', 'Feng et al. (2022); Calderón et al. (2014)'],
-  ['PLS/CARS (1.2.2)', 'z-score of candidate bands', 'samples used for selection', 'Bijlwan et al. (2025)'],
-  ['ReliefF (1.4.2, 1.6.1, L5.4)', 'min–max 0–1 (built into the ReliefF difference)', 'samples used for selection', 'Lv et al. (2023); Ma et al. (2026)'],
+  ['PLS/CARS (1.2.2)', 'z-score of candidate bands', '33 training plots', 'Bijlwan et al. (2025)'],
+  ['ReliefF (1.4.2, 1.6.1, L5.4)', 'min–max 0–1 (built into the ReliefF difference)', '33 training plots / training leaves', 'Lv et al. (2023); Ma et al. (2026)'],
   ['Filters, mRMR, TTFI, VIF, maps', 'none (scale-free methods)', '–', 'Ma et al. (2026); Lv et al. (2023)'],
   ['Feature fusion (2.2)', 'none at the join; VIF < 10 again', '–', 'Feng et al. (2022); Liu et al. (2024)'],
   ['Models (D4), covariates (2.9)', 'z-score in the pipeline (trees unaffected); categorical one-hot', 'fitting part of each fold; training plots', 'Bijlwan et al. (2025); Zhang et al. (2014a)'],
-  ['Pre-symptomatic (3.2)', 'z relative to healthy plants of the same date and variety', 'healthy training plots', 'Oerke et al. (2006); Zarco-Tejada et al. (2018)'],
+  ['Pre-symptomatic (3.2)', 'spectra × (healthy baseline / healthy mean of the date) per variety; thermal as D3', 'healthy training plots', 'Lv et al. (2023); Oerke et al. (2006)'],
   ['Bharatpur (2.11)', 'same formulas; frozen IARI constants', 'IARI training plots', 'Ma et al. (2026)']], 0.45, 1.2, 12.43, [2.6, 4.6, 2.5, 2.73], { firstCol: true, fs: 12 });
 // ------------------------------------------------------------------ Objective 1
 sec('Objective 1');
 s = S('Objective 1: Characterisation of white rust (overview)', 'Objective 1');
 img(s, 'g10_selection_chain.png', 0.45, 1.15, 8.0, 4.4);
 BL(s, ['**1.1** response curves, correlation, strata', '**1.2** NDSI/RSI maps → SHAP-CARS optimal wavelengths', '**1.3** best NDSI, RSI; White Rust Index', '**1.4** filter + ReliefF indices', '**1.5** mRMR texture + TTFI', '**1.6** VIF → DSF; camera complementarity', '**1.7** physiological basis', '**1.8** pre-symptomatic stage'], 8.65, 1.15, 4.23, 4.6, { ps: 3 });
-refline(s, 'one selection method per feature group, as in Ma et al. (2026); VIF: Lv et al. (2023); physiology: Calderón et al. (2013); pre-symptomatic: Zarco-Tejada et al. (2018), Zhu et al. (2017).', 6.0, 0.6);
+T(s, '**Samples:** selection (1.2–1.6, 1.8.2) on the 33 training plots only – used unchanged by the models; description (1.1, 1.7, 1.8.1, 1.8.3) on all 48 plots.', 0.45, 5.6, 12.43, 0.4, { color: C.g });
+refline(s, 'one selection method per feature group, as in Ma et al. (2026); VIF: Lv et al. (2023); physiology: Calderón et al. (2013); pre-symptomatic: Zarco-Tejada et al. (2018), Zhu et al. (2017).', 6.15, 0.55);
 s = S('Activity 1.1: Response analysis (Steps 1.1.1–1.1.3)', 'Objective 1');
 img(s, 'g07_spectra_demo.png', 0.45, 1.15, 12.43, 2.8);
 BL(s, ['**1.1.1** mean ± SD reflectance and first derivative by DI class; % difference from class 0; class means of MS, RGB, thermal features.', '**1.1.2** Pearson r of every feature with the DI.', '**1.1.3** the same by variety, sowing date, growth stage, DAI; DI against favourable days.'], 0.45, 4.15, 12.43, 1.6);
@@ -194,7 +194,7 @@ box(s, 0.45, 1.2, 6.1, 2.2, '1.3 Data-driven indices', ['Best NDSI and RSI (band
 box(s, 6.78, 1.2, 6.1, 2.2, '1.4 Vegetation index selection', ['48 indices + 3 red-edge parameters + NDSI, RSI, WRI', 'Redundancy filter: clusters at |r| ≥ 0.95, keep the one best related to DI', 'ReliefF (Tasks A, B) / RReliefF (Task C), k = 10 → top 5 = VI'], C.blue, C.lblue, { fs: 13, align: 'left', valign: 'top' });
 tb(s, [['Rank', 'λ1', 'λ2', 'λ3', 'w', '|r| with DI', 'Balanced accuracy'], ['1', '754', '700', '532', '−0.5', '0.71', '0.83'], ['2', '760', '694', '550', '−0.5', '0.70', '0.82']], 0.45, 3.65, 6.1, [0.7, 0.8, 0.8, 0.8, 0.8, 1.0, 1.2], { fs: 12 });
 T(s, 'WRI search output (demo data)', 0.45, 4.75, 6.1, 0.3, { italic: true, fontSize: 12 });
-refline(s, 'WRI form and 50-nm rule: Mahlein et al. (2013); three-band index: Zheng et al. (2018); ground-to-UAV index: Liu et al. (2026); Relief top 5 indices and correlation among indices: Ma et al. (2026); k = 10: Lv et al. (2023).', 5.6, 0.75);
+refline(s, 'WRI form and 50-nm rule: Mahlein et al. (2013); three-band index: Zheng et al. (2018); ground-to-UAV index: Liu et al. (2026); Relief top 5 indices and correlation among indices: Ma et al. (2026); Relief-F ranking (top 10%): Lv et al. (2023).', 5.6, 0.75);
 s = S('Activities 1.5–1.6: Texture, Tri-band Texture Fusion Index and disease-specific feature set', 'Objective 1');
 box(s, 0.45, 1.2, 6.1, 2.6, '1.5 Texture', ['24 PCA texture features → |r| ≥ 0.95 filter → mRMR top 6 (TF1–TF6)', '120 ordered triplets × 3 formulas: TTFI1 = (TF1 + TF2)/TF3; TTFI2 = TF1 × TF2/TF3; TTFI3 = TF1 × (TF1 + TF2)/(TF2 + TF3)', 'Best |r| with DI = TTFI'], C.purple, C.lpurple, { fs: 13, align: 'left', valign: 'top' });
 box(s, 6.78, 1.2, 6.1, 2.6, '1.6 Disease-specific feature set (DSF)', ['MS, RGB, thermal: filter + ReliefF top 5 (normalised thermal kept)', 'HS: OW + VI + TF + TTFI pooled', 'VIF = 1/(1 − R²): remove the largest until all < 10 → DSF of each camera and task', 'Cross-camera correlation → complementarity'], C.g, C.lt, { fs: 13, align: 'left', valign: 'top' });
@@ -208,19 +208,19 @@ refline(s, 'white rust biochemistry: Mishra et al. (2009); physiology vs severit
 sec('Objective 2');
 s = S('Objective 2: Detection and severity discrimination (overview)', 'Objective 2');
 img(s, 'g11_models.png', 0.45, 1.15, 12.43, 4.0);
-BL(s, ['**15 sensor sets** (4 single, 6 pairs, 4 triplets, all four) × **3 tasks**; selection repeated on the 33 training plots; camera DSFs concatenated (feature-level fusion) and VIF < 10 again.'], 0.45, 5.25, 12.43, 0.75);
+BL(s, ['**15 sensor sets** (4 single, 6 pairs, 4 triplets, all four) × **3 tasks**; inputs = features selected in Objective 1 on the training plots, joined at feature level, VIF < 10 again; ML with SFFS + grid search, DNN-F1, DNN-F2, pseudo-image networks.'], 0.45, 5.25, 12.43, 0.75);
 refline(s, 'single vs fused sources: Feng et al. (2022); feature-level fusion: Liu et al. (2024), Huang et al. (2020); multimodal networks: Deng et al. (2024), Yu et al. (2025); selection on training data only: Ma et al. (2026).', 6.15, 0.5);
 s = S('Activity 2.3: Sequential floating forward selection and machine-learning models', 'Objective 2');
 tb(s, [['Model', 'Grid (GroupKFold(3) by plot)', 'Disease papers'], ['SVM / SVR (RBF)', 'C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5}', 'Tian et al. (2021); Lv et al. (2023); Yuan et al. (2025)'],
   ['Random forest', '500 trees; max_features ∈ {sqrt, 0.3}; min_samples_leaf ∈ {1, 3, 5}', 'Abdulridha et al. (2023); Liu et al. (2024); Yuan et al. (2025)'], ['k-NN', 'k ∈ {3, 5, 7, 9, 11}; uniform or distance weights', 'Tian et al. (2021); Yuan et al. (2025)'],
   ['PLS-DA / PLSR', '1–15 components', 'Zhang et al. (2012); Mandal et al. (2023)']], 0.45, 1.25, 12.43, [2.2, 5.6, 4.63], { firstCol: true, fs: 13 });
 BL(s, ['**SFFS:** adds the feature that most improves the GroupKFold(3) score and tries to remove one after each addition; best subset ≤ 15 features (macro-F1 for A, B; −RMSE for C).', '**Final fit:** best setting refitted on all 33 training plots; test plots predicted once.'], 0.45, 4.0, 12.43, 1.5);
-refline(s, 'SFFS wrapped around LDA, k-NN, SVM (2–4 features best): Tian et al. (2021); SFFS with macro-F1 after ReliefF and VIF: Lv et al. (2023).', 6.0, 0.5);
+refline(s, 'SFFS wrapped around LDA, k-NN, SVM (2–4 features best): Tian et al. (2021); Relief-F + SFFS, VIF > 10 removed, macro-F1 reported: Lv et al. (2023); grid search with 3-fold CV: Bijlwan et al. (2025).', 6.0, 0.5);
 s = S('Activity 2.4: Deep neural network with feature fusion and the pseudo-image networks', 'Objective 2');
-tb(s, [['Setting', 'Ma et al. (2026)', 'This study'], ['Networks', 'DT-EDNet vs EfficientNet, ResNet18, ConvNeXt V2', 'same (Tasks A, B); DNN-F1 for A, B, C'], ['Input', 'feature vector reshaped into a pseudo-2D representation', 'k × k pseudo-image of the selected features'],
+tb(s, [['Setting', 'Ma et al. (2026)', 'This study'], ['Networks', 'DT-EDNet vs EfficientNet, ResNet18, ConvNeXt V2', 'same (Tasks A, B, all 15 sets); DNN-F1 (15 sets) and DNN-F2 with camera attention (11 fused sets) for A, B, C'], ['Input', 'feature vector reshaped into a pseudo-2D representation', 'k × k pseudo-image of the selected features'],
   ['Optimiser, schedule', 'AdamW 6 × 10⁻⁴, weight decay 10⁻⁵; cosine to 10⁻⁶', 'same'], ['Epochs, patience', '300; 60 (min. improvement 5 × 10⁻⁵)', 'same'], ['Batch, label smoothing, clipping', '32; 0.01; 1.2', 'same'],
   ['Validation', '10% of the training set', '11 of the 33 training plots'], ['Model selection', 'highest validation OA', 'same'], ['Comparisons', 'feature configurations; module ablation', 'OW, VI, TF, OW+VI, OW+TTFI, OW+VI+TTFI; −SE, −DTG, −both']], 0.45, 1.25, 12.43, [2.7, 4.9, 4.83], { firstCol: true, fs: 13 });
-refline(s, 'Ma et al. (2026); multimodal deep network for the disease index: Deng et al. (2024); neural network on UAV features: Liu et al. (2020); network severity estimation: Martínez-Martínez et al. (2018).', 6.0, 0.6);
+refline(s, 'Ma et al. (2026); intermediate (branch) fusion inside the network: Deng et al. (2024), Yu et al. (2025); neural network on UAV features: Liu et al. (2020); network severity estimation: Martínez-Martínez et al. (2018).', 6.0, 0.6);
 s = S('Activity 2.5: Evaluation on the 15 test plots', 'Objective 2');
 img(s, 'g12_eval_demo.png', 0.45, 1.15, 7.4, 3.3);
 BL(s, ['**Tasks A, B:** confusion matrix, OA, kappa, per-class precision, recall, F1, macro recall, macro-F1; Task A also sensitivity, specificity, AUC.', '**Task C:** R², RMSE, RPD = SD/RMSE.', '**Main metrics:** macro-F1 (A, B), R² (C).'], 8.05, 1.15, 4.83, 3.4);
@@ -238,9 +238,9 @@ refline(s, 'by growth stage and maps: Liu et al. (2024), Blasch et al. (2023), A
 // ------------------------------------------------------------------ Objective 3
 sec('Objective 3');
 s = S('Objective 3: Pre-symptomatic prediction (Steps 3.1–3.4)', 'Objective 3');
-chain(s, [{ h: '3.1 Labels', b: 'healthy plots vs inoculated subplots that show pustules later; never-symptomatic excluded' }, { h: '3.2 Normalisation', b: 'z to healthy training plots of the same date and variety' }, { h: '3.3 Selection', b: 'chain of 1.8.2 on training plots; VIF; SFFS ≤ 10' }, { h: '3.4 Models', b: 'SVM, RF, k-NN, PLS-DA, DNN-F1; 15 sensor sets' }], 0.45, 1.3, 12.43, 2.0, 0.3, C.red, C.lred);
+chain(s, [{ h: '3.1 Labels', b: 'healthy plots vs inoculated subplots that show pustules later; never-symptomatic excluded' }, { h: '3.2 Normalisation', b: 'spectra aligned to the healthy baseline of each date and variety; thermal as D3' }, { h: '3.3 Features', b: 'pre-symptomatic DSF of 1.8.2 (training plots) joined; VIF; SFFS ≤ 10' }, { h: '3.4 Models', b: 'SVM, RF, k-NN, PLS-DA (SFFS), DNN-F1, DNN-F2; 15 sensor sets' }], 0.45, 1.3, 12.43, 2.0, 0.3, C.red, C.lred);
 BL(s, ['**Data:** 576 subplot-dates (1, 4, 7 January; 2, 5, 8 DAI): 396 training, 180 test.', '**No pseudo-image networks:** about 400 training samples are too few for them.'], 0.45, 3.6, 12.43, 1.3);
-refline(s, 'labels from later status: Zhu et al. (2017), Tian et al. (2021), Yu et al. (2021); healthy reference: Oerke et al. (2006), Zarco-Tejada et al. (2018); ML classifiers before symptoms: Zhu et al. (2017), Tian et al. (2021).', 5.9, 0.75);
+refline(s, 'labels from later status: Zhu et al. (2017), Tian et al. (2021), Yu et al. (2021); healthy-baseline normalisation: Lv et al. (2023); healthy reference: Oerke et al. (2006), Calderón et al. (2014), Zarco-Tejada et al. (2018); ML classifiers before symptoms: Zhu et al. (2017), Tian et al. (2021).', 5.9, 0.75);
 s = S('Activity 3.5–3.6: Earliest detection day and risk maps', 'Objective 3');
 img(s, 'g15_presym_demo.png', 0.45, 1.15, 7.6, 2.95);
 BL(s, ['**Metrics per date:** sensitivity, specificity, OA, kappa, macro-F1, AUC on the test plots.', '**Earliest detection day:** first DAI on which predicted scores of later-infected and healthy test subplots differ (t-test, p < 0.05).', '**Covariate model** as reference.', '**Risk maps:** probability of later infection per subplot.'], 8.25, 1.15, 4.63, 4.4);
@@ -254,8 +254,8 @@ tb(s, [['Step', 'Settings', 'Disease papers'], ['L1 Leaf table', 'join grades; a
   ['L3 Pre-processing', 'Savitzky–Golay (11, 2); 400–2400 nm, water bands kept; FD; 5-nm band means for searches', 'Ma et al. (2026); Selvaprakash et al. (2026); Meng et al. (2020); Mandal et al. (2023)'],
   ['L4 Indices', '48 published indices + REP, Dr, SDr (1 nm)', 'Mandal et al. (2023); Zhang et al. (2012)']], 0.45, 4.45, 12.43, [2.2, 6.0, 4.23], { firstCol: true, fs: 12 });
 s = S('Part L: Leaf Objective 1, models and the leaf–canopy link', 'ASD analysis');
-tb(s, [['Step', 'What is done', 'Disease papers'], ['L5 Leaf Objective 1', 'mean/difference/r spectra; NDSI/RSI maps; SHAP-CARS; NDSI, RSI, WRI; filter + ReliefF; VIF → leaf DSF; JM distance; PCA', 'Ma et al. (2026); Mahlein et al. (2013); Mandal et al. (2023); Lv et al. (2023)'],
-  ['L6 Leaf models', 'selection on training leaves; SVM, RF, k-NN, PLS (SFFS + grid, GroupKFold(3)); DNN-F1; four networks (A, B)', 'Tian et al. (2021); Lv et al. (2023); Zhang et al. (2022); Ma et al. (2026)'],
+tb(s, [['Step', 'What is done', 'Disease papers'], ['L5 Leaf Objective 1', 'description on all leaves: mean/difference/r spectra, PCA; selection on training leaves: NDSI/RSI maps; SHAP-CARS; NDSI, RSI, WRI; filter + ReliefF; VIF → leaf DSF; JM distance', 'Ma et al. (2026); Mahlein et al. (2013); Mandal et al. (2023); Lv et al. (2023)'],
+  ['L6 Leaf models', 'leaf DSF of L5 (training leaves); SVM, RF, k-NN, PLS (SFFS + grid, GroupKFold(3)); DNN-F1; four networks (A, B)', 'Tian et al. (2021); Lv et al. (2023); Zhang et al. (2022); Ma et al. (2026)'],
   ['L7 Test metrics', 'OA, kappa, macro-F1, per-class F1, AUC; R², RMSE, RPD on 2340 test leaves', 'Ma et al. (2026); Lv et al. (2023); Mandal et al. (2023)'],
   ['L8 Covariate baseline', 'M0, M1, M2 at leaf level', 'Zhang et al. (2014a); Bijlwan et al. (2025)'],
   ['L9 Leaf–canopy link', 'leaf vs canopy OW and VI; subplot mean leaf spectrum resampled to Headwall bands vs UAV spectrum; leaf WRI on UAV subplot spectra vs DI', 'Liu et al. (2026); Bohnenkamp et al. (2019); Poblete et al. (2023); Zheng et al. (2018)'],

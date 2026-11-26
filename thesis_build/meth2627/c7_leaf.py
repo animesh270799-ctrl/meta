@@ -49,7 +49,9 @@ def add():
                  ('Mahlein et al. (2013); Apan et al. (2004)', 'Sugar-beet diseases (Healthy Index); sugarcane orange rust (DWSI).', 'Disease indices included.')])
 
     h2('L5 – Objective 1 with the leaf spectra')
+    p('As for the UAV data, L5.1 and L5.7 describe all 7488 leaves; the selection steps L5.2–L5.5 use the 5148 training leaves only, and their leaf DSF is used unchanged by the leaf models (L6).')
     step('L5.1', 'Leaf response: mean spectra, differences and correlation', part=P,
+         data='All 7488 leaves: description only.',
          what='Mean ± SD spectra and first derivatives of each leaf grade, % difference from grade 0, Pearson r of every 5-nm band and index with the grade; by leaf position, growth stage, variety and date.',
          why='Model-free evidence of where and how white rust changes the leaf spectrum.',
          do=['All leaves; 5-nm bands.', 'Mean, SD and difference spectra; r curves; same plots by leaf position and stage.'],
@@ -61,6 +63,7 @@ def add():
                  ('Zhang et al. (2022)', 'Rice leaf blast; the spread (standard deviation) of whole-leaf reflectance differed between disease grades.', 'Leaf spectra compared between grades.'),
                  ('Cross et al. (2024)', 'Wheat stripe rust; progression followed with hyperspectral reflectance.', 'Leaf spectra over disease progression.')])
     step('L5.2', 'Effective wavelength ranges and optimal wavelengths by Shapley additive explanations and competitive adaptive reweighted sampling', part=P,
+         data='5148 training leaves only; fixed here and used unchanged in L6.',
          what='NDSI and RSI R² maps of all 5-nm band pairs with the leaf grade; effective ranges (R² > 0.5, else top 5%); SHAP-CARS on the R and FD bands inside the ranges.',
          why='Same chain as the UAV data (Steps 1.2.1–1.2.2).',
          do=['About 80 000 band pairs per index; maps; effective ranges.', 'Random forest SHAP ranking (top 40%), MCCV by plot for PLS components, CARS 50 iterations, subset with lowest GroupKFold(3) RMSE.'],
@@ -69,6 +72,7 @@ def add():
          papers=[('Ma et al. (2026)', 'Rice blast; NDSI/RSI R² maps (R² > 0.5) and SHAP-CARS with MCCV and CARS.', 'Same maps and SHAP-CARS.'),
                  ('Tian et al. (2021)', 'Rice leaf blast; top 5% of features by separability.', 'Top-5% fall-back.')])
     step('L5.3', 'Leaf indices: best normalised difference and ratio spectral indices and the White Rust Index', part=P,
+         data='5148 training leaves only; formulas then computed for all leaves.',
          what='Best NDSI and RSI pairs (≥ 10 nm apart) and the leaf White Rust Index WRI = NDSI(λ_{1}, λ_{2}) + w × R_{λ3} (λ_{1}, λ_{2} ≥ 50 nm apart, w ∈ {−1, −0.5, 0, 0.5, 1}).',
          why='A data-driven leaf index for white rust that can be compared with the canopy WRI.',
          do=['Search on 5-nm reflectance over the 200 best NDSI pairs and every λ_{3} at 10 nm; score by |r| with the grade.', 'Compute the chosen indices at 1 nm.'],
@@ -77,21 +81,24 @@ def add():
          papers=[('Mahlein et al. (2013)', 'Sugar-beet diseases; normalised difference of two wavelengths plus or minus a third; wavelengths ≥ 50 nm apart.', 'WRI form and 50-nm rule.'),
                  ('Mandal et al. (2023); Selvaprakash et al. (2026)', 'Rice blast; exhaustive two-band searches gave new blast indices (RBI, NDBI; RBI = (R1068 − R1560)/(R1068 + R1560)).', 'Exhaustive pair search.')])
     step('L5.4', 'Redundancy filter and Relief-F ranking of the leaf indices', part=P,
+         data='5148 training leaves only.',
          what='Indices correlated at |r| ≥ 0.95 are reduced to the one most correlated with the grade; ReliefF (Tasks A, B) and RReliefF (Task C) with k = 10 rank the rest; the top five per task are the leaf VI.',
          why='Same rule as the UAV indices (Activity 1.4).',
          do=['Correlation clusters at |r| ≥ 0.95.', 'ReliefF / RReliefF, k = 10, min–max scaled; top five per task.'],
          check=['Leaf VI of Tasks A, B and C.'],
          out='Leaf VI → L5.5.',
          papers=[('Ma et al. (2026)', 'Rice blast; correlation among indices and Relief ranking (top five).', 'Same filter idea and Relief ranking.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F with 10 nearest hits and misses.', 'k = 10.')])
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F weights ranked the features; the top 10% were kept.', 'Relief-F ranking of leaf features.')])
     step('L5.5', 'Variance inflation factor and the leaf disease-specific feature set', part=P,
+         data='5148 training leaves only; the leaf DSF is the input of L6.',
          what='For each task, leaf OW + VI are pooled and the largest-VIF feature is removed until all VIF < 10; the rest is the leaf DSF.',
          why='Collinear inputs make leaf models unstable.',
          do=['Iterative VIF removal to VIF < 10.'],
          check=['Leaf DSF of Tasks A, B, C.'],
          out='Leaf DSF → L5.6, L6, L9.',
-         papers=[('Lv et al. (2023)', 'Southern corn leaf blight; VIF < 10 before SFFS.', 'Same rule.')])
+         papers=[('Lv et al. (2023)', 'Southern corn leaf blight; features with VIF above 10 not used for modelling.', 'Same rule.')])
     step('L5.6', 'Separability of the leaf grades (Jeffries–Matusita distance)', part=P,
+         data='5148 training leaves (leaf DSF of Task B).',
          what='Jeffries–Matusita (JM) distance between every pair of grades on the leaf DSF of Task B.',
          why='Shows which grades the selected features separate before any classifier.',
          do=['JM = 2(1 − e^{−B}), B = Bhattacharyya distance under Gaussian class distributions; all 15 grade pairs.'],
@@ -99,6 +106,7 @@ def add():
          out='Separability → interpretation of L7.',
          papers=[('Mandal et al. (2023)', 'Rice blast; JM distance between severity levels; almost all levels separable (JM > 1.92) except levels 4 and 5.', 'Same JM analysis.')])
     step('L5.7', 'Principal component analysis of the leaf spectra', part=P,
+         data='All 7488 leaves: description only.',
          what='PCA of standardised 5-nm reflectance; scores of the first components with grade ellipses.',
          why='Shows the main structure of the data and the overlap of grades.',
          do=['PCA on all leaves; plot PC1–PC2 and PC1–PC3 with 95% ellipses per grade; loadings plot.'],
@@ -110,9 +118,9 @@ def add():
 
     h2('L6–L10 – Leaf models, evaluation and links')
     step('L6', 'Leaf models', part=P,
-         what='The leaf selection chain (L5.2–L5.5) is repeated on the training leaves; SVM/SVR, random forest, k-NN and PLS-DA/PLSR (SFFS + grid search, GroupKFold(3)), DNN-F1 (all tasks) and the four pseudo-image networks (Tasks A, B; settings of Step 2.6) are trained.',
+         what='The leaf DSF of L5.5 (selected on the training leaves) is the input; SVM/SVR, random forest, k-NN and PLS-DA/PLSR (SFFS + grid search, GroupKFold(3)), DNN-F1 (all tasks) and the four pseudo-image networks (Tasks A, B; settings of Step 2.6) are trained.',
          why='Gives the leaf-level detection and grading models and shows how much information a single leaf spectrum carries.',
-         do=['Selection on training leaves only.', 'ML: SFFS (≤ 15) and grid search as Steps 2.3–2.4; refit on all training leaves.', 'Networks: fit on 22 plots, early stopping on 11 validation plots, model with the highest validation OA.', 'Predict the test leaves once.'],
+         do=['Use the leaf DSF of L5.5 unchanged.', 'ML: SFFS (≤ 15) and grid search as Steps 2.3–2.4; refit on all training leaves.', 'Networks: fit on 22 plots, early stopping on 11 validation plots, model with the highest validation OA.', 'Predict the test leaves once.'],
          check=['Models and test predictions for all model types × tasks.'],
          out='Leaf predictions → L7.',
          papers=[('Ma et al. (2026)', 'Rice blast; DT-EDNet and comparison networks with identical settings.', 'Same networks and settings.'),
@@ -126,7 +134,7 @@ def add():
          check=['One metric row per model × task.'],
          out='Leaf results → L9, conclusions.',
          papers=[('Ma et al. (2026)', 'Rice blast; OA, kappa, macro recall, macro-F1 and per-class scores.', 'Same classification metrics.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; OA, macro-F1 and kappa for detection and severity.', 'Same metrics at leaf level.'),
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; overall accuracy and macro-F1 for asymptomatic detection, symptomatic detection and severity classes.', 'Same metrics at leaf level.'),
                  ('Mandal et al. (2023)', 'Rice blast; R², RMSE and RPD.', 'Regression metrics.')])
     step('L8', 'Leaf covariate baseline', part=P,
          what='Covariate-only model (DAI, variety, sowing date, stage, leaf position, weather), leaf-spectrum model and leaf spectrum + covariates, on the same training and test leaves.',
@@ -150,7 +158,7 @@ def add():
     step('L10', 'Pre-symptomatic leaves', part=P,
          what='Leaves of 1, 4 and 7 January: healthy = leaves of tagged plants in healthy plots; later-infected = leaves of tagged plants in inoculated plots that show pustules later; the leaf selection chain and models are run for this binary task.',
          why='Tests whether the leaf spectrum shows white rust before symptoms and compares this with the canopy (Objective 3).',
-         do=['Label by the later status of the tagged plant.', 'Selection (L5.2–L5.5) with the binary label on training leaves; ML models and DNN-F1; test leaves once; metrics by date.'],
+         do=['Label by the later status of the tagged plant; normalise the leaf spectra to the healthy baseline as in Step 3.2 (Lv et al., 2023).', 'Selection (L5.2–L5.5) with the binary label on training leaves; ML models and DNN-F1; test leaves once; metrics by date.'],
          check=['Pre-symptomatic leaf metrics per date.'],
          out='Earliest leaf detection → comparison with 3.5.',
          papers=[('Gold et al. (2020)', 'Potato late and early blight; leaf spectra detected infection before symptoms.', 'Pre-symptomatic leaf spectra.'),

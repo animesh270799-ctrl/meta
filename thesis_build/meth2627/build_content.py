@@ -42,13 +42,14 @@ def references(text):
 
 FULL = {'Ma et al. (2026)', 'Guo et al. (2021)', 'Yu et al. (2021)', 'Liu et al. (2020)', 'Zheng et al. (2018)', 'Liu et al. (2026)', 'Blasch et al. (2023)', 'Yuan et al. (2025)',
         'Chattopadhyay et al. (2011)', 'Conn et al. (1990)', 'Mishra et al. (2009)', 'Zhang et al. (2014a)', 'Liu et al. (2024)', 'Bijlwan et al. (2025)', 'Feng et al. (2022)',
-        'Ruan et al. (2022)', 'Zhu et al. (2017)', 'Zhang et al. (2022)', 'Poblete et al. (2023)', 'Guo et al. (2021); Feng et al. (2022)'}
+        'Ruan et al. (2022)', 'Zhu et al. (2017)', 'Zhang et al. (2022)', 'Poblete et al. (2023)', 'Guo et al. (2021); Feng et al. (2022)',
+        'Lv et al. (2023)', 'Calderón et al. (2014)', 'Oerke et al. (2006)', 'Zarco-Tejada et al. (2018)'}
 CONF = set()
 def mark(r):
     parts = [x.strip() for x in r.split(';')]
     return '; '.join(('✓ ' if p in FULL else ('! ' if p in CONF else '○ ')) + p for p in parts)
 dsl.h1('13. Cross-check of every step against its references')
-dsl.p('Every step was checked against the disease papers in its table. ✓ = the paper\'s description was checked in the full text during this revision (including the PDFs supplied for Chattopadhyay et al. (2011), Conn et al. (1990), Mishra et al. (2009), Zhang et al. (2014a), Liu et al. (2024), Bijlwan et al. (2025), Feng et al. (2022), Ruan et al. (2022) and Zhu et al. (2017)); ○ = description taken from the paper as read for the earlier methodology documents (abstract and methods), full text not re-checked in this revision.')
+dsl.p('Every step was checked against the disease papers in its table. ✓ = the paper\'s description was checked in the full text during this revision (including the PDFs supplied for Chattopadhyay et al. (2011), Conn et al. (1990), Mishra et al. (2009), Zhang et al. (2014a), Liu et al. (2024), Bijlwan et al. (2025), Feng et al. (2022), Ruan et al. (2022), Zhu et al. (2017), Lv et al. (2023), Calderón et al. (2014), Oerke et al. (2006) and Zarco-Tejada et al. (2018)); ○ = description taken from the paper as read for the earlier methodology documents (abstract and methods), full text not re-checked in this revision.')
 rows = [['Step', 'Title', 'Disease papers and check status']] + [[c, t, '\n'.join(mark(r) for r in refs)] for c, t, refs in c_lib.PAPERS]
 dsl.tab('crosscheck', rows=rows, caption='Cross-check of the references of every step.', widths=[900, 3300, 5400], size=15, nokeep=True)
 refs, missing = references(alltext(dsl.B))

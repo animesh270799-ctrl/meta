@@ -97,7 +97,7 @@ def add():
          q='Is one plant per subplot enough? → It gives 576 leaves per date, as many per date as the 2025-26 ASD data (419–648 leaves per date), and more than the 800 leaves of a whole rice blast leaf study (Selvaprakash et al., 2026).',
          papers=[('Mandal et al. (2023)', 'Rice blast; leaf spectra with a handheld spectroradiometer (350–2500 nm) of leaves scored on the 0–9 scale.', 'Leaf spectra of graded leaves, full range.'),
                  ('Chen et al. (2023)', 'Tobacco TMV and PVY; leaves measured with an ASD FieldSpec 4 (350–2500 nm) and graded 0, 1, 3, 5, 7, 9.', 'Same instrument class and grade scale.'),
-                 ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra (350–2500 nm) for asymptomatic detection and severity classes.', 'Leaf clip with its own lamp.'),
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra (portable spectroradiometer with the halogen lamp of the clip; white and black panels of the clip) of healthy and infected leaves for asymptomatic detection and severity classes.', 'Leaf clip with its own lamp.'),
                  ('Selvaprakash et al. (2026)', 'Rice blast (IARI); 800 leaf spectra (350–2500 nm) used for early detection.', 'A leaf data set of similar size per date is sufficient for leaf models.'),
                  ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; spectra in contact with the leaf estimated severity better than spectra taken above the crop.', 'Contact measurement of single leaves.'),
                  ('Yu et al. (2021)', 'Pine wilt disease; field portable spectrometer measurements collected with UAV hyperspectral images.', 'Leaf spectra collected on the same dates as the UAV flights.'),
@@ -138,14 +138,13 @@ def add():
                  ('Blasch et al. (2023)', 'Wheat rusts; detection by UAV changed with the crop growth stage.', 'Growth stage recorded so that results can be reported by stage.')])
 
     step('A7', 'Biochemical and biophysical parameters', part=PART,
-         what='Pigments, anthocyanin, protein, relative water content, membrane stability, gas exchange and leaf area index are measured on four dates.',
+         what='Pigments, anthocyanin, protein, relative water content, membrane stability and gas exchange (10 parameters) are measured on four dates.',
          why='They show what white rust does to the plant and explain the camera responses (Activity 1.7); they are not model inputs.',
          do=['Dates: 7 January (pre-symptomatic), 18 January, 8 February and 1 March 2027, on flight days.',
              'One designated subplot per plot, rotated so that each subplot position is sampled in 12 plots (position = plot number modulo 4, plus 1).',
              'Gas exchange on leaf L3 of the centre (ASD) plant of that subplot, 09:30–11:30 h, before the flight.',
-             'Laboratory samples: L3 leaves of 3 untagged plants of the same subplot, kept cool and processed the same day.',
-             'Leaf area index in all four subplots under diffuse light.'],
-         check=['48 samples per parameter and date; LAI 192 per date.', 'Sample codes join to plot, subplot and date.'],
+             'Laboratory samples: L3 leaves of 3 untagged plants of the same subplot, kept cool and processed the same day.'],
+         check=['48 samples per parameter and date.', 'Sample codes join to plot, subplot and date.'],
          out='Parameter table → 1.7, 3.1.',
          papers=[('Mishra et al. (2009)', 'White rust of Indian mustard; protein, total phenols, total, reducing and non-reducing sugars of inoculated leaves of six genotypes related to the disease index.', 'Biochemical parameters of infected vs healthy plants of the same host–pathogen system.'),
                  ('Calderón et al. (2013)', 'Verticillium wilt of olive; airborne fluorescence, temperature and narrow-band indices related to disease severity and to field physiological measurements.', 'Plant physiology measured to explain thermal and spectral signals.'),
@@ -157,7 +156,7 @@ def add():
             ['Chlorophyll a, b (mg g^{−1} FW)', 'DMSO extraction; absorbance 645, 663 nm', 'Hiscox and Israelstam (1979); Wellburn (1994)'], ['Carotenoids (mg g^{−1} FW)', 'same extract; 470 nm', 'Lichtenthaler and Wellburn (1983); Wellburn (1994)'],
             ['Anthocyanin (mg L^{−1})', 'pH differential, 520 and 700 nm', 'Lee et al. (2005)'], ['Total protein (µg mg^{−1} FW)', 'Bradford dye binding, 595 nm', 'Bradford (1976)'],
             ['Relative water content (%)', '(FW − DW)/(TW − DW) × 100', 'Barrs and Weatherley (1962)'], ['Membrane stability index (%)', 'conductivity at 40 and 100 °C', 'Premachandra et al. (1990); Sairam et al. (1994)'],
-            ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable photosynthesis system', 'Long and Bernacchi (2003)'], ['Leaf area index (m^{2} m^{−2})', 'plant canopy analyser, 1 reading above and 4 below', 'Bréda (2003); Goyal et al. (2021)']]
+            ['Photosynthesis, transpiration, stomatal conductance', 'LI-6400 portable photosynthesis system', 'Long and Bernacchi (2003)']]
     tab('physio', rows=rows, caption='Parameters, methods and method references.', widths=[2800, 3600, 3200], size=16)
 
     step('A8', 'Independent test data at Bharatpur', part=PART,

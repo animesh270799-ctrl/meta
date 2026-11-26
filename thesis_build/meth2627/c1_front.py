@@ -44,7 +44,7 @@ def add():
             ['', '', '3 pre-symptomatic dates', '48 × 4 × 3 = 576 per camera', '396', '180'],
             ['ASD leaf spectrum + leaf grade', 'one leaf on one date', '13 dates', '48 × 4 subplots × 1 centre plant × 3 leaves = 576 per date; 7488 in all', '5148', '2340'],
             ['Disease index (DI)', 'one subplot on one date', '13 dates', 'from the 15 graded leaves of 5 plants per subplot (2880 grades per date)', '–', '–'],
-            ['Biochemical and biophysical parameters', 'one designated subplot per plot', '4 dates', '48 per date (LAI: 192 per date)', '–', '–'],
+            ['Biochemical and biophysical parameters', 'one designated subplot per plot', '4 dates', '48 per parameter and date', '–', '–'],
             ['Covariates (DAI, variety, timing, stage, weather)', 'one subplot on one date', '13 dates', 'one row per sample', '–', '–'],
             ['Bharatpur independent test', 'one quadrat on one date', '2–3 dates', '≥ 300 quadrat-dates', 'not used for training', 'all']]
     tab('datasets', rows=rows, caption='Data collected in 2026-27 and their division between the 33 training plots and the 15 test plots.', widths=[2200, 1500, 1500, 2300, 1100, 1000], size=15)
@@ -62,7 +62,7 @@ def add():
             ['9', 'ASD leaf spectra', '.asd files of the centre plant (2 readings per leaf) and ASCII export; white-reference log', '13 dates', '1152 readings per date (14 976)', 'A4, Part L'],
             ['10', 'Growth stage', 'BBCH stage of every plot', '13 dates', '624 records', 'A6, 1.1.3, 2.10'],
             ['11', 'Weather', 'daily Tmax, Tmin, RH I, RH II, rainfall from the IARI observatory, 1 Dec 2026 – 31 Mar 2027', 'daily', '≈ 120 days', 'A6, 2.9, 3.5, L8'],
-            ['12', 'Biochemical and biophysical parameters', '11 parameters of the designated subplot; LI-6400 and canopy-analyser files', '4 dates', '48 per parameter and date (LAI 192)', 'A7, 1.7'],
+            ['12', 'Biochemical and biophysical parameters', '10 parameters of the designated subplot; LI-6400 files', '4 dates', '48 per parameter and date', 'A7, 1.7'],
             ['13', 'Bharatpur test data', 'images of the 4 cameras, quadrat positions (RTK), scoring sheets (5 plants per quadrat), covariates, local weather', '2–3 dates', '≥ 300 quadrat-dates', 'A8, 2.11'],
             ['14', 'Glasshouse data', 'pot plan, inoculation record, 0–6 severity, ASD spectra', '2, 5, 8, 11 DAI, then weekly', '48 pots', 'A9'],
             ['15', 'Tables made during the analysis', 'subplot ROI means of each camera; feature tables; leaf table; split file (test plots); inner folds and validation plots', 'after Parts B–D', '–', 'all later steps']]
@@ -71,7 +71,7 @@ def add():
     nl('One sample is one subplot on one date (UAV) or one leaf on one date (ASD). All samples of a plot stay together in the training part or in the test part.',
        'The 15 test plots are fixed before the first flight (Step D1) and are used once, at the end.',
        'Every step that learns from the labels (feature selection for the models, tuning, early stopping, scaling constants) uses the 33 training plots only: GroupKFold(3) by plot for machine learning, 11 of the 33 training plots for the early stopping of the networks.',
-       'Objective 1 (description) uses all samples; the same selection steps are repeated on the training plots before any model is built (Step 2.2).',
+       'In Objective 1 (and Part L), descriptive steps use all samples, while every feature-selection step uses the training plots only; the selected features are used unchanged by the models (Ma et al., 2026).',
        'All cameras are measured on the same subplot ROIs; each sample is the field-level average of its ROI (Step B6).',
        'Every sensor model is compared with a covariate-only model, because severity also follows time and weather (Step 2.9).')
     h2('1.6 Main disease papers used')

@@ -174,14 +174,14 @@ for i, (a, b, c, d) in enumerate(lanes):
     for x in (19.5, 42.5, 65.5): arrow(ax, (x, y + 7), (x + 4, y + 7))
     arrow(ax, (81.5, y + 7), (86.5, 50))
 boxes(ax, [(87, 40, 12, 20, 'VIF < 10\n→ DSF of\neach camera\nand task', '#FCE4D6')], fs=8.5)
-ax.text(50, 3, 'Objective 1: chain run on all samples (description). Objectives 2–3: the same chain re-run on the training plots only (model inputs).', ha='center', fontsize=9, style='italic')
+ax.text(50, 3, 'Chain run once on the 33 training plots; its feature sets are used unchanged by the models of Objectives 2–3. Description (curves, correlations) uses all plots.', ha='center', fontsize=9, style='italic')
 save(fig, 'g10_selection_chain.png')
 
 # 11 models + pseudo-image --------------------------------------------------------------------------
 fig, ax = plt.subplots(1, 2, figsize=(11.5, 4.2), gridspec_kw=dict(width_ratios=[1.6, 1]))
 a = ax[0]; a.set_xlim(0, 100); a.set_ylim(0, 100); a.axis('off')
 boxes(a, [(2, 70, 30, 24, 'Machine learning\nSVM/SVR, RF, XGBoost,\nk-NN, PLS-DA/PLSR\n(SFFS ≤ 15 features)', '#DDEBF7'),
-          (36, 70, 30, 24, 'Feature-fusion network\nDNN-F1\n(input-level fusion,\nall three tasks)', '#EDE2F6'),
+          (36, 70, 30, 24, 'Feature-fusion networks\nDNN-F1 (input-level)\nDNN-F2 (camera branches,\nSE attention)', '#EDE2F6'),
           (70, 70, 28, 24, 'Pseudo-image networks\nDT-EDNet, EfficientNet-B0,\nResNet18, ConvNeXt V2\n(Tasks A and B)', '#FCE4D6'),
           (2, 30, 96, 26, 'Same 33 training plots and same 15 test plots for every model and sensor set\nML: SFFS and grid search by GroupKFold(3) over the training plots → refit on all 33 training plots\nNetworks: fit on 22 training plots; early stopping on 11 training plots (one third)\nTest plots: predicted once → OA, kappa, macro-F1, per-class F1; R², RMSE, RPD', '#F2F2F2')], fs=8.6)
 for x in (17, 51, 84): arrow(a, (x, 70), (x, 56.5))

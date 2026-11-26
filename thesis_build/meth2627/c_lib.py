@@ -3,7 +3,7 @@
 from dsl import *
 
 BOX = '☐ '
-ROWS = [('what', 'What is done'), ('why', 'Why at this position'), ('papers', 'Disease papers: what they did'), ('match', 'How my step follows them'),
+ROWS = [('what', 'What is done'), ('why', 'Why at this position'), ('data', 'Samples used'), ('papers', 'Disease papers: what they did'), ('match', 'How my step follows them'),
         ('mine', 'With my data (exact settings)'), ('check', 'Check before the next step'), ('out', 'Output → next step'), ('alt', 'Alternatives and notes'), ('q', 'Likely question → answer')]
 STEPS = []          # (part, code, title) for the master checklist
 PAPERS = []         # (code, title, [references]) for the cross-check table
