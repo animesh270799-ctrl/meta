@@ -109,6 +109,7 @@ def chart(ws, sp, at, data_col, data_row=None, h=9.0, w=17.0):
     ch.title = sp['title']; ch.x_axis.title = sp['xlab'] if kind != 'bar' else None; ch.y_axis.title = sp['ylab']; ch.height = h; ch.width = w; ch.roundedCorners = False
     ch.x_axis.delete = False; ch.y_axis.delete = False; ch.legend.position = 'b'; ch.legend.overlay = False
     if len(ser) == 1 and not sp.get('line_series'): ch.legend = None
+    if sp.get('ymin') is not None: ch.y_axis.scaling.min = sp['ymin']; ch.y_axis.scaling.max = sp.get('ymax')
     if kind in ('line', 'scatter'):
         xs = pd.to_numeric(d.iloc[:, 0], errors='coerce'); ch.x_axis.scaling.min = float(np.floor(xs.min())) if xs.notna().any() else None; ch.x_axis.scaling.max = float(np.ceil(xs.max())) if xs.notna().any() else None
         ch.x_axis.majorGridlines = None
@@ -216,7 +217,8 @@ it = T['l51_index_r'].copy(); hr, fr, lr, _ = table(ws, r, 1, it, 'Table L5.1.1 
 hr, fr, lr, _ = table(ws, r, 1, T['l51_index_means'], 'Table L5.1.2 – Mean of every index for each grade'); r = lr + 2
 hr, fr, lr, _ = table(ws, r, 1, T['l51_strata'], 'Table L5.1.3 – Strata: leaves, grade distribution, highest |r| and REP'); r = lr + 2
 put(ws, r, 1, 'Full curves (mean ± SD per grade, % difference, r) are in the chart data of the figures below and in L5.1_Formulas.', FNOTE); r += 2
-charts_block(ws, ['c11', 'c12', 'c13', 'c14', 'c15', 'c16', 'c17'], r)
+hr, fr, lr, _ = table(ws, r, 1, T['l51_rededge'], 'Table L5.1.4 – Red-edge parameters by grade (all leaves): REP, Dr, SDr'); r = lr + 2
+charts_block(ws, ['c11', 'c12', 'c12b', 'c12c', 'c12d', 'c13', 'c14', 'c15', 'c16', 'c17'], r)
 # formulas: mean spectra and r recomputed from Data_R5
 ws = sheet('L5.1_Formulas', '548235'); put(ws, 1, 1, 'Cross-check of Step L5.1: mean reflectance of each grade (AVERAGEIFS) and Pearson r with the grade (CORREL) computed by Excel from sheet Data_R5; Python values alongside.', FS)
 hdr = ['Wavelength (nm)'] + ['Mean grade %d (Excel)' % g for g in C.GRADES] + ['r with grade (Excel)', 'Mean grade 0 (Python)', 'Mean grade 9 (Python)', 'r with grade (Python)', '|Excel − Python| max']

@@ -15,7 +15,7 @@ charts = {}
 for s in SP:
     d = s['data']; x = d.iloc[:, 0]
     charts[s['id']] = dict(id=s['id'], kind=s['kind'], title=s['title'], xlab=s['xlab'], ylab=s['ylab'], colors=s['colors'], note=s['note'], labels_on=bool(s.get('labels')), markers=bool(s.get('markers')),
-                           line_series=s.get('line_series', []), point_colors=s.get('point_colors'), x=[clean(v) for v in x] if s['kind'] == 'scatter' else [lab(v) for v in x],
+                           line_series=s.get('line_series', []), point_colors=s.get('point_colors'), ymin=s.get('ymin'), ymax=s.get('ymax'), x=[clean(v) for v in x] if s['kind'] == 'scatter' else [lab(v) for v in x],
                            series=[dict(name=c, values=[clean(v) for v in d[c]]) for c in s['series']])
 def rows(df, fmt=None, cols=None):
     df = df[cols] if cols else df; out = [list(map(str, df.columns))]

@@ -31,6 +31,7 @@ def draw(s):
         (ax.set_yticks if s['kind'] == 'bar' else ax.set_xticks)(k); (ax.set_yticklabels if s['kind'] == 'bar' else ax.set_xticklabels)([str(v) for v in x], rotation=0 if s['kind'] == 'bar' or len(d) < 8 else 45, ha='right' if (s['kind'] == 'col' and len(d) >= 8) or s['kind'] == 'bar' else 'center', fontsize=8)
         if s['kind'] == 'bar': ax.grid(axis='y', visible=False)
         else: ax.grid(axis='x', visible=False)
+    if s.get('ymin') is not None: ax.set_ylim(s['ymin'], s.get('ymax'))
     ax.set_xlabel(s['xlab'] if s['kind'] != 'bar' else s['ylab']); ax.set_ylabel(s['ylab'] if s['kind'] != 'bar' else s['xlab']); ax.set_title(s['title'], loc='left')
     if n > 1 or s['kind'] == 'scatter': ax.legend(ncol=min(n, 4) if n > 3 else 1, loc='best')
     fig.savefig(os.path.join(FG, s['id'] + '.png')); plt.close(fig)

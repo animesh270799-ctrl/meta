@@ -42,6 +42,7 @@ function chart(s, id, x, y, w, h, o = {}) {
     if (c.point_colors && c.series.length === 1) base.chartColors = c.point_colors;
     if (c.labels_on) Object.assign(base, { showValue: true, dataLabelPosition: 'outEnd', dataLabelFontSize: 8, dataLabelColor: '404040', dataLabelFormatCode: fmtLabel(c.series.flatMap(r => r.values)) });
   }
+  if (c.ymin !== null && c.ymin !== undefined) { base.valAxisMinVal = c.ymin; base.valAxisMaxVal = c.ymax; }
   s.addChart(type, data, Object.assign(base, o));
 }
 function tbl(s, rows, x, y, w, colW, fs = 11, o = {}) {
@@ -75,6 +76,20 @@ function card(code) {
   banner(s, st.output); refs(s, st.refs); return s;
 }
 const F = D.facts, T = D.tabs, R = (c) => ST[c] ? ST[c].refs : '';
+function redEdge() {
+  const s = slide('L5.1 results: red-edge first derivative and blue shift'); const RE = F.rededge;
+  chart(s, 'c12b', 0.4, 1.08, 8.0, 4.35, { lineSize: 2.25 });
+  chart(s, 'c12c', 8.6, 1.08, 4.3, 2.45); chart(s, 'c12d', 8.6, 3.58, 4.3, 2.45);
+  s.addText('The red-edge peak of the first derivative falls and shifts to shorter wavelengths as the grade rises (chlorophyll loss and pustules).', { x: 0.4, y: 5.48, w: 3.9, h: 0.62, fontSize: 12, italic: true, color: '1A1A1A', fontFace: 'Calibri', valign: 'middle', isTextBox: true, margin: 0 });
+  const box = (x, big, small, col, fill) => { s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 5.45, w: 2.0, h: 0.66, fill: { color: fill }, line: { color: col, width: 1.25 }, rectRadius: 0.06, objectName: 'stat ' + small });
+    s.addText([{ text: big, options: { bold: true, fontSize: 15, color: col, breakLine: true } }, { text: small, options: { fontSize: 10.5, color: '1A1A1A' } }], { x, y: 5.45, w: 2.0, h: 0.66, align: 'center', valign: 'middle', fontFace: 'Calibri', isTextBox: true, margin: 0.02 }); };
+  box(4.4, RE.rep[0].toFixed(1) + ' → ' + RE.rep[5].toFixed(1), 'REP (nm): blue shift ' + (RE.rep[0] - RE.rep[5]).toFixed(1) + ' nm', '8A6100', 'FFF4D9');
+  box(6.5, RE.dr[0].toFixed(1) + ' → ' + RE.dr[5].toFixed(1), 'Dr (×10⁻³): −' + (100 * (1 - RE.dr[5] / RE.dr[0])).toFixed(0) + '%', '2E7D32', 'E2EFDA');
+  banner(s, 'Grade 0 → 9: REP ' + RE.rep[0].toFixed(1) + ' → ' + RE.rep[5].toFixed(1) + ' nm (r = ' + RE.r_rep.toFixed(2) + ' with grade); Dr ' + RE.dr[0].toFixed(1) + ' → ' + RE.dr[5].toFixed(1) + ' ×10⁻³ (r = ' + RE.r_dr.toFixed(2) + '); ' + F.n_final + ' leaves.', 6.17);
+  refs(s, 'Horler et al. (1983); Filella and Peñuelas (1994); Cho and Skidmore (2006); Mahlein et al. (2010); Zhang et al. (2012).');
+  s.addNotes('Mean first derivative of the leaf spectra of each grade (all 2255 leaves). The red-edge peak near 700–710 nm is lower and lies at shorter wavelengths in diseased leaves: the red-edge position falls from 709.0 nm (grade 0) to 701.4 nm (grade 9), and the peak height Dr falls by about 16%. Both follow from the loss of chlorophyll and damage to the leaf tissue under white rust pustules.');
+}
+if (process.env.ONLY === 'rededge') { pres.addSection({ title: 'Red edge' }); SEC = 'Red edge'; redEdge(); pres.writeFile({ fileName: OUT }).then(async () => { await applyTheme(OUT, THEME); console.log('written', OUT); }); return; }
 // ======================================================================= slides
 pres.addSection({ title: 'Introduction' }); let s = pres.addSlide({ masterName: 'TITLE', sectionTitle: 'Introduction' });
 s.addText('Part L analysis of the 2025-26 ASD leaf spectra', { x: 0.8, y: 1.6, w: 11.7, h: 1.0, fontSize: 36, bold: true, color: 'FFFFFF', fontFace: 'Cambria', isTextBox: true });
@@ -132,6 +147,7 @@ banner(s, '51 features per leaf; the red-edge and pigment indices (RVSI, HI, RR,
 section('Step L5.1 – Leaf response to white rust', 'Mean spectra, differences from healthy leaves and correlation with the grade (all leaves)'); card('L5.1');
 s = slide('L5.1 results: mean reflectance and first derivative of each grade'); chart(s, 'c11', 0.4, 1.1, 6.2, 4.95); chart(s, 'c12', 6.7, 1.1, 6.2, 4.95);
 banner(s, 'With severity: visible reflectance rises, NIR falls, SWIR rises; the red-edge peak drops and moves to shorter wavelengths (REP ' + F.l51.REP_by_grade['0'].toFixed(1) + ' → ' + F.l51.REP_by_grade['9'].toFixed(1) + ' nm).'); refs(s, R('L5.1'));
+redEdge();
 s = slide('L5.1 results: difference from grade 0 and correlation with the grade'); chart(s, 'c13', 0.4, 1.1, 6.2, 4.95); chart(s, 'c14', 6.7, 1.1, 6.2, 4.95);
 banner(s, 'Largest change in the red edge and green peak; highest |r|: FD ' + F.l51.max_abs_r_FD.toFixed(3) + ' at ' + F.l51.wl_max_r_FD + ' nm; reflectance ' + F.l51.max_abs_r_R.toFixed(3) + ' at ' + F.l51.wl_max_r_R + ' nm.'); refs(s, R('L5.1'));
 s = slide('L5.1 results: is the response the same in every stratum?'); chart(s, 'c16', 0.4, 1.1, 6.2, 4.95); chart(s, 'c17', 6.7, 1.1, 6.2, 4.95);

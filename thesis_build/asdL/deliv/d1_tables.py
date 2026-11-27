@@ -59,6 +59,10 @@ T['l4_values'] = pd.concat([leaf[['leaf_id', 'date', 'plot', 'leaf', 'grade', 's
 sp = rd('L5_1_spectra_by_grade.csv'); T['l51_spectra'] = sp
 T['l51_index_r'] = ir.reset_index().rename(columns={'index': 'Index', 'r_with_grade': 'r', 'abs_r': '|r|'}).merge(L4D[['Index', 'Group', 'Reference']], on='Index', how='left')
 im = rd('L5_1_index_means_by_grade.csv', index_col=0); T['l51_index_means'] = im.reset_index().rename(columns={'index': 'Index'})
+re_ = pd.concat([M[['grade']], idx[['REP', 'Dr', 'SDr']]], axis=1).groupby('grade').agg(['mean', 'std'])
+T['l51_rededge'] = pd.DataFrame({'Grade': ['Grade %d' % g for g in GR], 'REP mean (nm)': re_[('REP', 'mean')].values, 'REP SD (nm)': re_[('REP', 'std')].values,
+                                 'Dr mean (×10⁻³ nm⁻¹)': re_[('Dr', 'mean')].values * 1000, 'Dr SD (×10⁻³ nm⁻¹)': re_[('Dr', 'std')].values * 1000, 'SDr mean': re_[('SDr', 'mean')].values, 'Leaves': [int((M.grade == g).sum()) for g in GR]})
+F['rededge'] = dict(rep=[float(x) for x in re_[('REP', 'mean')].values], dr=[float(x) * 1000 for x in re_[('Dr', 'mean')].values], r_rep=float(ir.loc['REP', 'r_with_grade']), r_dr=float(ir.loc['Dr', 'r_with_grade']), r_sdr=float(ir.loc['SDr', 'r_with_grade']))
 T['l51_strata'] = rd('L5_1_strata.csv'); rs = rd('L5_1_r_by_stratum.csv'); T['l51_r_strata'] = rs
 F['l51'] = json.load(open(os.path.join(O, 'L5_1_summary.json')))
 # ---------------- L5.7 PCA

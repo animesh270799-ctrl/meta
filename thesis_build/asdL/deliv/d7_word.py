@@ -70,7 +70,7 @@ p('Savitzky–Golay smoothing removed instrument noise (residual SD 0.00018 refl
 step_header('L4', ST['L4']['title'])
 dtab(T['l4_defs'], 'The 48 published indices and three red-edge parameters with formula, original reference and Pearson r with the leaf grade (all leaves).', widths=[2100, 1100, 3600, 1900, 900], size=13)
 step_header('L5.1', ST['L5.1']['title'])
-fig('c11'); fig('c12'); fig('c13'); fig('c14')
+fig('c11'); fig('c12'); fig('c12b'); dtab(T['l51_rededge'], 'Red-edge parameters by grade (all leaves): REP, Dr and SDr (mean and SD).', size=13); fig('c12c'); fig('c12d'); fig('c13'); fig('c14')
 p('Reflectance rises in the visible and SWIR and falls in the NIR with increasing grade; the red-edge peak of the first derivative falls and shifts to shorter wavelengths (REP %.1f nm at grade 0 to %.1f nm at grade 9). The first derivative is more strongly correlated with the grade (|r| up to %.3f at %d nm) than reflectance (|r| up to %.3f at %d nm).' % (F['l51']['REP_by_grade']['0'], F['l51']['REP_by_grade']['9'], F['l51']['max_abs_r_FD'], F['l51']['wl_max_r_FD'], F['l51']['max_abs_r_R'], F['l51']['wl_max_r_R']))
 dtab(T['l51_index_r'][['Index', 'r', '|r|', 'Group']].head(20), 'The 20 indices most correlated with the leaf grade (all leaves).', widths=[2000, 1500, 1500, 4600]); fig('c15')
 dtab(T['l51_index_means'], 'Mean of every index for each grade.', size=13)
