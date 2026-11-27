@@ -24,3 +24,14 @@ thesis_build/splitcmp/fig/
 thesis_build/splitcmp/c3_build.js
 thesis_build/splitcmp/*.log
 thesis_build/splitcmp/master.done
+thesis_build/asdL/out/
+thesis_build/asdL/deliv/fig/
+thesis_build/asdL/deliv/*.xlsx
+thesis_build/asdL/deliv/*.pptx
+thesis_build/asdL/deliv/*.docx
+thesis_build/asdL/deliv/*.pdf
+thesis_build/asdL/deliv/tables.pkl
+thesis_build/asdL/deliv/content.json
+thesis_build/asdL/deliv/pptdata.json
+thesis_build/asdL/deliv/figlist.json
+thesis_build/asdL/deliv/facts.json
