@@ -7,7 +7,7 @@ from mlxtend.feature_selection import SequentialFeatureSelector as SFS
 import configL as C
 from lmods import base
 O = C.OUT; M = pd.read_csv(os.path.join(O, 'L2_meta.csv')); ALL = pd.read_csv(os.path.join(O, 'L5_all_features.csv')); SEL = json.load(open(os.path.join(O, 'L5_selection.json')))
-BM = json.load(open(os.path.join(O, 'L7_best.json')))['best_ml']; N = int(sys.argv[1]) if len(sys.argv) > 1 else 100; N_RF = int(sys.argv[2]) if len(sys.argv) > 2 else 20   # RF: 20 divisions with 100 trees (run time, DEV-6)
+BM = json.load(open(os.path.join(O, 'L7_best.json')))['best_ml']; N = int(sys.argv[1]) if len(sys.argv) > 1 else 50; N_RF = int(sys.argv[2]) if len(sys.argv) > 2 else 20   # run time (DEV-6): 50 divisions for SVM/k-NN/PLS, 20 with 100 trees for RF (methodology: 100)
 tr = (M.split == 'TRAIN').values; pl = M['plot'].values[tr]; up = np.unique(pl)
 Y = {'A': M.diseased.values.astype(int), 'B': M.grade.map({g: i for i, g in enumerate(C.GRADES)}).values.astype(int), 'C': M.grade.values.astype(float)}
 SC = {'A': 'f1_macro', 'B': 'f1_macro', 'C': 'neg_root_mean_squared_error'}; rows, freq = [], []

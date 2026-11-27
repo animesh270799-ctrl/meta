@@ -7,10 +7,23 @@ import re
 def clean(s):
     if not isinstance(s, str): return s
     s = s.replace('^{2}', '²').replace('^{−1}', '⁻¹'); return re.sub(r'[_^]\{([^}]*)\}', r'\1', s)
+def stab(T):
+    q = T['l6_stab_freq']; parts = []
+    for t in 'ABC':
+        d = q[q.task == t]; hi = d[d.frequency >= 0.9].sort_values('frequency', ascending=False)
+        parts.append('%s (%s): %s' % (t, d.model.iloc[0], ', '.join(hi.feature)))
+    common = set.intersection(*[set(q[(q.task == t) & (q.frequency >= 0.9)].feature) for t in 'ABC'])
+    return 'SFFS stability – features chosen in ≥ 90% of the repeated divisions: ' + '; '.join(parts) + ('. Stable in all three tasks: %s.' % ', '.join(sorted(common)) if common else '.')
+def lres(T):
+    g = T['l8_gains']; g = g[g.scope == 'all test leaves'].set_index(['task', 'gain'])
+    sig = all(g.loc[(t, 'dS'), 'CI_low'] > 0 for t in 'ABC')
+    return ('The leaf spectrum adds to the covariates in every task (ΔS 95%% CI above 0: A %+.2f, B %+.2f, C %+.2f); adding the covariates to the spectrum changed little (B %+.3f, C %+.3f) and lowered the task-A network (%+.2f).'
+            % (g.loc[('A', 'dS'), 'value'], g.loc[('B', 'dS'), 'value'], g.loc[('C', 'dS'), 'value'], g.loc[('B', 'dC'), 'value'], g.loc[('C', 'dC'), 'value'], g.loc[('A', 'dC'), 'value'])) if sig else \
+           'ΔS: A %+.2f, B %+.2f, C %+.2f (see CIs).' % (g.loc[('A', 'dS'), 'value'], g.loc[('B', 'dS'), 'value'], g.loc[('C', 'dS'), 'value'])
 def steps(T, F):
     g = F['grade_counts']; l52 = F['l52']; l53 = F['l53']; S = []
     def add(code, title, sheet, position, samples, settings, mydata, result, output, notes, mrefs, q, figs=()):
-        js = SJ.get(code, {}); S.append(dict(code=code, title=title, sheet=sheet, why=clean(js.get('why', '')), what=clean(js.get('what', '')), position=position, samples=samples, settings=settings,
+        js = SJ.get(code, {}); S.append(dict(code=code, title=title, sheet=sheet, why=clean(js.get('why', '')), what=clean(js.get('what', '')).replace('(DAI,', '(DAS – days after sowing, natural infection –'), position=position, samples=samples, settings=settings,
                                              papers=[(p[0], clean(p[1])) for p in js.get('papers', [])], mydata=mydata, result=result, output=output, notes=notes, mrefs=mrefs, q=q, figs=list(figs)))
     add('L1', 'Leaf table and data checks', 'L1', 'First step: raw ASD files → leaf table. Feeds L2 (split) and L3 (pre-processing).', 'All spectra of the four dates (11 Feb, 24 Feb, 3 Mar, 13 Mar 2026).',
         'Leaf positions L3, L5, LL; grades 0, 1, 3, 5, 7, 9; exact duplicates removed; Isolation Forest (300 trees, contamination "auto", seed 42) within each date × grade on 10-nm means; removal only if faulty (reflectance < 0 or > 1).',
@@ -99,7 +112,7 @@ def steps(T, F):
         dtxt = ['Networks: %d runs (DNN-F1 for A, B, C; four image networks for A, B); early stopping chose epochs %d–%d; best validation OA %.3f (task A) and %.3f (task B).' % (len(dl), dl.best_epoch.min(), dl.best_epoch.max(), dl[dl.task == 'A'].best_val.max(), dl[dl.task == 'B'].best_val.max())] if len(dl) else []
         add('L6', 'Leaf models: machine learning and networks', 'L6', 'After L5.5 (DSF); models are tested once in L7.', 'Training leaves: ML on all %d (GroupKFold(3) by plot); networks fitted on %d and early-stopped on %d validation-plot leaves.' % (F['n_train'], F['n_fit'], F['n_val']),
             'ML: SFFS (mlxtend, floating, 1–15 features, default settings SVM C = 1 γ = scale, RF 500 trees, k-NN k = 5, PLS 2 components) → grid search (SVM C {0.1, 1, 10, 100}, γ {0.001, 0.01, 0.1, scale}, ε {0.1, 0.5}; RF max_features {sqrt, 0.3}, min_samples_leaf {1, 3, 5}; k-NN k {3–11}, uniform/distance; PLS 1–15) → refit on all training leaves; balanced class weights. Networks: AdamW 6e-4, weight decay 1e-5, cosine to 1e-6, 300 epochs, patience 60, batch 32, label smoothing 0.01, gradient clip 1.2; model of the epoch with the highest validation OA (lowest RMSE for Task C); pseudo-image k = ⌈√p⌉.',
-            rows + dtxt, ['See L7 for the test results.'], 'Fitted models (L6_models folder) and test predictions → L7.', 'SFFS stability (repeated random GroupKFold(3) divisions) is reported for the best ML model of each task.',
+            rows + dtxt, ([stab(T)] if len(T.get('l6_stab_freq', [])) else []) + ['Test results in Step L7.'], 'Fitted models (L6_models folder) and test predictions → L7.', 'SFFS stability for the best ML model of each task: SFFS repeated over 50 random GroupKFold(3) divisions (SVM, tasks A, B) and 20 divisions with 100 trees (RF, task C); methodology: 100 (run time, DEV-6).',
             ['Pudil et al. (1994)', 'Cortes and Vapnik (1995)', 'Breiman (2001)', 'Wold et al. (2001)', 'Barker and Rayens (2003)', 'He et al. (2016)', 'Tan and Le (2019)', 'Woo et al. (2023)', 'Loshchilov and Hutter (2019)'],
             'Why SFFS after VIF? → VIF removes collinearity without looking at the model; SFFS keeps only the features that improve the inner-fold score of each model.', ['c31a', 'c31b', 'c31c', 'c32a', 'c32b', 'c32c', 'c40a', 'c40b', 'c40c'])
     if 'l7_metrics' in T:
@@ -117,7 +130,7 @@ def steps(T, F):
         m = T['l8_models']; gtxt = ['%s: M0 %.3f, M1 %.3f, M2 %.3f → ΔS = %+.3f, ΔC = %+.3f.' % (TN[r.task], r.M0, r.M1, r.M2, r.dS, r.dC) for r in m.itertuples()]
         add('L8', 'Leaf covariate baseline', 'L8', 'After L7; credits the leaf spectrum only with what it adds to time, crop and weather.', 'Same training (%d) and test (%d) leaves.' % (F['n_train'], F['n_test']),
             'M0 = random forest on covariates only (DAS, variety, sowing date, growth stage, leaf position, 7-day weather ending the day before sampling, favourable days since sowing), tuned with GroupKFold(3) (grid of Step 2.4); M1 = best leaf model of L7; M2 = M1 model type on DSF + covariates (SFFS and grid repeated); ΔS = M1 − M0, ΔC = M2 − M1; plot-bootstrap 95% CI.',
-            gtxt, ['Read with care: in one season each date has one weather value for all plots, so M0 learns date and crop differences (within-season baseline).'], 'Gains table → conclusions.', 'Favourable-day rules: leaf infection Tmax 16–24 °C, morning RH > 97%, afternoon RH > 40% (Chattopadhyay et al., 2011).',
+            gtxt, [lres(T)] + ['Read with care: in one season each date has one weather value for all plots, so M0 learns date and crop differences (within-season baseline).'], 'Gains table → conclusions.', 'Favourable-day rules: leaf infection Tmax 16–24 °C, morning RH > 97%, afternoon RH > 40% (Chattopadhyay et al., 2011).',
             ['Chattopadhyay et al. (2011)'], 'Why compare with a weather model? → Disease rises with time and weather, so a spectral model can look good by learning the calendar; ΔS shows what the spectrum adds (Zhang et al., 2014a).', ['c41', 'c42', 'c43'])
     if 'l9_transfer' in T:
         tf = T['l9_transfer'].set_index('feature'); l9 = F['l9']

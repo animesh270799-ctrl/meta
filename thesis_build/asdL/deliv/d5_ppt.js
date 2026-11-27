@@ -197,8 +197,8 @@ if (ST.L7) {
 if (ST.L8) {
   section('Step L8 – Covariate baseline', 'What does the leaf spectrum add to time, crop and weather?'); card('L8');
   s = slide('L8 results: M0, M1, M2 and the gains'); chart(s, 'c41', 0.4, 1.1, 6.2, 3.2); tbl(s, T.l8, 0.4, 4.4, 6.2, [1.6, 0.9, 1.0, 1.0, 0.85, 0.85], 9.5); chart(s, 'c42', 6.75, 1.1, 6.15, 4.95);
-  banner(s, ST.L8.mydata.join(' ').slice(0, 220)); refs(s, R('L8') + '; Zhang et al. (2014a)');
-  if (D.charts.c43) { s = slide('L8 results: covariate importance and bootstrap intervals'); chart(s, 'c43', 0.4, 1.1, 6.2, 4.95); tbl(s, T.l8ci, 6.8, 1.2, 6.1, [0.8, 1.2, 1.5, 2.6], 11); banner(s, ST.L8.result[0]); refs(s, R('L8')); }
+  banner(s, ST.L8.result[0].length > 190 ? 'Leaf spectrum adds to the covariates in every task (ΔS > 0, CI above 0); covariates add little to the spectrum.' : ST.L8.result[0]); refs(s, R('L8') + '; Zhang et al. (2014a)');
+  if (D.charts.c43) { s = slide('L8 results: covariate importance and bootstrap intervals'); chart(s, 'c43', 0.4, 1.1, 6.2, 4.95); tbl(s, T.l8ci, 6.8, 1.2, 6.1, [0.8, 1.2, 1.5, 2.6], 11); bul(s, [ST.L8.result[0], ST.L8.result[1]], { x: 6.8, y: 3.6, w: 6.1, h: 2.4, fontSize: 12 }); banner(s, 'ΔS = M1 − M0 (what the spectrum adds); ΔC = M2 − M1 (what the covariates add).'); refs(s, R('L8')); }
 }
 // ---------------- L9
 if (ST.L9) {

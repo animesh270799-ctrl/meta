@@ -138,7 +138,7 @@ tab(rows, 'Cross-check summary (details in the Excel sheet Checks).', widths=[80
 h1('%d. Deviations from the methodology' % (5 + len(ST)), newpage=False)
 tab([['Code', 'Step', 'Situation in 2025-26', 'What was done']] + [['DEV-1', 'L1/L5.2', 'Residual splice step −0.002 at 1000/1001 nm', 'Not corrected; FD 995–1005 nm excluded from band selection'], ['DEV-2', 'L1', 'One spectrum per leaf in the files', '"Average 2 readings" not applicable'],
      ['DEV-3', 'L2', '2255 leaves instead of the 7488 planned for 2026-27', 'Same plot split applied'], ['DEV-4', 'L5.3', 'WRI search chose w = 0', 'WRI = NDSI(780, 830)'], ['DEV-5', 'L7', 'Leaf data, not subplots', 'Low-severity check on grade-1 leaves (A) and grades 0–1 (C)'],
-     ['DEV-6', 'L6', 'Run time of the SFFS stability check', 'Number of divisions and, for RF, 100 trees in the repeated runs only (Table of Step L6)'], ['DEV-7', 'L9', 'One UAV date; no canopy selection chain', 'OW overlap not computed; plot-mean leaf spectra used'],
+     ['DEV-6', 'L6', 'Run time of the SFFS stability check', '50 random GroupKFold(3) divisions for SVM (tasks A, B); 20 divisions with 100 trees for RF (task C)'], ['DEV-7', 'L9', 'One UAV date; no canopy selection chain', 'OW overlap not computed; plot-mean leaf spectra used'],
      ['DEV-8', 'L10', 'No pre-symptomatic leaves', 'Not run'], ['DEV-9', 'L6–L8', 'Task C predictions outside 0–9', 'Clipped to 0–9']], 'Deviations and adaptations.', widths=[900, 1000, 3800, 3900])
 if 'L7' in ST:
     h1('%d. Main findings' % (6 + len(ST)))

@@ -101,7 +101,7 @@ T['l56_matrix'] = Mx
 def cat(pat): fs = sorted(glob.glob(os.path.join(O, pat))); return pd.concat([pd.read_csv(f) for f in fs], ignore_index=True) if fs else pd.DataFrame()
 T['l6_ml'] = cat('L6_ml_summary_*.csv'); T['l6_paths'] = cat('L6_sffs_paths_*.csv'); T['l6_dl'] = cat('L6_dl_summary*.csv'); T['l6_hist'] = cat('L6_dl_history*.csv')
 for nm, f in (('l6_stab_runs', 'L6_stability_runs.csv'), ('l6_stab_freq', 'L6_stability_frequency.csv'), ('l7_metrics', 'L7_metrics.csv'), ('l7_conf', 'L7_confusion.csv'), ('l7_strata', 'L7_strata.csv'),
-              ('l7_low', 'L7_low_severity.csv'), ('l8_models', 'L8_models.csv'), ('l8_gains', 'L8_gains.csv'), ('l8_weather', 'L8_weather_windows.csv'), ('l8_pred', 'L8_predictions.csv'),
+              ('l7_low', 'L7_low_severity.csv'), ('l8_models', 'L8_models.csv'), ('l8_gains', 'L8_gains.csv'), ('l8_weather', 'L8_weather_windows.csv'), ('l8_pred', 'L8_predictions.csv'), ('l8_imp', 'L8_importance.csv'),
               ('l9_band', 'L9_bandwise.csv'), ('l9_transfer', 'L9_transfer.csv'), ('l9_plots', 'L9_plots.csv')):
     if os.path.isfile(os.path.join(O, f)): T[nm] = rd(f)
 if os.path.isfile(os.path.join(O, 'L7_best.json')):

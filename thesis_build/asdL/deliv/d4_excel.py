@@ -418,7 +418,7 @@ dev = [('DEV-1', 'L1/L5.2', 'Splice correction assumed done by the instrument so
        ('DEV-3', 'L2', 'Leaf counts of the 2026-27 plan (5148 / 2340)', '2025-26: 1571 training / 684 test leaves', 'Same plot split applied', 'Same plots as the 2026-27 plan'),
        ('DEV-4', 'L5.3', 'WRI = NDSI + w·R(λ3)', 'Best weight w = 0', 'WRI reported as NDSI(780, 830); λ3 not used', 'The search itself chose w = 0 (best |r|)'),
        ('DEV-5', 'L7', 'Low-severity check on DI ≤ 5 / ≤ 10 (canopy)', 'Leaf data', 'Grade-1 leaves (Task A recall) and grades 0–1 (Task C RMSE)', 'Leaf-level equivalent'),
-       ('DEV-6', 'L6', 'SFFS stability over 100 divisions', 'Run time', 'See L6 Table L6.3 note (number of divisions and, for RF, 100 trees in the repeated runs only)', 'Keeps the check feasible on 4 CPU cores'),
+       ('DEV-6', 'L6', 'SFFS stability over 100 divisions', 'Run time', '50 random GroupKFold(3) divisions for the SVM models (tasks A, B); 20 divisions with 100 trees for the RF model (task C)', 'Keeps the check feasible on 4 CPU cores'),
        ('DEV-7', 'L9', 'Leaf vs canopy OW overlap; centre-plant leaves', 'One UAV date, no canopy selection; leaves of the whole plot', 'Overlap not computed; plot-mean leaf spectra used', 'Only data available for 2025-26'),
        ('DEV-8', 'L10', 'Pre-symptomatic leaves', 'No tagged pre-symptomatic leaves in 2025-26', 'Not run', 'Planned for 2026-27'),
        ('DEV-9', 'L6–L8', 'Task C predictions', 'Predictions outside 0–9', 'Clipped to 0–9', 'Grade scale limits')]
