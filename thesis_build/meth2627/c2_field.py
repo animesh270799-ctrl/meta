@@ -1,0 +1,187 @@
+from c_lib import *
+PART = 'A Field and data'
+
+
+def add():
+    h1('2. Part A – Field experiment and data collection')
+    p('Part A creates every observation used later: the plots and treatments, the UAV images, the leaf scores of 5 plants per subplot and the ASD leaf spectra of the centre plant, the disease index, the covariates, the plant parameters and the independent test data.')
+    myfig('layout', 'g02_layout.png', 'Field layout 2026-27 (same plot plan as 2025-26): healthy block (plots 1–12), 10 m buffer and inoculated block (R3, R2, R1). Each box shows the treatment (sowing date D, variety V) and plot number; colours show the fixed 7:3 split (Step D1).')
+
+    step('A1', 'Experimental design and treatments', part=PART,
+         what='Factorial field experiment at IARI, New Delhi: 4 sowing dates × 3 varieties = 12 treatments, inoculated in three replications (36 plots), plus one uninoculated healthy plot of every treatment in a separate block (12 plots) – 48 plots of 5 m × 3 m.',
+         why='The design creates a range of severity (different crop ages at inoculation and different varieties) and gives healthy plots of the same age and variety; it also defines the plots that are kept together in the split.',
+         do=['Sow D1 = 19 November, D2 = 26 November, D3 = 3 December and D4 = 10 December 2026 (7-day intervals).',
+             'Varieties V1 = PM 26, V2 = Pusa Vijay, V3 = PM 37; plot plan as in the layout figure (healthy 1–12, R3 13–24, R2 25–36, R1 37–48).',
+             'Inoculate all 36 plots of R1–R3 on 30 December 2026 with a zoosporangial suspension of ~~Albugo candida~~ (1.5 × 10^{5} zoosporangia mL^{−1}); crop age at inoculation 41, 34, 27 and 20 days for D1–D4.',
+             'Keep the healthy block (plots 1–12) uninoculated, 10 m away from the inoculated block.',
+             'Mark each plot with its code (plot number, treatment, replication) and divide it into four quadrant subplots (2.5 m × 1.5 m).'],
+         check=['48 plots sown on the four dates; labels in place.', 'Inoculation date, suspension concentration and weather of the inoculation day recorded.', 'Subplot corners pegged (needed for Steps A3 and B6).'],
+         out='Plot table (plot, block, replication, sowing date, variety) → A3, A5, D1.',
+         q='Why a separate healthy block? → Healthy plots inside the inoculated block would be infected by spores from neighbouring plots; healthy controls of each treatment are needed for comparison and normalisation (Step D3).',
+         papers=[('Mishra et al. (2009)', 'Six Brassica juncea genotypes (including Varuna) inoculated with Albugo candida at 1.44 × 10^{5} zoosporangia mL^{−1}, with uninoculated control plants; disease components and biochemical constituents compared.', 'Same host and pathogen; a zoosporangial suspension of similar strength and uninoculated healthy controls.'),
+                 ('Guo et al. (2021)', 'Wheat yellow rust; inoculated and healthy plots to create a range of disease for UAV hyperspectral detection.', 'Inoculated replications plus healthy plots create the severity range seen by the UAV.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; artificially inoculated and healthy field plots monitored by UAV at early, middle and late infection stages.', 'Inoculated and healthy plots create the severity range seen by the UAV.'),
+                 ('Blasch et al. (2023)', 'Wheat yellow and stem rust; randomised field trial with varieties of different resistance, monitored by UAV and satellite.', 'Three varieties are included so that the models are tested across varieties.'),
+                 ('Chattopadhyay et al. (2011)', 'Indian mustard (cv. Varuna and a local cultivar) sown on 10 dates at weekly intervals at Bharatpur, New Delhi and Kangra; white rust related to weather to build forecasting models.', 'Staggered sowing dates give crops of different ages under the same weather, for the same crop and disease.')])
+    rows = [['Code', 'Sowing date', 'Crop age at inoculation (30 Dec 2026)', 'V1 PM 26', 'V2 Pusa Vijay', 'V3 PM 37'],
+            ['D1', '19 Nov 2026', '41 days', 'D1V1', 'D1V2', 'D1V3'], ['D2', '26 Nov 2026', '34 days', 'D2V1', 'D2V2', 'D2V3'],
+            ['D3', '3 Dec 2026', '27 days', 'D3V1', 'D3V2', 'D3V3'], ['D4', '10 Dec 2026', '20 days', 'D4V1', 'D4V2', 'D4V3']]
+    tab('treat', rows=rows, caption='The 12 treatments (sowing date × variety); each is inoculated in R1–R3 and has one healthy plot.', widths=[900, 1600, 2600, 1500, 1500, 1500], size=17)
+
+    step('A2', 'Unmanned aerial vehicle (UAV) flights and the four cameras', part=PART,
+         what='On 13 dates the hyperspectral, multispectral, RGB and thermal cameras are flown over the whole field.',
+         why='Each camera records a different effect of infection: pigments and structure (HS, MS), colour and texture of pustules (RGB), and transpiration (thermal).',
+         do=['Fly between 11:00 and 14:00 h under clear sky and low wind, 30 m above ground, about 85% forward and 80% side overlap.',
+             'Place the reflectance panels and the ground control points (GCPs) before every flight; image the panels before and after the flight.',
+             'Record air temperature and relative humidity during the flight (needed for thermal conversion, Step B1).',
+             'Pre-symptomatic dates: 1, 4 and 7 January 2027 (2, 5 and 8 DAI). Post-symptomatic dates: 11, 18 and 25 January, 1, 8, 15 and 22 February, 1, 8 and 15 March 2027 (12–75 DAI).',
+             'On every flight day carry out the leaf scoring and ASD measurements (Steps A3 and A4).'],
+         settings=['Hyperspectral: Headwall co-aligned VNIR–SWIR imager, 400–2500 nm (483 usable bands, 399–2398 nm); ground pixel about 2.2 cm.',
+                   'Multispectral: MicaSense RedEdge-MX, 475, 560, 668, 717, 840 nm; about 2 cm.',
+                   'RGB: DJI camera, about 0.8 cm. Thermal: FLIR Vue Pro R, 7.5–13.5 µm, 640 × 480 pixels, about 3.9 cm.'],
+         check=['All four cameras flown on the date; panel images before and after.', 'GCPs visible in every mosaic.', 'Flight log (time, sky, wind, air temperature, RH) filled in.'],
+         out='Raw images of the four cameras → Part B.',
+         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; canopy spectra (spectroradiometer), thermal infrared images and RGB images collected in the flowering and filling periods and fused.', 'Several sensors measured on the same dates.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; UAV multispectral and thermal images flown between 11:30 and 12:30 h with 80% / 85% overlap at early, middle and late infection stages.', 'Multispectral and thermal cameras flown together around midday with high overlap.'),
+                 ('Calderón et al. (2014)', 'Downy mildew of opium poppy; UAV multispectral and thermal imagery at high resolution.', 'UAV thermal + multispectral for a foliar disease.'),
+                 ('Guo et al. (2021)', 'Wheat yellow rust; UAV hyperspectral imaging with reflectance panels.', 'UAV hyperspectral flights with panels.'),
+                 ('Ma et al. (2026)', 'Rice blast; UAV hyperspectral images (400–1000 nm, 1.26 cm ground pixel).', 'UAV hyperspectral camera at centimetre resolution.'),
+                 ('Nguyen et al. (2023)', 'Spring wheat yellow rust; multispectral UAV imagery: red-edge (690–740 nm) and near-infrared bands separated healthy and severely infected plots.', 'A multispectral camera with red-edge and near-infrared bands.')])
+    myfig('timeline', 'g04_timeline.png', 'Data collection timeline, 2026-27: sowings, inoculation, 13 flight dates (pre- and post-symptomatic) with leaf scoring and ASD, and the 4 physiology dates.')
+    rows = [['No.', 'Date', 'DAI', 'Stage of the data', 'Cameras', 'Leaf scoring + ASD', 'Physiology'],
+            ['1', '1 Jan 2027', '2', 'pre-symptomatic', 'HS, MS, RGB, TIR', '✓', ''], ['2', '4 Jan', '5', 'pre-symptomatic', 'all four', '✓', ''], ['3', '7 Jan', '8', 'pre-symptomatic', 'all four', '✓', '✓'],
+            ['4', '11 Jan', '12', 'post-symptomatic', 'all four', '✓', ''], ['5', '18 Jan', '19', 'post-symptomatic', 'all four', '✓', '✓'], ['6', '25 Jan', '26', 'post-symptomatic', 'all four', '✓', ''],
+            ['7', '1 Feb', '33', 'post-symptomatic', 'all four', '✓', ''], ['8', '8 Feb', '40', 'post-symptomatic', 'all four', '✓', '✓'], ['9', '15 Feb', '47', 'post-symptomatic', 'all four', '✓', ''],
+            ['10', '22 Feb', '54', 'post-symptomatic', 'all four', '✓', ''], ['11', '1 Mar', '61', 'post-symptomatic', 'all four', '✓', '✓'], ['12', '8 Mar', '68', 'post-symptomatic', 'all four', '✓', ''],
+            ['13', '15 Mar', '75', 'post-symptomatic', 'all four', '✓', '']]
+    tab('flights', rows=rows, caption='The 13 data-collection dates.', widths=[600, 1300, 700, 1900, 1700, 1800, 1300], size=16)
+
+    step('A3', 'Plant scoring and disease index of each subplot', part=PART,
+         what='In every subplot, 5 plants (the centre and the four corners, inside the inner buffer) are tagged; on every flight day their leaves L3, L5 and LL are graded on the 0–9 scale. The 15 grades of a subplot give its disease index (DI).',
+         why='The DI is the reference (label) of every UAV model; five plants spread over the subplot represent the area seen by the cameras, and the centre plant also carries the ASD readings (Step A4).',
+         do=['Before inoculation, tag 5 plants in each subplot: the plant nearest the centre and the plants nearest the four corners of the inner buffer (5 × 4 = 20 plants per plot, 960 in the field). The centre plant is the ASD plant.',
+             'On each flight day (same day or ± 1 day) grade the 3rd (L3) and 5th (L5) fully expanded leaves from the top and the lowest green leaf (LL) of each tagged plant; count the positions again on every date.',
+             'Grade each leaf by the percentage of its area with pustules: 0 = none; 1 = 1–5%; 3 = 6–10%; 5 = 11–25%; 7 = 26–50%; 9 = more than 50%. Judge the percentage with the standard area diagrams of Conn et al. (1990) (leaves with 1, 5, 10, 20, 30 and 50% of the area affected); the same trained person grades all dates.',
+             'Subplot DI = Σ(x × f) / (9 × Σf) × 100, where x is the grade and f the number of leaves with grade x (15 leaves per subplot).',
+             'From flowering, record staghead severity (%) per subplot = staghead racemes / total racemes × 100.',
+             'If a tagged plant dies, tag the nearest healthy-looking neighbour and note the change.'],
+         settings=['DI classes (Task B): 0 healthy (DI = 0), 1 very low (0 < DI ≤ 5), 3 low (5 < DI ≤ 10), 5 moderate (10 < DI ≤ 25), 7 high (25 < DI ≤ 50), 9 very high (DI > 50). 2880 leaf grades per date (192 subplots × 15).'],
+         check=['15 grades per subplot on every date (missing leaves written as missing).', 'DI computed for 192 subplots per date.', 'Scorer, date and time on every sheet.'],
+         out='Leaf grades (→ A4, Part L) and subplot DI and DI class (→ A5, all UAV models).',
+         alt='Image-based pustule area would avoid rater error but is not available for all leaves in the field; visual grades are the field standard (Bock et al., 2010).',
+         q='Why five plants? → The centre and four corners spread the scored plants over the subplot seen by the UAV, and 15 leaves give a finer DI than one plant; the leaf-based DI formula is that of Mishra et al. (2009) and Liu et al. (2024).',
+         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; the disease was surveyed at the centre and four corners of each plot (twenty plants per point), leaves graded by severity class (national standard) and combined into DI = Σ(grade × leaves)/(highest grade × leaves examined) × 100 as the target of UAV models.', 'Centre and four corners scored; subplot DI from graded leaves is the target of the UAV models.'),
+                 ('Mishra et al. (2009)', 'White rust of Indian mustard; DI = sum of all numerical ratings × 100 / (maximum grade × number of leaves examined), on a 0–9 scale (cotyledons) and a 0–5 leaf-area scale (true leaves).', 'Same DI formula for white rust, with grades of leaf area covered by pustules.'),
+                 ('Conn et al. (1990)', 'Rapeseed and mustard; disease assessment key with drawings of leaves and siliques showing 1, 5, 10, 20, 30 and 50% of the area diseased, stated to be usable also for white rust (Albugo candida).', 'Area diagrams used to judge the percentage of leaf area with pustules.'),
+                 ('Chen et al. (2023)', 'Tobacco viruses; leaves graded healthy, 1, 3, 5, 7 or 9 by the fraction of the leaf with symptoms (Chinese standard GB/T 23222-2008).', 'The same six grade values defined by leaf area.'),
+                 ('Mandal et al. (2023)', 'Rice blast scored on the IRRI 0–9 scale (lesion type and percentage of leaf area) and related to canopy spectra.', 'A 0–9 scale defined by leaf area.'),
+                 ('Bock et al. (2010)', 'Reviewed visual severity assessment: raters disagree most between neighbouring classes; clear class limits and trained raters reduce error.', 'Written grade limits and one trained scorer for all dates.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast; the disease grade of each leaf classified from hyperspectral images at the jointing, booting and heading stages.', 'Leaf grades recorded on every date across growth stages.')])
+    myfig('survey', 'g03_survey.png', 'Subplots, inner buffer and the 5 scored plants of each subplot (centre and four corners); the centre plant (star) also carries the ASD readings (left). Leaves graded on each tagged plant (right).')
+    demo('di_ex', [['Plant', 'Leaf grades L3 / L5 / LL', 'Σ x'],
+                   ['Centre (ASD plant)', '1 / 3 / 5', '9'], ['Corner 1', '0 / 1 / 3', '4'], ['Corner 2', '1 / 3 / 7', '11'], ['Corner 3', '0 / 0 / 1', '1'], ['Corner 4', '0 / 3 / 5', '8'],
+                   ['Subplot', '15 leaves', 'Σ(x × f) = 33 → DI = 33 / (9 × 15) × 100 = 24.4% → DI class 5']],
+         'Worked example of the disease index of one subplot', widths=[2200, 3400, 4000])
+
+    step('A4', 'Leaf spectra with the ASD FieldSpec spectroradiometer on the centre plant of each subplot', part=PART,
+         what='Right after grading, the three graded leaves (L3, L5, LL) of the centre plant of each subplot are measured with the ASD FieldSpec spectroradiometer (contact probe and leaf clip with its own lamp) on all 13 dates.',
+         why='A leaf spectrum of a graded leaf records the disease without sun, sky, soil or atmosphere and links leaf and canopy data; one plant per subplot keeps the work to one team per date while covering all 192 subplots.',
+         do=['Warm up the instrument; optimise and take a white reference at the start, then every 10–15 minutes or at the start of every plot.',
+             'Take 2 readings per leaf on the lamina, avoiding the midrib (each reading = the instrument average of its scans), 350–2500 nm.',
+             'Name every file with date, plot, subplot, leaf position and reading number; the leaf grade comes from Step A3.',
+             'Measure on the flight day (or ± 1 day); the clip has its own lamp, so the time of day does not matter.'],
+         settings=['576 leaves per date (48 plots × 4 subplots × 1 plant × 3 leaves) × 2 readings = 1152 readings per date; 7488 leaves over 13 dates; about 7 operator-hours per date.'],
+         check=['Every centre-plant leaf graded in A3 has 2 readings.', 'White reference times recorded.', 'File names match the record sheet.'],
+         out='Leaf spectra with leaf grade and identifiers → Part L.',
+         alt='Other ways to reduce the ASD work further: measure only L3 and LL (384 leaves per date); measure on every second post-symptomatic date (8 dates); take 1 reading per leaf. Measuring all 5 plants (2880 leaves per date) is not needed for the leaf models.',
+         q='Is one plant per subplot enough? → It gives 576 leaves per date, as many per date as the 2025-26 ASD data (419–648 leaves per date), and more than the 800 leaves of a whole rice blast leaf study (Selvaprakash et al., 2026).',
+         papers=[('Chen et al. (2023)', 'Tobacco TMV and PVY; leaves measured with an ASD FieldSpec 4 (350–2500 nm; probe 10 cm above the leaf, six points per leaf averaged; white reference every ten plants) and graded healthy, 1, 3, 5, 7, 9.', 'Same instrument, full range, several readings per leaf averaged, graded leaves.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; ASD FieldSpec 4 with a leaf clip (own lamp, white and black panels); three readings per leaf (1/3, 1/2 and 2/3 of the length, midrib avoided) averaged as the leaf spectrum.', 'Leaf clip, readings on the lamina avoiding the midrib, averaged per leaf.'),
+                 ('Mandal et al. (2023)', 'Rice blast (IARI); handheld ASD spectroradiometer (350–2500 nm), white reference before measurement, 30 scans averaged per spectrum; canopy spectra of plants scored 0–9.', 'Full-range ASD spectra related to a 0–9 grade; here at leaf level with the leaf clip.'),
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; leaf-clip spectra (portable spectroradiometer with the halogen lamp of the clip; white and black panels of the clip) of healthy and infected leaves for asymptomatic detection and severity classes.', 'Leaf clip with its own lamp.'),
+                 ('Selvaprakash et al. (2026)', 'Rice blast (IARI); 800 leaf spectra (handheld spectroradiometer, 350–2500 nm, Spectralon reference) of healthy, early, moderate and severe leaves used for early detection; the index held across independent seasons (F1 0.95).', 'A leaf data set of similar size per date is sufficient for leaf models.'),
+                 ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; ASD FieldSpec HandHeld-2 with a leaf clip; spectra in contact with the leaf estimated severity well (R² up to 0.87), spectra taken above the canopy did not.', 'Leaf-clip contact measurement of single leaves.'),
+                 ('Yu et al. (2021)', 'Pine wilt disease; field portable spectrometer measurements collected with UAV hyperspectral images.', 'Leaf spectra collected on the same dates as the UAV flights.'),
+                 ('Mandal et al. (2022)', 'Rice blast (IARI); reflectance of ten genotypes scored 0–9; correlation above 0.6 with severity in 550–760 and 1140–1300 nm.', 'Leaf reflectance of plants scored on the 0–9 scale.'),
+                 ('Zhang et al. (2022)', 'Rice leaf blast; hyperspectral images normalised against the white reference; the whole leaf traced as the region of interest and its average reflectance extracted.', 'Readings relative to a white reference; one average spectrum per leaf.')])
+    demo('rec', [['Date', 'Plot', 'Subplot', 'Plant', 'Leaf', 'Grade', 'ASD files', 'White ref.'],
+                 ['18 Jan 2027', '25', '2', 'centre', 'L3', '1', '25_2_C_L3_01, _02', '10:42'], ['18 Jan 2027', '25', '2', 'centre', 'L5', '3', '25_2_C_L5_01, _02', '10:42'], ['18 Jan 2027', '25', '2', 'corner 1', 'L3', '0', '– (graded only)', '–']],
+         'Record sheet for leaf grades and ASD readings', widths=[1300, 700, 900, 1000, 700, 800, 2700, 1100])
+
+    step('A5', 'Labels and the datasets', part=PART,
+         what='Labels of the three tasks are set for every UAV sample (subplot-date) and every leaf; the pre-symptomatic labels are set from the later status.',
+         why='Each task answers a different question (is it diseased? how severe? what score?) and needs its own models and metrics.',
+         do=['UAV, post-symptomatic dates: Task A = healthy (DI = 0) or diseased (DI > 0), from the survey, not from the treatment; Task B = DI class (0, 1, 3, 5, 7, 9); Task C = DI (%).',
+             'If a DI class has fewer than 5% of the samples, merge it with its neighbour (for example 7 + 9) and note it.',
+             'ASD leaves (Part L): Task A = grade 0 or > 0; Task B = leaf grade; Task C = leaf grade as a number.',
+             'Pre-symptomatic dates (2, 5, 8 DAI): healthy = subplots of the healthy plots; later-infected = inoculated subplots whose DI becomes > 0 on a later date; inoculated subplots that never show pustules are left out.'],
+         check=['Every sample has its three labels.', 'Class counts tabulated before any analysis.'],
+         out='Labelled tables: UAV post-symptomatic (1920 per camera), UAV pre-symptomatic (576 per camera), ASD leaves (7488) → Parts B–D, L.',
+         papers=[('Lv et al. (2023)', 'Southern corn leaf blight; asymptomatic and symptomatic detection plus severity classes.', 'Detection task plus severity classes.'),
+                 ('Chen et al. (2023)', 'Tobacco viruses; binary (healthy/infected) and six-grade models.', 'Task A and six-class Task B.'),
+                 ('Mandal et al. (2023)', 'Rice blast; the same spectra used for classification of the ten severity levels and for regression of the 0–9 score; regression was more reliable because neighbouring classes overlapped.', 'Classification (Task B) and regression (Task C) on the same samples.'),
+                 ('Zhu et al. (2017)', 'Tobacco mosaic virus; leaves of inoculated and healthy plants imaged 2, 4 and 6 days after inoculation, before visible symptoms appeared (about 5 days).', 'Separate early-date samples of infected and healthy plants; here infection is confirmed by later symptoms.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; at the asymptomatic stage, leaves that later showed stable lesions were labelled infected and leaves clean on all days healthy.', 'Pre-symptomatic labels from the later status.')])
+
+    step('A6', 'Covariates and weather', part=PART,
+         what='For every sample: DAI, variety, crop age at inoculation, growth stage, 7-day weather and the number of favourable days for white rust.',
+         why='Severity also follows time, crop stage and weather; these covariates describe the epidemic and form the sensor-free baseline of Steps 2.9, 3.5 and L8.',
+         do=['DAI = flight date − 30 December 2026.',
+             'Growth stage on each date with the BBCH scale, coded 1 = vegetative (BBCH 10–49), 2 = flowering (60–69), 3 = pod formation (70 and later).',
+             'Daily weather from the IARI observatory: Tmax, Tmin, morning and afternoon relative humidity (RH I, RH II), rainfall; mean (rainfall: total) of the 7 days ending the day before each flight.',
+             'Favourable days since inoculation, with the white rust conditions of Chattopadhyay et al. (2011): leaf infection Tmax 16–24 °C, morning RH (RH I) > 97% and afternoon RH (RH II) > 40%; staghead Tmax 20–29 °C, Tmin > 12 °C and RH I > 97%.',
+             'Do not use covariates in feature selection; use them only in the covariate models and to report results by stratum.'],
+         check=['One covariate row per sample; no weather from after the flight date.'],
+         out='Covariate table → 1.1, 2.9, 3.5, L8.',
+         papers=[('Chattopadhyay et al. (2011)', 'White rust of Indian mustard at Bharatpur, New Delhi and Kangra: leaf severity favoured by > 40% afternoon RH, > 97% morning RH and 16–24 °C maximum temperature; staghead by 20–29 °C maximum temperature, aided by > 12 °C minimum temperature and > 97% morning RH; stepwise regression models on weather forecast crop age at first appearance and peak severity.', 'The favourable-day counts use exactly these limits (checked in the full text).'),
+                 ('Zhang et al. (2014a)', 'Wheat powdery mildew; a logistic regression forecast from meteorological factors alone compared with one that added two remotely sensed features; overall accuracy rose from 69% to 78%.', 'Weather covariates form the baseline against which the cameras are judged.'),
+                 ('Bhattacharya and Chattopadhyay (2013)', 'Mustard rot; surface meteorology combined with satellite remote sensing.', 'Weather combined with sensor data for a mustard disease.'),
+                 ('Blasch et al. (2023)', 'Wheat rusts; detection by UAV changed with the crop growth stage.', 'Growth stage recorded so that results can be reported by stage.')])
+
+    step('A7', 'Biochemical and biophysical parameters', part=PART,
+         what='Pigments, anthocyanin, protein, relative water content, membrane stability and gas exchange (10 parameters) are measured on four dates.',
+         why='They show what white rust does to the plant and explain the camera responses (Activity 1.7); they are not model inputs.',
+         do=['Dates: 7 January (pre-symptomatic), 18 January, 8 February and 1 March 2027, on flight days.',
+             'One designated subplot per plot, rotated so that each subplot position is sampled in 12 plots (position = plot number modulo 4, plus 1).',
+             'Gas exchange on leaf L3 of the centre (ASD) plant of that subplot, 09:30–11:30 h, before the flight.',
+             'Laboratory samples: L3 leaves of 3 untagged plants of the same subplot, kept cool and processed the same day.'],
+         check=['48 samples per parameter and date.', 'Sample codes join to plot, subplot and date.'],
+         out='Parameter table → 1.7, 3.1.',
+         papers=[('Mishra et al. (2009)', 'White rust of Indian mustard; protein, total phenols, total, reducing and non-reducing sugars of inoculated leaves of six genotypes related to the disease index.', 'Biochemical parameters of infected vs healthy plants of the same host–pathogen system.'),
+                 ('Calderón et al. (2013)', 'Verticillium wilt of olive; airborne fluorescence, temperature and narrow-band indices related to disease severity and to field physiological measurements.', 'Plant physiology measured to explain thermal and spectral signals.'),
+                 ('Zarco-Tejada et al. (2018)', 'Xylella in olive; plant traits (pigments, fluorescence, temperature) retrieved from imagery changed before visible symptoms.', 'Pigments and gas exchange explain pre-symptomatic signals (7 January).'),
+                 ('Baranowski et al. (2015)', 'Oilseed rape (~~Brassica napus~~) leaves infected by ~~Alternaria~~; hyperspectral and thermal responses.', 'Brassica leaf responses to a fungal disease.'),
+                 ('Chatterjee et al. (2022)', 'White rust of Indian mustard; biochemical changes in infected plants in relation to the pathogenic variability of the pathogen.', 'Recent biochemical study of the same host and disease.'),
+                 ('Yu et al. (2025)', 'Rice sheath blight; ASD spectra measured with gas exchange (LI-6800) and chlorophyll fluorescence during infection; Pearson correlation picked eight physiological parameters that, with the spectral bands, gave 94% early detection.', 'Gas exchange and other physiology measured on the same plants as the spectra.')])
+    rows = [['Parameter (unit)', 'Method', 'Method reference'],
+            ['Chlorophyll a, b (µg mg^{−1} FW)', 'DMSO extraction; absorbance 645, 663 nm', 'Hiscox and Israelstam (1979); Wellburn (1994)'], ['Carotenoids (mg g^{−1} FW)', 'same extract; 470 nm', 'Lichtenthaler and Wellburn (1983); Wellburn (1994)'],
+            ['Anthocyanin (µg g^{−1} FW)', 'pH differential, 520 and 700 nm', 'Lee et al. (2005)'], ['Total protein (µg mg^{−1} FW)', 'Bradford dye binding, 595 nm', 'Bradford (1976)'],
+            ['Relative water content (%)', '(FW − DW)/(TW − DW) × 100', 'Barrs and Weatherley (1962)'], ['Membrane stability index (%)', 'conductivity at 40 and 100 °C', 'Premachandra et al. (1990); Sairam et al. (1994)'],
+            ['Net photosynthetic rate (µmol CO_{2} m^{−2} s^{−1}), transpiration rate (mmol H_{2}O m^{−2} s^{−1}), stomatal conductance (mol H_{2}O m^{−2} s^{−1})', 'LI-6400 portable gas exchange system (LI-COR, USA)', 'Riches et al. (2020); Long and Bernacchi (2003)']]
+    tab('physio', rows=rows, caption='Parameters, methods and method references.', widths=[2800, 3600, 3200], size=16)
+
+    step('A8', 'Independent test data at Bharatpur', part=PART,
+         what='Research-farm plots and farmers\' fields with natural white rust at Bharatpur are flown with the same cameras and surveyed in the same way, to test the frozen IARI models.',
+         why='A test on another site under natural infection shows whether the models transfer; these data are never used for training or tuning.',
+         do=['Choose 8–10 fields covering healthy to severely diseased crops and the common varieties.',
+             'Mark quadrats of subplot size (2.5 m × 1.5 m) with pegs and image-visible markers, record them with RTK GNSS; 15–20 quadrats per field.',
+             'Fly the four cameras on 2–3 post-symptomatic dates (February–March) with the IARI flight settings.',
+             'Score 5 plants per quadrat (centre and four corners, Step A3) on the flight day and record covariates (variety, sowing date, stage, sprays, nearest weather station).'],
+         check=['At least 300 quadrat-dates with all DI classes, including healthy.'],
+         out='Independent test table → 2.11.',
+         papers=[('Ma et al. (2026)', 'Rice blast; models built on 2023 data and tested on an independent 2024 data set from natural infection.', 'Independent test data never used for training.'),
+                 ('Yuan et al. (2025)', 'Rice bacterial blight; UAV models carried to other areas and scales (UAV to satellite).', 'Transfer of UAV disease models to new fields.'),
+                 ('Liu et al. (2026)', 'Wheat powdery mildew; a disease index developed on the ground and applied to UAV images of other fields and dates.', 'A model built in one setting applied to new fields.'),
+                 ('Chattopadhyay et al. (2011)', 'White rust field experiments at Bharatpur, New Delhi and Kangra with weather-based forecasting models.', 'Bharatpur is an established white rust site.')])
+
+    step('A9', 'Glasshouse (pot) experiment', part=PART,
+         what='A pot experiment with the same treatments gives leaf responses under controlled inoculation.',
+         why='Controlled conditions separate the disease response from field variation and support the field results.',
+         do=['Sow 23 November, 30 November, 7 December and 14 December 2026 × 3 varieties; 36 inoculated pots (R1–R3) and 12 healthy pots in a separate compartment.',
+             'Inoculate on 4 January 2027 with 10 µL droplets of the suspension on the upper leaf surface; cover with polythene for 3 days (RH 80–90%, about 19 °C).',
+             'At 2, 5, 8 and 11 DAI and then weekly: visual severity (0–6 scale) and ASD leaf spectra of the same leaves (Step A4 protocol).'],
+         check=['Same identifiers and labels as in the field.'],
+         out='Pot leaf data → comparison with field leaf responses (L5).',
+         papers=[('Mishra et al. (2009)', 'Potted seedlings of six Brassica juncea genotypes inoculated with 10-µL droplets of a zoosporangial suspension (1.44 × 10^{5} mL^{−1}); disease index at 14 and 21 days after inoculation.', 'Same droplet inoculation of potted plants and repeated disease-index scoring.'),
+                 ('Mahlein et al. (2013)', 'Sugar-beet leaf diseases inoculated under controlled conditions; disease-specific indices from leaf spectra.', 'Leaf spectra under controlled inoculation.'),
+                 ('Baranowski et al. (2015)', 'Oilseed rape leaves inoculated with ~~Alternaria~~ species under controlled conditions; hyperspectral and thermal imaging.', 'Brassica leaves under controlled infection.')])

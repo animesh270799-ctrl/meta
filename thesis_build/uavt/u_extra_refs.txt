@@ -1,0 +1,11 @@
+Asner, G.P. (1998). Biophysical and biochemical sources of variability in canopy reflectance. Remote Sensing of Environment 64(3), 234–253.
+Bohnenkamp, D., Behmann, J., Mahlein, A.-K. (2019). In-field detection of yellow rust in wheat on the ground canopy and UAV scale. Remote Sensing 11(21), 2495.
+Feudale, R.N., Woody, N.A., Tan, H., Myles, A.J., Brown, S.D., Ferré, J. (2002). Transfer of multivariate calibration models: a review. Chemometrics and Intelligent Laboratory Systems 64(2), 181–192.
+Gruninger, J., Ratkowski, A.J., Hoke, M.L. (2004). The sequential maximum angle convex cone (SMACC) endmember model. Proceedings of SPIE 5425, 1–14.
+Pan, S.J., Yang, Q. (2010). A survey on transfer learning. IEEE Transactions on Knowledge and Data Engineering 22(10), 1345–1359.
+Zhang, J., Huang, Y., Pu, R., González-Moreno, P., Yuan, L., Wu, K., Huang, W. (2019). Monitoring plant diseases and pests through remote sensing technology: a review. Computers and Electronics in Agriculture 165, 104943.
+Barnes, R.J., Dhanoa, M.S., Lister, S.J. (1989). Standard normal variate transformation and de-trending of near-infrared diffuse reflectance spectra. Applied Spectroscopy 43(5), 772–777.
+Ojala, M., Garriga, G.C. (2010). Permutation tests for studying classifier performance. Journal of Machine Learning Research 11, 1833–1863.
+Sahigara, F., Mansouri, K., Ballabio, D., Mauri, A., Consonni, V., Todeschini, R. (2012). Comparison of different approaches to define the applicability domain of QSAR models. Molecules 17(5), 4791–4810.
+Smith, G.M., Milton, E.J. (1999). The use of the empirical line method to calibrate remotely sensed data to reflectance. International Journal of Remote Sensing 20(13), 2653–2662.
+Westfall, P.H., Young, S.S. (1993). Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment. John Wiley and Sons, New York.

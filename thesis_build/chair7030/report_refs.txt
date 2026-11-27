@@ -1,0 +1,110 @@
+Ambroise, C., McLachlan, G.J. (2002). Selection bias in gene extraction on the basis of microarray gene-expression data. Proceedings of the National Academy of Sciences 99(10), 6562--6566. https://doi.org/10.1073/pnas.102102699
+Apan, A., Held, A., Phinn, S., Markley, J. (2004). Detecting sugarcane \'orange rust\' disease using EO-1 Hyperion hyperspectral imagery. International Journal of Remote Sensing 25(2), 489--498.
+Bal, R. S., & Kumar, A. (2014). Studies on the epidemiology of white rust and Alternaria leaf blight and their effect on the yield of Indian mustard. African Journal of Agricultural Research, 9(2), 302-306.
+Barker, M., Rayens, W. (2003). Partial least squares for discrimination. Journal of Chemometrics 17(3), 166--173.
+Barnes, J.D., Balaguer, L., Manrique, E., Elvira, S., Davison, A.W. (1992). A reappraisal of the use of DMSO for the extraction and determination of chlorophylls a and b in lichens and higher plants. Environmental and Experimental Botany 32(2), 85--100.
+Bijlwan, A., Ranjan, R., Singh, M., Purohit, R., Nath, A.J., Chakravarty, S. (2025). Predicting crop disease severity using real time weather variability through machine learning algorithms. Scientific Reports 15, 34767. https://doi.org/10.1038/s41598-025-18613-7
+Blackburn, G.A. (1998). Quantifying chlorophylls and carotenoids at leaf and canopy scales: an evaluation of some hyperspectral approaches. Remote Sensing of Environment 66(3), 273--285.
+Bock, C.H., Poole, G.H., Parker, P.E., Gottwald, T.R. (2010). Plant disease severity estimated visually, by digital photography and image analysis, and by hyperspectral imaging. Critical Reviews in Plant Sciences 29(2), 59--107.
+Breiman, L. (2001). Random forests. Machine Learning 45(1), 5--32.
+Broge, N.H., Leblanc, E. (2001). Comparing prediction power and stability of broadband and hyperspectral vegetation indices for estimation of green leaf area index and canopy chlorophyll density. Remote Sensing of Environment 76(2), 156--172.
+Cawley, G.C., Talbot, N.L.C. (2010). On over-fitting in model selection and subsequent selection bias in performance evaluation. Journal of Machine Learning Research 11, 2079--2107.
+Chattopadhyay, C., et al. (2011). Epidemiology and development of forecasting models for white rust of Brassica juncea in India. Archives of Phytopathology and Plant Protection 44(8), 751--763.
+Chen, J.M. (1996). Evaluation of vegetation indices and a modified simple ratio for boreal applications. Canadian Journal of Remote Sensing 22(3), 229--242.
+Chen, T., Guestrin, C. (2016). XGBoost: a scalable tree boosting system. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 785--794.
+Cohen, J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37--46.
+Cohen, J. (1968). Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. Psychological Bulletin 70(4), 213--220.
+Cortes, C., Vapnik, V. (1995). Support-vector networks. Machine Learning 20(3), 273--297.
+Cover, T., Hart, P. (1967). Nearest neighbor pattern classification. IEEE Transactions on Information Theory 13(1), 21--27.
+Cross, J.F., Cobo, N., Drewry, D.T. (2024). Non-invasive diagnosis of wheat stripe rust progression using hyperspectral reflectance. Frontiers in Plant Science 15, 1429879. https://doi.org/10.3389/fpls.2024.1429879
+Dash, J., Curran, P.J. (2004). The MERIS terrestrial chlorophyll index. International Journal of Remote Sensing 25(23), 5403--5413.
+Daughtry, C.S.T., Walthall, C.L., Kim, M.S., de Colstoun, E.B., McMurtrey, J.E. (2000). Estimating corn leaf chlorophyll concentration from leaf and canopy reflectance. Remote Sensing of Environment 74(2), 229--239.
+De Wolf, E.D., Isard, S.A. (2007). Disease cycle approach to plant disease prediction. Annual Review of Phytopathology 45, 203--220. https://doi.org/10.1146/annurev.phyto.44.070505.143329
+DeLong, E.R., DeLong, D.M., Clarke-Pearson, D.L. (1988). Comparing the areas under two or more correlated receiver operating characteristic curves: a nonparametric approach. Biometrics 44(3), 837--845.
+Dobbin, K.K., Simon, R.M. (2011). Optimally splitting cases for training and testing high dimensional classifiers. BMC Medical Genomics 4, 31. https://doi.org/10.1186/1755-8794-4-31
+Dormann, C.F., Elith, J., Bacher, S., et al. (2013). Collinearity: a review of methods to deal with it and a simulation study evaluating their performance. Ecography 36(1), 27--46. https://doi.org/10.1111/j.1600-0587.2012.07348.x
+Efron, B., Tibshirani, R.J. (1993). An Introduction to the Bootstrap. Chapman & Hall, New York.
+Fawcett, T. (2006). An introduction to ROC analysis. Pattern Recognition Letters 27(8), 861--874.
+Ferentinos, K.P. (2018). Deep learning models for plant disease detection and diagnosis. Computers and Electronics in Agriculture 145, 311--318. https://doi.org/10.1016/j.compag.2018.01.009
+Field, C.A., Welsh, A.H. (2007). Bootstrapping clustered data. Journal of the Royal Statistical Society Series B 69(3), 369--390. https://doi.org/10.1111/j.1467-9868.2007.00593.x
+Filella, I., Peñuelas, J. (1994). The red edge position and shape as indicators of plant chlorophyll content, biomass and hydric status. International Journal of Remote Sensing 15(7), 1459--1470.
+Gamon, J.A., Peñuelas, J., Field, C.B. (1992). A narrow-waveband spectral index that tracks diurnal changes in photosynthetic efficiency. Remote Sensing of Environment 41(1), 35--44.
+Gao, B.-C. (1996). NDWI -- a normalized difference water index for remote sensing of vegetation liquid water from space. Remote Sensing of Environment 58(3), 257--266.
+Gholamy, A., Kreinovich, V., Kosheleva, O. (2018). Why 70/30 or 80/20 relation between training and testing sets: a pedagogical explanation. Technical Report UTEP-CS-18-09, Department of Computer Science, University of Texas at El Paso.
+Gitelson, A., Merzlyak, M.N. (1994). Spectral reflectance changes associated with autumn senescence of Aesculus hippocastanum L. and Acer platanoides L. leaves. Journal of Plant Physiology 143(3), 286--292.
+Gitelson, A.A., Gritz, Y., Merzlyak, M.N. (2003). Relationships between leaf chlorophyll content and spectral reflectance and algorithms for non-destructive chlorophyll assessment in higher plant leaves. Journal of Plant Physiology 160(3), 271--282.
+Gitelson, A.A., Kaufman, Y.J., Merzlyak, M.N. (1996). Use of a green channel in remote sensing of global vegetation from EOS-MODIS. Remote Sensing of Environment 58(3), 289--298.
+Gitelson, A.A., Kaufman, Y.J., Stark, R., Rundquist, D. (2002). Novel algorithms for remote estimation of vegetation fraction. Remote Sensing of Environment 80(1), 76--87.
+Gitelson, A.A., Merzlyak, M.N., Chivkunova, O.B. (2001). Optical properties and nondestructive estimation of anthocyanin content in plant leaves. Photochemistry and Photobiology 74(1), 38--45.
+Goodfellow, I., Bengio, Y., Courville, A. (2016). Deep Learning. MIT Press, Cambridge, MA.
+Guo, A., Huang, W., Dong, Y., Ye, H., Ma, H., Liu, B., Wu, W., Ren, Y., Ruan, C., Geng, Y. (2021). Wheat yellow rust detection using UAV-based hyperspectral technology. Remote Sensing 13(1), 123. https://doi.org/10.3390/rs13010123
+Haboudane, D., Miller, J.R., Pattey, E., Zarco-Tejada, P.J., Strachan, I.B. (2004). Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: modeling and validation in the context of precision agriculture. Remote Sensing of Environment 90(3), 337--352.
+Haboudane, D., Miller, J.R., Tremblay, N., Zarco-Tejada, P.J., Dextraze, L. (2002). Integrated narrow-band vegetation indices for prediction of crop chlorophyll content for application to precision agriculture. Remote Sensing of Environment 81(2--3), 416--426.
+Hardisky, M.A., Klemas, V., Smart, R.M. (1983). The influence of soil salinity, growth form, and leaf moisture on the spectral radiance of Spartina alterniflora canopies. Photogrammetric Engineering and Remote Sensing 49(1), 77--83.
+Hastie, T., Tibshirani, R., Friedman, J. (2009). The Elements of Statistical Learning: Data Mining, Inference, and Prediction, 2nd edn. Springer, New York.
+He, K., Zhang, X., Ren, S., Sun, J. (2016). Deep residual learning for image recognition. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 770--778. https://doi.org/10.1109/CVPR.2016.90
+Horler, D.N.H., Dockray, M., Barber, J. (1983). The red edge of plant leaf reflectance. International Journal of Remote Sensing 4(2), 273--288.
+Hu, J., Shen, L., Sun, G. (2018). Squeeze-and-excitation networks. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 7132--7141. https://doi.org/10.1109/CVPR.2018.00745
+Huang, L., Li, T., Ding, C., Zhao, J., Zhang, D., Yang, G. (2020). Diagnosis of the severity of Fusarium head blight of wheat ears on the basis of image and spectral feature fusion. Sensors 20(10), 2887. https://doi.org/10.3390/s20102887
+Hunt, E.R., Rock, B.N. (1989). Detection of changes in leaf water content using near- and middle-infrared reflectances. Remote Sensing of Environment 30(1), 43--54.
+Jordan, C.F. (1969). Derivation of leaf-area index from quality of light on the forest floor. Ecology 50(4), 663--666.
+Joseph, V.R. (2022). Optimal ratio for data splitting. Statistical Analysis and Data Mining 15(4), 531--538. https://doi.org/10.1002/sam.11583
+Kapoor, S., Narayanan, A. (2023). Leakage and the reproducibility crisis in machine-learning-based science. Patterns 4(9), 100804. https://doi.org/10.1016/j.patter.2023.100804
+Kattenborn, T., Schiefer, F., Frey, J., Feilhauer, H., Mahecha, M.D., Dormann, C.F. (2022). Spatially autocorrelated training and validation samples inflate performance assessment of convolutional neural networks. ISPRS Open Journal of Photogrammetry and Remote Sensing 5, 100018. https://doi.org/10.1016/j.ophoto.2022.100018
+Kira, K., Rendell, L.A. (1992). A practical approach to feature selection. In: Sleeman, D., Edwards, P. (eds) Machine Learning: Proceedings of the Ninth International Workshop (ML92). Morgan Kaufmann, San Francisco, 249--256.
+Kohavi, R. (1995). A study of cross-validation and bootstrap for accuracy estimation and model selection. Proceedings of the 14th International Joint Conference on Artificial Intelligence, 1137--1145.
+Kononenko, I. (1994). Estimating attributes: analysis and extensions of RELIEF. Proceedings of the European Conference on Machine Learning (ECML-94), LNCS 784, 171--182.
+Kuhn, M., Johnson, K. (2013). Applied Predictive Modeling. Springer, New York. https://doi.org/10.1007/978-1-4614-6849-3
+Lancashire, P.D., Bleiholder, H., van den Boom, T., Langelüddeke, P., Stauss, R., Weber, E., Witzenberger, A. (1991). A uniform decimal code for growth stages of crops and weeds. Annals of Applied Biology 119(3), 561--601. https://doi.org/10.1111/j.1744-7348.1991.tb04895.x
+Li, H., Liang, Y., Xu, Q., Cao, D. (2009). Key wavelengths screening using competitive adaptive reweighted sampling method for multivariate calibration. Analytica Chimica Acta 648(1), 77--84.
+Lundberg, S.M., Erion, G., Chen, H., DeGrave, A., Prutkin, J.M., Nair, B., Katz, R., Himmelfarb, J., Bansal, N., Lee, S.-I. (2020). From local explanations to global understanding with explainable AI for trees. Nature Machine Intelligence 2(1), 56--67. https://doi.org/10.1038/s42256-019-0138-9
+Lundberg, S.M., Lee, S.-I. (2017). A unified approach to interpreting model predictions. Advances in Neural Information Processing Systems 30, 4765--4774.
+Lv, Z., Meng, R., Chen, G., Zhao, F., Xu, B., Zhao, Y., Huang, Z., Zhou, L., Zeng, L., Yan, J. (2023). Combining multiple spectral enhancement features for improving spectroscopic asymptomatic detection and symptomatic severity classification of southern corn leaf blight. Precision Agriculture 24, 1593--1618. https://doi.org/10.1007/s11119-023-10010-2
+Ma, J., Wu, P., Guo, S., Lin, Y., Yu, F., Liu, T. (2026). Early detection of rice blast disease using a dual transformer network (DT-EDNet) based on hyperspectral imaging and multi-feature fusion. IAENG International Journal of Applied Mathematics 56(11), 5380--5398.
+Madden, L.V., Hughes, G., van den Bosch, F. (2007). The Study of Plant Disease Epidemics. APS Press, St. Paul.
+Mahlein, A.-K. (2016). Plant disease detection by imaging sensors -- parallels and specific demands for precision agriculture and plant phenotyping. Plant Disease 100(2), 241--251.
+Mahlein, A.-K., Rumpf, T., Welke, P., Dehne, H.-W., Plümer, L., Steiner, U., Oerke, E.-C. (2013). Development of spectral indices for detecting and identifying plant diseases. Remote Sensing of Environment 128, 21--30. https://doi.org/10.1016/j.rse.2012.09.019
+Mandal, N., Adak, S., Das, D.K., Sahoo, R.N., Mukherjee, J., Kumar, A., Chinnusamy, V., Das, B., Mukhopadhyay, A., Rajashekara, H., Gakhar, S. (2023). Spectral characterization and severity assessment of rice blast disease using univariate and multivariate models. Frontiers in Plant Science 14, 1067189. https://doi.org/10.3389/fpls.2023.1067189
+McCullagh, P. (1980). Regression models for ordinal data. Journal of the Royal Statistical Society B 42(2), 109--142.
+Meng, R., Lv, Z., Yan, J., Chen, G., Zhao, F., Zeng, L., Xu, B. (2020). Development of spectral disease indices for southern corn rust detection and severity classification. Remote Sensing 12(19), 3233. https://doi.org/10.3390/rs12193233
+Merton, R., Huntington, J. (1999). Early simulation results of the ARIES-1 satellite sensor for multi-temporal vegetation research derived from AVIRIS. Proceedings of the 8th JPL Airborne Earth Science Workshop, Pasadena.
+Merzlyak, M.N., Gitelson, A.A., Chivkunova, O.B., Rakitin, V.Y. (1999). Non-destructive optical detection of pigment changes during leaf senescence and fruit ripening. Physiologia Plantarum 106(1), 135--141.
+Milton, E.J., Schaepman, M.E., Anderson, K., Kneubühler, M., Fox, N. (2009). Progress in field spectroscopy. Remote Sensing of Environment 113 (Supplement 1), S92--S109.
+Mishra, K.K., Kolte, S.J., Nashaat, N.I., Awasthi, R.P. (2009). Pathological and biochemical changes in Brassica juncea (mustard) infected with Albugo candida (white rust). Plant Pathology 58(1), 80--86. https://doi.org/10.1111/j.1365-3059.2008.01939.x
+Mohanty, S.P., Hughes, D.P., Salathé, M. (2016). Using deep learning for image-based plant disease detection. Frontiers in Plant Science 7, 1419.
+Molinaro, A.M., Simon, R., Pfeiffer, R.M. (2005). Prediction error estimation: a comparison of resampling methods. Bioinformatics 21(15), 3301--3307. https://doi.org/10.1093/bioinformatics/bti499
+O\'Brien, R.M. (2007). A caution regarding rules of thumb for variance inflation factors. Quality & Quantity 41, 673--690. https://doi.org/10.1007/s11135-006-9018-6
+Paszke, A., Gross, S., Massa, F., et al. (2019). PyTorch: an imperative style, high-performance deep learning library. Advances in Neural Information Processing Systems 32, 8024--8035.
+Pedregosa, F., et al. (2011). Scikit-learn: machine learning in Python. Journal of Machine Learning Research 12, 2825--2830.
+Peñuelas, J., Baret, F., Filella, I. (1995). Semi-empirical indices to assess carotenoids/chlorophyll a ratio from leaf spectral reflectance. Photosynthetica 31(2), 221--230.
+Peñuelas, J., Gamon, J.A., Fredeen, A.L., Merino, J., Field, C.B. (1994). Reflectance indices associated with physiological changes in nitrogen- and water-limited sunflower leaves. Remote Sensing of Environment 48(2), 135--146.
+Peñuelas, J., Piñol, J., Ogaya, R., Filella, I. (1997). Estimation of plant water concentration by the reflectance Water Index WI (R900/R970). International Journal of Remote Sensing 18(13), 2869--2875.
+Prechelt, L. (1998). Early stopping -- but when? In: Orr, G.B., Müller, K.-R. (eds) Neural Networks: Tricks of the Trade. Lecture Notes in Computer Science 1524. Springer, Berlin, pp. 55--69. https://doi.org/10.1007/3-540-49430-8_3
+Pudil, P., Novovičová, J., Kittler, J. (1994). Floating search methods in feature selection. Pattern Recognition Letters 15(11), 1119--1125.
+Raschka, S. (2018). MLxtend: providing machine learning and data science utilities and extensions to Python\'s scientific computing stack. Journal of Open Source Software 3(24), 638.
+Raun, W.R., Solie, J.B., Johnson, G.V., Stone, M.L., Lukina, E.V., Thomason, W.E., Schepers, J.S. (2001). In-season prediction of potential grain yield in winter wheat using canopy reflectance. Agronomy Journal 93(1), 131--138.
+Ripley, B.D. (1996). Pattern Recognition and Neural Networks. Cambridge University Press, Cambridge. https://doi.org/10.1017/CBO9780511812651
+Roberts, D.R., Bahn, V., Ciuti, S., et al. (2017). Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure. Ecography 40(8), 913--929. https://doi.org/10.1111/ecog.02881
+Robnik-Šikonja, M., Kononenko, I. (2003). Theoretical and empirical analysis of ReliefF and RReliefF. Machine Learning 53, 23--69. https://doi.org/10.1023/A:1025667309714
+Rondeaux, G., Steven, M., Baret, F. (1996). Optimization of soil-adjusted vegetation indices. Remote Sensing of Environment 55(2), 95--107.
+Roujean, J.-L., Bréon, F.-M. (1995). Estimating PAR absorbed by vegetation from bidirectional reflectance measurements. Remote Sensing of Environment 51(3), 375--384.
+Rouse, J.W., Haas, R.H., Schell, J.A., Deering, D.W. (1974). Monitoring vegetation systems in the Great Plains with ERTS. Third ERTS Symposium, NASA SP-351, Vol. 1, 309--317.
+Ruan, C., et al. (2022). Integrating remote sensing and meteorological data to predict wheat stripe rust. Remote Sensing 14(5), 1221. https://doi.org/10.3390/rs14051221
+Saharan, G.S., Verma, P.R., Meena, P.D., Kumar, A. (2014). White Rust of Crucifers: Biology, Ecology and Management. Springer India, New Delhi.
+Savitzky, A., Golay, M.J.E. (1964). Smoothing and differentiation of data by simplified least squares procedures. Analytical Chemistry 36(8), 1627--1639.
+Sharma, A., Vans, E., Shigemizu, D., Boroevich, K.A., Tsunoda, T. (2019). DeepInsight: a methodology to transform a non-image data to an image for convolution neural network architecture. Scientific Reports 9, 11399. https://doi.org/10.1038/s41598-019-47765-6
+Sokolova, M., Lapalme, G. (2009). A systematic analysis of performance measures for classification tasks. Information Processing and Management 45(4), 427--437.
+Tan, M., Le, Q.V. (2019). EfficientNet: rethinking model scaling for convolutional neural networks. Proceedings of the 36th International Conference on Machine Learning, PMLR 97, 6105--6114.
+Thomas, S., Kuska, M.T., Bohnenkamp, D., Brugger, A., Alisaac, E., Wahabzada, M., Behmann, J., Mahlein, A.-K. (2018). Benefits of hyperspectral imaging for plant disease detection and plant protection: a technical perspective. Journal of Plant Diseases and Protection 125, 5--20.
+Tsai, F., Philpot, W. (1998). Derivative analysis of hyperspectral data. Remote Sensing of Environment 66(1), 41--51.
+Urbanowicz, R.J., Meeker, M., La Cava, W., Olson, R.S., Moore, J.H. (2018). Relief-based feature selection: introduction and review. Journal of Biomedical Informatics 85, 189--203. https://doi.org/10.1016/j.jbi.2018.07.014
+Vabalas, A., Gowen, E., Poliakoff, E., Casson, A.J. (2019). Machine learning algorithm validation with a limited sample size. PLoS ONE 14(11), e0224365. https://doi.org/10.1371/journal.pone.0224365
+Varma, S., Simon, R. (2006). Bias in error estimation when using cross-validation for model selection. BMC Bioinformatics 7, 91. https://doi.org/10.1186/1471-2105-7-91
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, Ł., Polosukhin, I. (2017). Attention is all you need. Advances in Neural Information Processing Systems 30, 5998--6008.
+Wang, H., et al. (2016). Identification and severity determination of wheat stripe rust and wheat leaf rust based on hyperspectral data acquired using a black-paper-based measuring method. PLoS ONE 11(4), e0154648. https://doi.org/10.1371/journal.pone.0154648
+Williams, P.C. (2001). Implementation of near-infrared technology. In: Williams, P., Norris, K. (eds) Near-Infrared Technology in the Agricultural and Food Industries, 2nd edn. American Association of Cereal Chemists, St. Paul, 145--169.
+Wold, S., Sjöström, M., Eriksson, L. (2001). PLS-regression: a basic tool of chemometrics. Chemometrics and Intelligent Laboratory Systems 58(2), 109--130.
+Woo, S., Debnath, S., Hu, R., Chen, X., Liu, Z., Kweon, I.S., Xie, S. (2023). ConvNeXt V2: co-designing and scaling ConvNets with masked autoencoders. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 16133--16142. https://doi.org/10.1109/CVPR52729.2023.01548
+Woo, S., Park, J., Lee, J.-Y., Kweon, I.S. (2018). CBAM: convolutional block attention module. Proceedings of the European Conference on Computer Vision (ECCV), Lecture Notes in Computer Science 11211, 3--19. https://doi.org/10.1007/978-3-030-01234-2_1
+Xu, Y., Goodacre, R. (2018). On splitting training and validation set: a comparative study of cross-validation, bootstrap and systematic sampling for estimating the generalization performance of supervised learning. Journal of Analysis and Testing 2, 249--262. https://doi.org/10.1007/s41664-018-0068-2
+Zhang, J., Pu, R., Yuan, L., Huang, W., Nie, C., Yang, G. (2014). Integrating remotely sensed and meteorological observations to forecast wheat powdery mildew at a regional scale. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 7(11), 4328--4339. https://doi.org/10.1109/JSTARS.2014.2315875

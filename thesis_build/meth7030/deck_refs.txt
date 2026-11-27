@@ -1,0 +1,120 @@
+Ambroise, C., McLachlan, G.J. (2002). PNAS 99(10), 6562–6566.
+Ambroise, C., McLachlan, G.J. (2002). Selection bias in gene extraction on the basis of microarray gene-expression data. Proceedings of the National Academy of Sciences USA 99(10), 6562–6566.
+Ankerst, M., et al. (1999). ACM SIGMOD Record 28(2), 49–60.
+Barnes, E.M., Clarke, T.R., Richards, S.E., Colaizzi, P.D., Haberland, J., Kostrzewski, M., et al. (2000). Coincident detection of crop water stress, nitrogen status and canopy density using ground-based multispectral data. In: Proceedings of the 5th International Conference on Precision Agriculture, Bloomington, MN, USA.
+Barnes, R.J., Dhanoa, M.S., Lister, S.J. (1989). Applied Spectroscopy 43(5), 772–777.
+Benjamini, Y., Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal Statistical Society B 57(1), 289–300.
+Blackburn, G.A. (1998). Remote Sensing of Environment 66, 273–285.
+Blackburn, G.A. (1998). Spectral indices for estimating photosynthetic pigment concentrations: a test using senescent tree leaves. International Journal of Remote Sensing 19(4), 657–675.
+Breiman, L. (2001). Machine Learning 45(1), 5–32.
+Breiman, L. (2001). Random forests. Machine Learning 45, 5–32.
+Breiman, L., Friedman, J.H., Olshen, R.A., Stone, C.J. (1984). Classification and Regression Trees. Wadsworth, Belmont, CA.
+Broge, N.H., Leblanc, E. (2001). Comparing prediction power and stability of broadband and hyperspectral vegetation indices for estimation of green leaf area index and canopy chlorophyll density. Remote Sensing of Environment 76(2), 156–172.
+Carter, G.A. (1993). American Journal of Botany 80(3), 239–243.
+Carter, G.A., Knapp, A.K. (2001). American Journal of Botany 88(4), 677–684.
+Chang, C.W., Laird, D.A., Mausbach, M.J., Hurburgh, C.R. (2001). Near-infrared reflectance spectroscopy–principal components regression analyses of soil properties. Soil Science Society of America Journal 65(2), 480–490.
+Chatterjee, A., Nirwan, S., Mohapatra, S., Sharma, P., Agnihotri, A., Shrivastava, N. (2022). Biochemical aspects of pathogenic variability in white rust infected Indian mustard. Mycologia 114(4), 757–768.
+Chen, J.M. (1996). Evaluation of vegetation indices and a modified simple ratio for boreal applications. Canadian Journal of Remote Sensing 22(3), 229–242.
+Cheng, T., Rivard, B., Sánchez-Azofeifa, G.A., et al. (2010). Remote Sensing of Environment 114(4), 899–910.
+Cheng, T., Rivard, B., Sánchez-Azofeifa, G.A., et al. (2010). Remote Sensing of Environment 114, 899–910.
+Cho, M.A., Skidmore, A.K. (2006). Remote Sensing of Environment 101(2), 181–193.
+Clark, R.N., Roush, T.L. (1984). Reflectance spectroscopy: quantitative analysis techniques for remote sensing applications. Journal of Geophysical Research 89(B7), 6329–6340.
+Cohen, J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37–46.
+Cohen, J. (1960). Educational and Psychological Measurement 20(1), 37–46.
+Congalton, R.G. (1991). Remote Sensing of Environment 37(1), 35–46.
+Cortes, C., Vapnik, V. (1995). Machine Learning 20(3), 273–297.
+Cortes, C., Vapnik, V. (1995). Machine Learning 20, 273–297.
+Cover, T., Hart, P. (1967). IEEE Transactions on Information Theory 13(1), 21–27.
+Crabb, G.U., Zhao, Y., Priest, N.K., Chen, X., Cevik, V. (2026). Presymptomatic plant disease detection with PSNet: a low-cost hyperspectral imaging and RGB fusion framework. bioRxiv preprint (posted 4 March 2026), not peer reviewed.
+Curran, P.J. (1989). Remote sensing of foliar chemistry. Remote Sensing of Environment 30(3), 271–278.
+Das, B., Sahoo, R.N., Biswas, A., et al. (2020). Discrimination of rice genotypes using field spectroradiometry. Geocarto International 35(1), 64–77.
+Das, B., Sahoo, R.N., Biswas, A., Pargal, S., Krishna, G., Verma, R., Chinnusamy, V., Sehgal, V.K., Gupta, V.K. (2020). Discrimination of rice genotypes using field spectroradiometry. Geocarto International 35(1), 64–77.
+Dash, J., Curran, P.J. (2004). The MERIS terrestrial chlorophyll index. International Journal of Remote Sensing 25(23), 5403–5413.
+Datt, B. (1999). Visible/near infrared reflectance and chlorophyll content in Eucalyptus leaves. International Journal of Remote Sensing 20(14), 2741–2759.
+Daughtry, C.S.T., Walthall, C.L., Kim, M.S., Brown de Colstoun, E., McMurtrey, J.E. (2000). Estimating corn leaf chlorophyll concentration from leaf and canopy reflectance. Remote Sensing of Environment 74(2), 229–239.
+Díaz-Uriarte, R., Alvarez de Andrés, S. (2006). Gene selection and classification of microarray data using random forest. BMC Bioinformatics 7, 3.
+Fisher, R.A. (1936). Annals of Eugenics 7(2), 179–188.
+Friedman, J.H. (1991). Multivariate adaptive regression splines. Annals of Statistics 19(1), 1–67.
+Gamon, J.A., et al. (2016). PNAS 113(46), 13087–13092.
+Gamon, J.A., Peñuelas, J., Field, C.B. (1992). A narrow-waveband spectral index that tracks diurnal changes in photosynthetic efficiency. Remote Sensing of Environment 41(1), 35–44.
+Gao, B.-C. (1996). NDWI: a normalized difference water index for remote sensing of vegetation liquid water from space. Remote Sensing of Environment 58(3), 257–266.
+Garrity, S.R., Eitel, J.U.H., Vierling, L.A. (2011). Remote Sensing of Environment 115(2), 628–635.
+Geladi, P., MacDougall, D., Martens, H. (1985). Applied Spectroscopy 39(3), 491–500.
+Gitelson, A.A., Gritz, Y., Merzlyak, M.N. (2003). Relationships between leaf chlorophyll content and spectral reflectance and algorithms for non-destructive chlorophyll assessment in higher plant leaves. Journal of Plant Physiology 160(3), 271–282.
+Gitelson, A.A., Merzlyak, M.N., Chivkunova, O.B. (2001). Optical properties and nondestructive estimation of anthocyanin content in plant leaves. Photochemistry and Photobiology 74(1), 38–45.
+Gitelson, A.A., Zur, Y., Chivkunova, O.B., Merzlyak, M.N. (2002). Assessing carotenoid content in plant leaves with reflectance spectroscopy. Photochemistry and Photobiology 75(3), 272–281.
+Gong, P., Pu, R., Heald, R.C. (2002). International Journal of Remote Sensing 23(9), 1827–1850.
+Guyot, G., Baret, F., Major, D.J. (1988). High spectral resolution: determination of spectral shifts between the red and near infrared. International Archives of Photogrammetry and Remote Sensing 11, 750–760.
+Haboudane, D., Miller, J.R., Pattey, E., Zarco-Tejada, P.J., Strachan, I.B. (2004). Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: modeling and validation in the context of precision agriculture. Remote Sensing of Environment 90(3), 337–352.
+Hernández-Clemente, R., et al. (2011). Remote Sensing of Environment 115(9), 2360–2375.
+Horler, D.N.H., Dockray, M., Barber, J. (1983). The red edge of plant leaf reflectance. International Journal of Remote Sensing 4(2), 273–288.
+Hueni, A., Bialek, A. (2017). Cause, effect, and correction of field spectroradiometer interchannel radiometric steps. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 10(4), 1542–1551.
+Hueni, A., Bialek, A. (2017). IEEE JSTARS 10(4), 1542–1551.
+Hughes, G. (1968). On the mean accuracy of statistical pattern recognizers. IEEE Transactions on Information Theory 14(1), 55–63.
+Hunt, E.R., Rock, B.N. (1989). Detection of changes in leaf water content using near- and middle-infrared reflectances. Remote Sensing of Environment 30(1), 43–54.
+Kalousis, A., Prados, J., Hilario, M. (2007). Stability of feature selection algorithms. Knowledge and Information Systems 12(1), 95–116.
+Kauth, R.J., Thomas, G.S. (1976). The tasselled cap: a graphic description of the spectral-temporal development of agricultural crops as seen by Landsat. In: Proceedings of the Symposium on Machine Processing of Remotely Sensed Data, Purdue University, West Lafayette, IN, pp. 41–51.
+Kokaly, R.F., Clark, R.N. (1999). Spectroscopic determination of leaf biochemistry using band-depth analysis of absorption features and stepwise multiple linear regression. Remote Sensing of Environment 67(3), 267–287.
+Kononenko, I. (1994). ECML-94, LNCS 784, 171–182.
+Kramer, C.Y. (1956). Extension of multiple range tests to group means with unequal numbers of replications. Biometrics 12(3), 307–310.
+Kruse, F.A., et al. (1993). Remote Sensing of Environment 44(2–3), 145–163.
+Landis, J.R., Koch, G.G. (1977). Biometrics 33(1), 159–174.
+Leardi, R., Lupiáñez González, A. (1998). Genetic algorithms applied to feature selection in PLS regression: how and when to use them. Chemometrics and Intelligent Laboratory Systems 41(2), 195–207.
+Liaw, A., Wiener, M. (2002). Classification and regression by randomForest. R News 2(3), 18–22.
+Lichtenthaler, H.K., Gitelson, A., Lang, M. (1996). Non-destructive determination of chlorophyll content of leaves of a green and an aurea mutant of tobacco by reflectance measurements. Journal of Plant Physiology 148(3–4), 483–493.
+Liu, F.T., Ting, K.M., Zhou, Z.-H. (2008). Proc. 8th IEEE ICDM, 413–422.
+Lv, Z., Meng, R., Chen, G., et al. (2023). Precision Agriculture 24, 1593–1618.
+Mahlein, A.-K. (2016). Plant disease detection by imaging sensors: parallels and specific demands for precision agriculture and plant phenotyping. Plant Disease 100(2), 241–251.
+Mahlein, A.-K., et al. (2013). Remote Sensing of Environment 128, 21–30.
+Mahlein, A.-K., Rumpf, T., Welke, P., Dehne, H.-W., Plümer, L., Steiner, U., Oerke, E.-C. (2013). Development of spectral indices for detecting and identifying plant diseases. Remote Sensing of Environment 128, 21–30.
+Mandal, N., Adak, S., Das, D.K., et al. (2023). Spectral characterization and severity assessment of rice blast disease using univariate and multivariate models. Frontiers in Plant Science 14, 1067189.
+Mandal, N., Adak, S., Das, D.K., Sahoo, R.N., Mukherjee, J., Kumar, A., Chinnusamy, V., Das, B., Mukhopadhyay, A., Rajashekara, H., Gakhar, S. (2023). Spectral characterization and severity assessment of rice blast disease using univariate and multivariate models. Frontiers in Plant Science 14, 1067189.
+McFeeters, S.K. (1996). The use of the normalized difference water index (NDWI) in the delineation of open water features. International Journal of Remote Sensing 17(7), 1425–1432.
+McInnes, L., Healy, J., Melville, J. (2018). arXiv:1802.03426.
+Merton, R., Huntington, J. (1999). Early simulation results of the ARIES-1 satellite sensor for multi-temporal vegetation research derived from AVIRIS. In: Proceedings of the 8th Annual JPL Airborne Earth Science Workshop, Pasadena, CA.
+Merzlyak, M.N., Gitelson, A.A., Chivkunova, O.B., Rakitin, V.Y. (1999). Non-destructive optical detection of pigment changes during leaf senescence and fruit ripening. Physiologia Plantarum 106(1), 135–141.
+Mevik, B.-H., Wehrens, R. (2007). The pls package: principal component and partial least squares regression in R. Journal of Statistical Software 18(2), 1–23.
+Milborrow, S. (2014). earth: Multivariate Adaptive Regression Spline Models. R package (derived from mda:mars by T. Hastie and R. Tibshirani).
+Nagler, P.L., Inoue, Y., Glenn, E.P., Russ, A.L., Daughtry, C.S.T. (2003). Cellulose absorption index (CAI) to quantify mixed soil–plant litter scenes. Remote Sensing of Environment 87(2–3), 310–325.
+Nogueira, S., Sechidis, K., Brown, G. (2018). On the stability of feature selection algorithms. Journal of Machine Learning Research 18(174), 1–54.
+O'Brien, R.M. (2007). Quality & Quantity 41, 673–690.
+O'Brien, R.M. (2007). Quality and Quantity 41(5), 673–690.
+Pedregosa, F., Varoquaux, G., Gramfort, A., et al. (2011). Scikit-learn: machine learning in Python. Journal of Machine Learning Research 12, 2825–2830.
+Peñuelas, J., Baret, F., Filella, I. (1995). Semi-empirical indices to assess carotenoids/chlorophyll a ratio from leaf spectral reflectance. Photosynthetica 31(2), 221–230.
+Peñuelas, J., et al. (1995). International Journal of Remote Sensing 16(14), 2727–2733.
+Peñuelas, J., Filella, I., Biel, C., Serrano, L., Savé, R. (1993). The reflectance at the 950–970 nm region as an indicator of plant water status. International Journal of Remote Sensing 14(10), 1887–1905.
+Pu, R., Ge, S., Kelly, N.M., Gong, P. (2003). International Journal of Remote Sensing 24(9), 1799–1810.
+Pudil, P., Novovičová, J., Kittler, J. (1994). Pattern Recognition Letters 15(11), 1119–1125.
+Richards, J.A. (2013). Remote Sensing Digital Image Analysis, 5th edn. Springer, Berlin.
+Richards, J.A. (2013). Remote Sensing Digital Image Analysis: An Introduction, 5th edn. Springer, Berlin.
+Richardson, A.J., Wiegand, C.L. (1977). Distinguishing vegetation from soil background information. Photogrammetric Engineering and Remote Sensing 43(12), 1541–1552.
+Rinnan, Å., van den Berg, F., Engelsen, S.B. (2009). TrAC 28(10), 1201–1222.
+Roberts, D.R., Bahn, V., Ciuti, S., Boyce, M.S., Elith, J., Guillera-Arroita, G., et al. (2017). Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure. Ecography 40(8), 913–929.
+Roberts, D.R., et al. (2017). Ecography 40(8), 913–929.
+Roujean, J.-L., Breon, F.-M. (1995). Estimating PAR absorbed by vegetation from bidirectional reflectance measurements. Remote Sensing of Environment 51(3), 375–384.
+Rouse, J.W., Haas, R.H., Schell, J.A., Deering, D.W. (1973). Monitoring vegetation systems in the Great Plains with ERTS. In: Third ERTS Symposium, NASA SP-351, Vol. 1, pp. 309–317 (published 1974).
+Savitzky, A., Golay, M.J.E. (1964). Analytical Chemistry 36(8), 1627–1639.
+Schmidt, K.S., Skidmore, A.K. (2003). Spectral discrimination of vegetation types in a coastal wetland. Remote Sensing of Environment 85(1), 92–108.
+Selvaprakash, R., Sahoo, R.N., Kumar, A., Ranjan, R., Chinnasamy, V. (2026). Plant Science Today 13(1), 1–10.
+Slaton, M.R., Hunt, E.R., Smith, W.K. (2001). American Journal of Botany 88(2), 278–284.
+Strobl, C., Boulesteix, A.-L., Zeileis, A., Hothorn, T. (2007). Bias in random forest variable importance measures. BMC Bioinformatics 8, 25.
+Terentev, A., Badenko, V., Shaydayuk, E., Emelyanov, D., Eremenko, D., Klabukov, D., Fedotov, A., Dolzhenko, V. (2023). Hyperspectral remote sensing for early detection of wheat leaf rust caused by Puccinia triticina. Agriculture 13(6), 1186.
+Therneau, T., Atkinson, B. (2023). rpart: Recursive Partitioning and Regression Trees. R package version 4.1.23.
+Tian, L., et al. (2021). Remote Sensing of Environment 257, 112350.
+Tian, L., Xue, B., Wang, Z., et al. (2021). Remote Sensing of Environment 257, 112350.
+Tian, L., Xue, B., Wang, Z., Li, D., Yao, X., Cao, Q., Zhu, Y., Cao, W., Cheng, T. (2021). Spectroscopic detection of rice leaf blast infection from asymptomatic to mild stages with integrated machine learning and feature selection. Remote Sensing of Environment 257, 112350.
+Tsai, F., Philpot, W. (1998). Remote Sensing of Environment 66(1), 41–51.
+Tukey, J.W. (1949). Comparing individual means in the analysis of variance. Biometrics 5(2), 99–114.
+Vaiphasa, C., Skidmore, A.K., de Boer, W.F., Vaiphasa, T. (2007). A hyperspectral band selector for plant species discrimination. ISPRS Journal of Photogrammetry and Remote Sensing 62(3), 225–235.
+van der Maaten, L., Hinton, G. (2008). JMLR 9, 2579–2605.
+Venables, W.N., Ripley, B.D. (2002). Modern Applied Statistics with S, 4th edn. Springer, New York.
+Wold, S., Sjöström, M., Eriksson, L. (2001). Chemometrics and Intelligent Laboratory Systems 58(2), 109–130.
+Wright, M.N., Ziegler, A. (2017). ranger: a fast implementation of random forests for high dimensional data in C++ and R. Journal of Statistical Software 77(1), 1–17.
+Yuan, L., et al. (2014). Field Crops Research 156, 199–207.
+Zarco-Tejada, P.J., Berjón, A., López-Lozano, R., Miller, J.R., Martín, P., Cachorro, V., González, M.R., de Frutos, A. (2005). Assessing vineyard condition with hyperspectral indices: leaf and canopy reflectance simulation in a row-structured discontinuous canopy. Remote Sensing of Environment 99(3), 271–287.
+Zhang, J., Pu, R., Huang, W., Yuan, L., Luo, J., Wang, J. (2012). Using in-situ hyperspectral data for detecting and discriminating yellow rust disease from nutrient stresses. Field Crops Research 134, 165–174.
+Zhang, J., Yuan, L., Pu, R., et al. (2014). Computers and Electronics in Agriculture 100, 79–87.
+Zhang, J.-C., Pu, R., Wang, J., et al. (2012). Computers and Electronics in Agriculture 85, 13–23.
+Zhang, J.-C., Pu, R., Wang, J., Huang, W., Yuan, L., Luo, J. (2012). Computers and Electronics in Agriculture 85, 13–23.
+Zhang, X., Vinatzer, B.A., Li, S. (2024). Hyperspectral imaging analysis for early detection of tomato bacterial leaf spot disease. Scientific Reports 14, 27666.
+Zheng, Q., Huang, W., Cui, X., Shi, Y., Liu, L. (2018). New spectral index for detecting wheat yellow rust using Sentinel-2 multispectral imagery. Sensors 18(3), 868.

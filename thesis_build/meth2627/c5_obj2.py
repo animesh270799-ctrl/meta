@@ -1,0 +1,181 @@
+from c_lib import *
+
+
+def add():
+    h1('7. Objective 2 – Detection and severity discrimination through artificial intelligence-based multimodal data fusion')
+    p('Objective 2 builds and compares predictive models on the post-symptomatic subplot-dates: 1320 from the 33 training plots for fusion, tuning and training, 600 from the 15 test plots for the single final test. '
+      'All 15 sensor sets – the 4 single cameras and their 11 combinations – are modelled for the three tasks. Their inputs are the features selected in Objective 1 on the training plots, joined at feature level (Step 2.2). '
+      'Models: SVM/SVR, random forest, k-NN and PLS-DA/PLSR, each with SFFS (Step 2.3) and grid search (Step 2.4); DNN-F1 for all 15 sets and DNN-F2 for the 11 fused sets (Step 2.5); DT-EDNet and its three comparison networks for Tasks A and B (Step 2.6).')
+    myfig('models', 'g11_models.png', 'Model families, inner validation and test of Objective 2 (left); demo of a pseudo-image for the networks (right).')
+    P = 'Objective 2'
+
+    h2('Activity 2.1 – Tasks and sensor sets')
+    step('2.1', 'Three tasks and 15 sensor sets', part=P,
+         what='Task A: healthy vs diseased; Task B: DI class; Task C: DI (%). Sensor sets: four single cameras, six pairs, four triplets and all four cameras.',
+         why='The objective asks which camera or combination works best; all combinations are tested on the same plots so that differences are due to the cameras.',
+         do=['S1 HS, S2 MS, S3 RGB, S4 TIR; S5 HS+MS, S6 HS+RGB, S7 HS+TIR, S8 MS+RGB, S9 MS+TIR, S10 RGB+TIR; S11 HS+MS+RGB, S12 HS+MS+TIR, S13 HS+RGB+TIR, S14 MS+RGB+TIR; S15 all four.',
+             'Tabulate class counts of Tasks A and B on the training and test plots.'],
+         check=['Class counts table; classes with < 5% merged (Step A5).'],
+         out='Task × sensor-set matrix → 2.2.',
+         papers=[('Maimaitijiang et al. (2020)', 'Soybean yield from UAV RGB, multispectral and thermal cameras (method support); PLSR, random forest, SVR and DNN-F1 run on every single camera and every camera combination, DNN-F2 on the two- and three-camera combinations; 70% training and 30% test samples.', 'All single cameras and all combinations modelled with the same models and split.'),
+                 ('Tian et al. (2021)', 'Rice leaf blast; infected vs healthy leaves classified separately at the asymptomatic, early and mild stages.', 'Detection task (Task A).'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; models from each single data source (indices, temperature, texture) compared with fused sources.', 'Single cameras and their combinations compared.'),
+                 ('Abdulridha et al. (2023)', 'Wheat stem rust; drone hyperspectral data of 960 plots classified into four severity classes (healthy, mild, moderate, severe) and mild vs healthy (88%).', 'Detection plus severity classes.'),
+                 ('Mahlein et al. (2019)', 'Fusarium head blight; SVM on each sensor alone and on every combination of thermal, fluorescence and hyperspectral parameters (seven data sets).', 'Every single sensor and every combination compared.')])
+
+    h2('Activity 2.2 – Feature-level fusion of the selected camera features')
+    step('2.2', 'Feature-level fusion of the camera feature sets selected in Objective 1', part=P,
+         data='33 training plots only (1320 subplot-dates per camera).',
+         what='The disease-specific feature sets of the cameras, selected once on the training plots in Objective 1 (Step 1.6.5), are joined for each of the 15 sensor sets; VIF < 10 is applied again to the joined set on the training plots.',
+         why='Each sensor set needs one input table; joining features of different cameras creates new collinearity, which VIF removes. No new selection is needed because the camera feature sets were already chosen on the training plots only.',
+         do=['Take the DSF of each camera and task from Step 1.6.5 (training plots).', 'For each sensor set, join the DSFs of its cameras by subplot code and date.', 'Remove the feature with the largest VIF until all VIF < 10 (training plots).', 'Compute the same features for the test samples with the wavelengths and formulas fixed on the training plots.'],
+         check=['One input table for each of the 15 sensor sets × 3 tasks; no step used the test plots.'],
+         out='Inputs of every model → 2.3–2.6.',
+         q='Why not select again here? → The Objective 1 selection already used only the 33 training plots, so its feature sets can be used as they are; only the joining of cameras is new.',
+         papers=[('Ma et al. (2026)', 'Rice blast; feature selection and model training on the 2023 data only; testing on independent 2024 data.', 'Features chosen on the training data and used unchanged for the models.'),
+                 ('Feng et al. (2022)', 'Wheat powdery mildew; vegetation indices, thermal temperature parameters and texture features fused at feature level; PLSR, random forest and SVR compared.', 'Feature-level fusion by concatenation.'),
+                 ('Liu et al. (2024)', 'Wheat powdery mildew; spectral, texture and canopy-temperature features fused after Pearson correlation and recursive feature elimination.', 'Same fusion level after selection.'),
+                 ('Huang et al. (2020)', 'Wheat Fusarium head blight; spectral bands, colour and texture features, each screened on its own, fused for severity diagnosis; spectral + colour fusion was best (PSO-SVM, 92% on the prediction set).', 'Features selected within each group, then fused at feature level.'),
+                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; the selected features of the hyperspectral, fluorescence and phenotyping data were fused after VIF < 10 and ML-SFFS chose the combination; two to three kinds of features were optimal for asymptomatic detection (87.04%).', 'Per-sensor selected features joined, VIF, then SFFS (Step 2.3).')])
+
+    h2('Activity 2.3 – Machine-learning models')
+    step('2.3', 'Sequential floating forward selection', part=P,
+         what='For each ML model, SFFS adds the feature that most improves the GroupKFold(3) score and after each addition tries to remove one; the subset with the best score (at most 15 features) is kept.',
+         why='Each model may need a different, smaller subset of the DSF.',
+         do=['Criterion: macro-F1 (Tasks A, B) or negative RMSE (Task C); folds of Step D2.', 'Record the best subset of each size up to 15; keep the best one.',
+             'Stability check for the best model of each task (Step 2.8): repeat SFFS over 100 random GroupKFold(3) divisions of the training plots; report how often each feature is selected and whether the most frequent subset equals the chosen one.'],
+         check=['Subset and inner score of every model × sensor set × task.'],
+         out='Feature subsets → 2.4.',
+         papers=[('Tian et al. (2021)', 'Rice leaf blast; SFFS wrapped around LDA, k-NN and SVM found optimal combinations of 2–4 features (SVM-SFFS best); 4-fold cross-validation repeated 100 times, the most frequently selected combination retained.', 'SFFS wrapped around each model; selection frequency over 100 repetitions for the best model.'),
+                 ('Lv et al. (2023)', 'Southern corn leaf blight; RELIEF-F followed by SFFS determined the optimal feature combination; models evaluated by overall accuracy and macro-F1 (SVM, 4-fold cross-validation repeated 100 times).', 'SFFS after Relief-F and VIF; macro-F1 reported.'),
+                 ('Mustafa et al. (2023)', 'Wheat Fusarium head blight; ML-SFFS with k-NN, random forest and SVM (mlxtend) on the VIF-screened features of three sensors; the k-NN model was best for severity (R² 0.92).', 'SFFS wrapped around k-NN, random forest and SVM on fused sensor features.'),
+                 ('Shafiee et al. (2021)', 'Wheat yield from UAV multispectral bands and indices (method support); sequential forward selection wrapped around SVR chose the best feature subset, compared with LASSO.', 'Sequential selection wrapped around SVR (Task C).')])
+    step('2.4', 'Models, tuning grids and final fit', part=P,
+         what='SVM/SVR, random forest, k-NN and PLS-DA/PLSR are tuned by grid search with the same inner folds, refitted on all 33 training plots and used once on the test plots.',
+         why='Classical models are the reference for the networks and are used in most disease studies.',
+         do=['Grid search on the SFFS subset (GroupKFold(3)).', 'Refit the best setting on all training samples.', 'Predict the 600 test samples once and save model, subset and predictions.'],
+         check=['Model files and test predictions for 4 models × 15 sets × 3 tasks.'],
+         out='ML predictions → 2.7.',
+         papers=[('Tian et al. (2021)', 'Rice leaf blast; SVM (RBF) C and γ by grid search; k-NN and LDA as the other criterion models; 4-fold cross-validation repeated 100 times.', 'SVM C and γ tuned by grid search with cross-validation.'),
+                 ('Chen et al. (2023)', 'Tobacco viruses; SVM penalty C and the number of random-forest trees chosen by grid search with cross-validation in the training set only (random 8:2 split); test set used once.', 'Grid search inside the training data; test used once.'),
+                 ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; model settings tuned by grid search with 3-fold cross-validation inside the 70% training set.', 'Grid search inside the training data.'),
+                 ('Abdulridha et al. (2023); Yuan et al. (2025)', 'Wheat stem rust: QDA, random forest, decision tree and SVM on UAV hyperspectral bands and indices (random forest best, 85%; 70:30, 10 runs); rice bacterial blight: random forest, SVM and k-NN on UAV features.', 'Random forest, SVM and k-NN on UAV data.'),
+                 ('Zhang et al. (2012); Mandal et al. (2023); Krishna et al. (2014)', 'Wheat powdery mildew: PLSR of the disease index (7 components) and Fisher discriminant of damage levels; rice blast: PLS, random forest, MARS and SVM for severity regression and classification; wheat yellow rust (IARI): full-spectrum PLSR of disease severity.', 'PLS-DA / PLSR among the models.')])
+    rows = [['Model', 'Grid (GroupKFold(3))', 'Disease papers'],
+            ['SVM / SVR (RBF)', 'C ∈ {0.1, 1, 10, 100}; γ ∈ {0.001, 0.01, 0.1, scale}; ε ∈ {0.1, 0.5}', 'Tian et al. (2021); Lv et al. (2023); Yuan et al. (2025)'],
+            ['Random forest', '500 trees; max_features ∈ {sqrt, 0.3}; min_samples_leaf ∈ {1, 3, 5}', 'Abdulridha et al. (2023); Liu et al. (2024); Yuan et al. (2025)'],
+            ['k-NN', 'k ∈ {3, 5, 7, 9, 11}; uniform or distance weights', 'Tian et al. (2021); Yuan et al. (2025)'],
+            ['PLS-DA / PLSR', '1–15 components', 'Zhang et al. (2012); Mandal et al. (2023); Krishna et al. (2014)']]
+    tab('mlgrid', rows=rows, caption='Machine-learning models and tuning grids.', widths=[1800, 4600, 3200], size=16)
+
+    h2('Activity 2.4 – Deep-learning models')
+    step('2.5', 'Feature-fusion networks: input-level (DNN-F1) and intermediate-level with camera attention (DNN-F2)', part=P,
+         data='Fitted on 22 training plots; early stopping on the 11 validation plots; test plots used once.',
+         what='DNN-F1 takes the joined feature vector of a sensor set (input-level fusion); DNN-F2 gives each camera its own branch, weights the branches with a squeeze-and-excitation camera attention and then joins them (intermediate-level fusion). Both are trained for Tasks A, B and C; DNN-F2 only for the 11 sensor sets with two or more cameras.',
+         why='Tests whether a neural network gains over the ML models on the same Objective 1 features, and whether letting the network weigh each camera (DNN-F2) helps more than simple joining (DNN-F1).',
+         do=['DNN-F1: two hidden layers (64 and 32 units), batch normalisation, ReLU, dropout 0.3; softmax (Tasks A, B) or linear output (Task C).',
+             'DNN-F2: one branch per camera (dense 32 units, batch normalisation, ReLU, dropout 0.3) on that camera\'s selected features; squeeze-and-excitation layer that learns one weight per camera; weighted branch outputs joined, dense 32 units, output layer.',
+             'Inputs z-scored with the 22 fitting plots (Step D4); AdamW and the schedule of Step 2.6; early stopping on the 11 validation plots; best epoch kept.',
+             'Record the learned camera weights of DNN-F2 for every fused set.'],
+         check=['Learning curves saved; best epoch and DNN-F2 camera weights recorded.'],
+         out='DNN-F1 and DNN-F2 predictions → 2.7; camera weights → 2.8.',
+         alt='The camera weights of DNN-F2 use squeeze-and-excitation (Hu et al., 2018), the same block used inside DT-EDNet (Ma et al., 2026); without it DNN-F2 is the plain intermediate-level network of Maimaitijiang et al. (2020).',
+         papers=[('Maimaitijiang et al. (2020)', 'Soybean yield from UAV RGB, multispectral and thermal cameras (method support); DNN-F1 joined all features at the input, DNN-F2 had one sub-network per modality joined by a concatenation layer (ReLU, dropout, batch normalisation); DNN-F2 was used only for camera combinations and consistently beat DNN-F1 (best R² 0.72).', 'Same two fusion levels; DNN-F2 only for the fused sensor sets.'),
+                 ('Deng et al. (2024)', 'Wheat stripe rust; RustQNet gave UAV RGB, multispectral and index images each its own encoder and fused them by cross-attention to estimate the DI (R² 0.80 for three modalities, better than one or two).', 'One branch per camera fused inside the network (DNN-F2) and regression of the DI.'),
+                 ('Yu et al. (2025)', 'Rice sheath blight; dual-branch model (GRU branch for spectra and physiology, CNN branch for their 2D images) fused by multi-head attention; 94% accuracy, better than either branch alone.', 'One branch per data source joined with attention, as in DNN-F2.'),
+                 ('Ma et al. (2026)', 'Rice blast; squeeze-and-excitation block in DT-EDNet to re-weight feature channels.', 'Squeeze-and-excitation used to weight the cameras.'),
+                 ('Liu et al. (2020)', 'Wheat Fusarium head blight; a neural network classifier on UAV hyperspectral bands, indices and texture.', 'Neural network on selected UAV features.'),
+                 ('Martínez-Martínez et al. (2018)', 'Bean angular leaf spot; PCA followed by an artificial neural network estimated severity from leaf reflectance (R² up to 0.87).', 'Network regression of severity.')])
+    step('2.6', 'Pseudo-image networks: Dual Transformer Early Detection Network and its comparison networks', part=P,
+         what='The selected features are arranged as a k × k pseudo-image and classified (Tasks A and B) by DT-EDNet, EfficientNet-B0, ResNet18 and ConvNeXt V2-Atto with identical settings.',
+         why='DT-EDNet is the network of the core reference paper; the three others are its comparison networks.',
+         do=['Pseudo-image side k = ⌈√p⌉ (at least 3) for p features; features in group order (OW, VI, texture, then the other cameras); empty cells 0.',
+             'DT-EDNet: 3 × 3 convolutional embedding (128 channels) → squeeze-and-excitation → one kernel transformer block with CBAM and four token transformer blocks (4 heads) → class token, LayerNorm, linear head.',
+             'Training: AdamW (6 × 10^{−4}, weight decay 10^{−5}), cosine schedule to 10^{−6}, 300 epochs, batch 32, label smoothing 0.01, gradient clipping 1.2, seed 42; early stopping with patience 60 and minimum improvement 5 × 10^{−5}; keep the model with the highest validation OA.',
+             'Configurations on HS (Ma et al. design): OW, VI, TF, OW + VI, OW + TTFI, OW + VI + TTFI; and the DSFs of the 15 sensor sets.',
+             'Module ablation of DT-EDNet: without SE, without the dual transformer group, without both.'],
+         check=['All networks trained with identical settings; validation curves saved.'],
+         out='Network predictions → 2.7, 2.8.',
+         papers=[('Ma et al. (2026)', 'Rice blast; DT-EDNet compared with EfficientNet, ResNet18 and ConvNeXt V2 under identical settings (AdamW 6 × 10^{−4}, weight decay 10^{−5}, cosine to 10^{−6} over 300 epochs, batch 32, label smoothing 0.01, clipping 1.2, patience 60, minimum improvement 5 × 10^{−5}); the input feature vector was reshaped into a pseudo-2D representation; the model with the highest validation OA was kept; feature configurations and module ablation compared.', 'Same networks, settings, model selection, configurations and ablation; validation on whole plots (Step D2).')])
+    rows = [['Setting', 'Ma et al. (2026)', 'This study'],
+            ['Input', 'feature vector reshaped into a pseudo-2D representation', 'k × k pseudo-image of the selected features'], ['Optimiser, schedule', 'AdamW 6 × 10^{−4}, wd 10^{−5}; cosine to 10^{−6}', 'same'],
+            ['Epochs, patience', '300; 60 (min. improvement 5 × 10^{−5})', 'same'], ['Batch, smoothing, clipping', '32; 0.01; 1.2', 'same'], ['Validation set', '10% of the training set', '11 of the 33 training plots (whole plots)'],
+            ['Model selection', 'highest validation OA', 'same'], ['Tasks', 'severity classes', 'Tasks A and B']]
+    tab('dlset', rows=rows, caption='Network settings of Ma et al. (2026) and of this study.', widths=[2200, 3900, 3500], size=16)
+
+    h2('Activity 2.5 – Evaluation on the test plots')
+    step('2.7', 'Test metrics', part=P,
+         what='Every model is applied once to the 600 test samples; classification and regression metrics are computed.',
+         why='The test plots were never used for selection, tuning or early stopping, so their metrics estimate performance on new plots.',
+         do=['Tasks A and B: confusion matrix, overall accuracy (OA), Cohen\'s kappa, precision, recall and F1 of each class, macro-averaged recall and F1; Task A also sensitivity, specificity and the area under the ROC curve (AUC).',
+             'Task B also: accuracy within one class (prediction at most one DI class from the observed class) and quadratic weighted kappa, because neighbouring DI classes overlap.',
+             'Task C: R², RMSE and the ratio of performance to deviation RPD = SD/RMSE.',
+             'Low-severity check: Task A recall for the subplots of DI class 1 (0 < DI ≤ 5) and Task C RMSE for subplots with DI ≤ 10, to show whether light infection is detected.',
+             'Main metrics: macro-F1 (A, B) and R² (C).'],
+         check=['One metric row per model × sensor set × task.'],
+         out='Metric table → 2.8–2.10.',
+         papers=[('Ma et al. (2026)', 'Rice blast; OA, specificity, precision, recall, F1, kappa, macro-average recall and F1, and per-class precision, recall and F1 on the test set.', 'Same classification metrics.'),
+                 ('Liu et al. (2020)', 'Wheat Fusarium head blight; the area under the ROC curve to judge disease detection.', 'AUC for Task A.'),
+                 ('Guo et al. (2021); Feng et al. (2022)', 'Wheat yellow rust; wheat powdery mildew: R² and RMSE of disease-index estimation (Feng et al.: R² 0.87 calibration, 0.86 validation for the fused random forest).', 'R² and RMSE for Task C.'),
+                 ('Mandal et al. (2023)', 'Rice blast; R², RMSE and RPD of severity models.', 'RPD for Task C.'),
+                 ('Cross et al. (2024)', 'Wheat stripe rust; exact severity-class accuracy 45–52% rose to 79–96% when a prediction one class off was accepted.', 'Accuracy within one class reported for Task B.'),
+                 ('Abdulridha et al. (2023); Deng et al. (2024)', 'Wheat stem rust: mildly diseased vs healthy plots classified separately (88%); wheat stripe rust: RMSE reported for DI ≤ 10 (5.47) to judge early detection.', 'Low-severity check of Tasks A and C.')])
+    myfig('evaldemo', 'g12_eval_demo.png', 'Demo of Steps 2.7–2.8 (simulated): (a) confusion matrix of DI classes on the test plots; (b) macro-F1 of sensor sets.')
+    demo('metrics_ex', [['', 'Predicted healthy', 'Predicted diseased', 'Metric', 'Value'], ['Observed healthy', '150 (TN)', '30 (FP)', 'OA = (150 + 380)/600', '0.883'], ['Observed diseased', '40 (FN)', '380 (TP)', 'sensitivity = 380/420; specificity = 150/180', '0.905; 0.833'],
+                         ['', '', '', 'kappa', '0.73'], ['', '', '', 'macro-F1', '0.86']], 'Worked example of the Task A metrics on 600 test samples', widths=[1800, 1700, 1800, 2700, 1600])
+
+    h2('Activity 2.6 – Comparison, interpretation and covariate baseline')
+    step('2.8', 'Comparison of sensor sets and models, ablation and Shapley additive explanations', part=P,
+         what='Sensor sets and models are ranked by the main metric; the fusion gain is the difference between a fused set and its best single camera; networks are compared on the HS configurations; DT-EDNet modules are ablated; SHAP shows the features used by the best models.',
+         why='Answers which camera or combination is best and why.',
+         do=['Rank all model × sensor-set results per task.', 'Fusion gain = metric(fused set) − metric(best single camera in it).', 'Drop-one-camera ablation: for the all-camera set S15, remove each camera in turn and record the loss of accuracy; compare with the DNN-F2 camera weights.', 'Network comparison and DT-EDNet ablation (Step 2.6).', 'SHAP of the best ML model of each task.'],
+         check=['Ranking table, fusion-gain table, ablation table, SHAP plots.'],
+         out='Best camera / combination → conclusions.',
+         papers=[('Feng et al. (2022)', 'Wheat powdery mildew; accuracy of the fused model compared with each single data source; random forest regression was stable in multi-source fusion.', 'Fusion gain over single cameras.'),
+                 ('Ma et al. (2026)', 'Rice blast; network comparison on feature configurations, DT-EDNet module ablation and SHAP analysis of features.', 'Same comparison, ablation and SHAP.'),
+                 ('Deng et al. (2024)', 'Wheat stripe rust; the three-modality model improved R² by 17.7–35.6% over single modalities and by 1.3–6.7% over two-modality models.', 'Fusion gain over single cameras and over pairs.'),
+                 ('Mahlein et al. (2019)', 'Fusarium head blight; thermal + hyperspectral was the best combination (90%) and adding fluorescence did not help (87%).', 'Drop-one-camera ablation: more cameras are not always better.')])
+    step('2.9', 'Covariate baseline: what the cameras add to time, crop and weather', part=P,
+         what='Three models are compared on the same 33 training and 15 test plots: M0 uses only the covariates of Step A6 (DAI, variety, sowing date, growth stage, 7-day weather, favourable days); M1 uses only camera features (the best sensor set and model of the task, Step 2.8); M2 uses camera features + covariates with the same model type as M1.',
+         why='White rust severity rises with time and depends on weather, variety and stage, so a camera model can look accurate by learning the calendar. As in disease-forecasting studies, the sensors are credited only with what they add to a weather-only model.',
+         do=['Build the covariate table for every sample (Step A6); weather windows end the day before each flight (no look-ahead).',
+             'M0: random forest on the covariates only (numeric covariates z-scored in the pipeline, variety and sowing date one-hot coded), tuned with GroupKFold(3) by plot on the training plots (same grid as Step 2.4).',
+             'M1: the best sensor model of the task (Step 2.8), unchanged.',
+             'M2: the M1 model type on sensor features + covariates; the covariates are added to the DSF and SFFS and grid search are repeated.',
+             'Predict the 15 test plots with M0, M1 and M2; compute all metrics of Step 2.7 (main: macro-F1 for Tasks A, B; R² for Task C).',
+             'Gains: ΔS = M1 − M0 (what the cameras add to the covariates) and ΔC = M2 − M1 (what the covariates add to the cameras), per task and, for Task A, per date.',
+             'Conclude: the cameras are useful if ΔS > 0; if ΔC > 0, practical models should combine cameras with weather and crop information.'],
+         check=['M0, M1, M2 trained on the same plots and folds; no weather from after a flight date.'],
+         out='Table of M0, M1, M2 and gains → conclusions; best practical model.',
+         alt='In one season, weather has one value per date for all plots, so M0 mostly learns date and crop differences; it is reported as a within-season baseline.',
+         q='Why compare with weather? → For wheat powdery mildew, adding remotely sensed data to meteorological data raised forecast accuracy (overall accuracy from about 69% to 78%; Zhang et al., 2014a); the same comparison shows what the UAV cameras add for white rust.',
+         papers=[('Zhang et al. (2014a)', 'Wheat powdery mildew at regional scale: a logistic regression forecast from meteorological factors (precipitation, temperature, sun radiation, humidity) compared with one that added two remotely sensed features; overall accuracy rose from 69% to 78%.', 'M0 (covariates only) vs M2 (sensors + covariates), on the same samples.'),
+                 ('Bijlwan et al. (2025)', 'Wheat yellow rust and powdery mildew; randomised block design with four sowing dates over two seasons; weekly severity predicted from meteorological variables with ANN and random forest (validation R² 0.93 and 0.90) and regularised regression.', 'A weather-only random forest as M0, in a design with four sowing dates like this one.'),
+                 ('Ruan et al. (2022)', 'Wheat stripe rust; random forest on phenology-based Sentinel-2 vegetation indices plus meteorological features (overall accuracy 88.7%, kappa 0.772).', 'Sensor + weather model M2 with a random forest.'),
+                 ('Chattopadhyay et al. (2011)', 'White rust of Indian mustard; stepwise regression models on weather forecast crop age at first appearance, peak leaf severity and staghead numbers.', 'Weather is a proven predictor of white rust; M0 uses the same kind of variables.'),
+                 ('Bhattacharya and Chattopadhyay (2013)', 'Mustard rot tracked by combining surface meteorology with satellite remote sensing.', 'Weather combined with sensor data for a mustard disease.')])
+    demo('covtab', [['Task', 'Main metric', 'M0 covariates', 'M1 sensors', 'M2 sensors + covariates', 'ΔS = M1 − M0', 'ΔC = M2 − M1'],
+                    ['A detection', 'macro-F1', '0.71', '0.84', '0.86', '+0.13', '+0.02'], ['B DI class', 'macro-F1', '0.38', '0.52', '0.55', '+0.14', '+0.03'], ['C DI (%)', 'R²', '0.41', '0.63', '0.66', '+0.22', '+0.03']],
+         'Output of Step 2.9 on the test plots', widths=[1300, 1200, 1300, 1200, 1800, 1400, 1400])
+    myfig('covdemo', 'g13_covariate_demo.png', 'Demo of Step 2.9 (simulated): covariate-only model M0, sensor model M1 and sensor + covariate model M2.')
+
+    h2('Activity 2.7 – Results by stratum, maps and independent testing')
+    step('2.10', 'Results by stratum and severity maps', part=P,
+         what='Test metrics of the best models are reported by variety, sowing date, growth stage and date; class and DI maps are drawn for every date.',
+         why='Shows where the models work and where they fail, and gives the field maps.',
+         do=['Macro-F1 and R² by variety, sowing date, stage and date (test plots).', 'Maps of predicted DI class and DI per subplot on the field layout; error maps on test plots.'],
+         check=['Strata table; maps for all 10 post-symptomatic dates.'],
+         out='Robustness tables and maps → conclusions.',
+         papers=[('Liu et al. (2024)', 'Wheat powdery mildew; severity results by growth stage and severity maps from UAV.', 'Results by stage and maps.'),
+                 ('Blasch et al. (2023)', 'Wheat rusts; detection by growth stage and variety.', 'Results by stratum.'),
+                 ('Deng et al. (2024)', 'Wheat stripe rust; the DI estimated for every pixel of the UAV images over the epidemic and summarised per plot.', 'DI predicted for every subplot and drawn on the field layout.')])
+    step('2.11', 'Independent testing at Bharatpur', part=P,
+         what='The tested IARI models (trained on the 33 training plots) are frozen and applied once to the Bharatpur quadrats processed with the same steps.',
+         why='Shows whether the models work at another site under natural infection.',
+         do=['Process Bharatpur images with Parts B–C (one ROI per quadrat; IARI scaling constants).', 'Compute the selected features with the IARI wavelengths and formulas.', 'Apply the frozen models; same metrics as Step 2.7, by site type and variety; draw farm maps.'],
+         check=['No refitting or tuning on Bharatpur data.'],
+         out='Independent test results and farm maps → conclusions.',
+         papers=[('Ma et al. (2026)', 'Rice blast; trained models evaluated on an independent 2024 data set from natural infection.', 'Frozen models tested once on independent data.'),
+                 ('Yuan et al. (2025)', 'Rice bacterial blight; UAV disease models applied at another scale and area.', 'Transfer of UAV models.'),
+                 ('Liu et al. (2026)', 'Wheat powdery mildew; an index developed on the ground applied to UAV images of other fields.', 'Application to new fields.'),
+                 ('Poblete et al. (2023)', 'Vascular pathogens (Xylella, Verticillium) in olive and almond; detection with WorldView-2 and -3 satellite imagery compared with airborne hyperspectral and thermal results.', 'Testing whether UAV-level detection holds on other data.')])
