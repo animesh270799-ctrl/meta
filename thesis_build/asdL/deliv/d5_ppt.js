@@ -173,7 +173,8 @@ if (ST.L6) {
   s = slide('L6 results: SFFS and grid search of the ML models'); if (T.ml) tbl(s, T.ml, 0.4, 1.15, 12.5, [0.7, 1.0, 1.5, 7.2, 2.1], 10.5); banner(s, 'Each model keeps its own SFFS subset of the 14 DSF features; tuned with the same GroupKFold(3) folds.'); refs(s, R('L6'));
   s = slide('L6 results: SFFS paths (inner GroupKFold(3) score by number of features)'); chart(s, 'c31a', 0.4, 1.1, 4.1, 4.95); chart(s, 'c31b', 4.6, 1.1, 4.1, 4.95); chart(s, 'c31c', 8.8, 1.1, 4.1, 4.95);
   banner(s, 'Scores level off after about 5–10 features: more features add little.'); refs(s, R('L6'));
-  s = slide('L6 results: network training (validation score by epoch)'); chart(s, 'c32a', 0.4, 1.1, 4.1, 3.0); chart(s, 'c32b', 4.6, 1.1, 4.1, 3.0); chart(s, 'c32c', 8.8, 1.1, 4.1, 3.0); if (T.dl) tbl(s, T.dl, 0.4, 4.2, 12.5, [1.0, 3.0, 2.5, 2.5, 3.5], 10);
+  s = slide('L6 results: network training (validation score by epoch)'); chart(s, 'c32a', 0.4, 1.1, 4.1, 2.75); chart(s, 'c32b', 4.6, 1.1, 4.1, 2.75); chart(s, 'c32c', 8.8, 1.1, 4.1, 2.75);
+  if (T.dl) { const h = T.dl[0], ra = T.dl.slice(1).filter(r => r[0] !== 'B'), rb = T.dl.slice(1).filter(r => r[0] === 'B'); tbl(s, [h].concat(ra), 0.4, 3.95, 6.1, [0.6, 1.9, 1.1, 1.1, 1.4], 10); tbl(s, [h].concat(rb), 6.8, 3.95, 6.1, [0.6, 1.9, 1.1, 1.1, 1.4], 10); }
   banner(s, 'Early stopping (patience 60) on the 11 validation plots; the epoch with the best validation OA (RMSE for task C) is kept.'); refs(s, R('L6'));
   if (D.charts.c40a) { s = slide('L6 check: stability of the SFFS selection'); chart(s, 'c40a', 0.4, 1.1, 4.1, 4.95); chart(s, 'c40b', 4.6, 1.1, 4.1, 4.95); chart(s, 'c40c', 8.8, 1.1, 4.1, 4.95);
     banner(s, 'Features chosen in most repeated divisions are stable; rarely chosen ones depend on the fold division.'); refs(s, 'Tian et al. (2021); Pudil et al. (1994)'); }
@@ -205,7 +206,11 @@ if (ST.L9) {
   s = slide('L9 results: leaf and canopy spectra'); chart(s, 'c44', 0.4, 1.1, 6.2, 4.95); chart(s, 'c45', 6.7, 1.1, 6.2, 4.95); banner(s, ST.L9.mydata[1]); refs(s, R('L9'));
   s = slide('L9 results: leaf indices computed from the UAV spectra'); chart(s, 'c46', 0.4, 1.1, 5.0, 4.95); tbl(s, T.l9, 5.6, 1.15, 7.3, [1.3, 1.2, 1.5, 1.0, 1.1, 1.2], 10.5); banner(s, ST.L9.result[0]); refs(s, R('L9'));
 }
-section('Step L10 – Pre-symptomatic leaves', 'Not applicable to 2025-26'); card('L10');
+s = slide('Step L10 – Pre-symptomatic leaves: not applicable to 2025-26');
+bul(s, ['Step L10 needs leaves of tagged plants sampled before symptoms (1, 4 and 7 January in the 2026-27 plan): healthy = tagged plants in healthy plots; later-infected = tagged plants in inoculated plots that show pustules later.',
+  'The 2025-26 season had natural infection without tagged pre-symptomatic leaves, so the step could not be run on this data set.',
+  'Planned for the 2026-27 inoculated trial: same selection chain (L5.2–L5.5) with the binary label, ML models and DNN-F1, spectra normalised to the healthy baseline (Lv et al., 2023), metrics per date.'], { x: 0.4, y: 1.2, w: 12.5, h: 4.6, fontSize: 15 });
+refs(s, R('L10'));
 // ---------------- checks, deviations, conclusions, references
 section('Cross-checks, deviations and conclusions');
 s = slide('How every step was cross-checked');

@@ -26,6 +26,8 @@ for item in zin.infolist():
                     if npts <= 60: ser = ser.replace('<c:size val="4"/>', '<c:size val="7"/>', 1)
                 return ser
             s = re.sub(r'<c:ser>.*?</c:ser>', fix, s, flags=re.S); n_fix += 1
+        if '<c:scatterChart>' in s:   # x axis (and its labels) at the bottom of the plot, never on the zero line
+            s = re.sub(r'<c:valAx>.*?</c:valAx>', lambda m: m.group(0).replace('<c:crosses val="autoZero"/>', '<c:crosses val="min"/>') if '<c:axPos val="b"/>' in m.group(0) else m.group(0), s, flags=re.S)
         data = s.encode('utf8')
     zout.writestr(item, data)
 zout.close(); zin.close(); os.replace(tmp, src); print('scatter charts styled:', n_fix)

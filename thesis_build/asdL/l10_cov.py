@@ -28,7 +28,12 @@ MAIN = {'A': 'macro_F1', 'B': 'macro_F1', 'C': 'R2'}; SC = {'A': 'f1_macro', 'B'
 import lmods as L6
 def mval(task, y, p, s=None): return L6.metrics(task, y, p, s)[0][MAIN[task]]
 res, gains, preds, imps = [], [], [], []
+import pickle
 for task in 'ABC':
+    ck = os.path.join(O, 'L8_ckpt_%s.pkl' % task)
+    if os.path.isfile(ck):
+        r_, g_, p_, i_ = pickle.load(open(ck, 'rb')); res += r_; gains += g_; preds += p_; imps += i_; print(task, 'loaded from checkpoint', flush=True); continue
+    n0 = (len(res), len(gains), len(preds), len(imps))
     grid = {'max_features': ['sqrt', 0.3], 'min_samples_leaf': [1, 3, 5]}
     rf = RandomForestClassifier(500, class_weight='balanced', random_state=C.SEED, n_jobs=4) if task != 'C' else RandomForestRegressor(500, random_state=C.SEED, n_jobs=4)
     g0 = GridSearchCV(rf, grid, scoring=SC[task], cv=SPL).fit(COV.values[tr], Y[task][tr]); p0 = g0.predict(COV.values[te]); s0 = g0.predict_proba(COV.values[te])[:, 1] if task == 'A' else None
@@ -63,5 +68,6 @@ for task in 'ABC':
             k = (M.date.values[te] == dt); vv = {n: mval(task, yt[k], p[k], None if s is None else s[k]) for n, (p, s) in (('M0', (p0, s0)), ('M1', (p1, s1)), ('M2', (p2, s2)))}
             gains.append(dict(task=task, scope='date ' + dt, gain='dS', value=vv['M1'] - vv['M0'], M0=vv['M0'], M1=vv['M1'], M2=vv['M2'])); gains.append(dict(task=task, scope='date ' + dt, gain='dC', value=vv['M2'] - vv['M1'], M0=vv['M0'], M1=vv['M1'], M2=vv['M2']))
     print(task, {k: round(x, 3) for k, x in v.items()}, 'M1 =', m1, '| top covariates', imp.head(4).round(2).to_dict(), flush=True)
+    pickle.dump((res[n0[0]:], gains[n0[1]:], preds[n0[2]:], imps[n0[3]:]), open(ck, 'wb'))
 pd.DataFrame(res).to_csv(os.path.join(O, 'L8_models.csv'), index=False); pd.DataFrame(gains).to_csv(os.path.join(O, 'L8_gains.csv'), index=False); pd.DataFrame(preds).to_csv(os.path.join(O, 'L8_predictions.csv'), index=False); pd.DataFrame(imps).to_csv(os.path.join(O, 'L8_importance.csv'), index=False)
 print(pd.DataFrame(gains).round(3).to_string(index=False))
